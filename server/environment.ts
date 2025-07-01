@@ -52,3 +52,6 @@ export function isDevelopment(): boolean {
 export function isProduction(): boolean {
   return config.NODE_ENV === 'production';
 }
+
+// Default export for deployment compatibility
+export default config;

@@ -1,4 +1,6 @@
 import { users, type User, type InsertUser } from "@shared/schema";
+import { createClient } from '@supabase/supabase-js';
+import { config } from './environment';
 
 // modify the interface with any CRUD methods
 // you might need
@@ -37,3 +39,6 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+// Supabase client instance for server-side operations
+export const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
