@@ -191,7 +191,7 @@ Timestamp: ${error.timestamp || 'N/A'}
           
           <Button 
             variant="outline" 
-            onClick={() => window.open('mailto:suporte@mentorx.com.br?subject=Erro na API Stripe&body=' + encodeURIComponent(`Olá, preciso de ajuda com o seguinte erro:\n\nCódigo: ${error.code}\nMensagem Original: ${error.message}\nRequest ID: ${error.request_id}`))}
+            onClick={() => window.open('mailto:suporte@mentoraai.com.br?subject=Erro na API Stripe&body=' + encodeURIComponent(`Olá, preciso de ajuda com o seguinte erro:\n\nCódigo: ${error.code}\nMensagem Original: ${error.message}\nRequest ID: ${error.request_id}`))}
             className="flex items-center gap-2"
           >
             <ExternalLink className="h-4 w-4" />

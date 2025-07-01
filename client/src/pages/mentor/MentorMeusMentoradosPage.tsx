@@ -1,9 +1,8 @@
-
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
@@ -34,6 +33,7 @@ interface Mentorado {
 
 type SortField = 'name' | 'email' | 'courses_acquired' | 'total_spent' | 'is_following';
 type SortDirection = 'asc' | 'desc';
+type FilterType = 'students' | 'followers';
 
 const MentorMeusMentoradosPage = () => {
   const [mentorados, setMentorados] = useState<Mentorado[]>([]);
@@ -42,6 +42,7 @@ const MentorMeusMentoradosPage = () => {
   const [selectedMentorados, setSelectedMentorados] = useState<string[]>([]);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('students');
 
   useEffect(() => {
     const fetchMentorados = async () => {
@@ -160,6 +161,11 @@ const MentorMeusMentoradosPage = () => {
     fetchMentorados();
   }, []);
 
+  // Limpar seleções quando o filtro mudar
+  useEffect(() => {
+    setSelectedMentorados([]);
+  }, [activeFilter]);
+
   // Função de ordenação
   const handleSort = (field: SortField) => {
     if (field === sortField) {
@@ -173,6 +179,14 @@ const MentorMeusMentoradosPage = () => {
   // Filtrar e ordenar mentorados
   const filteredAndSortedMentorados = mentorados
     .filter((mentorado) => {
+      // Filtro por tipo
+      const typeFilter = activeFilter === 'students' 
+        ? mentorado.courses_acquired > 0 
+        : mentorado.is_following && mentorado.courses_acquired === 0;
+      
+      if (!typeFilter) return false;
+      
+      // Filtro por busca
       const searchLower = searchTerm.toLowerCase();
       return (
         mentorado.full_name?.toLowerCase().includes(searchLower) ||
@@ -247,6 +261,8 @@ const MentorMeusMentoradosPage = () => {
     total: mentorados.length,
     totalRevenue: mentorados.reduce((sum, m) => sum + m.total_spent, 0),
     followers: mentorados.filter(m => m.is_following).length,
+    students: mentorados.filter(m => m.courses_acquired > 0).length,
+    followersWithoutCourse: mentorados.filter(m => m.is_following && m.courses_acquired === 0).length,
     avgCoursesPerStudent: mentorados.length > 0 
       ? mentorados.reduce((sum, m) => sum + m.courses_acquired, 0) / mentorados.length 
       : 0
@@ -321,7 +337,10 @@ const MentorMeusMentoradosPage = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
-                  placeholder="Buscar por nome ou email..."
+                  placeholder={activeFilter === 'students' 
+                    ? "Buscar alunos por nome ou email..." 
+                    : "Buscar seguidores por nome ou email..."
+                  }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -345,10 +364,29 @@ const MentorMeusMentoradosPage = () => {
         {/* Table */}
         <Card>
           <CardHeader>
-                         <CardTitle className="flex items-center gap-2">
-               <Users className="w-5 h-5" />
-               Alunos e Seguidores ({filteredAndSortedMentorados.length})
-             </CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant={activeFilter === 'students' ? 'default' : 'outline'}
+                  onClick={() => setActiveFilter('students')}
+                  className="flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Alunos Matriculados ({stats.students})
+                </Button>
+                <Button
+                  variant={activeFilter === 'followers' ? 'default' : 'outline'}
+                  onClick={() => setActiveFilter('followers')}
+                  className="flex items-center gap-2"
+                >
+                  <Heart className="w-4 h-4" />
+                  Seguidores sem Curso ({stats.followersWithoutCourse})
+                </Button>
+              </div>
+              <div className="text-sm text-gray-500">
+                {filteredAndSortedMentorados.length} registros
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {isLoading ? (
@@ -491,15 +529,25 @@ const MentorMeusMentoradosPage = () => {
                 </table>
               </div>
             ) : (
-                             <div className="text-center py-12">
-                 <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                 <h3 className="text-xl font-medium text-gray-900 mb-2">
-                   Nenhum mentorado ou seguidor encontrado
-                 </h3>
-                 <p className="text-gray-500">
-                   Quando alguém adquirir seus cursos ou te seguir, aparecerá aqui!
-                 </p>
-               </div>
+              <div className="text-center py-12">
+                {activeFilter === 'students' ? (
+                  <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                ) : (
+                  <Heart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                )}
+                <h3 className="text-xl font-medium text-gray-900 mb-2">
+                  {activeFilter === 'students' 
+                    ? 'Nenhum aluno matriculado encontrado'
+                    : 'Nenhum seguidor sem curso encontrado'
+                  }
+                </h3>
+                <p className="text-gray-500">
+                  {activeFilter === 'students'
+                    ? 'Quando alguém adquirir seus cursos, aparecerá aqui!'
+                    : 'Quando alguém te seguir sem ter adquirido cursos, aparecerá aqui!'
+                  }
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

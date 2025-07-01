@@ -1,4 +1,4 @@
-# Correções de Deployment - MentorX Platform
+# Correções de Deployment - Mentora Ai Platform
 
 ## Problemas Identificados e Resolvidos
 

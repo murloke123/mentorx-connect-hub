@@ -1,24 +1,27 @@
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  GraduationCap,
-  BookOpen, 
-  BarChart2,
-  Settings, 
-  LogOut,
-  User,
-  Tags
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/utils/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+"use client";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/utils/supabase";
+import { cn } from "@/utils/utils";
+import {
+    BarChart2,
+    BookOpen,
+    GraduationCap,
+    LayoutDashboard,
+    LogOut,
+    Settings,
+    Tags,
+    User,
+    Users
+} from "lucide-react";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
 const AdminSidebar = () => {
   const location = useLocation();
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -40,101 +43,107 @@ const AdminSidebar = () => {
     }
   };
 
+  const menuItems = [
+    {
+      label: "Dashboard",
+      href: "/admin/dashboard",
+      icon: (
+        <LayoutDashboard className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meu Perfil",
+      href: "/admin/perfil",
+      icon: (
+        <User className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Mentores",
+      href: "/admin/mentores",
+      icon: (
+        <Users className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Mentorados",
+      href: "/admin/mentorados",
+      icon: (
+        <GraduationCap className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Cursos",
+      href: "/admin/cursos",
+      icon: (
+        <BookOpen className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Relatórios",
+      href: "/admin/relatorios",
+      icon: (
+        <BarChart2 className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Configurações",
+      href: "/admin/configuracoes",
+      icon: (
+        <Settings className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Categorias",
+      href: "/admin/categorias",
+      icon: (
+        <Tags className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+  ];
+
+  const logoutLink = {
+    label: "Sair",
+    href: "#",
+    icon: (
+      <LogOut className="h-5 w-5 shrink-0 text-red-400" />
+    ),
+  };
+
   return (
-    <div className="w-64 h-screen bg-gray-50 border-r flex flex-col">
-      <div className="flex-1 py-6 px-3 space-y-1">
-        <Link to="/admin/dashboard">
-          <Button 
-            variant={isActive("/admin/dashboard") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </Button>
-        </Link>
-        
-        <Link to="/admin/perfil">
-          <Button 
-            variant={isActive("/admin/perfil") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <User className="mr-2 h-4 w-4" />
-            Meu Perfil
-          </Button>
-        </Link>
-        
-        <Link to="/admin/mentores">
-          <Button 
-            variant={isActive("/admin/mentores") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Mentores
-          </Button>
-        </Link>
-        
-        <Link to="/admin/mentorados">
-          <Button 
-            variant={isActive("/admin/mentorados") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <GraduationCap className="mr-2 h-4 w-4" />
-            Mentorados
-          </Button>
-        </Link>
-        
-        <Link to="/admin/cursos">
-          <Button 
-            variant={isActive("/admin/cursos") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <BookOpen className="mr-2 h-4 w-4" />
-            Cursos
-          </Button>
-        </Link>
-        
-        <Link to="/admin/relatorios">
-          <Button 
-            variant={isActive("/admin/relatorios") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <BarChart2 className="mr-2 h-4 w-4" />
-            Relatórios
-          </Button>
-        </Link>
-        
-        <Link to="/admin/configuracoes">
-          <Button 
-            variant={isActive("/admin/configuracoes") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Configurações
-          </Button>
-        </Link>
-        
-        <Link to="/admin/categorias">
-          <Button 
-            variant={isActive("/admin/categorias") ? "default" : "ghost"} 
-            className="w-full justify-start"
-          >
-            <Tags className="mr-2 h-4 w-4" />
-            Categorias
-          </Button>
-        </Link>
-      </div>
-      
-      <div className="p-4 border-t mt-auto">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
-          onClick={handleLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sair
-        </Button>
-      </div>
-    </div>
+    <Sidebar open={open} setOpen={setOpen}>
+      <SidebarBody className="justify-between gap-10">
+        <div className="flex flex-col gap-4 pt-4">
+          {menuItems.map((link, idx) => {
+            const active = isActive(link.href);
+            return (
+              <SidebarLink 
+                key={idx} 
+                link={link}
+                className={cn(
+                  "text-gray-300 hover:text-white hover:bg-white/10 rounded-lg px-3 py-3",
+                  active && "bg-white/20 text-white shadow-lg"
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                }}
+              />
+            );
+          })}
+        </div>
+        <div className="border-t border-gray-700 pt-4 mt-auto">
+          <SidebarLink
+            link={logoutLink}
+            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-3"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogout();
+            }}
+          />
+        </div>
+      </SidebarBody>
+    </Sidebar>
   );
 };
 

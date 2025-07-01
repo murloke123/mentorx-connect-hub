@@ -1,45 +1,18 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Calendar, Settings, LayoutDashboard, LogOut } from "lucide-react";
-import { cn } from "@/utils/utils";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/utils/supabase";
+"use client";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "lucide-react";
+import { supabase } from "@/utils/supabase";
+import { cn } from "@/utils/utils";
+import { BookOpen, Calendar, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
 const MentoradoSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [open, setOpen] = useState(false);
   
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/mentorado/dashboard",
-    },
-    {
-      title: "Meu Perfil",
-      icon: User,
-      href: "/mentorado/perfil",
-    },
-    {
-      title: "Meus Cursos",
-      icon: BookOpen,
-      href: "/mentorado/cursos",
-    },
-    {
-      title: "Calendário",
-      icon: Calendar,
-      href: "/mentorado/calendario",
-    },
-    {
-      title: "Configurações",
-      icon: Settings,
-      href: "/mentorado/configuracoes",
-    },
-  ];
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -58,40 +31,86 @@ const MentoradoSidebar = () => {
     }
   };
 
+  const menuItems = [
+    {
+      label: "Dashboard",
+      href: "/mentorado/dashboard",
+      icon: (
+        <LayoutDashboard className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meu Perfil",
+      href: "/mentorado/perfil",
+      icon: (
+        <User className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meus Cursos",
+      href: "/mentorado/cursos",
+      icon: (
+        <BookOpen className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Calendário",
+      href: "/mentorado/calendario",
+      icon: (
+        <Calendar className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Configurações",
+      href: "/mentorado/configuracoes",
+      icon: (
+        <Settings className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+  ];
+
+  const logoutLink = {
+    label: "Sair",
+    href: "#",
+    icon: (
+      <LogOut className="h-5 w-5 shrink-0 text-red-400" />
+    ),
+  };
+
   return (
-    <div className="w-64 border-r h-screen sticky top-0 bg-white">
-      <div className="flex flex-col h-full">
-        <div className="p-4">
-          <nav className="space-y-1">
-            {menuItems.map((item) => (
-              <Link key={item.href} to={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start", 
-                      location.pathname === item.href ? "bg-muted" : ""
-                    )}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.title}
-                  </Button>
-              </Link>
-            ))}
-          </nav>
+    <Sidebar open={open} setOpen={setOpen}>
+      <SidebarBody className="justify-between gap-10">
+        <div className="flex flex-col gap-4 pt-4">
+          {menuItems.map((link, idx) => {
+            const isActive = location.pathname === link.href;
+            return (
+              <SidebarLink 
+                key={idx} 
+                link={link}
+                className={cn(
+                  "text-gray-300 hover:text-white hover:bg-white/10 rounded-lg px-3 py-3",
+                  isActive && "bg-white/20 text-white shadow-lg"
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                }}
+              />
+            );
+          })}
         </div>
-        
-        <div className="mt-auto p-4 border-t">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
+        <div className="border-t border-gray-700 pt-4 mt-auto">
+          <SidebarLink
+            link={logoutLink}
+            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-3"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogout();
+            }}
+          />
         </div>
-      </div>
-    </div>
+      </SidebarBody>
+    </Sidebar>
   );
 };
 

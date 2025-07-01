@@ -29,7 +29,7 @@ const Hero = () => {
                 Conecte-se \o/ com os melhores<br />
                 <span className="text-primary">mentores</span> para evoluir
               </h1>
-              <p className="text-lg text-gray-700 mb-6">Na MentorX, você encontra especialistas prontos para compartilhar conhecimento através de cursos, materiais exclusivos e sessões de mentoria personalizadas = ).</p>
+              <p className="text-lg text-gray-700 mb-6">Na Mentora Ai, você encontra especialistas prontos para compartilhar conhecimento através de cursos, materiais exclusivos e sessões de mentoria personalizadas = ).</p>
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -37,7 +37,7 @@ const Hero = () => {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle className="text-xl">Bem-vindo(a) à MentorX! 👋</DialogTitle>
+                      <DialogTitle className="text-xl">Bem-vindo(a) à Mentora Ai! 👋</DialogTitle>
                       <DialogDescription className="py-4">
                         Você quer aprender com um mentor ou compartilhar seu conhecimento com o mundo?
                         Escolha uma opção para começar:
@@ -65,7 +65,7 @@ const Hero = () => {
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
-              <img src="/placeholder.svg" alt="MentorX Platform" className="rounded-xl shadow-lg w-full max-w-md" />
+              <img src="/placeholder.svg" alt="Mentora Ai Platform" className="rounded-xl shadow-lg w-full max-w-md" />
             </div>
           </div>
         </div>

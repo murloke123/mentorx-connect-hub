@@ -2,17 +2,17 @@ import { NotificationBell } from "@/components/shared/NotificationBell";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { preloadUserRoutes } from '@/utils/lazyComponents';
-import { Calendar, LayoutDashboard, LogOut, Settings, UserCircle } from "lucide-react";
+import { Bot, Calendar, LayoutDashboard, LogOut, Settings, UserCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from '../../utils/supabase';
@@ -143,9 +143,12 @@ const Navigation = () => {
       <nav className="bg-white border-b shadow-sm">
         <div className="container mx-auto px-4">
           <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center">
-              <Link to="/" className="font-bold text-xl text-primary">
-                MentorX
+            <div className="flex items-center justify-start">
+              <Link to="/" className="flex items-center gap-3 font-bold text-xl text-primary -ml-[80px]">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                  <Bot className="h-5 w-5 text-white" />
+                </div>
+                Mentora Ai
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -161,9 +164,12 @@ const Navigation = () => {
     <nav className="bg-white border-b shadow-sm">
       <div className="container mx-auto px-4">
         <div className="h-16 flex items-center justify-between">
-          <div className="flex items-center">
-            <Link to="/" className="font-bold text-xl text-primary">
-              MentorX
+          <div className="flex items-center justify-start">
+            <Link to="/" className="flex items-center gap-3 font-bold text-xl text-primary -ml-[80px]">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                <Bot className="h-5 w-5 text-white" />
+              </div>
+              Mentora Ai
             </Link>
           </div>
           

@@ -195,10 +195,19 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                         <p className="text-xs text-destructive mt-1">Erro ao carregar imagem.</p>
                       )}
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <Badge variant={course.is_public ? "outline" : "secondary"}>
+                        <Badge 
+                          variant="secondary" 
+                          className={course.is_public 
+                            ? "bg-blue-100 text-blue-800 border-blue-200" 
+                            : "bg-orange-100 text-orange-800 border-orange-200"
+                          }
+                        >
                           {course.is_public ? 'Público' : 'Privado'}
                         </Badge>
-                        <Badge variant={course.is_paid ? "default" : "outline"}>
+                        <Badge 
+                          variant="secondary"
+                          className="bg-green-100 text-green-800 border-green-200"
+                        >
                           {course.is_paid ? `R$${course.price?.toFixed(2)}` : 'Gratuito'}
                         </Badge>
                       </div>
@@ -226,22 +235,30 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <div className="mb-4">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm">Inscrições</span>
-                    <span className="text-sm font-medium">
-                      {course.enrollments_count || 0}
-                    </span>
+                <div 
+                  className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 hover:shadow-md"
+                  onClick={() => navigate(`/mentor/cursos/${course.id}/alunos`)}
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-900">Inscrições</span>
+                    </div>
+                    <div className="bg-white px-3 py-1 rounded-full shadow-sm border">
+                      <span className="text-sm font-semibold text-blue-600">
+                        {course.enrollments_count || 0}
+                      </span>
+                    </div>
                   </div>
                   <Progress 
                     value={Math.min((course.enrollments_count || 0) * 10, 100)}
-                    className="w-full h-2" 
+                    className="w-full h-2 mb-3" 
                   />
-                  <div className="flex justify-between mt-1">
-                    <span className="text-xs text-gray-500">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 font-medium">
                       {course.enrollments_count || 0} alunos ativos
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-blue-600 font-medium">
                       Meta: 10+ alunos
                     </span>
                   </div>

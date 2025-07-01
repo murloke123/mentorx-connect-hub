@@ -194,7 +194,7 @@ export async function verifyStripeAccountStatus(accountId: string): Promise<{ su
     console.log('✅ [SERVER-STRIPE] Response da Stripe recebido:');
     console.log('📊 [SERVER-STRIPE] Account ID:', account.id);
     console.log('📊 [SERVER-STRIPE] Charges enabled:', account.charges_enabled);
-    console.log('�� [SERVER-STRIPE] Payouts enabled:', account.payouts_enabled);
+    console.log('📊 [SERVER-STRIPE] Payouts enabled:', account.payouts_enabled);
     console.log('📊 [SERVER-STRIPE] Details submitted:', account.details_submitted);
     console.log('📊 [SERVER-STRIPE] Requirements currently due:', account.requirements?.currently_due || []);
     console.log('📊 [SERVER-STRIPE] Requirements past due:', account.requirements?.past_due || []);
@@ -388,7 +388,7 @@ export async function createOrUpdateStripeConnectedAccount(userData: StripeOnboa
       accountUpdateData.tos_acceptance = {
         date: Math.floor(Date.now() / 1000),
         ip: userData.tos_ip || '127.0.0.1',
-        user_agent: 'MentorX-Platform/1.0'
+        user_agent: 'Mentora-Ai-Platform/1.0'
       };
 
       // 🔍 DEBUG: Verificar se tos_acceptance foi definido
@@ -412,7 +412,7 @@ export async function createOrUpdateStripeConnectedAccount(userData: StripeOnboa
         campos_automaticos_adicionados: [
           'individual.political_exposure = "none"',
           'business_profile.monthly_estimated_revenue = {amount: 500000, currency: "brl"}',
-          'tos_acceptance = {date: auto, ip: auto, user_agent: "MentorX-Platform/1.0"}'
+          'tos_acceptance = {date: auto, ip: auto, user_agent: "Mentora-Ai-Platform/1.0"}'
         ],
         // 🔍 NOVA VALIDAÇÃO: Análise dos campos obrigatórios
         validacao_campos_obrigatorios: {

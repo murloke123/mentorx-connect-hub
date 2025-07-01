@@ -1,48 +1,18 @@
-import { Button } from "@/components/ui/button";
+"use client";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
 import { BookOpen, Calendar, LayoutDashboard, LogOut, Settings, User, Users } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
 const MentorSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [open, setOpen] = useState(false);
   
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/mentor/dashboard",
-    },
-    {
-      title: "Meu Perfil",
-      icon: User,
-      href: "/mentor/perfil",
-    },
-    {
-      title: "Meus Cursos",
-      icon: BookOpen,
-      href: "/mentor/cursos?tab=meus-cursos",
-    },
-    {
-      title: "Meus Mentorados",
-      icon: Users,
-      href: "/mentor/mentorados",
-    },
-    {
-      title: "Calendário",
-      icon: Calendar,
-      href: "/mentor/calendario",
-    },
-    {
-      title: "Configurações",
-      icon: Settings,
-      href: "/mentor/configuracoes",
-    },
-  ];
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -61,48 +31,101 @@ const MentorSidebar = () => {
     }
   };
 
+  // Função para verificar se a rota está ativa
+  const isActiveRoute = (href: string) => {
+    if (href.includes('?')) {
+      return location.pathname === href.split('?')[0];
+    }
+    return location.pathname === href;
+  };
+
+  const menuItems = [
+    {
+      label: "Dashboard",
+      href: "/mentor/dashboard",
+      icon: (
+        <LayoutDashboard className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meu Perfil",
+      href: "/mentor/perfil",
+      icon: (
+        <User className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meus Cursos",
+      href: "/mentor/cursos?tab=meus-cursos",
+      icon: (
+        <BookOpen className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meus Mentorados",
+      href: "/mentor/mentorados",
+      icon: (
+        <Users className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Calendário",
+      href: "/mentor/calendario",
+      icon: (
+        <Calendar className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Configurações",
+      href: "/mentor/configuracoes",
+      icon: (
+        <Settings className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+  ];
+
+  const logoutLink = {
+    label: "Sair",
+    href: "#",
+    icon: (
+      <LogOut className="h-5 w-5 shrink-0 text-red-400" />
+    ),
+  };
+
   return (
-    <div className="w-64 border-r h-screen sticky top-0 bg-white">
-      <div className="flex flex-col h-full">
-        <div className="p-4">
-          <nav className="space-y-1">
-            {menuItems.map((item) => {
-              // Verificar se a rota atual corresponde ao item do menu
-              // Para itens com query parameters, comparar apenas o pathname
-              const isActive = item.href.includes('?') 
-                ? location.pathname === item.href.split('?')[0]
-                : location.pathname === item.href;
-              
-              return (
-                <Link key={item.href} to={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start", 
-                      isActive ? "bg-muted" : ""
-                    )}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.title}
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
+    <Sidebar open={open} setOpen={setOpen}>
+      <SidebarBody className="justify-between gap-10">
+        <div className="flex flex-col gap-4 pt-4">
+          {menuItems.map((link, idx) => {
+            const isActive = isActiveRoute(link.href);
+            return (
+              <SidebarLink 
+                key={idx} 
+                link={link}
+                className={cn(
+                  "text-gray-300 hover:text-white hover:bg-white/10 rounded-lg px-3 py-3",
+                  isActive && "bg-white/20 text-white shadow-lg"
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                }}
+              />
+            );
+          })}
         </div>
-        
-        <div className="mt-auto p-4 border-t">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
+        <div className="border-t border-gray-700 pt-4 mt-auto">
+          <SidebarLink
+            link={logoutLink}
+            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-3"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogout();
+            }}
+          />
         </div>
-      </div>
-    </div>
+      </SidebarBody>
+    </Sidebar>
   );
 };
 

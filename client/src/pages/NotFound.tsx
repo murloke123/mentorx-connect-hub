@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -9,7 +8,7 @@ const NotFound = () => {
         <h1 className="text-6xl font-bold text-primary">404</h1>
         <h2 className="text-2xl font-semibold">Algo deu errado...</h2>
         <p className="text-gray-600">
-          Não conseguimos encontrar a página que você procurava. Verifique o endereço ou volte para a página inicial da MentorX.
+          Não conseguimos encontrar a página que você procurava. Verifique o endereço ou volte para a página inicial da Mentora Ai.
         </p>
         <Link to="/">
           <Button>Voltar para Home</Button>

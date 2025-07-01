@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -7,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-white mb-4">MentorX</h3>
+            <h3 className="text-xl font-bold text-white mb-4">Mentora Ai</h3>
             <p className="mb-4">
               Conectando mentores e mentorados para um futuro de conhecimento compartilhado.
             </p>
@@ -50,7 +49,7 @@ const Footer = () => {
             <h3 className="font-semibold text-white mb-4">Contato</h3>
             <ul className="space-y-2">
               <li>
-                <a href="mailto:contato@mentorx.com" className="hover:text-white transition-colors">contato@mentorx.com</a>
+                <a href="mailto:contato@mentoraai.com.br" className="hover:text-white transition-colors">contato@mentoraai.com.br</a>
               </li>
               <li>
                 <a href="#" className="hover:text-white transition-colors">Suporte</a>
@@ -63,7 +62,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p>&copy; {new Date().getFullYear()} MentorX. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Mentora Ai. Todos os direitos reservados.</p>
           <div className="mt-4 md:mt-0 flex space-x-4">
             <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-white transition-colors">Privacidade</a>
