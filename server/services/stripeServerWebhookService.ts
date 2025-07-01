@@ -1,9 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import config from '../environment';
-
-// Cliente Supabase para operações do servidor
-const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+import { supabase } from '../storage';
 
 // Instância do Stripe usando configuração do servidor
 const stripe = new Stripe(config.STRIPE_SECRET_KEY, {

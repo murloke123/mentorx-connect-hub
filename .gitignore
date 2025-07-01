@@ -15,9 +15,6 @@ vite.config.ts.*
 **/stripe-config.ts
 !**/stripe-config.example.ts
 
-# Configurações do servidor (contém credenciais sensíveis)
-server/environment.ts
-
 # Logs
 logs
 *.log

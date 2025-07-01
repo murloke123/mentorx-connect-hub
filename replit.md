@@ -1,126 +1,131 @@
 # Mentora Ai Platform
 
-## Overview
+## Visão Geral
 
-Mentora Ai is a comprehensive mentoring platform that connects experienced mentors with learners through courses, exclusive materials, and personalized mentoring sessions. The platform features a modern tech stack with React frontend, Express.js backend, Supabase database, and Stripe payment integration.
+Mentora Ai is a comprehensive mentoring and course platform built with React frontend and Express backend. The platform enables mentors to create and sell courses while students can enroll and learn. It features integrated payments through Stripe Connect, content management, user profiles, and a robust dashboard system for different user roles.
 
 ## System Architecture
 
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite for fast development and optimized builds
-- **UI Library**: Radix UI components with Tailwind CSS styling
-- **State Management**: TanStack React Query for server state management
-- **Authentication**: Supabase Auth integration
-- **Payment UI**: Stripe checkout integration with custom forms
+- **Routing**: React Router for client-side navigation
+- **State Management**: TanStack Query for server state, React state for local UI state
+- **UI Components**: Shadcn/ui components built on Radix UI primitives
+- **Styling**: Tailwind CSS with custom design system
+- **Forms**: React Hook Form with Zod validation
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js framework
-- **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL via Supabase with direct SQL queries
-- **Payment Processing**: Stripe API with connected accounts for marketplace functionality
-- **File Storage**: Supabase Storage for course materials and documents
-- **Environment Management**: Centralized configuration system
+- **Runtime**: Node.js with Express.js
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Supabase Auth
+- **Payment Processing**: Stripe Connect for marketplace functionality
+- **File Storage**: Supabase Storage for images and documents
+- **API Pattern**: RESTful API with /api prefix
 
-### Data Storage Solutions
-- **Primary Database**: PostgreSQL hosted on Supabase
-- **Authentication**: Supabase Auth with role-based access control
-- **File Storage**: Supabase Storage buckets for images, documents, and course content
-- **Session Management**: PostgreSQL session store with connect-pg-simple
+### Database Design
+- **ORM**: Drizzle with PostgreSQL dialect
+- **Schema Location**: `shared/schema.ts` for type sharing
+- **Key Tables**: users, profiles, courses (cursos), modules (modulos), content (conteudos), enrollments (matriculas)
+- **User Roles**: admin, mentor, mentorado (student)
 
 ## Key Components
 
-### User Management System
-- **Roles**: Admin, Mentor, and Mentorado (Student) with distinct permissions
-- **Profiles**: Extended user profiles with categories, bio, and social media integration
-- **Authentication**: Email/password authentication with automatic profile creation
+### User Management
+- **Authentication**: Supabase-based auth with role-based access control
+- **Profiles**: Extended user profiles with role-specific data
+- **Roles**: Three-tier system (admin, mentor, student) with appropriate permissions
 
-### Course Management System
-- **Course Creation**: Rich course builder with modules and content support
-- **Content Types**: Video (external), rich text, and PDF content support
-- **Landing Pages**: Dynamic landing page builder for course marketing
-- **Enrollment System**: Free and paid course enrollment with progress tracking
+### Course Management
+- **Course Creation**: Form-based course creation with Stripe product integration
+- **Content Types**: Video (external), rich text, PDF support
+- **Module Structure**: Hierarchical content organization (Course -> Modules -> Content)
+- **Publishing**: Draft/published states with visibility controls
 
-### Payment and Monetization
-- **Stripe Integration**: Connected accounts for direct mentor payments
-- **Marketplace Model**: Platform fee structure with automatic splits
-- **Document Verification**: KYC compliance with document upload and verification
-- **Checkout Flow**: Secure payment processing with enrollment automation
+### Payment System
+- **Stripe Connect**: Marketplace model with connected accounts for mentors
+- **Product Integration**: Automatic Stripe product/price creation
+- **Document Verification**: KYC document upload for mentor verification
+- **Transaction Tracking**: Complete payment flow with webhooks
 
 ### Content Delivery
-- **Course Player**: Progressive course player with lesson tracking
-- **Module Organization**: Hierarchical content structure (Course → Module → Content)
-- **Progress Tracking**: Student progress monitoring and completion certificates
+- **Course Player**: Progressive content consumption with progress tracking
+- **Multiple Formats**: Support for videos, rich text, and PDF content
+- **Progress Tracking**: User progress persistence across sessions
 
 ## Data Flow
 
-### User Registration Flow
-1. User completes registration form with role selection
-2. Supabase Auth creates user account
-3. Profile record created in profiles table
-4. Mentors automatically get Stripe connected account creation initiated
-5. Email verification and role-specific dashboard access
+### Course Creation Flow
+1. Mentor creates course via form
+2. System creates Stripe product (if paid)
+3. Course stored in database with Stripe metadata
+4. Mentor can add modules and content
+5. Course published when ready
 
-### Course Purchase Flow
-1. Student selects course and initiates checkout
-2. Stripe checkout session created with mentor's connected account
-3. Payment processed with platform fee deduction
-4. Enrollment record created in matriculas table
+### Enrollment Flow
+1. Student browses public courses
+2. For paid courses: Stripe Checkout session created
+3. Payment processed via Stripe Connect
+4. Enrollment record created on successful payment
 5. Student gains access to course content
 
-### Content Management Flow
-1. Mentor creates course with basic information
-2. Modules are added with ordering system
-3. Content items are added to modules (video, text, PDF)
-4. Course is published and becomes available for enrollment
+### Content Consumption Flow
+1. Enrolled student accesses course player
+2. Content served based on enrollment status
+3. Progress tracked and persisted
+4. Completion status updated in real-time
 
 ## External Dependencies
 
-### Core Services
-- **Supabase**: Database, authentication, and file storage
-- **Stripe**: Payment processing and marketplace functionality
-- **Replit**: Hosting and deployment platform
+### Payment Processing
+- **Stripe**: Full integration with Connect for marketplace functionality
+- **Webhook Handling**: Automated payment status updates
+- **KYC Integration**: Document upload for mentor verification
 
-### Frontend Libraries
-- **UI Components**: Radix UI primitives with shadcn/ui styling
-- **Form Handling**: React Hook Form with Zod validation
-- **Icons**: Tabler Icons and Lucide React
-- **Animations**: Framer Motion for micro-interactions
-- **Confetti**: Canvas-confetti for celebration effects
+### Database & Storage
+- **Supabase**: Primary database and storage provider
+- **PostgreSQL**: Relational database with advanced features
+- **File Storage**: Images, documents, and content assets
 
-### Backend Dependencies
-- **Database ORM**: Direct Supabase client queries
-- **File Processing**: Native Node.js file handling
-- **Security**: Environment-based configuration with validation
+### UI & Styling
+- **Tailwind CSS**: Utility-first CSS framework
+- **Radix UI**: Accessible component primitives
+- **Lucide Icons**: Consistent icon system
+- **Framer Motion**: Smooth animations and transitions
 
 ## Deployment Strategy
 
+### Development Environment
+- **Replit Integration**: Native Replit development environment
+- **Hot Reloading**: Vite HMR for fast development cycles
+- **Database**: PostgreSQL module in Replit
+
+### Production Build
+- **Frontend**: Vite build to `dist/public`
+- **Backend**: ESBuild compilation for Node.js
+- **Serving**: Express serves both API and static files
+- **Autoscale**: Replit autoscale deployment target
+
 ### Environment Configuration
-- **Development**: Local development with environment variables
-- **Production**: Replit deployment with automatic PostgreSQL database
-- **Health Checks**: `/health` endpoint for deployment monitoring
-- **Port Configuration**: Configured for port 5000 as required by Autoscale
-
-### Build Process
-- **Frontend**: Vite build process with TypeScript compilation
-- **Backend**: ESBuild bundling for optimized server deployment
-- **Static Assets**: Served from dist/public directory
-
-### Security Measures
-- **HTTPS Enforcement**: Automatic HTTPS redirects in production
-- **Security Headers**: Comprehensive security headers implementation
-- **Environment Validation**: Required environment variables validation
-- **CORS Configuration**: Proper cross-origin request handling
-
-## Changelog
-
-```
-Changelog:
-- July 01, 2025. Initial setup
-```
+- **Database**: PostgreSQL connection via `DATABASE_URL`
+- **Stripe**: API keys for payment processing
+- **Supabase**: Client configuration for auth and storage
 
 ## User Preferences
 
-```
 Preferred communication style: Simple, everyday language.
-```
+
+## Recent Changes
+
+- **June 26, 2025**: Aplicadas correções críticas de deployment
+  - Configurado endpoint `/health` para verificação do servidor
+  - Criado sistema de gerenciamento de variáveis de ambiente
+  - Configurado PostgreSQL database via Replit
+  - Atualizadas configurações do Supabase para usar environment variables
+  - Aplicadas correções para Replit Autoscale deployment
+  - Status: Pronto para deployment com funcionalidades básicas
+
+## Changelog
+
+Changelog:
+- June 26, 2025. Initial setup and deployment fixes applied
