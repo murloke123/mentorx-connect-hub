@@ -1,0 +1,20 @@
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "typescript.validate.enable": true,
+  "typescript.suggest.autoImports": true,
+  "eslint.workingDirectories": ["./"],
+  "eslint.options": {
+    "configFile": "./config/eslint.config.js"
+  },
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "*.ts": "typescript"
+  }
+} 
