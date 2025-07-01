@@ -139,7 +139,7 @@ const MentorsPage = () => {
                 className="relative flex flex-col gap-4 items-center justify-center"
               >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                  Conecte-se com Mentores Cagao
+                  Conecte-se com Mentores
                 </h1>
                 <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto italic">
                   Encontre o mentor ideal para acelerar seu crescimento pessoal e profissional
@@ -217,11 +217,6 @@ const MentorsPage = () => {
                       }`}>
                         {category.name}
                       </p>
-                      <span className={`text-xs transition-colors duration-300 ${
-                        selectedCategory === category.id ? 'text-white/80' : 'text-white/60 group-hover:text-white/80'
-                      }`}>
-                        ({category.count} mentores)
-                      </span>
                     </div>
                   );
                 })}
