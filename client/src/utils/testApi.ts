@@ -31,6 +31,6 @@ export async function testApiConnectivity() {
     return { success: true, message: 'API connectivity working' };
   } catch (error) {
     console.error('❌ testApiConnectivity error:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
