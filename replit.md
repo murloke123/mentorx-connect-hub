@@ -117,13 +117,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 2, 2025**: Corrigido problema crítico de conectividade das APIs do Stripe
+  - Identificado e resolvido problema de "Failed to fetch" nas APIs de balance e payouts
+  - Alteradas URLs do frontend de absoluta (`http://localhost:5000`) para relativa (`/api/...`)
+  - Corrigida arquitetura para usar servidor único que serve frontend e APIs na mesma porta
+  - Adicionada configuração CORS para compatibilidade
+  - Removidos arquivos de teste temporários
+  - Status: APIs do Stripe funcionando corretamente no dashboard do mentor
+
 - **June 26, 2025**: Aplicadas correções críticas de deployment
   - Configurado endpoint `/health` para verificação do servidor
   - Criado sistema de gerenciamento de variáveis de ambiente
   - Configurado PostgreSQL database via Replit
   - Atualizadas configurações do Supabase para usar environment variables
   - Aplicadas correções para Replit Autoscale deployment
-  - Status: Pronto para deployment com funcionalidades básicas
 
 ## Changelog
 
