@@ -8,11 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { createOrUpdateStripeConnectedAccount } from '@/services/stripeClientService';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { categories, loading: categoriesLoading } = useCategories();
   const [email, setEmail] = useState('');
@@ -24,6 +25,42 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Capturar a página de origem para redirecionamento após login
+  const from = location.state?.from?.pathname || null;
+
+  // Função para redirecionar baseado no role e página de origem
+  const redirectAfterLogin = (userRole: string) => {
+    // Se veio de uma página específica (via ProtectedRoute), tentar voltar para ela
+    if (from) {
+      // Verificar se a página de origem é compatível com o role do usuário
+      const roleRouteMapping = {
+        admin: ['/admin'],
+        mentor: ['/mentor'],
+        mentorado: ['/mentorado']
+      };
+
+      const allowedRoutes = roleRouteMapping[userRole as keyof typeof roleRouteMapping] || [];
+      const isAllowed = allowedRoutes.some(route => from.startsWith(route));
+
+      if (isAllowed) {
+        console.log(`Redirecionando ${userRole} de volta para: ${from}`);
+        navigate(from, { replace: true });
+        return;
+      }
+    }
+
+    // Fallback: redirecionar para dashboard padrão baseado no role
+    if (userRole === 'admin') {
+      navigate('/admin/dashboard');
+    } else if (userRole === 'mentor') {
+      navigate('/mentor/dashboard');
+    } else if (userRole === 'mentorado') {
+      navigate('/mentorado/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,13 +238,8 @@ const LoginPage = () => {
             });
           }
           
-          if (profileData?.role === 'mentor') {
-            navigate('/mentor/dashboard');
-          } else if (profileData?.role === 'mentorado') {
-            navigate('/mentorado/dashboard');
-          } else {
-            navigate('/');
-          }
+          // Usar a nova função de redirecionamento
+          redirectAfterLogin(profileData?.role || '');
         }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
@@ -242,19 +274,12 @@ const LoginPage = () => {
           }
 
           console.log("User role:", profileData?.role);
+          console.log("Página de origem (from):", from);
           
           toast({ title: "Login bem-sucedido!", description: "Redirecionando..." });
           
-          // Redirect based on user role
-          if (profileData?.role === 'admin') {
-            navigate('/admin/dashboard');
-          } else if (profileData?.role === 'mentor') {
-            navigate('/mentor/dashboard'); 
-          } else if (profileData?.role === 'mentorado') {
-            navigate('/mentorado/dashboard'); 
-          } else {
-            navigate('/');
-          }
+          // Usar a nova função de redirecionamento
+          redirectAfterLogin(profileData?.role || '');
         } else {
           toast({ title: "Erro de Login", description: "Usuário não encontrado ou credenciais inválidas.", variant: "destructive" });
         }

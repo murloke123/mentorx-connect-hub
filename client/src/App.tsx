@@ -1,3 +1,4 @@
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Footer from "@/components/shared/Footer";
 import Navigation from "@/components/shared/Navigation";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -108,45 +109,177 @@ const AppContent = () => {
           <Route path="/course-landing/:courseId" element={<CourseLandingPublicPage />} />
           <Route path="/curso/:courseId" element={<CoursePublicView />} />
           
-          {/* Rotas de Mentor */}
-          <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
-          <Route path="/mentor/perfil" element={<MentorProfilePage />} />
+          {/* Rotas de Mentor - Protegidas */}
+          <Route path="/mentor/dashboard" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/perfil" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorProfilePage />
+            </ProtectedRoute>
+          } />
           <Route path="/mentor/publicview/:id" element={<MentorPublicProfilePage />} />
-          <Route path="/mentor/cursos" element={<MentorMeusCursosPage />} />
-          <Route path="/mentor/cursos/novo" element={<MentorCriarCursoPage />} />
-          <Route path="/mentor/cursos/:id/editar" element={<MentorEditarCursoPage />} />
-          <Route path="/mentor/cursos/view/:id" element={<CoursePlayerPage />} />
-          <Route path="/mentor/cursoplayer/:id" element={<CoursePlayerPage />} />
-          <Route path="/mentor/cursos/:courseId/landing-page" element={<CourseLandingPage />} />
-          <Route path="/mentor/cursos/:cursoId/modulos" element={<MentorModulosPage />} />
-          <Route path="/mentor/cursos/:cursoId/modulos/:moduloId" element={<MentorConteudosPage />} />
-          <Route path="/mentor/categorias" element={<MentorCategoriasPage />} />
-          <Route path="/mentor/mentorados" element={<MentorMeusMentoradosPage />} />
-          <Route path="/mentor/calendario" element={<MentorCalendarioPage />} />
-          <Route path="/mentor/configuracoes" element={<MentorConfiguracoesPage />} />
-          <Route path="/mentor/configuracoes/rotas" element={<MentorRotasPage />} />
-          <Route path="/mentor/configuracoes/database-mapping" element={<MentorMapeamentoDBPage />} />
-          <Route path="/mentor/stripe-onboarding" element={<MentorStripeOnboardingPage />} />
+          <Route path="/mentor/cursos" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorMeusCursosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/novo" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorCriarCursoPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/:id/editar" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorEditarCursoPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/view/:id" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <CoursePlayerPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursoplayer/:id" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <CoursePlayerPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/:courseId/landing-page" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <CourseLandingPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/:cursoId/modulos" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorModulosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos/:cursoId/modulos/:moduloId" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorConteudosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/categorias" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorCategoriasPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/mentorados" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorMeusMentoradosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/calendario" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorCalendarioPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/configuracoes" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorConfiguracoesPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/configuracoes/rotas" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorRotasPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/configuracoes/database-mapping" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorMapeamentoDBPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/stripe-onboarding" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorStripeOnboardingPage />
+            </ProtectedRoute>
+          } />
           
-          {/* Rotas de Mentorado */}
-          <Route path="/mentorado/dashboard" element={<MentoradoDashboardPage />} />
-          <Route path="/mentorado/perfil" element={<MentoradoProfilePage />} />
-          <Route path="/mentorado/cursos" element={<MentoradoMeusCursosPage />} />
-          <Route path="/mentorado/cursoplayer/:id" element={<CoursePlayerPage />} />
-          <Route path="/mentorado/mentores" element={<MentoradoMeusMentoresPage />} />
-          <Route path="/mentorado/calendario" element={<MentoradoCalendarioPage />} />
-          <Route path="/mentorado/configuracoes" element={<MentoradoConfiguracoesPage />} />
+          {/* Rotas de Mentorado - Protegidas */}
+          <Route path="/mentorado/dashboard" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/perfil" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/cursos" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoMeusCursosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/cursoplayer/:id" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <CoursePlayerPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/mentores" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoMeusMentoresPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/calendario" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoCalendarioPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentorado/configuracoes" element={
+            <ProtectedRoute allowedRoles={['mentorado']}>
+              <MentoradoConfiguracoesPage />
+            </ProtectedRoute>
+          } />
           
-          {/* Rotas de Administrador */}
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-          <Route path="/admin/perfil" element={<AdminProfilePage />} />
-          <Route path="/admin/mentores" element={<AdminMentoresPage />} />
-          <Route path="/admin/mentorados" element={<AdminMentoradosPage />} />
-          <Route path="/admin/cursos" element={<AdminCursosPage />} />
-          <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
-          <Route path="/admin/calendario" element={<AdminCalendarioPage />} />
-          <Route path="/admin/relatorios" element={<NotFound />} />
-          <Route path="/admin/configuracoes" element={<AdminConfiguracoesPage />} />
+          {/* Rotas de Administrador - Protegidas */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/perfil" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/mentores" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminMentoresPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/mentorados" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminMentoradosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/cursos" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminCursosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/categorias" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminCategoriasPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/calendario" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminCalendarioPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/relatorios" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <NotFound />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/configuracoes" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminConfiguracoesPage />
+            </ProtectedRoute>
+          } />
           
           {/* Rota 404 - deve ser a última */}
           <Route path="*" element={<NotFound />} />
