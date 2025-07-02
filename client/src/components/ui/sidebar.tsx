@@ -1,7 +1,6 @@
 "use client";
 import { cn } from "@/utils/utils";
-import { IconMenu2, IconX } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import React, { createContext, useContext, useState } from "react";
 
 interface Links {
@@ -71,10 +70,7 @@ export const Sidebar = ({
 
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
-    <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
-    </>
+    <DesktopSidebar {...props} />
   );
 };
 
@@ -85,75 +81,23 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   return (
-    <>
-      <motion.div
-        className={cn(
-          "min-h-screen px-4 py-6 hidden md:flex md:flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 relative",
-          className
-        )}
-        style={{
-          boxShadow: "2px 0 8px rgba(0,0,0,0.1)"
-        }}
-        animate={{
-          width: animate ? (open ? "280px" : "70px") : "280px",
-        }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    </>
-  );
-};
-
-export const MobileSidebar = ({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"div">) => {
-  const { open, setOpen } = useSidebar();
-  return (
-    <>
-      <div
-        className={cn(
-          "h-14 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 w-full shadow-sm"
-        )}
-        {...props}
-      >
-        <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-white"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-white"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
-              </div>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+    <motion.div
+      className={cn(
+        "min-h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 relative",
+        className
+      )}
+      style={{
+        boxShadow: "2px 0 8px rgba(0,0,0,0.1)"
+      }}
+      animate={{
+        width: animate ? (open ? "280px" : "70px") : "280px",
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      {...props}
+    >
+      {children}
+    </motion.div>
   );
 };
 

@@ -178,7 +178,7 @@ export default function StripeOnboardingAlert({ className }: StripeOnboardingAle
                 </div>
               </div>
               
-              <div className="flex-shrink-0 hidden md:block">
+              <div className="flex-shrink-0">
                 <Button 
                   onClick={handleStartOnboarding}
                   className="bg-green-600 hover:bg-green-700 text-white border-0 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors duration-200 flex items-center gap-1.5"
@@ -187,16 +187,6 @@ export default function StripeOnboardingAlert({ className }: StripeOnboardingAle
                   Atualizar Dados da Conta
                 </Button>
               </div>
-            </div>
-            
-            <div className="md:hidden">
-              <Button 
-                onClick={handleStartOnboarding}
-                className="w-full bg-green-600 hover:bg-green-700 text-white border-0 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors duration-200 flex items-center justify-center gap-1.5"
-              >
-                <ArrowRight className="w-3.5 h-3.5" />
-                Atualizar Dados da Conta
-              </Button>
             </div>
           </div>
         )}
@@ -219,12 +209,9 @@ export default function StripeOnboardingAlert({ className }: StripeOnboardingAle
               </Badge>
             </div>
           </div>
-          <div className="text-gray-600 text-xs hidden md:block">
+          <div className="text-gray-600 text-xs">
             Sua conta está configurada para receber pagamentos dos seus cursos.
           </div>
-        </div>
-        <div className="text-gray-600 text-xs md:hidden mt-2">
-          Sua conta está configurada para receber pagamentos dos seus cursos.
         </div>
       </div>
     );
@@ -301,16 +288,6 @@ export default function StripeOnboardingAlert({ className }: StripeOnboardingAle
             </Button>
           </div>
         </div>
-        
-        <div className="md:hidden mt-4">
-          <Button 
-            onClick={handleStartOnboarding}
-            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white border-0 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors duration-200 flex items-center justify-center gap-1.5"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            Resolver Pendências
-          </Button>
-        </div>
       </div>
     );
   }
@@ -364,16 +341,6 @@ export default function StripeOnboardingAlert({ className }: StripeOnboardingAle
             Configurar Agora
           </Button>
         </div>
-      </div>
-      
-      <div className="md:hidden mt-4">
-        <Button 
-          onClick={handleStartOnboarding}
-          className="w-full bg-orange-600 hover:bg-orange-700 text-white border-0 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors duration-200 flex items-center justify-center gap-1.5"
-        >
-          <ArrowRight className="w-3.5 h-3.5" />
-          Configurar Agora
-        </Button>
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ const MentorDashboardPage = () => {
   const totalRevenue = enrollmentStats?.totalRevenue || 0;
   
   return (
-    <div className="flex">
+    <div className="flex min-w-[1200px] overflow-x-auto">
       <MentorSidebar />
       <div className="flex-1 p-6 overflow-auto">
         <div className="mb-8">
