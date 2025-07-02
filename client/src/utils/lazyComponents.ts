@@ -4,7 +4,7 @@ import { lazy } from 'react';
 // Separando por domínio para melhor code splitting
 
 // ===== PÁGINAS PRINCIPAIS =====
-export const HomePage = lazy(() => import('@/pages/HomePage'));
+export const HomePage = lazy(() => import('../pages/HomePage'));
 export const AboutPage = lazy(() => import('@/pages/AboutPage'));
 export const CoursesPage = lazy(() => import('@/pages/CoursesPage'));
 export const MentorsPage = lazy(() => import('@/pages/MentorsPage'));

@@ -11,6 +11,7 @@ import { Suspense, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 // Importando todas as páginas do sistema centralizado de lazy loading
 import CheckoutSuccessPage from "@/pages/CheckoutSuccessPage";
+import HomePage from "@/pages/HomePage";
 import {
     AboutPage,
     AdminCalendarioPage,
@@ -27,8 +28,6 @@ import {
     CoursePlayerPage,
     CoursePublicView,
     CoursesPage,
-    // Páginas principais
-    HomePage,
     LoginPage,
     MentoradoCalendarioPage, MentoradoConfiguracoesPage,
     // Mentorado
