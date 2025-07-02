@@ -119,7 +119,7 @@ const MentorDashboardPage = () => {
             <div className="flex items-center gap-3">
               {stripeStatus.stripe_onboarding_status === 'completed' ? (
                 <>
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-black" />
                   <Badge className="bg-green-100 text-green-700">Conta Verificada</Badge>
                 </>
               ) : (
@@ -146,8 +146,16 @@ const MentorDashboardPage = () => {
 
         {/* Debug Info - Mostrar status do Stripe */}
         {isLoadingStripeData && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-700 text-sm">🔄 Carregando dados financeiros do Stripe...</p>
+          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader-2 w-5 h-5 text-black animate-spin">
+                <path d="M21 12a9 9 0 11-6.219-8.56"/>
+              </svg>
+              <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent shadow hover:bg-primary/80 bg-green-100 text-green-700">
+                Carregando Dados Financeiros
+              </div>
+              <span className="text-sm text-green-600 ml-auto">Conectando com Stripe...</span>
+            </div>
           </div>
         )}
         
