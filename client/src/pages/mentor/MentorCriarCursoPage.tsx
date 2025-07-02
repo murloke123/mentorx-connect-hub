@@ -88,7 +88,7 @@ const CreateCoursePage = () => {
       });
       
       // Redirect to course edit page or courses list with tab parameter
-      navigate("/mentor/cursos?tab=meus-cursos");
+      navigate("/mentor/cursos");
     } catch (error) {
       console.error("❌ Erro ao criar curso:", error);
       toast({
@@ -102,7 +102,7 @@ const CreateCoursePage = () => {
   };
 
   const handleCancel = () => {
-    navigate("/mentor/cursos?tab=meus-cursos");
+    navigate("/mentor/cursos");
   };
 
   return (

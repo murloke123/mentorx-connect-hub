@@ -1,11 +1,11 @@
 import { Course } from '@/types/database';
 import { supabase } from '../utils/supabase';
 import {
-  createStripeProductWithPrice,
-  syncCourseWithStripe,
-  updateProductPrice,
-  updateStripeProduct,
-  type CourseStripeData
+    createStripeProductWithPrice,
+    syncCourseWithStripe,
+    updateProductPrice,
+    updateStripeProduct,
+    type CourseStripeData
 } from './stripeProductService';
 
 // Fetches a single course by its ID and returns it as a Course object.
@@ -634,7 +634,7 @@ export async function redirectAfterEnrollment(userId: string, navigate: (path: s
 
     // Redirecionar baseado no role
     if (userRole === 'mentor') {
-      navigate('/mentor/cursos?tab=cursos-adquiridos');
+      navigate('/mentor/cursos-adquiridos');
     } else {
       navigate('/mentorado/cursos');
     }

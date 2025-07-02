@@ -488,7 +488,7 @@ const CoursePlayerPage = () => {
           .single();
         
         if (profile?.role === 'mentor') {
-          navigate('/mentor/cursos?tab=meus-cursos');
+          navigate('/mentor/cursos');
         } else {
           navigate('/mentorado/cursos');
         }

@@ -39,6 +39,7 @@ import {
     MentorConfiguracoesPage,
     MentorConteudosPage,
     MentorCriarCursoPage,
+    MentorCursosAdquiridosPage,
     // Mentor
     MentorDashboardPage,
     MentorEditarCursoPage,
@@ -119,6 +120,11 @@ const AppContent = () => {
           <Route path="/mentor/cursos" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorMeusCursosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/cursos-adquiridos" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorCursosAdquiridosPage />
             </ProtectedRoute>
           } />
           <Route path="/mentor/cursos/novo" element={

@@ -49,7 +49,7 @@ const CheckoutSuccessPage = () => {
     };
 
     getUserRoleByEmail();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     // Só executar redirecionamento quando tiver o role definido
@@ -65,10 +65,10 @@ const CheckoutSuccessPage = () => {
       console.log('⏰ CheckoutSuccessPage: Timer executado, redirecionando...');
 
       if (userRole === 'mentor') {
-        console.log('👨‍🏫 CheckoutSuccessPage: Redirecionando mentor para /mentor/cursos');
-        navigate('/mentor/cursos?tab=meus-cursos');
+        console.log('👨‍🏫 CheckoutSuccessPage: Mentor comprou curso, redirecionando para /mentor/cursos-adquiridos');
+        navigate('/mentor/cursos-adquiridos');
       } else if (userRole === 'mentorado') {
-        console.log('👨‍🎓 CheckoutSuccessPage: Redirecionando mentorado para /mentorado/cursos');
+        console.log('👨‍🎓 CheckoutSuccessPage: Mentorado comprou curso, redirecionando para /mentorado/cursos');
         navigate('/mentorado/cursos');
       } else {
         console.log('❓ CheckoutSuccessPage: Role não identificado, redirecionando para home');

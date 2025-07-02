@@ -33,7 +33,7 @@ const ModulosPage = () => {
   // Redirecionar se não tem cursoId
   useEffect(() => {
     if (!cursoId) {
-      navigate('/mentor/cursos?tab=meus-cursos');
+      navigate('/mentor/cursos');
       toast({
         title: 'Erro',
         description: 'ID do curso não fornecido',
@@ -146,6 +146,10 @@ const ModulosPage = () => {
     }
   };
 
+  const handleGoToCourses = () => {
+    navigate('/mentor/cursos');
+  };
+
   // Se houver erro no carregamento
   if (isError) {
     return (
@@ -173,7 +177,7 @@ const ModulosPage = () => {
       <div className="flex-1 p-6">
         <Breadcrumbs 
           items={[
-            { label: 'Meus Cursos', href: '/mentor/cursos?tab=meus-cursos' },
+            { label: 'Meus Cursos', href: '/mentor/cursos' },
             { label: 'Módulos do Curso' }
           ]} 
           className="mb-6"

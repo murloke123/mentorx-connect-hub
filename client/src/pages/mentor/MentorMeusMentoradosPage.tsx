@@ -7,16 +7,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
 import {
-    BookOpen,
-    ChevronDown,
-    ChevronUp,
-    DollarSign,
-    Heart,
-    Mail,
-    Search,
-    TrendingUp,
-    User,
-    Users
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  Frown,
+  Heart,
+  Mail,
+  Search,
+  TrendingUp,
+  User,
+  Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -261,7 +262,7 @@ const MentorMeusMentoradosPage = () => {
     total: mentorados.length,
     totalRevenue: mentorados.reduce((sum, m) => sum + m.total_spent, 0),
     followers: mentorados.filter(m => m.is_following).length,
-    students: mentorados.filter(m => m.courses_acquired > 0).length,
+    students: mentorados.filter(m => m.courses_acquired > 0).length, // Alunos únicos com matrículas ativas
     followersWithoutCourse: mentorados.filter(m => m.is_following && m.courses_acquired === 0).length,
     avgCoursesPerStudent: mentorados.length > 0 
       ? mentorados.reduce((sum, m) => sum + m.courses_acquired, 0) / mentorados.length 
@@ -284,22 +285,10 @@ const MentorMeusMentoradosPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                                     <p className="text-blue-100 text-sm font-medium">Alunos + Seguidores</p>
-                  <p className="text-3xl font-bold">{stats.total}</p>
+                  <p className="text-blue-100 text-sm font-medium">Total de Alunos</p>
+                  <p className="text-3xl font-bold">{stats.students}</p>
                 </div>
                 <Users className="w-8 h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium">Receita Total</p>
-                  <p className="text-3xl font-bold">R$ {stats.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </div>
-                <DollarSign className="w-8 h-8 text-green-200" />
               </div>
             </CardContent>
           </Card>
@@ -308,7 +297,7 @@ const MentorMeusMentoradosPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium">Me Seguem</p>
+                  <p className="text-purple-100 text-sm font-medium">Total de Seguidores</p>
                   <p className="text-3xl font-bold">{stats.followers}</p>
                 </div>
                 <Heart className="w-8 h-8 text-purple-200" />
@@ -320,10 +309,22 @@ const MentorMeusMentoradosPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-100 text-sm font-medium">Cursos por Aluno</p>
+                  <p className="text-orange-100 text-sm font-medium">Seguidores sem Curso</p>
+                  <p className="text-3xl font-bold">{stats.followersWithoutCourse}</p>
+                </div>
+                <Frown className="w-8 h-8 text-orange-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm font-medium">Cursos por Aluno</p>
                   <p className="text-3xl font-bold">{stats.avgCoursesPerStudent.toFixed(1)}</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-orange-200" />
+                <TrendingUp className="w-8 h-8 text-green-200" />
               </div>
             </CardContent>
           </Card>

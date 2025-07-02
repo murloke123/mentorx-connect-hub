@@ -36,6 +36,7 @@ export const MentorDashboardPage = lazy(() => import('@/pages/mentor/MentorDashb
 export const MentorProfilePage = lazy(() => import('@/pages/mentor/MentorProfilePage'));
 export const MentorPublicProfilePage = lazy(() => import('@/pages/mentor/MentorPublicProfilePage'));
 export const MentorMeusCursosPage = lazy(() => import('@/pages/mentor/MentorMeusCursosPage'));
+export const MentorCursosAdquiridosPage = lazy(() => import('@/pages/mentor/MentorCursosAdquiridosPage'));
 export const MentorCriarCursoPage = lazy(() => import('@/pages/mentor/MentorCriarCursoPage'));
 export const MentorEditarCursoPage = lazy(() => import('@/pages/mentor/MentorEditarCursoPage'));
 export const MentorModulosPage = lazy(() => import('@/pages/mentor/MentorModulosPage'));

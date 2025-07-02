@@ -165,7 +165,7 @@ export async function createCheckoutSession({
       .single();
 
     const userRole = userProfile?.role || 'mentorado';
-    const baseUrl = userRole === 'mentor' ? '/mentor/cursos' : '/mentorado/cursos';
+    const baseUrl = userRole === 'mentor' ? '/mentor/cursos-adquiridos' : '/mentorado/cursos';
 
     // 🎯 CORREÇÃO CRÍTICA: Chamar backend em vez de Stripe diretamente
     const response = await fetch('/api/stripe/checkout/session', {

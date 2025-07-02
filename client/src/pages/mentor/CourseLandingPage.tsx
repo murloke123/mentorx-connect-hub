@@ -245,7 +245,7 @@ const CourseLandingPage: React.FC = () => {
         <div className="flex-1 p-6">
           <div className="text-center py-10">
             <p className="text-lg text-red-500">Curso não encontrado</p>
-                            <Button onClick={() => navigate('/mentor/cursos?tab=meus-cursos')} className="mt-4">
+            <Button onClick={() => navigate('/mentor/cursos')} className="mt-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -264,7 +264,7 @@ const CourseLandingPage: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
-              onClick={() => navigate('/mentor/cursos?tab=meus-cursos')}
+              onClick={() => navigate('/mentor/cursos')}
               className="flex items-center"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
