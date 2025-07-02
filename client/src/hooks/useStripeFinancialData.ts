@@ -71,7 +71,8 @@ export const useStripeFinancialData = () => {
       console.log('💸 useStripeFinancialData: RESULTADO PAYOUTS (valores pagos):', payoutsResult);
 
       // Log para Network do Chrome
-      await fetch('http://localhost:5000/api/stripe-network-logs', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await fetch(`${API_BASE_URL}/api/stripe-network-logs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

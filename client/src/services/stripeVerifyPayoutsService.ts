@@ -14,6 +14,11 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
   try {
     console.log('🔍 stripeVerifyPayoutsService: Verificando payouts para conta:', stripeAccountId);
     console.log('🌐 stripeVerifyPayoutsService: URL da API:', `${API_BASE_URL}/api/stripe/verify-payouts`);
+    console.log('🌐 stripeVerifyPayoutsService: API_BASE_URL:', API_BASE_URL);
+    console.log('🌐 stripeVerifyPayoutsService: VITE_API_URL:', import.meta.env.VITE_API_URL);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
     const response = await fetch(`${API_BASE_URL}/api/stripe/verify-payouts`, {
       method: 'POST',
@@ -22,8 +27,11 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
       },
       body: JSON.stringify({
         stripeAccountId: stripeAccountId
-      })
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log('📡 stripeVerifyPayoutsService: Response status:', response.status);
     console.log('📡 stripeVerifyPayoutsService: Response headers:', response.headers);

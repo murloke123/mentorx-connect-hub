@@ -1,10 +1,25 @@
 import 'dotenv/config';
+import cors from 'cors';
 import express, { NextFunction, type Request, Response } from "express";
 import { config, validateRequiredEnvironmentVariables } from "./environment";
 import { registerRoutes } from "./routes";
 import { log, serveStatic, setupVite } from "./vite";
 
 const app = express();
+
+// CORS configuration
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5000', 
+    'http://localhost:5173',
+    /\.replit\.dev$/,
+    /\.replit\.app$/
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Security middleware for HTTPS and SSL
 app.use((req, res, next) => {
