@@ -1,6 +1,7 @@
 import { toast } from '@/hooks/use-toast';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Força o uso da porta correta
+const API_BASE_URL = 'http://localhost:5000';
 
 export interface StripePayoutsData {
   totalPaidOut: number;
@@ -55,10 +56,16 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
 
   } catch (error) {
     console.error('❌ stripeVerifyPayoutsService: Erro ao verificar payouts:', error);
+    console.error('❌ stripeVerifyPayoutsService: Tipo do erro:', typeof error);
+    console.error('❌ stripeVerifyPayoutsService: Nome do erro:', error instanceof Error ? error.name : 'N/A');
+    console.error('❌ stripeVerifyPayoutsService: Stack trace:', error instanceof Error ? error.stack : 'N/A');
+    console.error('❌ stripeVerifyPayoutsService: URL que falhou:', `${API_BASE_URL}/api/stripe/verify-payouts`);
+    
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch";
     
     toast({
       title: "Erro ao verificar pagamentos",
-      description: error instanceof Error ? error.message : "Não foi possível verificar os pagamentos realizados",
+      description: errorMessage,
       variant: "destructive",
     });
 
@@ -67,7 +74,7 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
       currency: 'brl',
       payoutsCount: 0,
       success: false,
-      message: error instanceof Error ? error.message : "Erro desconhecido"
+      message: errorMessage
     };
   }
 } 

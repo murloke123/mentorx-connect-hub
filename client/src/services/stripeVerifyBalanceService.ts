@@ -1,6 +1,7 @@
 import { toast } from '@/hooks/use-toast';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Força o uso da porta correta
+const API_BASE_URL = 'http://localhost:5000';
 
 export interface StripeBalanceData {
   pendingAmount: number;
@@ -53,10 +54,16 @@ export async function verifyStripeBalance(stripeAccountId: string): Promise<Stri
 
   } catch (error) {
     console.error('❌ stripeVerifyBalanceService: Erro ao verificar saldo:', error);
+    console.error('❌ stripeVerifyBalanceService: Tipo do erro:', typeof error);
+    console.error('❌ stripeVerifyBalanceService: Nome do erro:', error instanceof Error ? error.name : 'N/A');
+    console.error('❌ stripeVerifyBalanceService: Stack trace:', error instanceof Error ? error.stack : 'N/A');
+    console.error('❌ stripeVerifyBalanceService: URL que falhou:', `${API_BASE_URL}/api/stripe/verify-balance`);
+    
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch";
     
     toast({
       title: "Erro ao verificar saldo",
-      description: error instanceof Error ? error.message : "Não foi possível verificar o saldo pendente",
+      description: errorMessage,
       variant: "destructive",
     });
 
@@ -64,7 +71,7 @@ export async function verifyStripeBalance(stripeAccountId: string): Promise<Stri
       pendingAmount: 0,
       currency: 'brl',
       success: false,
-      message: error instanceof Error ? error.message : "Erro desconhecido"
+      message: errorMessage
     };
   }
 } 
