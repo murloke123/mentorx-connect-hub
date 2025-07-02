@@ -738,6 +738,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ##########################################################################################
+  // ###################### ENDPOINTS STRIPE - BALANCE & PAYOUTS ########################
+  // ##########################################################################################
+
+  // ENDPOINT 19: Verificar saldo pendente da conta conectada
+  app.post('/api/stripe/verify-balance', async (req, res) => {
+    try {
+      const { stripeAccountId } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/verify-balance');
+      console.log('📦 ROUTES.TS: Stripe Account ID:', stripeAccountId);
+      
+      // 🔍 VALIDAÇÃO: stripeAccountId é obrigatório
+      if (!stripeAccountId) {
+        return res.status(400).json({
+          success: false,
+          error: 'stripeAccountId é obrigatório para verificar saldo'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de balance
+      const { verifyConnectedAccountBalance } = await import('./services/stripeServerVerifyBalanceService');
+      
+      const result = await verifyConnectedAccountBalance(stripeAccountId);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/stripe/verify-balance:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ENDPOINT 20: Verificar payouts da conta conectada
+  app.post('/api/stripe/verify-payouts', async (req, res) => {
+    try {
+      const { stripeAccountId } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/verify-payouts');
+      console.log('📦 ROUTES.TS: Stripe Account ID:', stripeAccountId);
+      
+      // 🔍 VALIDAÇÃO: stripeAccountId é obrigatório
+      if (!stripeAccountId) {
+        return res.status(400).json({
+          success: false,
+          error: 'stripeAccountId é obrigatório para verificar payouts'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de payouts
+      const { verifyConnectedAccountPayouts } = await import('./services/stripeServerVerifyPayoutsService');
+      
+      const result = await verifyConnectedAccountPayouts(stripeAccountId);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/stripe/verify-payouts:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ##########################################################################################
   // ###################### ENDPOINT STRIPE - WEBHOOK ####################################
   // ##########################################################################################
 

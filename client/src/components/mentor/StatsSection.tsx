@@ -1,16 +1,17 @@
 import StatsCard from '@/components/shared/StatsCard';
 import { formatCurrency } from '@/utils/formatters';
-import { BookOpen, DollarSign, Users } from 'lucide-react';
+import { CircleDollarSign, DollarSign, Library, Users } from 'lucide-react';
 
 interface StatsSectionProps {
   followersCount: number;
   totalCourses: number;
   activeEnrollments: number;
-  inactiveEnrollments: number;
+  totalStudents: number;
   totalRevenue: number;
+  totalPaidAmount: number;
 }
 
-const StatsSection = ({ followersCount, totalCourses, activeEnrollments, inactiveEnrollments, totalRevenue }: StatsSectionProps) => {
+const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalStudents, totalRevenue, totalPaidAmount }: StatsSectionProps) => {
   return (
     <div className="mb-8 grid gap-6 grid-cols-5">
       <StatsCard 
@@ -20,28 +21,28 @@ const StatsSection = ({ followersCount, totalCourses, activeEnrollments, inactiv
         description="Pessoas que seguem seu perfil" 
       />
       <StatsCard 
-        title="Cursos" 
-        value={totalCourses} 
-        icon={<BookOpen />} 
-        description="Total de cursos criados" 
-      />
-      <StatsCard 
-        title="Alunos Ativos" 
+        title="Cursos Adquiridos" 
         value={activeEnrollments} 
-        icon={<Users />} 
-        description="Alunos com matrículas ativas" 
+        icon={<Library />} 
+        description="Total de cursos adquiridos pelos seus Alunos" 
       />
       <StatsCard 
-        title="Alunos Pendentes" 
-        value={inactiveEnrollments} 
+        title="Alunos" 
+        value={totalStudents} 
         icon={<Users />} 
-        description="Alunos com matrículas inativas" 
+        description="Total de alunos que adquiriram seus cursos" 
       />
       <StatsCard 
         title="Receita Estimada" 
         value={formatCurrency(totalRevenue)} 
         icon={<DollarSign />} 
-        description="De cursos pagos" 
+        description="Saldo pendente no Stripe" 
+      />
+      <StatsCard 
+        title="Valores Pagos" 
+        value={formatCurrency(totalPaidAmount)} 
+        icon={<CircleDollarSign />} 
+        description="Já está na sua conta" 
       />
     </div>
   );

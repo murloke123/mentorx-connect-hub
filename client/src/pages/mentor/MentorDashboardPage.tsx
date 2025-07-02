@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeAccountStatus } from '@/hooks/useStripeAccountStatus';
+import { useStripeFinancialData } from '@/hooks/useStripeFinancialData';
 import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from '@/services/mentorService';
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -19,6 +20,15 @@ const MentorDashboardPage = () => {
   
   // Hook que executa polling automático do Stripe
   const { status: stripeStatus } = useStripeAccountStatus();
+  
+  // Hook para buscar dados financeiros do Stripe
+  const { 
+    pendingAmount, 
+    paidAmount, 
+    isLoading: isLoadingStripeData,
+    error: stripeError,
+    lastUpdated 
+  } = useStripeFinancialData();
   
   // ✅ OTIMIZADO: Cache gerenciado pelo useAuth - evita invalidações excessivas
   useEffect(() => {
@@ -51,6 +61,21 @@ const MentorDashboardPage = () => {
     enabled: !!user?.id,
   });
 
+  // Log dos dados do Stripe para debug - MOVIDO PARA ANTES DO EARLY RETURN
+  useEffect(() => {
+    if (lastUpdated) {
+      console.log('📊 MentorDashboard: Dados financeiros do Stripe atualizados:', {
+        pendingAmount,
+        paidAmount,
+        totalRevenue: pendingAmount,
+        totalPaidAmount: paidAmount,
+        lastUpdated,
+        isLoading: isLoadingStripeData,
+        error: stripeError
+      });
+    }
+  }, [pendingAmount, paidAmount, lastUpdated, isLoadingStripeData, stripeError]);
+
   // Se não há usuário logado, não renderiza o dashboard
   if (!user) {
     return (
@@ -66,11 +91,11 @@ const MentorDashboardPage = () => {
   // Stats calculations
   const totalCourses = courses.length;
   const totalActiveEnrollments = enrollmentStats?.activeEnrollments || 0;
-  const totalInactiveEnrollments = enrollmentStats?.inactiveEnrollments || 0;
-  const totalEnrollments = totalActiveEnrollments + totalInactiveEnrollments;
+  const totalStudents = enrollmentStats?.totalStudents || 0;
   
-  // Calculate estimated revenue (for paid courses)
-  const totalRevenue = enrollmentStats?.totalRevenue || 0;
+  // ✅ NOVO: Usar dados do Stripe para receita e valores pagos
+  const totalRevenue = pendingAmount; // Receita estimada = saldo pendente do Stripe
+  const totalPaidAmount = paidAmount; // Valores pagos = payouts já realizados
 
   // Função para redirecionar para onboarding
   const handleGoToOnboarding = () => {
@@ -119,13 +144,27 @@ const MentorDashboardPage = () => {
           </div>
         )}
 
+        {/* Debug Info - Mostrar status do Stripe */}
+        {isLoadingStripeData && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-700 text-sm">🔄 Carregando dados financeiros do Stripe...</p>
+          </div>
+        )}
+        
+        {stripeError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 text-sm">❌ Erro nos dados do Stripe: {stripeError}</p>
+          </div>
+        )}
+
         {/* Stats Section */}
         <StatsSection 
           followersCount={followersCount} 
           totalCourses={totalCourses}
           activeEnrollments={totalActiveEnrollments}
-          inactiveEnrollments={totalInactiveEnrollments}
+          totalStudents={totalStudents}
           totalRevenue={totalRevenue}
+          totalPaidAmount={totalPaidAmount}
         />
 
         {/* Analytics Section */}

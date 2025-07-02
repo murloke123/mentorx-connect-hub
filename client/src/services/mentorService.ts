@@ -8,8 +8,10 @@ import { supabase } from '../utils/supabase';
 
 export interface MentorEnrollmentStats {
   activeEnrollments: number;
-  inactiveEnrollments: number;
+  totalStudents: number;
   totalRevenue: number;
+  stripePendingAmount: number;
+  stripePaidAmount: number;
 }
 
 export interface EnrollmentDataPoint {
@@ -133,36 +135,54 @@ export async function getMentorEnrollmentStatsById(userId: string): Promise<Ment
 
     console.log('🔍 Buscando estatísticas de matrículas para mentor (course_owner_id):', userId);
 
-    const { data: activeEnrollments, error: activeError } = await supabase
+    // Buscar apenas contagem de matrículas ativas - sem join desnecessário
+    const { count: activeCount, error: activeError } = await supabase
       .from("matriculas")
-      .select("id, studant_name, course_id, cursos:course_id(price)")
+      .select("*", { count: "exact", head: true })
       .eq("course_owner_id", userId)
       .eq("status", "active");
 
     if (activeError) throw activeError;
 
-    const { data: inactiveEnrollments, error: inactiveError } = await supabase
+    // Buscar alunos únicos (student_id) que tem matrículas com este mentor
+    const { data: uniqueStudents, error: studentsError } = await supabase
       .from("matriculas")
-      .select("id, studant_name, course_id")
+      .select("student_id")
+      .eq("course_owner_id", userId);
+
+    if (studentsError) throw studentsError;
+
+    // Contar alunos únicos
+    const uniqueStudentIds = Array.from(new Set(uniqueStudents?.map(enrollment => enrollment.student_id) || []));
+    const totalStudents = uniqueStudentIds.length;
+
+    console.log('👥 Cursos adquiridos (matrículas ativas):', activeCount || 0);
+    console.log('👨‍🎓 Total de alunos únicos:', totalStudents);
+
+    // Para receita, buscar apenas cursos com preço - query separada e otimizada
+    const { data: paidEnrollments, error: revenueError } = await supabase
+      .from("matriculas")
+      .select("cursos:course_id(price)")
       .eq("course_owner_id", userId)
-      .eq("status", "inactive");
+      .eq("status", "active");
 
-    if (inactiveError) throw inactiveError;
+    if (revenueError) {
+      console.warn('⚠️ Erro ao calcular receita, continuando sem receita:', revenueError);
+    }
 
-    console.log('👥 Alunos ativos encontrados:', activeEnrollments?.length || 0, activeEnrollments);
-    console.log('⏳ Alunos inativos encontrados:', inactiveEnrollments?.length || 0, inactiveEnrollments);
-
-    // Calcular receita estimada (apenas de matrículas ativas)
-    const totalRevenue = activeEnrollments?.reduce((sum, enrollment) => {
+    // Calcular receita estimada apenas de matrículas ativas
+    const totalRevenue = paidEnrollments?.reduce((sum, enrollment) => {
       const course = Array.isArray(enrollment.cursos) ? enrollment.cursos[0] : enrollment.cursos;
       const price = course?.price || 0;
       return sum + Number(price);
     }, 0) || 0;
 
     const stats = {
-      activeEnrollments: activeEnrollments?.length || 0,
-      inactiveEnrollments: inactiveEnrollments?.length || 0,
-      totalRevenue: totalRevenue
+      activeEnrollments: activeCount || 0,
+      totalStudents: totalStudents,
+      totalRevenue: totalRevenue,
+      stripePendingAmount: 0, // Será atualizado no dashboard
+      stripePaidAmount: 0 // Será atualizado no dashboard
     };
 
     console.log('📊 Estatísticas finais calculadas:', stats);
@@ -176,8 +196,10 @@ export async function getMentorEnrollmentStatsById(userId: string): Promise<Ment
     });
     return {
       activeEnrollments: 0,
-      inactiveEnrollments: 0,
-      totalRevenue: 0
+      totalStudents: 0,
+      totalRevenue: 0,
+      stripePendingAmount: 0,
+      stripePaidAmount: 0
     };
   }
 }
@@ -228,8 +250,10 @@ export async function getMentorEnrollmentStats(): Promise<MentorEnrollmentStats>
     console.error("Error fetching enrollment stats:", error);
     return {
       activeEnrollments: 0,
-      inactiveEnrollments: 0,
-      totalRevenue: 0
+      totalStudents: 0,
+      totalRevenue: 0,
+      stripePendingAmount: 0,
+      stripePaidAmount: 0
     };
   }
 }
