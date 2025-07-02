@@ -3,7 +3,7 @@ export async function testSimpleStripeAPI() {
   console.log('🧪 testSimpleStripeAPI: Iniciando teste simples...');
   
   try {
-    const url = 'http://localhost:5000/api/stripe/verify-balance';
+    const url = '/api/stripe/verify-balance';
     console.log('🔗 testSimpleStripeAPI: URL:', url);
     
     const payload = {

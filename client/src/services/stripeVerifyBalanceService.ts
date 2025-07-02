@@ -1,7 +1,7 @@
 import { toast } from '@/hooks/use-toast';
 
-// Força o uso da porta correta
-const API_BASE_URL = 'http://localhost:5000';
+// Usa URL relativa já que frontend e backend estão na mesma porta
+const API_BASE_URL = '';
 
 export interface StripeBalanceData {
   pendingAmount: number;
