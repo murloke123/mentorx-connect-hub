@@ -1,19 +1,23 @@
 import AnalyticsSection from '@/components/mentor/AnalyticsSection';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
 import StatsSection from '@/components/mentor/StatsSection';
-import StripeOnboardingAlert from '@/components/mentor/StripeOnboardingAlert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeAccountStatus } from '@/hooks/useStripeAccountStatus';
 import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from '@/services/mentorService';
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckCircle, Timer } from 'lucide-react';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MentorDashboardPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
-  // Verificação automática do status da conta Stripe
+  // Hook que executa polling automático do Stripe
   const { status: stripeStatus } = useStripeAccountStatus();
   
   // ✅ OTIMIZADO: Cache gerenciado pelo useAuth - evita invalidações excessivas
@@ -67,6 +71,11 @@ const MentorDashboardPage = () => {
   
   // Calculate estimated revenue (for paid courses)
   const totalRevenue = enrollmentStats?.totalRevenue || 0;
+
+  // Função para redirecionar para onboarding
+  const handleGoToOnboarding = () => {
+    navigate('/mentor/stripe-onboarding');
+  };
   
   return (
     <div className="flex min-w-[1200px] overflow-x-auto">
@@ -79,8 +88,36 @@ const MentorDashboardPage = () => {
           <p className="text-gray-600">Gerencie suas métricas e acompanhe seu desempenho.</p>
         </div>
 
-        {/* Stripe Onboarding Alert */}
-        <StripeOnboardingAlert className="mb-6" />
+        {/* Stripe Status Display */}
+        {stripeStatus.stripe_onboarding_status && (
+          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              {stripeStatus.stripe_onboarding_status === 'completed' ? (
+                <>
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <Badge className="bg-green-100 text-green-700">Conta Verificada</Badge>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    onClick={handleGoToOnboarding}
+                    size="sm"
+                    className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white shadow-lg"
+                  >
+                    Preencher Dados para Começar a Receber
+                  </Button>
+                  <Timer className="w-8 h-8 text-slate-700 animate-pulse ml-4" />
+                  <Badge className="bg-yellow-100 text-yellow-700 animate-pulse">Aguardando preenchimento de dados da conta ...</Badge>
+                </>
+              )}
+              {stripeStatus.lastChecked && (
+                <span className="text-sm text-gray-500 ml-auto">
+                  Última verificação: {stripeStatus.lastChecked.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Stats Section */}
         <StatsSection 

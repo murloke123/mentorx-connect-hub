@@ -5,8 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import DocumentTestPage from "@/pages/DocumentTestPage";
-import StripeDocumentTestPage from "@/pages/StripeDocumentTestPage"; // Import the new page
-import StripeTestPage from "@/pages/StripeTestPage";
 import { TestDocumentVerificationPage } from "@/pages/TestDocumentVerificationPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo } from "react";
@@ -99,9 +97,7 @@ const AppContent = () => {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/mentors" element={<MentorsPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/stripe-test" element={<StripeTestPage />} />
           <Route path="/document-test" element={<DocumentTestPage />} />
-          <Route path="/stripe-document-test" element={<StripeDocumentTestPage />} />
           <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
           <Route path="/course/:courseId" element={<CoursePublicView />} />
