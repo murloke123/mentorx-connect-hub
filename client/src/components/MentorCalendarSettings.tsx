@@ -412,7 +412,7 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
         <Button 
           onClick={saveSettings} 
           disabled={saving}
-          className="w-full"
+          className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white border-none"
         >
           {saving ? (
             <>

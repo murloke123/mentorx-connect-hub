@@ -56,7 +56,7 @@ GET /api/email/test
     "hasSenderName": true,
     "senderEmail": "contato@mentoraai.com.br",
     "senderName": "Mentora AI",
-    "apiKeyPrefix": "xkeysib-ea08616..."
+    "apiKeyPrefix": "xkeysib-[sua-chave-aqui]..."
   },
   "environment": "development"
 }

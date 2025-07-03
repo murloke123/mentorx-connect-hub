@@ -218,8 +218,12 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
 
   // Função para lidar com clique nos cards de filtro
   const handleCardClick = (filterType: string) => {
-    if (activeCardFilter === filterType) {
-      // Se já está ativo, desativa o filtro
+    if (filterType === 'all') {
+      // Sempre ativa o filtro "all" quando clicado
+      setActiveCardFilter('all');
+      setDateFilter('all');
+    } else if (activeCardFilter === filterType) {
+      // Se já está ativo, desativa o filtro (volta para "all")
       setActiveCardFilter('all');
       setDateFilter('all');
     } else {
@@ -237,9 +241,18 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             <Calendar className="h-5 w-5" />
             Minhas Mentorias Agendadas
           </CardTitle>
-          <Badge variant="outline" className="text-sm">
-            {filteredAppointments.length} {filteredAppointments.length === 1 ? 'agendamento' : 'agendamentos'}
-          </Badge>
+          <Button
+            variant={activeCardFilter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleCardClick('all')}
+            className={`transition-all font-semibold ${
+              activeCardFilter === 'all' 
+                ? 'bg-white hover:bg-gray-50 text-gray-700 shadow-md border-gray-300' 
+                : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
+            }`}
+          >
+            Todos Agendamentos ({appointments.length})
+          </Button>
         </div>
       </CardHeader>
       
@@ -255,11 +268,13 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             }`}
             onClick={() => handleCardClick('past')}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium text-orange-600">Passados</span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full mb-2">
+                <Clock className="h-4 w-4" />
+                <span className="text-sm font-medium">Passados</span>
+              </div>
+              <p className="text-2xl font-bold text-orange-700">{stats.past}</p>
             </div>
-            <p className="text-2xl font-bold text-orange-700">{stats.past}</p>
           </div>
           
           {/* Card Hoje */}
@@ -271,43 +286,49 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             }`}
             onClick={() => handleCardClick('today')}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-600">Hoje</span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full mb-2">
+                <Calendar className="h-4 w-4" />
+                <span className="text-sm font-medium">Hoje</span>
+              </div>
+              <p className="text-2xl font-bold text-blue-700">{stats.today}</p>
             </div>
-            <p className="text-2xl font-bold text-blue-700">{stats.today}</p>
           </div>
           
           {/* Card Futuros */}
           <div 
             className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
               activeCardFilter === 'future' 
-                ? 'bg-white border-green-400 shadow-md' 
-                : 'bg-white border-gray-200 hover:border-green-300'
+                ? 'bg-white border-purple-400 shadow-md' 
+                : 'bg-white border-gray-200 hover:border-purple-300'
             }`}
             onClick={() => handleCardClick('future')}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-green-600">Futuros</span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 bg-purple-100 text-purple-700 px-3 py-1 rounded-full mb-2">
+                <CheckCircle className="h-4 w-4" />
+                <span className="text-sm font-medium">Futuros</span>
+              </div>
+              <p className="text-2xl font-bold text-purple-700">{stats.future}</p>
             </div>
-            <p className="text-2xl font-bold text-green-700">{stats.future}</p>
           </div>
           
           {/* Card Concluídos */}
           <div 
             className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
               activeCardFilter === 'completed' 
-                ? 'bg-white border-purple-400 shadow-md' 
-                : 'bg-white border-gray-200 hover:border-purple-300'
+                ? 'bg-white border-green-400 shadow-md' 
+                : 'bg-white border-gray-200 hover:border-green-300'
             }`}
             onClick={() => handleCardClick('completed')}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-600">Concluídos</span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full mb-2">
+                <CheckCircle className="h-4 w-4" />
+                <span className="text-sm font-medium">Concluídos</span>
+              </div>
+              <p className="text-2xl font-bold text-green-700">{stats.completed}</p>
             </div>
-            <p className="text-2xl font-bold text-purple-700">{stats.completed}</p>
           </div>
           
           {/* Card Cancelados */}
@@ -319,11 +340,13 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             }`}
             onClick={() => handleCardClick('cancelled')}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <XCircle className="h-4 w-4 text-red-600" />
-              <span className="text-sm font-medium text-red-600">Cancelados</span>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 bg-red-100 text-red-700 px-3 py-1 rounded-full mb-2">
+                <XCircle className="h-4 w-4" />
+                <span className="text-sm font-medium">Cancelados</span>
+              </div>
+              <p className="text-2xl font-bold text-red-700">{stats.cancelled}</p>
             </div>
-            <p className="text-2xl font-bold text-red-700">{stats.cancelled}</p>
           </div>
         </div>
 
