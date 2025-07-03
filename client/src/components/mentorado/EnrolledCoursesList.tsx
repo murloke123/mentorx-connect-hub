@@ -1,10 +1,10 @@
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Course {
   id: string;
@@ -26,7 +26,7 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
   if (isLoading) {
     return (
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Meus Cursos</h2>
+        <h2 className="text-2xl font-semibold mb-4">Meus Cursos Adquiridos</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -48,7 +48,7 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
   if (courses.length === 0) {
     return (
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Meus Cursos</h2>
+        <h2 className="text-2xl font-semibold mb-4">Meus Cursos Adquiridos</h2>
         <Card className="bg-muted/50">
           <CardContent className="flex flex-col items-center justify-center py-8">
             <BookOpen className="h-12 w-12 mb-4 text-muted-foreground/80" />
@@ -67,7 +67,7 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold">Meus Cursos</h2>
+        <h2 className="text-2xl font-semibold">Meus Cursos Adquiridos</h2>
         <Button variant="outline" size="sm" asChild>
           <Link to="/courses">
             Ver todos

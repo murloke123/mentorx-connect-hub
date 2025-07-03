@@ -2,7 +2,7 @@ import EnrolledCoursesList from '@/components/mentorado/EnrolledCoursesList';
 import MentoradoSidebar from '@/components/mentorado/MentoradoSidebar';
 import StatsSection from '@/components/mentorado/StatsSection';
 import { useAuth } from '@/hooks/useAuth';
-import { getMenteeCourses, getMenteeProfile } from '@/services/menteeService';
+import { getMenteeCourses, getMenteeFollowingCount, getMenteeProfile } from '@/services/menteeService';
 import { useQuery } from '@tanstack/react-query';
 
 interface Course {
@@ -32,6 +32,13 @@ const MentoradoDashboardPage = () => {
     queryFn: getMenteeCourses,
     enabled: !!user?.id,
   });
+
+  // Fetch mentee following count
+  const { data: followingCount = 0 } = useQuery({
+    queryKey: ['menteeFollowingCount', user?.id],
+    queryFn: getMenteeFollowingCount,
+    enabled: !!user?.id,
+  });
   
   // Se não há usuário logado, não renderiza o dashboard
   if (!user) {
@@ -57,12 +64,7 @@ const MentoradoDashboardPage = () => {
   const completedLessons = coursesArray.reduce((sum, course) => sum + (course.completed_lessons || 0), 0);
   
   // Calculate active mentors
-  const activeMentors = coursesArray.reduce((acc, curr) => {
-    if (!acc.includes(curr.mentor_id)) {
-      acc.push(curr.mentor_id);
-    }
-    return acc;
-  }, []).length;
+  const activeMentors = Array.from(new Set(coursesArray.map(course => course.mentor_id))).length;
   
   return (
     <div className="flex">
@@ -80,6 +82,7 @@ const MentoradoDashboardPage = () => {
           enrolledCourses={coursesArray.length}
           completedLessons={completedLessons}
           activeMentors={activeMentors}
+          followingMentors={followingCount}
         />
 
         {/* Enrolled Courses Section */}

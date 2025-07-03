@@ -5,9 +5,29 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } from '@/services/coursePlayerService';
 import { supabase } from '@/utils/supabase';
-import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+// Função para converter URLs do YouTube para embed
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = url.match(youtubeRegex);
+  if (match && match[1]) {
+    return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  return null;
+};
+
+// Função para converter URLs do Vimeo para embed
+const getVimeoEmbedUrl = (url: string): string | null => {
+  const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?(?:vimeo\.com\/)([0-9]+)/;
+  const match = url.match(vimeoRegex);
+  if (match && match[1]) {
+    return `https://player.vimeo.com/video/${match[1]}`;
+  }
+  return null;
+};
 
 const ContentRenderer: React.FC<{
   currentConteudo: ConteudoItemLocal | null;
@@ -26,19 +46,59 @@ const ContentRenderer: React.FC<{
 
     switch (content_type) {
       case 'video_externo':
-        if (content_data?.url) {
-          return (
-            <div className="aspect-video w-full">
-              <iframe
-                src={content_data.url}
-                className="w-full h-full"
-                allowFullScreen
-                title={currentConteudo.title}
-              />
-            </div>
-          );
+        // Verificar múltiplos campos possíveis para URL do vídeo
+        const videoUrl = content_data?.url || content_data?.video_url;
+        
+        if (videoUrl) {
+          console.log('🎬 Processando vídeo:', { videoUrl, content_data });
+          
+          // Detectar provider e converter URL
+          let embedUrl: string | null = null;
+          let provider: string = 'unknown';
+          
+          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+            embedUrl = getYouTubeEmbedUrl(videoUrl);
+            provider = 'youtube';
+          } else if (videoUrl.includes('vimeo.com')) {
+            embedUrl = getVimeoEmbedUrl(videoUrl);
+            provider = 'vimeo';
+          } else {
+            // Se não for YouTube nem Vimeo, tentar usar a URL diretamente
+            embedUrl = videoUrl;
+            provider = 'other';
+          }
+          
+          console.log('🔗 URL convertida:', { original: videoUrl, embed: embedUrl, provider });
+          
+          if (embedUrl) {
+            return (
+              <div className="aspect-video w-full">
+                <iframe
+                  src={embedUrl}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={currentConteudo.title}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div className="p-8 text-center text-red-500">
+                <p>Não foi possível processar a URL do vídeo</p>
+                <p className="text-sm text-gray-500 mt-2">URL: {videoUrl}</p>
+              </div>
+            );
+          }
         }
-        return <div className="p-8 text-center text-red-500">URL do vídeo não encontrada</div>;
+        return (
+          <div className="p-8 text-center text-red-500">
+            <p>URL do vídeo não encontrada</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Dados disponíveis: {JSON.stringify(content_data)}
+            </p>
+          </div>
+        );
 
       case 'texto_rico':
         return (
@@ -69,12 +129,7 @@ const ContentRenderer: React.FC<{
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="bg-white border-b p-4">
-        <h1 className="text-2xl font-bold">{currentConteudo?.title || 'Carregando...'}</h1>
-      </div>
-
-      {/* Content */}
+      {/* Content - Removido o cabeçalho duplicado */}
       <div className="flex-1 bg-white overflow-auto">
         {renderContent()}
       </div>
@@ -525,21 +580,78 @@ const CoursePlayerPage = () => {
   
   if (!curso) return <div className="flex justify-center items-center h-screen"><p>Curso não encontrado.</p></div>;
 
-  return (
+  // Função para encontrar o módulo atual
+  const getCurrentModule = (): ModuloItemLocal | null => {
+    if (!curso || !currentConteudo) return null;
+    return curso.modulos.find(m => m.id === currentConteudo.module_id) || null;
+  };
+
+  const currentModule = getCurrentModule();
+
+    return (
     <div className="flex flex-col h-screen">
-      {/* Header with Back Button */}
-      <div className="bg-white border-b p-4 flex items-center justify-between">
-        <div className="flex items-center">
+      {/* Header com altura fixa de 45px */}
+      <div className="bg-white border-b shadow-sm h-[45px] flex items-center px-6">
+        <div className="flex items-center space-x-4 w-full">
+          {/* Botão voltar */}
           <Button
             variant="ghost"
             size="sm"
             onClick={handleGoBack}
-            className="mr-4"
+            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-2 h-8"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4" />
             Voltar
           </Button>
-          <h1 className="text-xl font-bold">{curso?.title || 'Carregando...'}</h1>
+          
+          {/* Breadcrumb alinhado à esquerda */}
+          <div className="flex items-center space-x-2 text-sm flex-1">
+            <span className="text-gray-700 truncate max-w-[200px] font-medium">
+              {curso?.title || 'Carregando...'}
+            </span>
+            
+            {currentModule && (
+              <>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600 truncate max-w-[150px]">
+                  {currentModule.title}
+                </span>
+              </>
+            )}
+            
+            {currentConteudo && (
+              <>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-900 font-medium truncate max-w-[200px]">
+                  {currentConteudo.title}
+                </span>
+              </>
+            )}
+          </div>
+          
+          {/* Badge do tipo de conteúdo */}
+          {currentConteudo && (
+            <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg">
+              {currentConteudo.content_type === 'video_externo' && (
+                <>
+                  <Video className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-700">Vídeo</span>
+                </>
+              )}
+              {currentConteudo.content_type === 'texto_rico' && (
+                <>
+                  <FileText className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-700">Texto</span>
+                </>
+              )}
+              {currentConteudo.content_type === 'pdf' && (
+                <>
+                  <FileText className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-700">PDF</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
       

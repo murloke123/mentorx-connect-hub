@@ -93,11 +93,11 @@ const MeusCursosPage = () => {
           </div>
         )}
 
-        <CoursesList 
-          courses={coursesData} 
-          isLoading={listIsLoading} 
-          totalEnrollments={totalEnrollments} 
-        />
+            <CoursesList 
+              courses={coursesData} 
+              isLoading={listIsLoading} 
+              totalEnrollments={totalEnrollments} 
+            />
       </div>
     </div>
   );

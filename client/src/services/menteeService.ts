@@ -18,6 +18,17 @@ type Progress = {
   last_accessed?: string;
 };
 
+interface Course {
+  id: string;
+  title: string;
+  description?: string;
+  mentor_id: string;
+  mentor_name?: string;
+  progress: number;
+  completed_lessons: number;
+  total_lessons: number;
+}
+
 export async function getEnrolledCourses() {
   try {
     // Obter o ID do usuário autenticado
@@ -75,7 +86,7 @@ export async function getEnrolledCourses() {
     console.log('📖 Cursos encontrados:', cursos?.length || 0, cursos);
 
     // Buscar informações dos mentores
-    const mentorIds = [...new Set(cursos?.map(c => c.mentor_id) || [])];
+    const mentorIds = Array.from(new Set(cursos?.map(c => c.mentor_id) || []));
     const { data: mentores, error: mentoresError } = await supabase
       .from("profiles")
       .select("id, full_name")
@@ -247,17 +258,8 @@ export async function updateProgress(courseId: string, lessonId: string, complet
 }
 
 // Adicionando funções necessárias para o MentoradoDashboardPage
-export function getMenteeProfile() {
-  return getProfile();
-}
-
-export function getMenteeCourses() {
-  return getEnrolledCourses();
-}
-
-async function getProfile() {
+export async function getMenteeProfile() {
   try {
-    // Obter o ID do usuário autenticado
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -274,7 +276,75 @@ async function getProfile() {
     
     return data;
   } catch (error) {
-    console.error("Erro ao buscar perfil:", error);
-    return null;
+    console.error("Error fetching mentee profile:", error);
+    throw error;
+  }
+}
+
+export async function getMenteeCourses(): Promise<Course[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("Usuário não autenticado");
+    }
+    
+    const { data, error } = await supabase
+      .from("matriculas")
+      .select(`
+        *,
+        course:cursos (
+          id,
+          title,
+          description,
+          mentor_id,
+          mentor:mentor_id (
+            full_name
+          )
+        )
+      `)
+      .eq("student_id", user.id)
+      .eq("status", "active");
+      
+    if (error) throw error;
+    
+    // Transform the data to match the Course interface
+    const courses: Course[] = (data || []).map((enrollment: any) => ({
+      id: enrollment.course.id,
+      title: enrollment.course.title,
+      description: enrollment.course.description,
+      mentor_id: enrollment.course.mentor_id,
+      mentor_name: enrollment.course.mentor?.full_name,
+      progress: enrollment.progress_percentage || 0,
+      completed_lessons: 0, // You might want to calculate this based on actual lesson completion
+      total_lessons: 0, // You might want to get this from the course structure
+    }));
+    
+    return courses;
+  } catch (error) {
+    console.error("Error fetching mentee courses:", error);
+    throw error;
+  }
+}
+
+export async function getMenteeFollowingCount(): Promise<number> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("Usuário não autenticado");
+    }
+    
+    const { count, error } = await supabase
+      .from("mentor_followers")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", user.id);
+      
+    if (error) throw error;
+    
+    return count || 0;
+  } catch (error) {
+    console.error("Error fetching mentee following count:", error);
+    return 0;
   }
 }

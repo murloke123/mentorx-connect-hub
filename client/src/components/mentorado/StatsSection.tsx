@@ -1,21 +1,21 @@
-
-import { BookOpen, Users, CheckSquare } from 'lucide-react';
 import StatsCard from '@/components/shared/StatsCard';
+import { BookOpen, CheckSquare, Heart, Users } from 'lucide-react';
 
 interface StatsSectionProps {
   enrolledCourses: number;
   completedLessons: number;
   activeMentors: number;
+  followingMentors: number;
 }
 
-const StatsSection = ({ enrolledCourses, completedLessons, activeMentors }: StatsSectionProps) => {
+const StatsSection = ({ enrolledCourses, completedLessons, activeMentors, followingMentors }: StatsSectionProps) => {
   return (
-    <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard 
-        title="Cursos" 
+        title="Cursos Adquiridos" 
         value={enrolledCourses}
         icon={<BookOpen />} 
-        description="Cursos em que você está matriculado" 
+        description="Total de cursos que você adquiriu" 
       />
       <StatsCard 
         title="Aulas Concluídas" 
@@ -28,6 +28,12 @@ const StatsSection = ({ enrolledCourses, completedLessons, activeMentors }: Stat
         value={activeMentors} 
         icon={<Users />} 
         description="Mentores dos seus cursos atuais" 
+      />
+      <StatsCard 
+        title="Mentores que Sigo" 
+        value={followingMentors} 
+        icon={<Heart />} 
+        description="Total de mentores que sigo" 
       />
     </div>
   );

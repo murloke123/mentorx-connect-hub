@@ -849,6 +849,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ##########################################################################################
+  // ###################### ENDPOINTS E-MAIL - BREVO ####################################
+  // ##########################################################################################
+
+  // ENDPOINT 21: Enviar e-mail de boas-vindas
+  app.post('/api/email/boas-vindas', async (req, res) => {
+    try {
+      const { userName, userEmail, userRole, loginUrl, supportUrl } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/email/boas-vindas');
+      console.log('📦 ROUTES.TS: Dados do e-mail:', {
+        userName,
+        userEmail,
+        userRole,
+        loginUrl: loginUrl ? 'presente' : 'ausente',
+        supportUrl: supportUrl ? 'presente' : 'ausente'
+      });
+      
+      // 🔍 VALIDAÇÃO: Campos obrigatórios
+      if (!userName || !userEmail || !userRole) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios: userName, userEmail, userRole'
+        });
+      }
+
+      // 🔍 VALIDAÇÃO: Role válido
+      if (!['mentor', 'mentorado'].includes(userRole)) {
+        return res.status(400).json({
+          success: false,
+          error: 'userRole deve ser "mentor" ou "mentorado"'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de e-mail
+      const { enviarEmailBoasVindas } = await import('./services/email/emailService');
+      
+      const emailData = {
+        userName,
+        userEmail,
+        userRole: userRole as 'mentor' | 'mentorado',
+        loginUrl: loginUrl || 'https://app.mentoraai.com.br/login',
+        supportUrl: supportUrl || 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      const result = await enviarEmailBoasVindas(emailData);
+      
+      if (!result.success) {
+        return res.status(500).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/email/boas-vindas:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ENDPOINT 22: Testar conectividade Brevo
+  app.get('/api/email/test', async (req, res) => {
+    try {
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/email/test');
+      
+      // Importar dinamicamente o serviço de e-mail
+      const { testarConectividadeBrevo } = await import('./services/email/emailService');
+      
+      const result = await testarConectividadeBrevo();
+      
+      // Verificar configurações de ambiente
+      const { config } = await import('./environment');
+      
+      const hasAPIKey = !!config.BREVO_API_KEY && config.BREVO_API_KEY !== '';
+      const hasSenderEmail = !!config.BREVO_SENDER_EMAIL && config.BREVO_SENDER_EMAIL !== '';
+      const hasSenderName = !!config.BREVO_SENDER_NAME && config.BREVO_SENDER_NAME !== '';
+      
+      res.json({
+        success: result.success,
+        message: result.message,
+        config: {
+          hasAPIKey,
+          hasSenderEmail,
+          hasSenderName,
+          senderEmail: config.BREVO_SENDER_EMAIL,
+          senderName: config.BREVO_SENDER_NAME,
+          apiKeyPrefix: config.BREVO_API_KEY?.substring(0, 15) + '...' || 'N/A'
+        },
+        environment: config.NODE_ENV
+      });
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/email/test:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT 23: Enviar e-mail de teste
+  app.post('/api/email/test-send', async (req, res) => {
+    try {
+      const { email, name, role } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/email/test-send');
+      console.log('📦 ROUTES.TS: Dados do teste:', { email, name, role });
+      
+      // 🔍 VALIDAÇÃO: Campos obrigatórios
+      if (!email || !name || !role) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios: email, name, role'
+        });
+      }
+
+      // 🔍 VALIDAÇÃO: Role válido
+      if (!['mentor', 'mentorado'].includes(role)) {
+        return res.status(400).json({
+          success: false,
+          error: 'role deve ser "mentor" ou "mentorado"'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de e-mail
+      const { enviarEmailBoasVindas } = await import('./services/email/emailService');
+      
+      const emailData = {
+        userName: name,
+        userEmail: email,
+        userRole: role as 'mentor' | 'mentorado',
+        loginUrl: 'https://app.mentoraai.com.br/login',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      const result = await enviarEmailBoasVindas(emailData);
+      
+      if (!result.success) {
+        return res.status(500).json(result);
+      }
+      
+      res.json({
+        ...result,
+        message: `E-mail de teste enviado com sucesso para ${email}`
+      });
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/email/test-send:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -230,7 +230,7 @@ const MentorCursosAdquiridosPage = () => {
             <h1 className="text-3xl font-bold">Cursos Adquiridos</h1>
             <p className="text-muted-foreground">Cursos que adquiri de outros mentores</p>
           </div>
-          <Button onClick={() => navigate('/cursos')}>
+          <Button onClick={() => navigate('/courses')}>
             <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
           </Button>
         </div>
@@ -256,7 +256,7 @@ const MentorCursosAdquiridosPage = () => {
                 <p className="text-gray-600 mb-4">
                   Você ainda não adquiriu nenhum curso de outros mentores.
                 </p>
-                <Button onClick={() => navigate('/cursos')}>
+                <Button onClick={() => navigate('/courses')}>
                   Explorar Cursos
                 </Button>
               </CardContent>

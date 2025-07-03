@@ -1,5 +1,4 @@
 import { supabase } from '../utils/supabase';
-import type { Database } from '../utils/supabase';
 
 // Tipos para o player de curso - compatíveis com types.ts e schema
 export type ConteudoItemLocal = {
@@ -8,6 +7,7 @@ export type ConteudoItemLocal = {
   content_type: 'video_externo' | 'texto_rico' | 'pdf'; // tipo_conteudo -> content_type
   content_data: { // dados_conteudo -> content_data
     url?: string;
+    video_url?: string; // Campo usado no banco de dados
     html_content?: string;
     pdf_url?: string;
     pdf_filename?: string;

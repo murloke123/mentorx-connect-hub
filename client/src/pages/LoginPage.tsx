@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
+import { enviarEmailBoasVindas } from '@/services/emailService';
 import { createOrUpdateStripeConnectedAccount } from '@/services/stripeClientService';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -104,15 +105,22 @@ const LoginPage = () => {
         });
         
         if (error) {
-          // Se o erro for de usuário já existente, tentar fazer login
+          // Se o erro for de usuário já existente, mudar para modo login
           if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
             console.log("User already exists, switching to login mode");
             toast({
               title: "Usuário já existe",
-              description: "Este email já está cadastrado. Redirecionando para login...",
+              description: "Este email já está cadastrado. Use a senha para fazer login.",
               variant: "destructive",
             });
             setIsSignUp(false);
+            setLoading(false); // Importante: resetar o loading
+            setError(null); // Limpar qualquer erro anterior
+            // Limpar campos específicos do cadastro
+            setFullName('');
+            setConfirmPassword('');
+            setCategoryId('');
+            setRole('mentorado');
             return;
           }
           throw error;
@@ -159,6 +167,29 @@ const LoginPage = () => {
           }
           
           console.log("User profile after signup:", profileData);
+          
+          // 📧 ENVIAR E-MAIL DE BOAS-VINDAS
+          console.log('📧 [SIGNUP] Iniciando envio de e-mail de boas-vindas...');
+          try {
+            const emailResult = await enviarEmailBoasVindas({
+              userName: fullName,
+              userEmail: email,
+              userRole: role,
+              loginUrl: window.location.origin + '/login',
+              supportUrl: window.location.origin + '/suporte'
+            });
+
+            if (emailResult.success) {
+              console.log('✅ [SIGNUP] E-mail de boas-vindas enviado com sucesso!');
+              console.log('✅ [SIGNUP] Message ID:', emailResult.messageId);
+            } else {
+              console.warn('⚠️ [SIGNUP] Falha no envio do e-mail:', emailResult.error);
+              // Não falhar o cadastro por causa do e-mail
+            }
+          } catch (emailError) {
+            console.error('❌ [SIGNUP] Erro crítico no envio de e-mail:', emailError);
+            // Não falhar o cadastro por causa do e-mail
+          }
           
           // Criar conta conectada na Stripe para mentores
           if (profileData?.role === 'mentor') {
@@ -213,13 +244,13 @@ const LoginPage = () => {
 
                 toast({
                   title: "Cadastro realizado com sucesso!",
-                  description: "Bem-vindo! Complete sua configuração de pagamentos.",
+                  description: "Bem-vindo! Verifique seu e-mail e complete sua configuração de pagamentos.",
                 });
               } else {
                 console.warn("⚠️ [LOGIN] Erro ao criar conta Stripe:", stripeResult.error);
                 toast({
                   title: "Cadastro realizado!",
-                  description: "Bem-vindo! Configure pagamentos mais tarde.",
+                  description: "Bem-vindo! Verifique seu e-mail e configure pagamentos mais tarde.",
                 });
               }
             } catch (error) {
@@ -227,14 +258,14 @@ const LoginPage = () => {
               // Não falhar o cadastro por causa do Stripe
               toast({
                 title: "Cadastro realizado!",
-                description: "Bem-vindo à plataforma!",
+                description: "Bem-vindo à plataforma! Verifique seu e-mail.",
               });
             }
           } else {
             // Para mentorados, apenas mostrar sucesso padrão
             toast({
               title: "Cadastro realizado com sucesso!",
-              description: "Bem-vindo à plataforma!",
+              description: "Bem-vindo à plataforma! Verifique seu e-mail de boas-vindas.",
             });
           }
           

@@ -14,6 +14,7 @@ import { Calendar, Facebook, GraduationCap, Heart, Instagram, MessageCircle, Sta
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PublicCalendarComponent from "@/components/PublicCalendarComponent";
 import Navigation from "@/components/shared/Navigation";
 
 interface CourseWithProfile extends Course {
@@ -539,44 +540,17 @@ const MentorPublicProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Agende uma Conversa</h2>
-              
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold">Horários Disponíveis</h3>
-                  
-                  <div className="space-y-3">
-                    {['Segunda a Sexta: 09:00 - 18:00', 'Sábado: 09:00 - 12:00', 'Domingo: Não atendo'].map((schedule, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                        <Calendar className="h-5 w-5 text-purple-600" />
-                        <span>{schedule}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 rounded-lg">
-                    Agendar Mentoria
-                  </Button>
-                </div>
-                
-                <div className="bg-gradient-to-br from-purple-100 to-blue-100 p-6 rounded-xl">
-                  <h3 className="text-lg font-semibold mb-4">Calendário do Mês</h3>
-                  <div className="grid grid-cols-7 gap-2 text-center">
-                    {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map((day) => (
-                      <div key={day} className="font-medium text-sm py-2">{day}</div>
-                    ))}
-                    {Array.from({ length: 31 }, (_, i) => (
-                      <div key={i} className={`py-2 text-sm rounded ${
-                        (i + 1) % 7 === 0 ? 'bg-red-100' : 'bg-white hover:bg-purple-200 cursor-pointer'
-                      }`}>
-                        {i + 1}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PublicCalendarComponent 
+              title="Agende uma Conversa"
+              buttonText="Agendar Mentoria"
+              onScheduleClick={() => {
+                // Aqui você pode adicionar a lógica de agendamento
+                toast({
+                  title: "Agendamento solicitado",
+                  description: "Em breve implementaremos o sistema de agendamento completo!"
+                });
+              }}
+            />
           </section>
 
           {/* Contato Section */}
