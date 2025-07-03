@@ -65,8 +65,21 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     // Só permite clicar em dias disponíveis (que não sejam indisponíveis)
     if (isWorking || isCurrentDay) {
       const clickedDate = new Date(currentYear, currentMonth, day);
+      
+      // Função para formatar data local sem problemas de fuso horário
+      const formatDateForDatabase = (date: Date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
       console.log('📅 [handleDayClick] Dia clicado:', {
-        date: clickedDate.toISOString().split('T')[0],
+        clickedDay: day,
+        clickedDate: clickedDate,
+        formattedDate: formatDateForDatabase(clickedDate),
+        isoString: clickedDate.toISOString(),
+        isoSplit: clickedDate.toISOString().split('T')[0],
         isWorking,
         isCurrentDay
       });

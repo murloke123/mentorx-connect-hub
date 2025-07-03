@@ -78,18 +78,46 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
   const loadAppointments = async () => {
     if (!selectedDate || !mentorId) return;
 
+    // Função para formatar data local sem problemas de fuso horário
+    const formatDateForDatabase = (date: Date) => {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const formattedDate = formatDateForDatabase(selectedDate);
     console.log('🔄 [loadAppointments] Carregando agendamentos para:', {
-      date: selectedDate.toISOString().split('T')[0],
-      mentorId
+      selectedDate: selectedDate,
+      formattedDate: formattedDate,
+      mentorId: mentorId,
+      dateType: typeof formattedDate,
+      mentorIdType: typeof mentorId,
+      dateDebug: {
+        year: selectedDate.getFullYear(),
+        month: selectedDate.getMonth() + 1,
+        day: selectedDate.getDate(),
+        isoString: selectedDate.toISOString(),
+        isoSplit: selectedDate.toISOString().split('T')[0]
+      }
     });
 
     setLoading(true);
     try {
+      // Primeiro, vamos buscar TODOS os agendamentos para debug
+      const { data: allData, error: allError } = await supabase
+        .from('calendar')
+        .select('*')
+        .eq('mentor_id', mentorId);
+
+      console.log('🔍 [loadAppointments] TODOS os agendamentos do mentor:', allData);
+
+      // Agora buscar apenas do dia específico
       const { data, error } = await supabase
         .from('calendar')
         .select('*')
         .eq('mentor_id', mentorId)
-        .eq('scheduled_date', selectedDate.toISOString().split('T')[0])
+        .eq('scheduled_date', formattedDate)
         .order('start_time', { ascending: true });
 
       if (error) {
@@ -100,7 +128,11 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
           variant: "destructive"
         });
       } else {
-        console.log('✅ [loadAppointments] Agendamentos carregados:', data);
+        console.log('✅ [loadAppointments] Agendamentos do dia específico:', {
+          searchDate: formattedDate,
+          found: data,
+          count: data?.length || 0
+        });
         setAppointments(data || []);
       }
     } catch (err) {
@@ -144,18 +176,18 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Agendamentos - {formatDate(selectedDate)}
+            Agendamento com {mentorName}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Cabeçalho com informações do mentor */}
+          {/* Cabeçalho com data do agendamento */}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="font-medium">Mentor: {mentorName}</span>
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium">Data: {selectedDate.toLocaleDateString('pt-BR')}</span>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">

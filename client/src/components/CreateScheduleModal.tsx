@@ -174,7 +174,16 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         notes: notes.trim() || null
       };
 
-      console.log('📊 [handleSchedule] Dados do agendamento:', appointmentData);
+      console.log('📊 [handleSchedule] Dados do agendamento:', {
+        appointmentData,
+        formattedDate,
+        selectedDate: selectedDate,
+        dateComparison: {
+          formattedDate,
+          selectedDateISO: selectedDate.toISOString().split('T')[0],
+          isEqual: formattedDate === selectedDate.toISOString().split('T')[0]
+        }
+      });
 
       const { data, error } = await supabase
         .from('calendar')
