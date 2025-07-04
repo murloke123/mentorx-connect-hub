@@ -45,10 +45,22 @@ export interface EmailResponse {
 }
 
 export interface BrevoEmailParams {
-  NOME_USUARIO: string;
-  EMAIL_USUARIO: string;
-  URL_LOGIN: string;
-  URL_SUPORTE: string;
-  ANO_ATUAL: string;
-  ROLE_USUARIO: string;
+  NOME_USUARIO?: string;
+  EMAIL_USUARIO?: string;
+  URL_LOGIN?: string;
+  URL_SUPORTE?: string;
+  ANO_ATUAL?: string;
+  ROLE_USUARIO?: string;
+  // Calendar cancel params
+  MENTOR_NAME?: string;
+  MENTEE_NAME?: string;
+  MENTEE_EMAIL?: string;
+  APPOINTMENT_DATE?: string;
+  APPOINTMENT_TIME?: string;
+  TIMEZONE?: string;
+  CANCELLATION_REASON?: string;
+  PLATFORM_URL?: string;
+  SUPPORT_URL?: string;
+  CURRENT_YEAR?: string;
+  [key: string]: string | undefined;
 } 

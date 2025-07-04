@@ -1,9 +1,10 @@
-import { Calendar, Clock, Globe, Plus, User } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Globe, Plus, User, X, XCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../utils/supabase';
 import { findTimezoneByValue } from '../utils/timezones';
+import CancelAppointmentModal from './CancelAppointmentModal';
 import CreateScheduleModal from './CreateScheduleModal';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
@@ -55,6 +56,8 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('pt-BR', {
@@ -168,6 +171,22 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
     });
   };
 
+  const handleCancelClick = (appointment: Appointment) => {
+    setAppointmentToCancel(appointment);
+    setShowCancelModal(true);
+  };
+
+  const handleCancelSuccess = () => {
+    setShowCancelModal(false);
+    setAppointmentToCancel(null);
+    loadAppointments(); // Recarregar agendamentos do dia
+    
+    // Notificar a página principal para atualizar a lista completa
+    if (onAppointmentChange) {
+      onAppointmentChange();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -252,17 +271,36 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <div className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 ${
                             appointment.status === 'scheduled' 
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-gray-100 text-gray-800 border-gray-200 border'
                               : appointment.status === 'completed'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-green-100 text-green-800 border-green-200 border'
+                              : 'bg-red-100 text-red-800 border-red-200 border'
                           }`}>
-                            {appointment.status === 'scheduled' && 'Agendado'}
-                            {appointment.status === 'completed' && 'Concluído'}
-                            {appointment.status === 'cancelled' && 'Cancelado'}
-                          </span>
+                            <div className="flex items-center gap-1">
+                              {appointment.status === 'scheduled' && <CheckCircle className="h-4 w-4" />}
+                              {appointment.status === 'completed' && <CheckCircle className="h-4 w-4" />}
+                              {appointment.status === 'cancelled' && <XCircle className="h-4 w-4" />}
+                              <span>
+                                {appointment.status === 'scheduled' && 'Agendado'}
+                                {appointment.status === 'completed' && 'Concluído'}
+                                {appointment.status === 'cancelled' && 'Cancelado'}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Botão de cancelar - só aparece para agendamentos "scheduled" e se o usuário é o mentor */}
+                          {appointment.status === 'scheduled' && user?.id === mentorId && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleCancelClick(appointment)}
+                              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Cancelar
+                            </Button>
+                          )}
                         </div>
                       </div>
                       {appointment.notes && (
@@ -289,6 +327,16 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
             mentorName={mentorName}
             settings={settings}
             existingAppointments={appointments}
+          />
+        )}
+
+        {/* Modal de cancelamento de agendamento */}
+        {showCancelModal && (
+          <CancelAppointmentModal
+            isOpen={showCancelModal}
+            onClose={() => setShowCancelModal(false)}
+            onSuccess={handleCancelSuccess}
+            appointment={appointmentToCancel}
           />
         )}
       </DialogContent>

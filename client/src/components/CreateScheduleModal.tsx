@@ -87,6 +87,66 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
   const timeOptions = generateTimeOptions();
 
+  // Verificar se um horário específico está ocupado
+  const isTimeOccupied = (time: string) => {
+    return existingAppointments.some(appointment => {
+      // Ignorar agendamentos cancelados
+      if (appointment.status === 'cancelled') return false;
+      
+      const appointmentStart = appointment.start_time.substring(0, 5);
+      const appointmentEnd = appointment.end_time.substring(0, 5);
+      
+      // Verificar se o horário está dentro do intervalo ocupado (incluindo o horário de início)
+      return time >= appointmentStart && time < appointmentEnd;
+    });
+  };
+
+  // Filtrar horários disponíveis para início
+  const getAvailableStartTimes = () => {
+    return timeOptions.filter(time => !isTimeOccupied(time));
+  };
+
+  // Filtrar horários disponíveis para fim (baseado no horário de início selecionado)
+  const getAvailableEndTimes = () => {
+    if (!startTime) return [];
+    
+    // Criar lista de horários ocupados (incluindo todos os slots dentro de cada agendamento)
+    const occupiedTimes = new Set<string>();
+    
+    existingAppointments.forEach(appointment => {
+      if (appointment.status === 'cancelled') return;
+      
+      const appointmentStart = appointment.start_time.substring(0, 5);
+      const appointmentEnd = appointment.end_time.substring(0, 5);
+      
+      // Marcar todos os slots de 30 minutos dentro do agendamento como ocupados
+      timeOptions.forEach(time => {
+        if (time >= appointmentStart && time < appointmentEnd) {
+          occupiedTimes.add(time);
+        }
+      });
+    });
+    
+    const availableEndTimes = timeOptions.filter(time => {
+      // Deve ser posterior ao horário de início
+      if (time <= startTime) return false;
+      
+      // Não pode ser um horário ocupado
+      if (occupiedTimes.has(time)) return false;
+      
+      // Verificar se algum slot entre startTime e time está ocupado
+      const hasOccupiedSlotInBetween = timeOptions.some(slotTime => {
+        return slotTime > startTime && slotTime < time && occupiedTimes.has(slotTime);
+      });
+      
+      if (hasOccupiedSlotInBetween) return false;
+      
+      return true;
+    });
+    
+    return availableEndTimes;
+  };
+
   const isTimeSlotAvailable = (start: string, end: string) => {
     if (!start || !end) return true;
     
@@ -240,12 +300,17 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Horário de Início</label>
-            <Select value={startTime} onValueChange={setStartTime}>
+            <Select value={startTime} onValueChange={(value) => {
+              setStartTime(value);
+              // Sempre limpar horário de fim quando mudar o horário de início
+              // para forçar o usuário a selecionar um novo horário de fim válido
+              setEndTime('');
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o horário de início" />
               </SelectTrigger>
-              <SelectContent>
-                {timeOptions.map((time) => (
+              <SelectContent side="bottom">
+                {getAvailableStartTimes().map((time) => (
                   <SelectItem key={time} value={time}>
                     {time}
                   </SelectItem>
@@ -256,16 +321,22 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Horário de Fim</label>
-            <Select value={endTime} onValueChange={setEndTime}>
+            <Select value={endTime} onValueChange={setEndTime} disabled={!startTime}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o horário de fim" />
+                <SelectValue placeholder={startTime ? "Selecione o horário de fim" : "Primeiro selecione o horário de início"} />
               </SelectTrigger>
-              <SelectContent>
-                {timeOptions.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
+              <SelectContent side="bottom">
+                {getAvailableEndTimes().length > 0 ? (
+                  getAvailableEndTimes().map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="p-2 text-center text-sm text-gray-500">
+                    Nenhum horário disponível para este início
+                  </div>
+                )}
               </SelectContent>
             </Select>
           </div>

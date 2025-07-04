@@ -1004,6 +1004,344 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ENDPOINT DEBUG: Testar envio de email sem verificar banco
+  app.post('/api/calendar/test-email', async (req, res) => {
+    try {
+      const { 
+        mentorName, 
+        menteeName, 
+        menteeEmail, 
+        appointmentDate, 
+        appointmentTime, 
+        cancellationReason 
+      } = req.body;
+      
+      console.log('🧪 [TEST-EMAIL] Testando envio de email diretamente...');
+      console.log('🧪 [TEST-EMAIL] Dados recebidos:', {
+        mentorName, menteeName, menteeEmail, appointmentDate, appointmentTime, cancellationReason
+      });
+      
+      // Importar dinamicamente o serviço de e-mail de cancelamento
+      const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
+      
+      const emailData = {
+        mentorName,
+        menteeName,
+        menteeEmail,
+        appointmentDate,
+        appointmentTime,
+        timezone: 'America/Sao_Paulo',
+        cancellationReason,
+        platformUrl: 'https://app.mentoraai.com.br',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 [TEST-EMAIL] Enviando email de teste...');
+      const result = await enviarEmailCancelamentoAgendamento(emailData);
+      
+      console.log('📥 [TEST-EMAIL] Resultado:', result);
+      
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          error: 'Falha no envio do email de teste',
+          details: result.error
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: 'Email de teste enviado com sucesso!',
+        messageId: result.messageId,
+        testData: emailData
+      });
+    } catch (error) {
+      console.error('❌ [TEST-EMAIL] Erro:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT DEBUG: Listar IDs de agendamentos disponíveis
+  app.get('/api/calendar/list-ids', async (req, res) => {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const { config } = await import('./environment');
+      const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+      
+      // Buscar todos os IDs de agendamentos
+      const { data: appointments, error } = await supabase
+        .from('calendar')
+        .select('id, status, mentor_name, mentee_name, scheduled_date, start_time, end_time, created_at')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      console.log('DEBUG: Lista de agendamentos:', { appointments, error });
+      
+      res.json({
+        found: appointments ? appointments.length : 0,
+        error: error?.message,
+        appointments: appointments || []
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Erro' });
+    }
+  });
+
+  // ENDPOINT DEBUG: Verificar agendamento
+  app.get('/api/calendar/debug/:appointmentId', async (req, res) => {
+    try {
+      const { appointmentId } = req.params;
+      const { createClient } = await import('@supabase/supabase-js');
+      const { config } = await import('./environment');
+      const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+      
+      // Buscar todos os agendamentos com esse ID
+      const { data: allResults, error: allError } = await supabase
+        .from('calendar')
+        .select('*')
+        .eq('id', appointmentId);
+        
+      // Buscar também todos os agendamentos para análise geral
+      const { data: allAppointments, error: allAppError } = await supabase
+        .from('calendar')
+        .select('id, status, mentor_name, mentee_name, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      console.log('DEBUG: Resultado da busca SEM .single():', { allResults, allError });
+      
+      // Buscar com .single()
+      const { data: singleResult, error: singleError } = await supabase
+        .from('calendar')
+        .select('*')
+        .eq('id', appointmentId)
+        .single();
+        
+      console.log('DEBUG: Resultado da busca COM .single():', { singleResult, singleError });
+      
+      res.json({
+        appointmentId,
+        withoutSingle: { data: allResults, error: allError?.message },
+        withSingle: { data: singleResult, error: singleError?.message },
+        recentAppointments: { data: allAppointments, error: allAppError?.message }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Erro' });
+    }
+  });
+
+  // ENDPOINT 24: Enviar e-mail de cancelamento de agendamento
+  app.post('/api/calendar/cancel-email', async (req, res) => {
+    try {
+      const { 
+        appointmentId, 
+        mentorName, 
+        menteeName, 
+        appointmentDate, 
+        appointmentTime, 
+        cancellationReason 
+      } = req.body;
+      
+      console.log('\n========== CANCELAMENTO DE AGENDAMENTO ==========');
+      console.log('📥 Dados recebidos:', JSON.stringify({
+        appointmentId,
+        mentorName,
+        menteeName,
+        appointmentDate,
+        appointmentTime,
+        cancellationReason
+      }, null, 2));
+      
+      // Validação dos campos obrigatórios
+      if (!appointmentId || !mentorName || !menteeName || !appointmentDate || !appointmentTime) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios faltando'
+        });
+      }
+      
+      // Buscar dados do agendamento no banco
+      const { createClient } = await import('@supabase/supabase-js');
+      const { config } = await import('./environment');
+      
+      // Usar SERVICE_ROLE_KEY para bypass RLS
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || config.SUPABASE_ANON_KEY;
+      const supabase = createClient(config.SUPABASE_URL, supabaseServiceKey);
+      
+      console.log('\n🔍 Buscando agendamento ID:', appointmentId);
+      
+      // Buscar o agendamento independente do status
+      const { data: appointments, error: searchError } = await supabase
+        .from('calendar')
+        .select('*')
+        .eq('id', appointmentId);
+      
+      console.log('📊 Resultado da busca:', {
+        encontrados: appointments?.length || 0,
+        erro: searchError?.message || null
+      });
+      
+      if (searchError) {
+        console.error('❌ Erro na busca:', searchError);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao buscar agendamento'
+        });
+      }
+      
+      // Se não encontrou o agendamento
+      if (!appointments || appointments.length === 0) {
+        console.log('⚠️ Agendamento não encontrado no banco (possível RLS ativo)');
+        console.log('✅ Usando dados fornecidos pelo frontend para envio do email');
+        
+        // Buscar email do mentorado baseado no nome (fallback)
+        const { data: menteeByName, error: nameError } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('full_name', menteeName)
+          .limit(1);
+        
+        const menteeEmail = menteeByName?.[0]?.email || 'guilherme.ramalho@outlook.com';
+        
+        console.log('\n📧 Preparando envio de email...');
+        const emailData = {
+          mentorName,
+          menteeName,
+          menteeEmail,
+          appointmentDate,
+          appointmentTime,
+          timezone: 'America/Sao_Paulo',
+          cancellationReason,
+          platformUrl: 'https://app.mentoraai.com.br',
+          supportUrl: 'https://app.mentoraai.com.br/suporte'
+        };
+        
+        console.log('📤 Dados para o email:', JSON.stringify(emailData, null, 2));
+        
+        // Importar e chamar o serviço de email
+        const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
+        const result = await enviarEmailCancelamentoAgendamento(emailData);
+        
+        console.log('\n📨 Resultado do envio:', JSON.stringify(result, null, 2));
+        
+        return res.json({
+          success: result.success,
+          message: result.success ? 'Email enviado com sucesso' : 'Erro ao enviar email',
+          details: result
+        });
+      }
+      
+      // Se encontrou o agendamento
+      const appointment = appointments[0];
+      console.log('✅ Agendamento encontrado:', {
+        id: appointment.id,
+        status: appointment.status,
+        mentee_id: appointment.mentee_id
+      });
+      
+      // Buscar email do mentorado
+      console.log('\n🔍 Buscando email do mentorado ID:', appointment.mentee_id);
+      
+      const { data: menteeProfile, error: menteeError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', appointment.mentee_id)
+        .single();
+      
+      if (menteeError || !menteeProfile?.email) {
+        console.error('❌ Email do mentorado não encontrado');
+        return res.status(400).json({
+          success: false,
+          error: 'Email do mentorado não encontrado'
+        });
+      }
+      
+      console.log('✅ Email encontrado:', menteeProfile.email);
+      
+      // Preparar e enviar email
+      console.log('\n📧 Preparando envio de email...');
+      const emailData = {
+        mentorName,
+        menteeName,
+        menteeEmail: menteeProfile.email,
+        appointmentDate,
+        appointmentTime,
+        timezone: 'America/Sao_Paulo',
+        cancellationReason,
+        platformUrl: 'https://app.mentoraai.com.br',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 Dados para o email:', JSON.stringify(emailData, null, 2));
+      
+      // Importar e chamar o serviço de email
+      const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
+      const result = await enviarEmailCancelamentoAgendamento(emailData);
+      
+      console.log('\n📨 Resultado do envio:', JSON.stringify(result, null, 2));
+      console.log('==================================================\n');
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 'Email de cancelamento enviado com sucesso' : 'Erro ao enviar email',
+        details: result
+      });
+      
+    } catch (error) {
+      console.error('\n❌ ERRO CRÍTICO:', error);
+      console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+      console.log('==================================================\n');
+      
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT 25: Testar e-mail de cancelamento (apenas para debug)
+  app.post('/api/calendar/cancel-email/test', async (req, res) => {
+    try {
+      console.log('🧪 ROUTES.TS: Endpoint de teste de email de cancelamento');
+      
+      // Importar dinamicamente o serviço de e-mail de cancelamento
+      const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
+      
+      const testEmailData = {
+        mentorName: 'Mentor Teste',
+        menteeName: 'Mentorado Teste',
+        menteeEmail: req.body.email || 'teste@exemplo.com',
+        appointmentDate: 'quinta-feira, 02 de janeiro de 2025',
+        appointmentTime: '14:00 - 15:00',
+        timezone: 'America/Sao_Paulo',
+        cancellationReason: req.body.reason || 'Teste de cancelamento via API',
+        platformUrl: 'https://app.mentoraai.com.br',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 ROUTES.TS: Dados de teste:', testEmailData);
+      
+      const result = await enviarEmailCancelamentoAgendamento(testEmailData);
+      
+      console.log('📥 ROUTES.TS: Resultado do teste:', result);
+      
+      res.json({
+        success: true,
+        message: 'Teste de email de cancelamento executado',
+        result
+      });
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro no teste de email:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

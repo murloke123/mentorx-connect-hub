@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { supabase } from '../utils/supabase';
+import CancelAppointmentModal from './CancelAppointmentModal';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -48,6 +49,8 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [activeCardFilter, setActiveCardFilter] = useState<string>('all');
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
 
   // Formatar data para exibição
   const formatDate = (dateString: string) => {
@@ -66,22 +69,25 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
     return timeString.substring(0, 5);
   };
 
-  // Verificar se é hoje
+  // Verificar se é hoje (usando data local)
   const isToday = (dateString: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    return dateString === today;
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    return dateString === todayFormatted;
   };
 
-  // Verificar se é futuro
+  // Verificar se é futuro (usando data local)
   const isFuture = (dateString: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    return dateString > today;
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    return dateString > todayFormatted;
   };
 
-  // Verificar se é passado
+  // Verificar se é passado (usando data local)
   const isPast = (dateString: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    return dateString < today;
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    return dateString < todayFormatted;
   };
 
   // Carregar agendamentos
@@ -163,24 +169,96 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
 
   // Obter estatísticas
   const getStats = () => {
+    // Debug: verificar data atual
+    const currentDate = new Date();
+    const todayFormatted = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`;
+    
+    console.log('📊 [getStats] Debug:', {
+      todayFormatted,
+      appointments: appointments.map(apt => ({
+        name: apt.mentee_name,
+        date: apt.scheduled_date,
+        status: apt.status,
+        isPast: isPast(apt.scheduled_date),
+        isToday: isToday(apt.scheduled_date),
+        isFuture: isFuture(apt.scheduled_date)
+      }))
+    });
+
+    // Contar baseado apenas na data (independente do status)
     const past = appointments.filter(apt => isPast(apt.scheduled_date)).length;
-    const today = appointments.filter(apt => isToday(apt.scheduled_date) && apt.status === 'scheduled').length;
-    const future = appointments.filter(apt => isFuture(apt.scheduled_date) && apt.status === 'scheduled').length;
+    const todayCount = appointments.filter(apt => isToday(apt.scheduled_date)).length;
+    const future = appointments.filter(apt => isFuture(apt.scheduled_date)).length;
+    
+    // Contar baseado apenas no status
     const cancelled = appointments.filter(apt => apt.status === 'cancelled').length;
     const completed = appointments.filter(apt => apt.status === 'completed').length;
 
-    return { past, today, future, cancelled, completed };
+    console.log('📊 [getStats] Contagens:', { past, today: todayCount, future, cancelled, completed });
+
+    return { past, today: todayCount, future, cancelled, completed };
   };
 
   const stats = getStats();
 
-  // Obter cor do status
+  // ============= TAGS TEMPORAIS (baseadas na data) =============
+  const getTemporalCategory = (appointment: Appointment) => {
+    if (isToday(appointment.scheduled_date)) {
+      return 'today';
+    } else if (isPast(appointment.scheduled_date)) {
+      return 'past';
+    } else if (isFuture(appointment.scheduled_date)) {
+      return 'future';
+    }
+    return 'today'; // fallback
+  };
+
+  const getTemporalColor = (category: string) => {
+    switch (category) {
+      case 'past':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'today':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'future':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getTemporalIcon = (category: string) => {
+    switch (category) {
+      case 'past':
+        return <Clock className="h-4 w-4" />;
+      case 'today':
+        return <Calendar className="h-4 w-4" />;
+      case 'future':
+        return <CheckCircle className="h-4 w-4" />;
+      default:
+        return <Calendar className="h-4 w-4" />;
+    }
+  };
+
+  const getTemporalText = (category: string) => {
+    switch (category) {
+      case 'past':
+        return 'Passado';
+      case 'today':
+        return 'Hoje';
+      case 'future':
+        return 'Futuro';
+      default:
+        return 'Hoje';
+    }
+  };
+
+  // ============= TAGS DE STATUS (baseadas no campo status) =============
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'completed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
@@ -188,7 +266,6 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
     }
   };
 
-  // Obter ícone do status
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -202,7 +279,6 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
     }
   };
 
-  // Obter texto do status
   const getStatusText = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -212,7 +288,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
       case 'cancelled':
         return 'Cancelado';
       default:
-        return status;
+        return 'Agendado';
     }
   };
 
@@ -231,6 +307,17 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
       setActiveCardFilter(filterType);
       setDateFilter(filterType);
     }
+  };
+
+  const handleCancelClick = (appointment: Appointment) => {
+    setAppointmentToCancel(appointment);
+    setShowCancelModal(true);
+  };
+
+  const handleCancelSuccess = () => {
+    setShowCancelModal(false);
+    setAppointmentToCancel(null);
+    loadAppointments(); // Recarregar agendamentos
   };
 
   return (
@@ -441,17 +528,21 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h4 className="font-semibold text-gray-900">{appointment.mentee_name}</h4>
+                          {/* Tag Temporal */}
+                          <Badge className={`${getTemporalColor(getTemporalCategory(appointment))} border`}>
+                            <div className="flex items-center gap-1">
+                              {getTemporalIcon(getTemporalCategory(appointment))}
+                              {getTemporalText(getTemporalCategory(appointment))}
+                            </div>
+                          </Badge>
+                          
+                          {/* Tag de Status */}
                           <Badge className={`${getStatusColor(appointment.status)} border`}>
                             <div className="flex items-center gap-1">
                               {getStatusIcon(appointment.status)}
                               {getStatusText(appointment.status)}
                             </div>
                           </Badge>
-                          {isToday(appointment.scheduled_date) && (
-                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                              Hoje
-                            </Badge>
-                          )}
                         </div>
                         
                         <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -481,13 +572,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                           variant="outline"
                           size="sm"
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                          onClick={() => {
-                            // TODO: Implementar cancelamento
-                            toast({
-                              title: "Funcionalidade em desenvolvimento",
-                              description: "O cancelamento de agendamentos será implementado em breve."
-                            });
-                          }}
+                          onClick={() => handleCancelClick(appointment)}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
                           Cancelar
@@ -500,6 +585,16 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             ))
           )}
         </div>
+
+        {/* Modal de cancelamento de agendamento */}
+        {showCancelModal && (
+          <CancelAppointmentModal
+            isOpen={showCancelModal}
+            onClose={() => setShowCancelModal(false)}
+            onSuccess={handleCancelSuccess}
+            appointment={appointmentToCancel}
+          />
+        )}
       </CardContent>
     </Card>
   );
