@@ -71,26 +71,41 @@ const MentorCalendarioPage = () => {
           {/* Layout com dois componentes lado a lado */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             {/* Lado esquerdo - Configurações */}
-            <MentorCalendarSettings 
-              onSettingsChange={handleSettingsChange}
-            />
+            <div className="relative">
+              <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
+                CONFIGURAÇÕES
+              </div>
+              <MentorCalendarSettings 
+                onSettingsChange={handleSettingsChange}
+              />
+            </div>
             
             {/* Lado direito - Calendário */}
-            <MentorCalendarComponent 
-              settings={calendarSettings}
-              mentorId={user?.id}
-              mentorName={mentorName}
-              isClickable={true}
-              onAppointmentChange={handleAppointmentChange}
-            />
+            <div className="relative">
+              <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
+                CALENDÁRIO
+              </div>
+              <MentorCalendarComponent 
+                settings={calendarSettings}
+                mentorId={user?.id}
+                mentorName={mentorName}
+                isClickable={true}
+                onAppointmentChange={handleAppointmentChange}
+              />
+            </div>
           </div>
 
           {/* Lista de agendamentos */}
           {user?.id && (
-            <AppointmentsList 
-              mentorId={user.id} 
-              refreshTrigger={refreshAppointments}
-            />
+            <div className="relative">
+              <div className="absolute top-2 left-2 bg-purple-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
+                LISTA DE AGENDAMENTOS
+              </div>
+              <AppointmentsList 
+                mentorId={user.id} 
+                refreshTrigger={refreshAppointments}
+              />
+            </div>
           )}
         </div>
       </div>
