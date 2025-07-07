@@ -18,7 +18,7 @@ export const useNotifications = (userId?: string) => {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', userId)
+        .eq('receiver_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -72,7 +72,7 @@ export const useNotifications = (userId?: string) => {
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
-        .eq('user_id', userId)
+        .eq('receiver_id', userId)
         .eq('is_read', false);
 
       if (error) throw error;
@@ -105,7 +105,7 @@ export const useNotifications = (userId?: string) => {
       const { error } = await supabase
         .from('notifications')
         .delete()
-        .eq('user_id', userId);
+        .eq('receiver_id', userId);
 
       if (error) throw error;
 
@@ -146,7 +146,7 @@ export const useNotifications = (userId?: string) => {
           event: '*',
           schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${userId}`,
+          filter: `receiver_id=eq.${userId}`,
         },
         () => {
           fetchNotifications();

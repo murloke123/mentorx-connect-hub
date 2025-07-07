@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
+import { notifyLostFollower, notifyNewFollower } from "@/services/notificationService";
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
 import { useQuery } from "@tanstack/react-query";
@@ -37,6 +38,34 @@ const MentorPublicProfilePage = () => {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Função para re-verificar status de follow
+  const recheckFollowStatus = async () => {
+    console.log('🔄 [FOLLOW-RECHECK] Iniciando re-verificação de status');
+    
+    if (!currentUser || !id) {
+      console.log('⚠️ [FOLLOW-RECHECK] Condições não atendidas');
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from("mentor_followers")
+        .select("mentor_id, follower_id, followed_at")
+        .eq("mentor_id", id)
+        .eq("follower_id", currentUser.id)
+        .single();
+      
+      const isCurrentlyFollowing = !!data && !error;
+      console.log('🔄 [FOLLOW-RECHECK] Status atualizado:', { isCurrentlyFollowing, data, error });
+      
+      setIsFollowing(isCurrentlyFollowing);
+      return isCurrentlyFollowing;
+    } catch (recheckError) {
+      console.error('💥 [FOLLOW-RECHECK] Erro na re-verificação:', recheckError);
+      return false;
+    }
+  };
 
   // Fetch mentor courses
   const { data: mentorCourses = [], isLoading: coursesLoading } = useQuery({
@@ -88,16 +117,32 @@ const MentorPublicProfilePage = () => {
   // Check if current user is following this mentor
   useEffect(() => {
     const checkFollowStatus = async () => {
-      if (!currentUser || !id) return;
+      console.log('🔍 [FOLLOW-CHECK] Iniciando verificação de follow status');
+      console.log('🔍 [FOLLOW-CHECK] Parâmetros:', { currentUser: !!currentUser, id, currentUserId: currentUser?.id });
       
-      const { data, error } = await supabase
-        .from("mentor_followers")
-        .select("id")
-        .eq("mentor_id", id)
-        .eq("follower_id", currentUser.id)
-        .single();
+      if (!currentUser || !id) {
+        console.log('⚠️ [FOLLOW-CHECK] Condições não atendidas - currentUser ou id ausentes');
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from("mentor_followers")
+          .select("mentor_id, follower_id, followed_at")
+          .eq("mentor_id", id)
+          .eq("follower_id", currentUser.id)
+          .single();
         
-      setIsFollowing(!!data && !error);
+        console.log('📥 [FOLLOW-CHECK] Resposta do banco:', { data, error });
+        
+        const isCurrentlyFollowing = !!data && !error;
+        console.log('✅ [FOLLOW-CHECK] Status final:', { isCurrentlyFollowing });
+        
+        setIsFollowing(isCurrentlyFollowing);
+      } catch (checkError) {
+        console.error('💥 [FOLLOW-CHECK] Erro na verificação:', checkError);
+        setIsFollowing(false);
+      }
     };
     
     checkFollowStatus();
@@ -161,7 +206,23 @@ const MentorPublicProfilePage = () => {
   }, []);
 
   const handleFollowToggle = async () => {
+    console.log('🚀 [FOLLOW] Iniciando handleFollowToggle');
+    console.log('🔍 [FOLLOW] Estado atual:', {
+      currentUser: currentUser ? {
+        id: currentUser.id,
+        full_name: currentUser.full_name,
+        role: currentUser.role
+      } : null,
+      mentorData: mentorData ? {
+        id: mentorData.id,
+        full_name: mentorData.full_name
+      } : null,
+      mentorId: id,
+      isFollowing
+    });
+
     if (!currentUser) {
+      console.log('❌ [FOLLOW] Usuário não logado');
       toast({
         variant: "destructive",
         title: "Login necessário",
@@ -174,35 +235,114 @@ const MentorPublicProfilePage = () => {
     try {
       // Get the user's full name from profile
       const userName = currentUser.full_name || 'Usuário Anônimo';
+      console.log('👤 [FOLLOW] Nome do usuário:', userName);
       
       if (isFollowing) {
-        // Unfollow
+        console.log('➖ [FOLLOW] Executando UNFOLLOW');
+        
+        // Unfollow direto
         const { error } = await supabase
           .from("mentor_followers")
           .delete()
           .eq("mentor_id", id)
           .eq("follower_id", currentUser.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ [FOLLOW] Erro no unfollow:', error);
+          throw error;
+        }
 
+        console.log('✅ [FOLLOW] Unfollow realizado com sucesso');
         setIsFollowing(false);
         toast({
           title: "Deixou de seguir",
           description: `Você não está mais seguindo ${mentorData?.full_name}.`
         });
+        
+        // Re-verificar status para garantir consistência
+        await recheckFollowStatus();
+
+        // Criar notificação para o mentor sobre perda de seguidor
+        console.log('💔 [FOLLOW] Iniciando criação de notificação de unfollow');
+        console.log('🔍 [FOLLOW] Verificando condições:', {
+          mentorData: !!mentorData,
+          id: !!id,
+          mentorDataId: mentorData?.id,
+          paramId: id
+        });
+        
+        if (mentorData && id) {
+          try {
+            const notificationData = {
+              mentorId: id,
+              mentorName: mentorData.full_name || 'Mentor',
+              followerId: currentUser.id,
+              followerName: userName,
+            };
+            
+            console.log('📤 [FOLLOW] Dados para notificação de unfollow:', notificationData);
+            console.log('🔧 [FOLLOW] Chamando notifyLostFollower...');
+            
+            const result = await notifyLostFollower(notificationData);
+            
+            console.log('📨 [FOLLOW] Resultado da notificação de unfollow:', result);
+            
+            if (result.success) {
+              console.log('✅ [FOLLOW] Notificação de unfollow criada com sucesso');
+            } else {
+              console.error('⚠️ [FOLLOW] Falha na criação da notificação de unfollow:', result.error);
+            }
+          } catch (notificationError) {
+            console.error('💥 [FOLLOW] Erro ao criar notificação de unfollow:', notificationError);
+            console.error('📋 [FOLLOW] Stack trace:', notificationError instanceof Error ? notificationError.stack : 'N/A');
+            // Não bloquear o unfollow por erro na notificação
+          }
+        } else {
+          console.log('⚠️ [FOLLOW] Condições não atendidas para criar notificação de unfollow:', {
+            mentorData: !!mentorData,
+            id: !!id
+          });
+        }
       } else {
-        // Follow
+        console.log('➕ [FOLLOW] Executando FOLLOW');
+        
+        // Follow direto
+        const followData = {
+          mentor_id: id,
+          follower_id: currentUser.id,
+          follower_name: userName,
+          mentor_name: mentorData?.full_name || 'Mentor'
+        };
+        
+        console.log('📦 [FOLLOW] Dados para inserir no mentor_followers:', followData);
+        
         const { error } = await supabase
           .from("mentor_followers")
-          .insert({
-            mentor_id: id,
-            follower_id: currentUser.id,
-            follower_name: userName,
-            mentor_name: mentorData?.full_name || 'Mentor'
-          });
+          .insert(followData);
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ [FOLLOW] Erro no follow:', error);
+          
+          // Se for erro de chave duplicada, verificar se já está seguindo
+          if (error.code === '23505') {
+            console.log('🔄 [FOLLOW] Erro de chave duplicada - verificando status real');
+            
+            const actualStatus = await recheckFollowStatus();
+            
+            if (actualStatus) {
+              console.log('✅ [FOLLOW] Já está seguindo - estado corrigido');
+              toast({
+                title: "Já seguindo",
+                description: `Você já está seguindo ${mentorData?.full_name}!`
+              });
+              return;
+            }
+          }
+          
+          throw error;
+        }
 
+        console.log('✅ [FOLLOW] Follow realizado com sucesso');
         setIsFollowing(true);
         
         // Mostrar modal de sucesso
@@ -212,15 +352,63 @@ const MentorPublicProfilePage = () => {
           title: "Agora você está seguindo",
           description: `Você está seguindo ${mentorData?.full_name}!`
         });
+
+        // Re-verificar status para garantir consistência
+        await recheckFollowStatus();
+
+        // Criar notificação para o mentor sobre novo seguidor
+        console.log('🔔 [FOLLOW] Iniciando criação de notificação');
+        console.log('🔍 [FOLLOW] Verificando condições:', {
+          mentorData: !!mentorData,
+          id: !!id,
+          mentorDataId: mentorData?.id,
+          paramId: id
+        });
+        
+        if (mentorData && id) {
+          try {
+            const notificationData = {
+              mentorId: id,
+              mentorName: mentorData.full_name || 'Mentor',
+              followerId: currentUser.id,
+              followerName: userName,
+            };
+            
+            console.log('📤 [FOLLOW] Dados para notificação:', notificationData);
+            console.log('🔧 [FOLLOW] Chamando notifyNewFollower...');
+            
+            const result = await notifyNewFollower(notificationData);
+            
+            console.log('📨 [FOLLOW] Resultado da notificação:', result);
+            
+            if (result.success) {
+              console.log('✅ [FOLLOW] Notificação criada com sucesso');
+            } else {
+              console.error('⚠️ [FOLLOW] Falha na criação da notificação:', result.error);
+            }
+          } catch (notificationError) {
+            console.error('💥 [FOLLOW] Erro ao criar notificação:', notificationError);
+            console.error('📋 [FOLLOW] Stack trace:', notificationError instanceof Error ? notificationError.stack : 'N/A');
+            // Não bloquear o follow por erro na notificação
+          }
+        } else {
+          console.log('⚠️ [FOLLOW] Condições não atendidas para criar notificação:', {
+            mentorData: !!mentorData,
+            id: !!id
+          });
+        }
       }
     } catch (error) {
-      console.error("Error toggling follow:", error);
+      console.error("💥 [FOLLOW] Error toggling follow:", error);
+      console.error("📋 [FOLLOW] Stack trace:", error instanceof Error ? error.stack : 'N/A');
       toast({
         variant: "destructive",
         title: "Erro",
         description: "Não foi possível processar sua solicitação."
       });
     }
+    
+    console.log('🏁 [FOLLOW] Finalizando handleFollowToggle');
   };
 
   const scrollToSection = (sectionId: string) => {

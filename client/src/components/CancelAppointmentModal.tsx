@@ -1,6 +1,7 @@
 import { AlertTriangle, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useToast } from '../hooks/use-toast';
+import { notifyScheduleCancelledByMentor } from '../services/notificationService';
 import { supabase } from '../utils/supabase';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
@@ -100,6 +101,24 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
 
       console.log('✅ [CancelAppointment] Status atualizado com sucesso no banco');
 
+      // Criar notificação para o mentorado
+      console.log('🔔 [CancelAppointment] Criando notificação para o mentorado...');
+      try {
+        await notifyScheduleCancelledByMentor({
+          receiverId: appointment.mentee_id,
+          receiverName: appointment.mentee_name,
+          senderId: appointment.mentor_id,
+          senderName: appointment.mentor_name,
+          appointmentDate: formatDate(appointment.scheduled_date),
+          appointmentTime: `${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)}`,
+          reason: cancellationReason.trim(),
+        });
+        console.log('✅ [CancelAppointment] Notificação criada com sucesso');
+      } catch (notificationError) {
+        console.error('⚠️ [CancelAppointment] Erro ao criar notificação:', notificationError);
+        // Não bloquear o cancelamento por erro na notificação
+      }
+
       // Enviar email de cancelamento
       console.log('📧 [CancelAppointment] Preparando dados para envio de email...');
       const emailPayload = {
@@ -140,14 +159,14 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
           // Mostrar toast de aviso, mas não bloquear o cancelamento
           toast({
             title: "Agendamento cancelado com aviso",
-            description: "O agendamento foi cancelado, mas houve problema no envio do email. Contate o mentorado diretamente.",
+            description: "O agendamento foi cancelado e o mentorado foi notificado na plataforma. Houve problema no envio do email.",
             variant: "destructive"
           });
         } else {
           console.log('✅ [CancelAppointment] Email enviado com sucesso:', responseData);
           toast({
             title: "Agendamento cancelado",
-            description: "O agendamento foi cancelado e o mentorado foi notificado por email."
+            description: "O agendamento foi cancelado e o mentorado foi notificado por email e na plataforma."
           });
         }
       } catch (emailError) {
@@ -156,7 +175,7 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
         // Mostrar toast de aviso, mas não bloquear o cancelamento
         toast({
           title: "Agendamento cancelado com aviso",
-          description: "O agendamento foi cancelado, mas houve problema no envio do email. Contate o mentorado diretamente.",
+          description: "O agendamento foi cancelado e o mentorado foi notificado na plataforma. Houve problema no envio do email.",
           variant: "destructive"
         });
       }

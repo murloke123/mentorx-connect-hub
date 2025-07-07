@@ -1,17 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CheckCheck, Clock, Plus, Trash2, User } from 'lucide-react';
+import { Calendar, CheckCheck, Clock, Plus, Trash2, User, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Notification } from '../../types/database';
@@ -28,21 +28,68 @@ interface NotificationModalProps {
 }
 
 const getActionIcon = (type: string) => {
-  if (type === 'new_follower') {
-    return (
-      <div className="flex items-center space-x-1">
-        <Plus className="w-3 h-3 text-green-600" />
-        <User className="w-3 h-3 text-green-600" />
-      </div>
-    );
+  switch (type) {
+    case 'new_follower':
+      return (
+        <div className="flex items-center space-x-1">
+          <Plus className="w-3 h-3 text-green-600" />
+          <User className="w-3 h-3 text-green-600" />
+        </div>
+      );
+    case 'lost_follower':
+      return (
+        <div className="flex items-center space-x-1">
+          <X className="w-3 h-3 text-red-600" />
+          <User className="w-3 h-3 text-red-600" />
+        </div>
+      );
+    case 'cancel_schedule':
+      return (
+        <div className="flex items-center space-x-1">
+          <X className="w-3 h-3 text-red-600" />
+          <Calendar className="w-3 h-3 text-red-600" />
+        </div>
+      );
+    case 'appointment_cancelled':
+      return (
+        <div className="flex items-center space-x-1">
+          <X className="w-3 h-3 text-red-600" />
+          <Clock className="w-3 h-3 text-red-600" />
+        </div>
+      );
+    case 'new_enrollment':
+      return (
+        <div className="flex items-center space-x-1">
+          <CheckCheck className="w-3 h-3 text-blue-600" />
+          <User className="w-3 h-3 text-blue-600" />
+        </div>
+      );
+    case 'course_updated':
+      return (
+        <div className="flex items-center space-x-1">
+          <Plus className="w-3 h-3 text-purple-600" />
+          <CheckCheck className="w-3 h-3 text-purple-600" />
+        </div>
+      );
+    default:
+      return <User className="w-3 h-3 text-blue-600" />;
   }
-  return <User className="w-3 h-3 text-blue-600" />;
 };
 
 const getActionColor = (type: string) => {
   switch (type) {
     case 'new_follower':
       return 'bg-green-50 border-green-200';
+    case 'lost_follower':
+      return 'bg-red-50 border-red-200';
+    case 'cancel_schedule':
+      return 'bg-red-50 border-red-200';
+    case 'appointment_cancelled':
+      return 'bg-red-50 border-red-200';
+    case 'new_enrollment':
+      return 'bg-blue-50 border-blue-200';
+    case 'course_updated':
+      return 'bg-purple-50 border-purple-200';
     default:
       return 'bg-blue-50 border-blue-200';
   }
@@ -154,11 +201,11 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     <div className="flex items-center space-x-2 flex-1">
                       <div 
                         className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200 hover:shadow-lg"
-                        onClick={() => handleUserClick(notification.related_user_id)}
-                        title={`Ver perfil de ${notification.related_user_name || 'usuário'}`}
+                        onClick={() => handleUserClick(notification.sender_id || null)}
+                        title={`Ver perfil de ${notification.sender_name || 'usuário'}`}
                       >
                         <span className="text-white text-xs font-bold">
-                          {(notification.related_user_name || 'U').charAt(0).toUpperCase()}
+                          {(notification.sender_name || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -170,6 +217,11 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                             <p className="text-xs text-gray-500">
                               {notification.message}
                             </p>
+                            {notification.sender_name && (
+                              <p className="text-xs text-gray-400 mt-1">
+                                de {notification.sender_name}
+                              </p>
+                            )}
                           </div>
                           <div className="flex items-center space-x-2">
                             {!notification.is_read && (

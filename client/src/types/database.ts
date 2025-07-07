@@ -117,13 +117,14 @@ export interface Category {
 
 export interface Notification {
   id: string;
-  user_id: string;
+  receiver_id: string;        // Quem recebe a notificação
+  receiver_name?: string;     // Nome de quem recebe
+  sender_id?: string | null;  // Quem envia a notificação (opcional)
+  sender_name?: string | null; // Nome de quem envia (opcional)
   type: string;
   title: string;
   message: string;
   is_read: boolean;
-  related_user_id?: string | null;
-  related_user_name?: string | null;
   created_at: string;
   updated_at: string;
 }

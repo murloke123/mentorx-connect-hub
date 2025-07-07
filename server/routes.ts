@@ -814,40 +814,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ##########################################################################################
-  // ###################### ENDPOINT STRIPE - WEBHOOK ####################################
+  // ###################### STRIPE WEBHOOK REMOVIDO ####################################
   // ##########################################################################################
-
-  // ENDPOINT WEBHOOK: Processar eventos do Stripe
-  app.post('/api/stripe/webhook', async (req, res) => {
-    try {
-      const signature = req.get('stripe-signature');
-      
-      console.log('🚀 ROUTES.TS: Webhook recebido do Stripe');
-      console.log('📦 ROUTES.TS: Signature presente:', !!signature);
-      
-      if (!signature) {
-        return res.status(400).json({
-          success: false,
-          error: 'Stripe signature header ausente'
-        });
-      }
-      
-      // Importar dinamicamente o serviço de webhook
-      const { handleStripeWebhook } = await import('./services/stripeServerWebhookService');
-      
-      const result = await handleStripeWebhook(req.body, signature);
-      
-      console.log('✅ ROUTES.TS: Webhook processado com sucesso');
-      res.json(result);
-      
-    } catch (error) {
-      console.error('❌ ROUTES.TS: Erro no webhook:', error);
-      res.status(400).json({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Erro interno do servidor'
-      });
-    }
-  });
+  // 
+  // ℹ️ WEBHOOK DO STRIPE FOI REMOVIDO - NÃO ESTAVA SENDO USADO
+  // - Sistema de pagamentos funciona sem webhook
+  // - Transações são processadas pelo frontend
+  // - Matrículas são ativadas diretamente no checkout
+  // 
+  // ##########################################################################################
 
   // ##########################################################################################
   // ###################### ENDPOINTS E-MAIL - BREVO ####################################
