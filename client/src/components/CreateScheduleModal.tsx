@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
+import { notifyNewAppointment } from '../services/notificationService';
 import { supabase } from '../utils/supabase';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
@@ -260,6 +261,38 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         });
       } else {
         console.log('✅ [handleSchedule] Agendamento criado:', data);
+        
+        // Criar notificação para o mentor sobre o novo agendamento
+        console.log('🔔 [handleSchedule] Criando notificação para o mentor...');
+        try {
+          const formatDate = (dateString: string) => {
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            });
+          };
+
+          const formatTime = (timeString: string) => {
+            return timeString.substring(0, 5);
+          };
+
+          await notifyNewAppointment({
+            receiverId: mentorId,
+            receiverName: mentorName,
+            senderId: user.id,
+            senderName: profile.full_name || 'Usuário',
+            appointmentDate: formatDate(formattedDate),
+            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+          });
+          console.log('✅ [handleSchedule] Notificação criada com sucesso');
+        } catch (notificationError) {
+          console.error('⚠️ [handleSchedule] Erro ao criar notificação:', notificationError);
+          // Não bloquear a criação do agendamento por erro na notificação
+        }
+        
         onSuccess();
       }
     } catch (err) {

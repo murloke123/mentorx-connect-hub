@@ -81,7 +81,7 @@ const AppContent = () => {
   const location = useLocation();
   
   const { isCoursePlayerPage, isMentorPublicProfilePage, isLandingPageEditPage } = useMemo(() => ({
-    isCoursePlayerPage: location.pathname.includes('/mentor/cursos/view/') || location.pathname.includes('/mentorado/cursoplayer/') || location.pathname.includes('/mentor/cursoplayer/'),
+    isCoursePlayerPage: location.pathname.includes('/mentor/meus-cursos/view/') || location.pathname.includes('/mentorado/cursoplayer/') || location.pathname.includes('/mentor/cursoplayer/'),
     isMentorPublicProfilePage: location.pathname.includes('/mentor/publicview/'),
     isLandingPageEditPage: location.pathname.includes('/landing-page')
   }), [location.pathname]);
@@ -117,7 +117,7 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           <Route path="/mentor/publicview/:id" element={<MentorPublicProfilePage />} />
-          <Route path="/mentor/cursos" element={
+          <Route path="/mentor/meus-cursos" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorMeusCursosPage />
             </ProtectedRoute>
@@ -127,17 +127,17 @@ const AppContent = () => {
               <MentorCursosAdquiridosPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/novo" element={
+          <Route path="/mentor/meus-cursos/novo" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorCriarCursoPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/:id/editar" element={
+          <Route path="/mentor/meus-cursos/:id/editar" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorEditarCursoPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/view/:id" element={
+          <Route path="/mentor/meus-cursos/view/:id" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <CoursePlayerPage />
             </ProtectedRoute>
@@ -147,17 +147,17 @@ const AppContent = () => {
               <CoursePlayerPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/:courseId/landing-page" element={
+          <Route path="/mentor/meus-cursos/:courseId/landing-page" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <CourseLandingPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/:cursoId/modulos" element={
+          <Route path="/mentor/meus-cursos/:cursoId/modulos" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorModulosPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/cursos/:cursoId/modulos/:moduloId" element={
+          <Route path="/mentor/meus-cursos/:cursoId/modulos/:moduloId" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorConteudosPage />
             </ProtectedRoute>

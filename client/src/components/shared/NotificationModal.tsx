@@ -43,6 +43,13 @@ const getActionIcon = (type: string) => {
           <User className="w-3 h-3 text-red-600" />
         </div>
       );
+    case 'schedule':
+      return (
+        <div className="flex items-center space-x-1">
+          <Plus className="w-3 h-3 text-blue-600" />
+          <Calendar className="w-3 h-3 text-blue-600" />
+        </div>
+      );
     case 'cancel_schedule':
       return (
         <div className="flex items-center space-x-1">
@@ -82,6 +89,8 @@ const getActionColor = (type: string) => {
       return 'bg-green-50 border-green-200';
     case 'lost_follower':
       return 'bg-red-50 border-red-200';
+    case 'schedule':
+      return 'bg-blue-50 border-blue-200';
     case 'cancel_schedule':
       return 'bg-red-50 border-red-200';
     case 'appointment_cancelled':

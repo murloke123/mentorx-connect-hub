@@ -78,7 +78,7 @@ const AppContent = () => {
   const location = useLocation();
   
   const { isCoursePlayerPage, isMentorPublicProfilePage, isLandingPageEditPage } = useMemo(() => ({
-    isCoursePlayerPage: location.pathname.includes('/mentor/cursos/view/') || location.pathname.includes('/mentorado/cursoplayer/') || location.pathname.includes('/mentor/cursoplayer/'),
+    isCoursePlayerPage: location.pathname.includes('/mentor/meus-cursos/view/') || location.pathname.includes('/mentorado/cursoplayer/') || location.pathname.includes('/mentor/cursoplayer/'),
     isMentorPublicProfilePage: location.pathname.includes('/mentor/publicview/'),
     isLandingPageEditPage: location.pathname.includes('/landing-page')
   }), [location.pathname]);
@@ -104,14 +104,14 @@ const AppContent = () => {
           <Route path="/mentor/dashboard" element={<MentorDashboardPage />} />
           <Route path="/mentor/perfil" element={<MentorProfilePage />} />
           <Route path="/mentor/publicview/:id" element={<MentorPublicProfilePage />} />
-          <Route path="/mentor/cursos" element={<MentorMeusCursosPage />} />
-          <Route path="/mentor/cursos/novo" element={<MentorCriarCursoPage />} />
-          <Route path="/mentor/cursos/:id/editar" element={<MentorEditarCursoPage />} />
-          <Route path="/mentor/cursos/view/:id" element={<CoursePlayerPage />} />
+          <Route path="/mentor/meus-cursos" element={<MentorMeusCursosPage />} />
+          <Route path="/mentor/meus-cursos/novo" element={<MentorCriarCursoPage />} />
+          <Route path="/mentor/meus-cursos/:id/editar" element={<MentorEditarCursoPage />} />
+          <Route path="/mentor/meus-cursos/view/:id" element={<CoursePlayerPage />} />
           <Route path="/mentor/cursoplayer/:id" element={<CoursePlayerPage />} />
-          <Route path="/mentor/cursos/:courseId/landing-page" element={<CourseLandingPage />} />
-          <Route path="/mentor/cursos/:cursoId/modulos" element={<MentorModulosPage />} />
-          <Route path="/mentor/cursos/:cursoId/modulos/:moduloId" element={<MentorConteudosPage />} />
+          <Route path="/mentor/meus-cursos/:courseId/landing-page" element={<CourseLandingPage />} />
+          <Route path="/mentor/meus-cursos/:cursoId/modulos" element={<MentorModulosPage />} />
+          <Route path="/mentor/meus-cursos/:cursoId/modulos/:moduloId" element={<MentorConteudosPage />} />
           <Route path="/mentor/categorias" element={<MentorCategoriasPage />} />
           <Route path="/mentor/mentorados" element={<MentorMeusMentoradosPage />} />
           <Route path="/mentor/calendario" element={<MentorCalendarioPage />} />

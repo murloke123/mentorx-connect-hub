@@ -84,7 +84,7 @@ const ModuloList = ({ modulos, cursoId, onAddModulo, onEditModulo, onDeleteModul
               <CardContent>
                 <div className="flex justify-between items-center mt-4">
                   <Button asChild>
-                    <Link to={`/mentor/cursos/${cursoId}/modulos/${modulo.id}`}>
+                    <Link to={`/mentor/meus-cursos/${cursoId}/modulos/${modulo.id}`}>
                       Gerenciar Conteúdos <ChevronRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

@@ -67,7 +67,7 @@ const MeusCursosPage = () => {
   }, 0);
 
   const handleCreateCourse = () => {
-    navigate('/mentor/cursos/novo');
+    navigate('/mentor/meus-cursos/novo');
   };
 
   const listIsLoading = isLoading || isFetching;

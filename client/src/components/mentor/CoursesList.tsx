@@ -53,7 +53,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
   // Lidar com o clique no botão de criar curso
   const handleCreateCourse = () => {
-    navigate('/mentor/cursos/novo');
+    navigate('/mentor/meus-cursos/novo');
   };
 
   // Handler for image loading errors
@@ -68,7 +68,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
   // Navegar para a página de visualização do curso (CoursePlayerPage)
   const handleViewCourse = (courseId: string) => {
-    navigate(`/mentor/cursos/view/${courseId}`);
+    navigate(`/mentor/meus-cursos/view/${courseId}`);
   };
 
   const handlePublishChange = async (courseId: string, newStatus: boolean) => {
@@ -227,7 +227,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       asChild
                       size="sm"
                     >
-                      <Link to={`/mentor/cursos/${course.id}/editar`}>
+                      <Link to={`/mentor/meus-cursos/${course.id}/editar`}>
                         <Edit2 className="mr-2 h-4 w-4" /> Editar
                       </Link>
                     </Button>
@@ -237,7 +237,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
               <CardContent className="flex-grow">
                 <div 
                   className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 hover:shadow-md"
-                  onClick={() => navigate(`/mentor/cursos/${course.id}/alunos`)}
+                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/alunos`)}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
@@ -278,14 +278,14 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => navigate(`/mentor/cursos/${course.id}/modulos`)}
+                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/modulos`)}
                 >
                   Gerenciar Módulos e Conteúdos
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full mt-2"
-                  onClick={() => navigate(`/mentor/cursos/${course.id}/landing-page`)}
+                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/landing-page`)}
                 >
                   Página de Venda
                 </Button>

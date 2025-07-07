@@ -9,7 +9,7 @@ export interface CreateNotificationData {
   receiver_name: string;
   sender_id?: string;
   sender_name?: string;
-  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'new_enrollment' | 'course_updated';
+  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'schedule' | 'new_enrollment' | 'course_updated';
   title: string;
   message: string;
 }
@@ -255,6 +255,40 @@ export async function notifyCourseUpdate({
     receiver_name: studentName,
     sender_name: mentorName,
     type: 'course_updated',
+    title,
+    message,
+  });
+} 
+
+/**
+ * Notificar sobre novo agendamento
+ */
+export async function notifyNewAppointment({
+  receiverId,
+  receiverName,
+  senderId,
+  senderName,
+  appointmentDate,
+  appointmentTime,
+}: {
+  receiverId: string;
+  receiverName: string;
+  senderId: string;
+  senderName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+}) {
+  console.log('📅 [NOTIFICATION] Criando notificação de novo agendamento');
+  
+  const title = 'Novo agendamento!';
+  const message = `${senderName} agendou uma sessão para ${appointmentDate} às ${appointmentTime}`;
+
+  return createNotification({
+    receiver_id: receiverId,
+    receiver_name: receiverName,
+    sender_id: senderId,
+    sender_name: senderName,
+    type: 'schedule',
     title,
     message,
   });

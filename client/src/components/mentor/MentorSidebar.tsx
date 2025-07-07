@@ -56,7 +56,7 @@ const MentorSidebar = () => {
     },
     {
       label: "Meus Cursos",
-      href: "/mentor/cursos",
+      href: "/mentor/meus-cursos",
       icon: (
         <BookOpen className="h-5 w-5 shrink-0 text-gray-300" />
       ),

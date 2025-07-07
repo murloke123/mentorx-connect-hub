@@ -75,7 +75,7 @@ const EditCoursePage = () => {
           description: "Não foi possível obter os dados do curso.",
           variant: "destructive",
         });
-        navigate("/mentor/cursos");
+        navigate("/mentor/meus-cursos");
       } finally {
         setIsLoading(false);
       }
@@ -134,7 +134,7 @@ const EditCoursePage = () => {
         description: successMessage,
       });
       
-      navigate("/mentor/cursos");
+      navigate("/mentor/meus-cursos");
     } catch (error) {
       console.error("❌ Erro ao atualizar curso:", error);
       toast({
@@ -148,7 +148,7 @@ const EditCoursePage = () => {
   };
 
   const handleCancel = () => {
-    navigate("/mentor/cursos");
+    navigate("/mentor/meus-cursos");
   };
 
   return (
@@ -178,7 +178,7 @@ const EditCoursePage = () => {
               Curso não encontrado ou você não tem permissão para editá-lo.
             </p>
             <button 
-              onClick={() => navigate("/mentor/cursos")}
+              onClick={() => navigate("/mentor/meus-cursos")}
               className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
             >
               Voltar para Meus Cursos

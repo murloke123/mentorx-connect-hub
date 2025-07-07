@@ -35,7 +35,7 @@ const ConteudosPage = () => {
   // Redirecionar se não tem ids necessários
   useEffect(() => {
     if (!cursoId || !moduloId) {
-      navigate('/mentor/cursos');
+      navigate('/mentor/meus-cursos');
       toast({
         title: 'Erro',
         description: 'Informações necessárias não fornecidas',
@@ -193,8 +193,8 @@ const ConteudosPage = () => {
   }
 
   const breadcrumbItems = [
-    { label: 'Meus Cursos', href: '/mentor/cursos' },
-    { label: 'Módulos', href: `/mentor/cursos/${cursoId}/modulos` },
+    { label: 'Meus Cursos', href: '/mentor/meus-cursos' },
+    { label: 'Módulos', href: `/mentor/meus-cursos/${cursoId}/modulos` },
     { label: modulo?.title || 'Módulo' }
   ];
 
