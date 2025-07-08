@@ -11,16 +11,7 @@ const MentorSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  // Manter o sidebar sempre expandido na página do perfil para melhor visibilidade
-  const isProfilePage = location.pathname === "/mentor/perfil";
-  const [open, setOpen] = useState(isProfilePage);
-  
-  // Efeito para manter o sidebar expandido na página do perfil
-  useEffect(() => {
-    if (isProfilePage) {
-      setOpen(true);
-    }
-  }, [isProfilePage]);
+  const [open, setOpen] = useState(false);
   
   const handleLogout = async () => {
     try {
@@ -116,7 +107,7 @@ const MentorSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen} animate={!isProfilePage}>
+    <Sidebar open={open} setOpen={setOpen} animate={true}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col gap-4 pt-4">
           {menuItems.map((link, idx) => {
