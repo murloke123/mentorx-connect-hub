@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
 import { BookOpen, Calendar, CalendarCheck, LayoutDashboard, LogOut, Play, Settings, User, Users } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
@@ -107,7 +107,7 @@ const MentorSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen} animate={true}>
+    <Sidebar open={open} setOpen={setOpen}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col gap-4 pt-4">
           {menuItems.map((link, idx) => {

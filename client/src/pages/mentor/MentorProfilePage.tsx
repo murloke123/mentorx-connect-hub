@@ -323,7 +323,7 @@ const MentorProfilePage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 md:ml-[280px] flex items-center justify-center min-h-screen">
+        <div className="flex-1 flex items-center justify-center min-h-screen">
           <Spinner className="h-8 w-8" />
         </div>
       </div>
@@ -341,7 +341,7 @@ const MentorProfilePage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px]">
+      <div className="flex-1">
         {/* Hero Section */}
         <div className="relative w-full">
           {/* Banner with gradient overlay */}
@@ -454,7 +454,7 @@ const MentorProfilePage = () => {
         </div>
         
         {/* Sticky Navigation */}
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-6">
             <nav className="flex justify-center space-x-8 py-4">
               {[
