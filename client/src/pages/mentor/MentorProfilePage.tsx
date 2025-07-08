@@ -1,8 +1,9 @@
-import PublicCalendarComponent from "@/components/PublicCalendarComponent";
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import BadgesSection from "@/components/mentor/profile/BadgesSection";
 import ContactForm from "@/components/mentor/profile/ContactForm";
 import TestimonialCard from "@/components/mentor/profile/TestimonialCard";
+import MentorCalendarComponent from "@/components/MentorCalendarComponent";
+import MentorCalendarSettings from "@/components/MentorCalendarSettings";
 import ProfileForm from "@/components/profile/ProfileForm";
 import CourseCard from "@/components/shared/CourseCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -21,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
+import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, Youtube } from "lucide-react";
@@ -35,6 +37,14 @@ interface CourseWithProfile extends Course {
   }[];
 }
 
+interface CalendarSettings {
+  workingDays: string[];
+  startTime: string;
+  endTime: string;
+  sessionDuration: number;
+  timezone: string;
+}
+
 const MentorProfilePage = () => {
   const { toast } = useToast();
   const [mentorAvatarUrl, setMentorAvatarUrl] = useState<string | null>(null);
@@ -45,6 +55,16 @@ const MentorProfilePage = () => {
   const [activeSection, setActiveSection] = useState('sobre');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Estados para o calendário
+  const [calendarSettings, setCalendarSettings] = useState<CalendarSettings>({
+    workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+    startTime: '09:00',
+    endTime: '18:00',
+    sessionDuration: 60,
+    timezone: detectUserTimezone()
+  });
+  const [refreshAppointments, setRefreshAppointments] = useState<number>(0);
   
   // Estados para edição das caixas
   const [editData, setEditData] = useState({
@@ -231,6 +251,15 @@ const MentorProfilePage = () => {
     }
   };
 
+  const handleSettingsChange = (newSettings: CalendarSettings) => {
+    setCalendarSettings(newSettings);
+  };
+
+  // Função para forçar atualização da lista de agendamentos
+  const handleAppointmentChange = () => {
+    setRefreshAppointments(prev => prev + 1);
+  };
+
   // Mock data
   const stats = [
     { value: "1.250+", label: "Mentorados de Sucesso", icon: "/src/assets/icons/group.png" },
@@ -294,7 +323,7 @@ const MentorProfilePage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 flex items-center justify-center min-h-screen">
+        <div className="flex-1 transition-all duration-300 md:ml-[280px] flex items-center justify-center min-h-screen">
           <Spinner className="h-8 w-8" />
         </div>
       </div>
@@ -312,7 +341,7 @@ const MentorProfilePage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px]">
         {/* Hero Section */}
         <div className="relative w-full">
           {/* Banner with gradient overlay */}
@@ -399,12 +428,12 @@ const MentorProfilePage = () => {
         </div>
         
         {/* Name and CTA section */}
-        <div className="mt-24 max-w-5xl mx-auto text-center px-4">
+        <div className="mt-24 max-w-7xl mx-auto text-center px-6">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             {currentUser?.full_name || ""}
           </h1>
           {currentUser?.highlight_message && (
-            <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 mb-6 max-w-4xl mx-auto">
               {currentUser.highlight_message}
             </p>
           )}
@@ -425,8 +454,8 @@ const MentorProfilePage = () => {
         </div>
         
         {/* Sticky Navigation */}
-        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="max-w-5xl mx-auto px-4">
+        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6">
             <nav className="flex justify-center space-x-8 py-4">
               {[
                 { id: 'sobre', label: 'Quem Sou Eu', icon: User },
@@ -456,14 +485,14 @@ const MentorProfilePage = () => {
         </div>
             
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto px-4 py-8 space-y-16">
+        <div className="max-w-7xl mx-auto px-6 py-8 space-y-12">
           
           {/* Sobre Mim Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Por que me seguir?</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Por que me seguir?</h2>
               
-              <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="grid lg:grid-cols-2 gap-12 mb-8">
                 <div className="space-y-6">
                   <ProfileForm 
                     user={currentUser} 
@@ -650,8 +679,8 @@ const MentorProfilePage = () => {
 
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Meus Cursos</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Meus Cursos</h2>
               
               {coursesLoading ? (
                 <div className="flex justify-center">
@@ -689,10 +718,10 @@ const MentorProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">O que dizem meus mentorados</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">O que dizem meus mentorados</h2>
               
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {testimonials.map((testimonial, index) => (
                   <TestimonialCard key={index} {...testimonial} />
                 ))}
@@ -702,25 +731,44 @@ const MentorProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <PublicCalendarComponent 
-              title="Agenda uma Conversa"
-              buttonText="Agendar Agora"
-              onScheduleClick={() => {
-                // Aqui você pode adicionar a lógica de agendamento
-                toast({
-                  title: "Agendamento solicitado",
-                  description: "Em breve implementaremos o sistema de agendamento completo!"
-                });
-              }}
-            />
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Agenda uma Conversa</h2>
+              
+              {/* Layout com dois componentes lado a lado */}
+              <div className="grid lg:grid-cols-2 gap-12 mb-8">
+                {/* Lado esquerdo - Configurações */}
+                <div className="relative">
+                  <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
+                    MentorCalendarSettings
+                  </div>
+                  <MentorCalendarSettings 
+                    onSettingsChange={handleSettingsChange}
+                  />
+                </div>
+                
+                {/* Lado direito - Calendário */}
+                <div className="relative">
+                  <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
+                    MentorCalendarComponent
+                  </div>
+                  <MentorCalendarComponent 
+                    settings={calendarSettings}
+                    mentorId={currentUser?.id}
+                    mentorName={currentUser?.full_name || 'Mentor'}
+                    isClickable={true}
+                    onAppointmentChange={handleAppointmentChange}
+                  />
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Entre em Contato</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Entre em Contato</h2>
               
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-12">
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold">Formas de Contato</h3>
                   
@@ -741,7 +789,7 @@ const MentorProfilePage = () => {
           </section>
 
           {/* CTA Final */}
-          <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-12 text-center text-white">
+          <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-16 text-center text-white">
             <h2 className="text-4xl font-bold mb-4">Pronto para Transformar sua Vida?</h2>
             <p className="text-xl mb-8 opacity-90">
               Junte-se a mais de 1.250 pessoas que já transformaram suas vidas e negócios

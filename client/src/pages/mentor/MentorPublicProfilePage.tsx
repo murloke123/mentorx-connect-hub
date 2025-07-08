@@ -11,11 +11,11 @@ import { notifyLostFollower, notifyNewFollower } from "@/services/notificationSe
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Facebook, GraduationCap, Heart, Instagram, MessageCircle, Star, User, Youtube } from "lucide-react";
+import { Calendar, Clock, Facebook, GraduationCap, Heart, Instagram, MessageCircle, Star, User, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import PublicCalendarComponent from "@/components/PublicCalendarComponent";
+import MentorCalendarComponent from "@/components/MentorCalendarComponent";
 import Navigation from "@/components/shared/Navigation";
 
 interface CourseWithProfile extends Course {
@@ -35,12 +35,25 @@ const MentorPublicProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('sobre');
   const [isFollowing, setIsFollowing] = useState(false);
+  const [mentorSettings, setMentorSettings] = useState({
+    workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+    startTime: '09:00',
+    endTime: '18:00',
+    sessionDuration: 60,
+    timezone: 'America/Sao_Paulo'
+  });
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Monitor changes to mentor settings
+  useEffect(() => {
+    console.log('📋 [MENTOR-SETTINGS] Estado atualizado:', mentorSettings);
+  }, [mentorSettings]);
+
   // Função para re-verificar status de follow
   const recheckFollowStatus = async () => {
+    console.log(' [FOLLOW-RECHECK] Iniciando re-verificação de status');
     console.log('🔄 [FOLLOW-RECHECK] Iniciando re-verificação de status');
     
     if (!currentUser || !id) {
@@ -182,6 +195,60 @@ const MentorPublicProfilePage = () => {
 
     fetchMentorData();
   }, [id, navigate, toast]);
+
+  // Load mentor calendar settings
+  useEffect(() => {
+    const fetchMentorSettings = async () => {
+      if (!id) return;
+      
+      console.log('🔍 [MENTOR-SETTINGS] Iniciando carregamento das configurações para mentor ID:', id);
+      
+      try {
+        const { data, error } = await supabase
+          .from('calendarsettings')
+          .select('*')
+          .eq('mentor_id', id)
+          .single();
+
+        console.log('📊 [MENTOR-SETTINGS] Resultado da consulta:', { data, error });
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('❌ [MENTOR-SETTINGS] Erro ao carregar configurações do mentor:', error);
+          return;
+        }
+        
+        if (data) {
+          console.log('✅ [MENTOR-SETTINGS] Configurações encontradas no banco:', data);
+          
+          // Converter horários do formato time (HH:MM:SS) para string (HH:MM)
+          const formatTime = (timeString: string) => {
+            if (!timeString) return null;
+            if (timeString.length === 5) return timeString;
+            return timeString.substring(0, 5);
+          };
+
+          const loadedSettings = {
+            workingDays: data.working_days || mentorSettings.workingDays,
+            startTime: formatTime(data.start_time) || mentorSettings.startTime,
+            endTime: formatTime(data.end_time) || mentorSettings.endTime,
+            sessionDuration: data.session_duration || mentorSettings.sessionDuration,
+            timezone: data.timezone || mentorSettings.timezone
+          };
+          
+          console.log('🔄 [MENTOR-SETTINGS] Configurações processadas:', loadedSettings);
+          console.log('🔄 [MENTOR-SETTINGS] Configurações anteriores:', mentorSettings);
+          
+          setMentorSettings(loadedSettings);
+        } else {
+          console.log('⚠️ [MENTOR-SETTINGS] Nenhuma configuração encontrada, usando valores padrão');
+        }
+      } catch (error) {
+        console.error('💥 [MENTOR-SETTINGS] Erro ao buscar configurações do mentor:', error);
+      }
+    };
+
+    fetchMentorSettings();
+  }, [id]);
 
   // Get current user
   useEffect(() => {
@@ -589,7 +656,7 @@ const MentorPublicProfilePage = () => {
         
         {/* Sticky Navigation */}
         <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="max-w-5xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-6">
             <nav className="flex justify-center space-x-8 py-4">
               {[
               { id: 'sobre', label: 'Quem Sou Eu', icon: User },
@@ -619,12 +686,12 @@ const MentorPublicProfilePage = () => {
         </div>
         
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto px-4 py-8 space-y-16">
+        <div className="max-w-7xl mx-auto px-6 py-8 space-y-12">
           
           {/* Sobre Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <div className="grid lg:grid-cols-2 gap-12">
                 <div className="space-y-6">
                   {mentorData.bio && (
                     <div>
@@ -641,7 +708,7 @@ const MentorPublicProfilePage = () => {
                   <h3 className="text-xl font-semibold mb-4">
                       Por que me seguir?
                   </h3>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
                       <h4 className="font-bold text-lg mb-2">
                         {mentorData.sm_tit1 || "🎯 Resultados Comprovados"}
@@ -679,8 +746,8 @@ const MentorPublicProfilePage = () => {
 
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Cursos Disponíveis</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Cursos Disponíveis</h2>
               
                 {coursesLoading ? (
                   <div className="flex justify-center">
@@ -715,10 +782,9 @@ const MentorPublicProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Depoimentos</h2>
-              
-              <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Depoimentos</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {testimonials.map((testimonial, index) => (
                   <TestimonialCard key={index} {...testimonial} />
                 ))}
@@ -728,23 +794,107 @@ const MentorPublicProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <PublicCalendarComponent 
-              title="Agende uma Conversa"
-              buttonText="Agendar Mentoria"
-              onScheduleClick={() => {
-                // Aqui você pode adicionar a lógica de agendamento
-                toast({
-                  title: "Agendamento solicitado",
-                  description: "Em breve implementaremos o sistema de agendamento completo!"
-                });
-              }}
-            />
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">
+                Agende uma Conversa
+              </h2>
+              
+              <div className="grid lg:grid-cols-2 gap-12">
+                {/* Lado esquerdo - Configurações de Disponibilidade (visualização) */}
+                <div className="md:col-span-1">
+                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-100 h-full">
+                    <h3 className="text-lg font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Disponibilidade
+                    </h3>
+                    
+                    {/* Dias da Semana */}
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Dias Disponíveis</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { key: 'monday', label: 'Seg' },
+                            { key: 'tuesday', label: 'Ter' },
+                            { key: 'wednesday', label: 'Qua' },
+                            { key: 'thursday', label: 'Qui' },
+                            { key: 'friday', label: 'Sex' },
+                            { key: 'saturday', label: 'Sáb' },
+                            { key: 'sunday', label: 'Dom' }
+                          ].map((day) => {
+                            const isAvailable = mentorSettings.workingDays.includes(day.key);
+                            return (
+                              <span
+                                key={day.key}
+                                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                                  isAvailable
+                                    ? 'bg-green-100 text-green-700 border border-green-200'
+                                    : 'bg-gray-100 text-gray-500 border border-gray-200'
+                                }`}
+                              >
+                                {day.label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      
+                      {/* Horários */}
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Horário de Atendimento</h4>
+                        <div className="bg-white p-4 rounded-lg border">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Clock className="h-4 w-4 text-purple-600" />
+                            <span>{mentorSettings.startTime} às {mentorSettings.endTime}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Duração da Sessão */}
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Duração das Sessões</h4>
+                        <div className="bg-white p-4 rounded-lg border">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Clock className="h-4 w-4 text-purple-600" />
+                            <span>{mentorSettings.sessionDuration} minutos</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Fuso Horário */}
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Fuso Horário</h4>
+                        <div className="bg-white p-4 rounded-lg border">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Clock className="h-4 w-4 text-purple-600" />
+                            <span>{mentorSettings.timezone}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Lado direito - Calendário */}
+                <div className="md:col-span-1">
+                  <MentorCalendarComponent 
+                    settings={mentorSettings}
+                    mentorId={id || ''}
+                    mentorName={mentorData.full_name || 'Mentor'}
+                    isClickable={true}
+                    onAppointmentChange={() => {
+                      console.log('Appointments updated');
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border">
-                <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+                <div className="grid lg:grid-cols-2 gap-12">
                   <div className="space-y-6">
                     <h3 className="text-xl font-semibold">Formas de Contato</h3>
                     
@@ -775,7 +925,7 @@ const MentorPublicProfilePage = () => {
             </section>
 
             {/* CTA Final */}
-            <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-12 text-center text-white">
+            <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-16 text-center text-white">
               <h2 className="text-4xl font-bold mb-4">Pronto para Transformar sua Vida?</h2>
               <p className="text-xl mb-8 opacity-90">
                 Junte-se aos seguidores de {mentorData.full_name?.split(' ')[0]} e comece sua jornada de transformação

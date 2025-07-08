@@ -83,7 +83,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "min-h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 relative",
+        "h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 fixed left-0 top-0 z-50 hidden md:flex",
         className
       )}
       style={{
@@ -92,8 +92,8 @@ export const DesktopSidebar = ({
       animate={{
         width: animate ? (open ? "280px" : "70px") : "280px",
       }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => animate && setOpen(true)}
+      onMouseLeave={() => animate && setOpen(false)}
       {...props}
     >
       {children}

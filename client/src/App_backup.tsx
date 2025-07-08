@@ -32,7 +32,7 @@ import {
     MentoradoDashboardPage,
     MentoradoMeusCursosPage, MentoradoMeusMentoresPage,
     MentoradoProfilePage,
-    MentorCalendarioPage,
+    MentorAgendamentosPage,
     MentorCategoriasPage,
     MentorConfiguracoesPage,
     MentorConteudosPage,
@@ -114,7 +114,7 @@ const AppContent = () => {
           <Route path="/mentor/meus-cursos/:cursoId/modulos/:moduloId" element={<MentorConteudosPage />} />
           <Route path="/mentor/categorias" element={<MentorCategoriasPage />} />
           <Route path="/mentor/mentorados" element={<MentorMeusMentoradosPage />} />
-          <Route path="/mentor/calendario" element={<MentorCalendarioPage />} />
+          <Route path="/mentor/agendamentos" element={<MentorAgendamentosPage />} />
           <Route path="/mentor/configuracoes" element={<MentorConfiguracoesPage />} />
           <Route path="/mentor/configuracoes/rotas" element={<MentorRotasPage />} />
           <Route path="/mentor/configuracoes/database-mapping" element={<MentorMapeamentoDBPage />} />

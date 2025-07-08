@@ -1,17 +1,18 @@
 import {
-  AlertCircle,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Filter,
-  MessageSquare,
-  Search,
-  Trash2,
-  X,
-  XCircle
+    AlertCircle,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Filter,
+    MessageSquare,
+    Search,
+    Trash2,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
+import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../utils/supabase';
 import CancelAppointmentModal from './CancelAppointmentModal';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -27,6 +28,7 @@ interface Appointment {
   mentee_name: string;
   mentor_id: string;
   mentor_name: string;
+  mentee_role: 'admin' | 'mentor' | 'mentorado';
   scheduled_date: string;
   start_time: string;
   end_time: string;
@@ -36,12 +38,14 @@ interface Appointment {
 }
 
 interface AppointmentsListProps {
-  mentorId: string;
+  mentorId?: string;
   refreshTrigger?: number;
+  showAcquiredOnly?: boolean;
 }
 
-const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTrigger }) => {
+const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTrigger, showAcquiredOnly = false }) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,16 +96,24 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
 
   // Carregar agendamentos
   const loadAppointments = async () => {
-    if (!mentorId) return;
+    const userId = mentorId || user?.id;
+    if (!userId) return;
 
-    console.log('🔄 [loadAppointments] Carregando agendamentos do mentor:', mentorId);
+    console.log('🔄 [loadAppointments] Carregando agendamentos do usuário:', {
+      userId,
+      mentorId,
+      userFromAuth: user?.id,
+      showAcquiredOnly
+    });
     setLoading(true);
     
     try {
+      // Se showAcquiredOnly for true, busca agendamentos onde o userId é o mentee_id
+      // Caso contrário, busca agendamentos onde o userId é o mentor_id (comportamento padrão)
       const { data, error } = await supabase
         .from('calendar')
         .select('*')
-        .eq('mentor_id', mentorId)
+        .eq(showAcquiredOnly ? 'mentee_id' : 'mentor_id', userId)
         .order('scheduled_date', { ascending: true })
         .order('start_time', { ascending: true });
 
@@ -132,11 +144,12 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
   useEffect(() => {
     let filtered = [...appointments];
 
-    // Filtro por texto (nome do mentorado)
+    // Filtro por texto (dinâmico baseado no showAcquiredOnly)
     if (searchTerm) {
-      filtered = filtered.filter(apt => 
-        apt.mentee_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(apt => {
+        const nameToSearch = showAcquiredOnly ? apt.mentor_name : apt.mentee_name;
+        return nameToSearch.toLowerCase().includes(searchTerm.toLowerCase());
+      });
     }
 
     // Filtro por status
@@ -162,10 +175,11 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
 
   // Carregar agendamentos quando o componente montar ou quando refreshTrigger mudar
   useEffect(() => {
-    if (mentorId) {
+    const userId = mentorId || user?.id;
+    if (userId) {
       loadAppointments();
     }
-  }, [mentorId, refreshTrigger]);
+  }, [mentorId, user?.id, refreshTrigger, showAcquiredOnly]);
 
   // Obter estatísticas
   const getStats = () => {
@@ -326,7 +340,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Minhas Mentorias Agendadas
+{showAcquiredOnly ? 'Meus Agendamentos' : 'Minhas Mentorias Agendadas'}
           </CardTitle>
           <Button
             variant={activeCardFilter === 'all' ? 'default' : 'outline'}
@@ -442,7 +456,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
           <div className="flex items-center gap-2 flex-1">
             <Search className="h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Buscar por nome do mentorado..."
+              placeholder={showAcquiredOnly ? "Buscar por nome do mentor..." : "Buscar por nome do mentorado..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1"
@@ -518,16 +532,39 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 flex-1">
-                      {/* Avatar e informações do mentorado */}
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-blue-100 text-blue-700">
-                          {appointment.mentee_name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-semibold text-gray-900">{appointment.mentee_name}</h4>
+                    {/* Avatar e informações - dinâmico baseado no showAcquiredOnly */}
+                    <Avatar 
+                      className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+                      onClick={() => {
+                        if (showAcquiredOnly) {
+                          // Na página do mentorado, clica no mentor -> vai para mentor/publicview
+                          window.location.href = `/mentor/publicview/${appointment.mentor_id}`;
+                        } else {
+                          // Na página do mentor, usa mentee_role para navegação inteligente
+                          if (appointment.mentee_role === 'mentor') {
+                            window.location.href = `/mentor/publicview/${appointment.mentee_id}`;
+                          } else {
+                            window.location.href = `/mentorado/publicview/${appointment.mentee_id}`;
+                          }
+                        }
+                      }}
+                    >
+                      <AvatarFallback className="bg-blue-100 text-blue-700">
+                        {showAcquiredOnly 
+                          ? appointment.mentor_name.charAt(0).toUpperCase()
+                          : appointment.mentee_name.charAt(0).toUpperCase()
+                        }
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-semibold text-gray-900">
+                          {showAcquiredOnly 
+                            ? appointment.mentor_name 
+                            : `${appointment.mentee_name} - ${appointment.mentee_role === 'mentor' ? 'Mentor' : 'Mentorado'}`
+                          }
+                        </h4>
                           {/* Tag Temporal */}
                           <Badge className={`${getTemporalColor(getTemporalCategory(appointment))} border`}>
                             <div className="flex items-center gap-1">

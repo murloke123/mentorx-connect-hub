@@ -105,7 +105,7 @@ const MentorDashboardPage = () => {
   return (
     <div className="flex min-w-[1200px] overflow-x-auto">
       <MentorSidebar />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6 overflow-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">
             {profile ? `Bem-vindo(a), ${profile.full_name || 'Mentor(a)'}!` : 'Painel do Mentor'}

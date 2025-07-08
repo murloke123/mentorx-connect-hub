@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
 import { notifyNewAppointment } from '../services/notificationService';
@@ -53,6 +54,7 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [notes, setNotes] = useState('');
@@ -64,6 +66,30 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
+  };
+
+  // Função para obter o role do usuário e redirecionar
+  const redirectToMyAppointments = async () => {
+    try {
+      if (user?.email) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('email', user.email)
+          .single();
+        
+        if (profile?.role === 'mentor') {
+          navigate('/mentor/agendamentos-adquiridos');
+        } else {
+          navigate('/mentorado/meus-agendamentos');
+        }
+      } else {
+        navigate('/mentorado/meus-agendamentos');
+      }
+    } catch (error) {
+      console.error('Erro ao obter role do usuário:', error);
+      navigate('/mentorado/meus-agendamentos');
+    }
   };
 
   // Gerar opções de horário baseadas nas configurações do mentor
@@ -292,6 +318,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           console.error('⚠️ [handleSchedule] Erro ao criar notificação:', notificationError);
           // Não bloquear a criação do agendamento por erro na notificação
         }
+        
+        // Redirecionar para a página de agendamentos baseado no role do usuário
+        await redirectToMyAppointments();
         
         onSuccess();
       }

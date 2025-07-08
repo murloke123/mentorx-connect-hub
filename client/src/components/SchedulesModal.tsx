@@ -1,10 +1,9 @@
-import { Calendar, CheckCircle, Clock, Globe, Plus, User, X, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Globe, Plus, User, XCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../utils/supabase';
 import { findTimezoneByValue } from '../utils/timezones';
-import CancelAppointmentModal from './CancelAppointmentModal';
 import CreateScheduleModal from './CreateScheduleModal';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
@@ -24,6 +23,7 @@ interface Appointment {
   mentee_name: string;
   mentor_id: string;
   mentor_name: string;
+  mentee_role: 'admin' | 'mentor' | 'mentorado';
   scheduled_date: string;
   start_time: string;
   end_time: string;
@@ -56,8 +56,6 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('pt-BR', {
@@ -171,21 +169,7 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
     });
   };
 
-  const handleCancelClick = (appointment: Appointment) => {
-    setAppointmentToCancel(appointment);
-    setShowCancelModal(true);
-  };
 
-  const handleCancelSuccess = () => {
-    setShowCancelModal(false);
-    setAppointmentToCancel(null);
-    loadAppointments(); // Recarregar agendamentos do dia
-    
-    // Notificar a página principal para atualizar a lista completa
-    if (onAppointmentChange) {
-      onAppointmentChange();
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -267,7 +251,7 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
                           </div>
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-gray-600" />
-                            <span>{appointment.mentee_name}</span>
+                            <span>{appointment.mentee_name} - {appointment.mentee_role === 'mentor' ? 'Mentor' : 'Mentorado'}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -289,18 +273,6 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
                               </span>
                             </div>
                           </div>
-                          {/* Botão de cancelar - só aparece para agendamentos "scheduled" e se o usuário é o mentor */}
-                          {appointment.status === 'scheduled' && user?.id === mentorId && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleCancelClick(appointment)}
-                              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                            >
-                              <X className="h-4 w-4 mr-1" />
-                              Cancelar
-                            </Button>
-                          )}
                         </div>
                       </div>
                       {appointment.notes && (
@@ -330,15 +302,7 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
           />
         )}
 
-        {/* Modal de cancelamento de agendamento */}
-        {showCancelModal && (
-          <CancelAppointmentModal
-            isOpen={showCancelModal}
-            onClose={() => setShowCancelModal(false)}
-            onSuccess={handleCancelSuccess}
-            appointment={appointmentToCancel}
-          />
-        )}
+
       </DialogContent>
     </Dialog>
   );

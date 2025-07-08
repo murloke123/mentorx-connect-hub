@@ -341,7 +341,7 @@ Equipe MentorX Connect Hub
     </div>
     
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{{frontendUrl}}/mentor/calendario" style="background: #4caf50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;">
+      <a href="{{frontendUrl}}/mentor/agendamentos" style="background: #4caf50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;">
         📅 Ver no Calendário
       </a>
     </div>

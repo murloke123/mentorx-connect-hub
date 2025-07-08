@@ -54,8 +54,8 @@ const MentoradoSidebar = () => {
       ),
     },
     {
-      label: "Calendário",
-      href: "/mentorado/calendario",
+      label: "Meus Agendamentos",
+      href: "/mentorado/meus-agendamentos",
       icon: (
         <Calendar className="h-5 w-5 shrink-0 text-gray-300" />
       ),

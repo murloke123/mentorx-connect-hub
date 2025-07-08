@@ -29,12 +29,14 @@ import {
     CoursePublicView,
     CoursesPage,
     LoginPage,
-    MentoradoCalendarioPage, MentoradoConfiguracoesPage,
+    MentoradoMeusAgendamentosPage, MentoradoConfiguracoesPage,
     // Mentorado
     MentoradoDashboardPage,
     MentoradoMeusCursosPage, MentoradoMeusMentoresPage,
     MentoradoProfilePage,
-    MentorCalendarioPage,
+    MentoradoPublicViewPage,
+    MentorAgendamentosPage,
+    MentorAgendamentosAdquiridosPage,
     MentorCategoriasPage,
     MentorConfiguracoesPage,
     MentorConteudosPage,
@@ -80,15 +82,16 @@ const PageLoader = () => (
 const AppContent = () => {
   const location = useLocation();
   
-  const { isCoursePlayerPage, isMentorPublicProfilePage, isLandingPageEditPage } = useMemo(() => ({
+  const { isCoursePlayerPage, isMentorPublicProfilePage, isMentoradoPublicViewPage, isLandingPageEditPage } = useMemo(() => ({
     isCoursePlayerPage: location.pathname.includes('/mentor/meus-cursos/view/') || location.pathname.includes('/mentorado/cursoplayer/') || location.pathname.includes('/mentor/cursoplayer/'),
     isMentorPublicProfilePage: location.pathname.includes('/mentor/publicview/'),
+    isMentoradoPublicViewPage: location.pathname.includes('/mentorado/publicview/'),
     isLandingPageEditPage: location.pathname.includes('/landing-page')
   }), [location.pathname]);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isCoursePlayerPage && !isMentorPublicProfilePage && !isLandingPageEditPage && <Navigation />}
+      {!isCoursePlayerPage && !isMentorPublicProfilePage && !isMentoradoPublicViewPage && !isLandingPageEditPage && <Navigation />}
       <main className="flex-grow">
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -117,6 +120,7 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           <Route path="/mentor/publicview/:id" element={<MentorPublicProfilePage />} />
+          <Route path="/mentorado/publicview/:id" element={<MentoradoPublicViewPage />} />
           <Route path="/mentor/meus-cursos" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorMeusCursosPage />
@@ -172,9 +176,14 @@ const AppContent = () => {
               <MentorMeusMentoradosPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/calendario" element={
+          <Route path="/mentor/agendamentos" element={
             <ProtectedRoute allowedRoles={['mentor']}>
-              <MentorCalendarioPage />
+              <MentorAgendamentosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/agendamentos-adquiridos" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorAgendamentosAdquiridosPage />
             </ProtectedRoute>
           } />
           <Route path="/mentor/configuracoes" element={
@@ -224,9 +233,9 @@ const AppContent = () => {
               <MentoradoMeusMentoresPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentorado/calendario" element={
+          <Route path="/mentorado/meus-agendamentos" element={
             <ProtectedRoute allowedRoles={['mentorado']}>
-              <MentoradoCalendarioPage />
+              <MentoradoMeusAgendamentosPage />
             </ProtectedRoute>
           } />
           <Route path="/mentorado/configuracoes" element={

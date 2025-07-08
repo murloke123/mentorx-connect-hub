@@ -2,8 +2,8 @@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
-import { BookOpen, Calendar, LayoutDashboard, LogOut, Play, Settings, User, Users } from "lucide-react";
-import { useState } from "react";
+import { BookOpen, Calendar, CalendarCheck, LayoutDashboard, LogOut, Play, Settings, User, Users } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
@@ -11,7 +11,16 @@ const MentorSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  // Manter o sidebar sempre expandido na página do perfil para melhor visibilidade
+  const isProfilePage = location.pathname === "/mentor/perfil";
+  const [open, setOpen] = useState(isProfilePage);
+  
+  // Efeito para manter o sidebar expandido na página do perfil
+  useEffect(() => {
+    if (isProfilePage) {
+      setOpen(true);
+    }
+  }, [isProfilePage]);
   
   const handleLogout = async () => {
     try {
@@ -76,10 +85,17 @@ const MentorSidebar = () => {
       ),
     },
     {
-      label: "Calendário",
-      href: "/mentor/calendario",
+      label: "Agendamentos",
+      href: "/mentor/agendamentos",
       icon: (
         <Calendar className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Agendamentos Adquiridos",
+      href: "/mentor/agendamentos-adquiridos",
+      icon: (
+        <CalendarCheck className="h-5 w-5 shrink-0 text-gray-300" />
       ),
     },
     {
@@ -100,7 +116,7 @@ const MentorSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
+    <Sidebar open={open} setOpen={setOpen} animate={!isProfilePage}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col gap-4 pt-4">
           {menuItems.map((link, idx) => {

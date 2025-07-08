@@ -43,7 +43,8 @@ export const MentorModulosPage = lazy(() => import('@/pages/mentor/MentorModulos
 export const MentorConteudosPage = lazy(() => import('@/pages/mentor/MentorConteudosPage'));
 export const MentorCategoriasPage = lazy(() => import('@/pages/mentor/MentorCategoriasPage'));
 export const MentorMeusMentoradosPage = lazy(() => import('@/pages/mentor/MentorMeusMentoradosPage'));
-export const MentorCalendarioPage = lazy(() => import('@/pages/mentor/MentorCalendarioPage'));
+export const MentorAgendamentosPage = lazy(() => import('@/pages/mentor/MentorAgendamentosPage'));
+export const MentorAgendamentosAdquiridosPage = lazy(() => import('@/pages/mentor/MentorAgendamentosAdquiridosPage'));
 export const MentorConfiguracoesPage = lazy(() => import('@/pages/mentor/MentorConfiguracoesPage'));
 export const MentorRotasPage = lazy(() => import('@/pages/mentor/MentorRotasPage'));
 export const MentorMapeamentoDBPage = lazy(() => import('@/pages/mentor/MentorMapeamentoDBPage'));
@@ -52,9 +53,10 @@ export const MentorStripeOnboardingPage = lazy(() => import('@/pages/mentor/Ment
 // ===== MENTORADO PAGES - Chunk separado =====
 export const MentoradoDashboardPage = lazy(() => import('@/pages/mentorado/MentoradoDashboardPage'));
 export const MentoradoProfilePage = lazy(() => import('@/pages/mentorado/MentoradoProfilePage'));
+export const MentoradoPublicViewPage = lazy(() => import('@/pages/mentorado/MentoradoPublicViewPage'));
 export const MentoradoMeusCursosPage = lazy(() => import('@/pages/mentorado/MentoradoMeusCursosPage'));
 export const MentoradoMeusMentoresPage = lazy(() => import('@/pages/mentorado/MentoradoMeusMentoresPage'));
-export const MentoradoCalendarioPage = lazy(() => import('@/pages/mentorado/MentoradoCalendarioPage'));
+export const MentoradoMeusAgendamentosPage = lazy(() => import('@/pages/mentorado/MentoradoMeusAgendamentosPage'));
 export const MentoradoConfiguracoesPage = lazy(() => import('@/pages/mentorado/MentoradoConfiguracoesPage'));
 
 // ===== PRELOAD HELPERS =====
