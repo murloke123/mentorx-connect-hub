@@ -69,7 +69,7 @@ const MentoradoDashboardPage = () => {
   return (
     <div className="flex">
       <MentoradoSidebar />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 transition-all duration-300  p-6 overflow-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">
             {profile ? `Bem-vindo, ${profile.full_name || 'Mentorado'}!` : 'Dashboard'}

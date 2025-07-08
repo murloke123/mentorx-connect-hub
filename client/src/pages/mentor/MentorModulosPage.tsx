@@ -155,7 +155,7 @@ const ModulosPage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
+        <div className="flex-1 transition-all duration-300  p-6">
           <div className="text-center py-10">
             <h1 className="text-2xl font-bold text-red-500">Erro ao carregar módulos</h1>
             <p className="mt-2">Não foi possível carregar os módulos deste curso.</p>
@@ -174,7 +174,7 @@ const ModulosPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
+      <div className="flex-1 transition-all duration-300  p-6">
         <Breadcrumbs 
           items={[
             { label: 'Meus Cursos', href: '/mentor/meus-cursos' },

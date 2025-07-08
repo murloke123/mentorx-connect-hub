@@ -154,7 +154,7 @@ const EditCoursePage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
+      <div className="flex-1 transition-all duration-300  p-6">
         <h1 className="text-2xl font-bold mb-6">Editar Curso</h1>
         
         {isLoading ? (

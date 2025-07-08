@@ -228,7 +228,7 @@ const CourseLandingPage: React.FC = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 p-6">
+        <div className="flex-1 transition-all duration-300  p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
             <div className="h-64 bg-gray-200 rounded"></div>
@@ -242,7 +242,7 @@ const CourseLandingPage: React.FC = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 p-6">
+        <div className="flex-1 transition-all duration-300  p-6">
           <div className="text-center py-10">
             <p className="text-lg text-red-500">Curso não encontrado</p>
             <Button onClick={() => navigate('/mentor/meus-cursos')} className="mt-4">
@@ -258,7 +258,7 @@ const CourseLandingPage: React.FC = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px]">
+      <div className="flex-1 transition-all duration-300 ">
         {/* Toolbar */}
         <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">

@@ -7,7 +7,7 @@ const MentoradoProfilePage = () => {
   return (
     <div className="flex">
       <MentoradoSidebar />
-      <div className="flex-1">
+      <div className="flex-1 transition-all duration-300 ">
         <ProfilePage userRole="mentorado" />
       </div>
     </div>

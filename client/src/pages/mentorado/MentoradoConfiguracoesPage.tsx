@@ -55,7 +55,7 @@ const MentoradoConfiguracoesPage = () => {
     return (
       <div className="flex h-screen bg-gray-50">
         <MentoradoSidebar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 transition-all duration-300  flex items-center justify-center">
           <Spinner />
         </div>
       </div>
@@ -65,7 +65,7 @@ const MentoradoConfiguracoesPage = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       <MentoradoSidebar />
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 transition-all duration-300  p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Configurações</h1>

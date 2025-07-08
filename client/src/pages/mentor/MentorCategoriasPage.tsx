@@ -6,7 +6,7 @@ const MentorCategoriasPage = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-8">
+      <div className="flex-1 transition-all duration-300  p-8">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Minhas Categorias</h1>
           

@@ -275,7 +275,7 @@ const MentoradoMeusCursosPage = () => {
     return (
       <div className="flex min-h-screen bg-gray-50">
         <MentoradoSidebar />
-        <div className="flex-1 p-8">
+        <div className="flex-1 transition-all duration-300  p-8">
           <div className="max-w-6xl mx-auto">
             <div className="animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
@@ -293,7 +293,7 @@ const MentoradoMeusCursosPage = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <MentoradoSidebar />
-      <div className="flex-1 p-8">
+      <div className="flex-1 transition-all duration-300  p-8">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Meus Cursos</h1>
           

@@ -185,7 +185,7 @@ const ConteudosPage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
+        <div className="flex-1 transition-all duration-300  p-6">
           <ConteudoError onRetry={refetch} />
         </div>
       </div>
@@ -201,7 +201,7 @@ const ConteudosPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
+      <div className="flex-1 transition-all duration-300  p-6">
         <Breadcrumbs 
           items={breadcrumbItems} 
           className="mb-6"

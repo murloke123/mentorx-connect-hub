@@ -12,7 +12,7 @@ const DatabaseMappingPage = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-8 overflow-y-auto">
+      <div className="flex-1 transition-all duration-300  p-8 overflow-y-auto">
         <Alert className="mb-6 bg-green-50 border-green-200">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
           <AlertTitle>Migração concluída</AlertTitle>

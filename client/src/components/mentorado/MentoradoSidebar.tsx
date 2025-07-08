@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
 import { BookOpen, Calendar, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
@@ -11,7 +11,13 @@ const MentoradoSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  // Sidebar sempre expandido para melhor usabilidade
+  const [open, setOpen] = useState(true);
+  
+  // Manter sidebar sempre expandido
+  useEffect(() => {
+    setOpen(true);
+  }, []);
   
   const handleLogout = async () => {
     try {
@@ -78,7 +84,7 @@ const MentoradoSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
+    <Sidebar open={open} setOpen={setOpen} animate={false}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col gap-4 pt-4">
           {menuItems.map((link, idx) => {

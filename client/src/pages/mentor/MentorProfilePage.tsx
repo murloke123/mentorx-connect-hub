@@ -341,7 +341,7 @@ const MentorProfilePage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px]">
         {/* Hero Section */}
         <div className="relative w-full">
           {/* Banner with gradient overlay */}

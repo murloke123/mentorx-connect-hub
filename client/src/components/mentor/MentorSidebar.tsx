@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
 import { BookOpen, Calendar, CalendarCheck, LayoutDashboard, LogOut, Play, Settings, User, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
@@ -11,7 +11,18 @@ const MentorSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  
+  // Páginas que devem ter sidebar fixo e sempre expandido
+  const fixedSidebarPages = ["/mentor/perfil", "/mentor/configuracoes"];
+  const shouldUseFixedSidebar = fixedSidebarPages.includes(location.pathname);
+  const [open, setOpen] = useState(shouldUseFixedSidebar);
+  
+  // Efeito para manter o sidebar expandido em páginas específicas
+  useEffect(() => {
+    if (shouldUseFixedSidebar) {
+      setOpen(true);
+    }
+  }, [shouldUseFixedSidebar]);
   
   const handleLogout = async () => {
     try {
