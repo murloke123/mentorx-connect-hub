@@ -258,7 +258,7 @@ const CourseLandingPage: React.FC = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px]">
         {/* Toolbar */}
         <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">

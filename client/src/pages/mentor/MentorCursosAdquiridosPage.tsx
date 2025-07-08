@@ -224,7 +224,7 @@ const MentorCursosAdquiridosPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 p-6">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px] p-6">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Cursos Adquiridos</h1>

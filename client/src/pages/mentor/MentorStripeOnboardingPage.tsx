@@ -776,7 +776,7 @@ export default function MentorStripeOnboardingPage() {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 min-h-screen bg-gradient-to-br from-orange-50 to-white">
+      <div className="flex-1 transition-all duration-300 md:ml-[280px] min-h-screen bg-gradient-to-br from-orange-50 to-white">
         <div className="max-w-2xl mx-auto px-6 py-8">
           {/* Header */}
           <div className="mb-8">
