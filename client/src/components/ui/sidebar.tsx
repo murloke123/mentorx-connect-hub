@@ -81,15 +81,10 @@ export const DesktopSidebar = ({
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   
-  // Verificar se é a página do perfil do mentor para usar posicionamento fixo
-  const isProfilePage = typeof window !== 'undefined' && window.location.pathname === "/mentor/perfil";
-  
   return (
     <motion.div
       className={cn(
-        isProfilePage 
-          ? "h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 fixed left-0 top-0 z-50 hidden md:flex"
-          : "min-h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 relative",
+        "min-h-screen px-4 py-6 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 w-[280px] shrink-0 relative",
         className
       )}
       style={{
