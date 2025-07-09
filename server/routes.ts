@@ -1317,6 +1317,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ENDPOINT 26: Enviar e-mail de novo agendamento para mentor
+  app.post('/api/calendar/new-appointment-email', async (req, res) => {
+    try {
+      const { 
+        mentorId,
+        mentorName, 
+        menteeName, 
+        appointmentDate, 
+        appointmentTime, 
+        timezone,
+        notes 
+      } = req.body;
+      
+      console.log('\n========== NOVO AGENDAMENTO - E-MAIL ==========');
+      console.log('📥 Dados recebidos:', JSON.stringify({
+        mentorId,
+        mentorName,
+        menteeName,
+        appointmentDate,
+        appointmentTime,
+        timezone,
+        notes
+      }, null, 2));
+      
+      // Validação dos campos obrigatórios
+      if (!mentorId || !mentorName || !menteeName || !appointmentDate || !appointmentTime) {
+        console.error('❌ Campos obrigatórios faltando');
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios faltando'
+        });
+      }
+      
+      // Buscar dados do mentor no banco
+      const { createClient } = await import('@supabase/supabase-js');
+      const { config } = await import('./environment');
+      
+      // Usar SERVICE_ROLE_KEY para bypass RLS
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || config.SUPABASE_ANON_KEY;
+      const supabase = createClient(config.SUPABASE_URL, supabaseServiceKey);
+      
+      console.log('\n🔍 Buscando e-mail do mentor ID:', mentorId);
+      
+      const { data: mentorProfile, error: mentorError } = await supabase
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', mentorId)
+        .single();
+      
+      if (mentorError || !mentorProfile?.email) {
+        console.error('❌ E-mail do mentor não encontrado:', mentorError);
+        return res.status(400).json({
+          success: false,
+          error: 'E-mail do mentor não encontrado'
+        });
+      }
+      
+      console.log('✅ Mentor encontrado:', {
+        email: mentorProfile.email,
+        name: mentorProfile.full_name || mentorName
+      });
+      
+      // Preparar dados para o e-mail
+      console.log('\n📧 Preparando envio de e-mail de novo agendamento...');
+      const emailData = {
+        mentorName: mentorProfile.full_name || mentorName,
+        mentorEmail: mentorProfile.email,
+        menteeName,
+        appointmentDate,
+        appointmentTime,
+        timezone: timezone || 'America/Sao_Paulo (UTC-3)',
+        notes: notes || undefined,
+        agendamentosUrl: 'https://app.mentoraai.com.br/mentor/agendamentos',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 Dados para o e-mail:', JSON.stringify(emailData, null, 2));
+      
+      // Importar e chamar o serviço de e-mail
+      const { enviarEmailNovoAgendamento } = await import('./services/email/services/mentor/emailNewSchedule');
+      const result = await enviarEmailNovoAgendamento(emailData);
+      
+      console.log('\n📨 Resultado do envio de e-mail:', JSON.stringify(result, null, 2));
+      console.log('==============================================\n');
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 'E-mail de novo agendamento enviado com sucesso' : 'Erro ao enviar e-mail',
+        messageId: result.messageId,
+        details: result
+      });
+      
+    } catch (error) {
+      console.error('\n❌ ERRO CRÍTICO no envio de e-mail de novo agendamento:', error);
+      console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+      console.log('==============================================\n');
+      
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT 27: Teste de e-mail de novo agendamento (debug)
+  app.post('/api/calendar/new-appointment-email/test', async (req, res) => {
+    try {
+      console.log('🧪 TESTE: Endpoint de teste de e-mail de novo agendamento');
+      
+      const { enviarEmailNovoAgendamento } = await import('./services/email/services/mentor/emailNewSchedule');
+      
+      const testEmailData = {
+        mentorName: 'Mentor Teste',
+        mentorEmail: req.body.email || 'mentor@teste.com',
+        menteeName: 'Mentorado Teste',
+        appointmentDate: 'quinta-feira, 02 de janeiro de 2025',
+        appointmentTime: '14:00 - 15:00',
+        timezone: 'America/Sao_Paulo (UTC-3)',
+        notes: req.body.notes || 'Este é um teste de novo agendamento',
+        agendamentosUrl: 'https://app.mentoraai.com.br/mentor/agendamentos',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 Dados de teste:', testEmailData);
+      
+      const result = await enviarEmailNovoAgendamento(testEmailData);
+      
+      console.log('📥 Resultado do teste:', result);
+      
+      res.json({
+        success: true,
+        message: 'Teste de e-mail de novo agendamento executado',
+        result
+      });
+    } catch (error) {
+      console.error('❌ Erro no teste de e-mail:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -318,6 +318,64 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           console.error('⚠️ [handleSchedule] Erro ao criar notificação:', notificationError);
           // Não bloquear a criação do agendamento por erro na notificação
         }
+
+        // 📧 ENVIAR E-MAIL PARA O MENTOR SOBRE NOVO AGENDAMENTO
+        console.log('📧 [handleSchedule] Enviando e-mail para o mentor...');
+        try {
+          const formatDate = (dateString: string) => {
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            });
+          };
+
+          const formatTime = (timeString: string) => {
+            return timeString.substring(0, 5);
+          };
+
+          const emailData = {
+            mentorId: mentorId,
+            mentorName: mentorName,
+            menteeName: profile.full_name || 'Usuário',
+            appointmentDate: formatDate(formattedDate),
+            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+            timezone: 'America/Sao_Paulo (UTC-3)',
+            notes: notes.trim() || undefined
+          };
+
+          console.log('📤 [handleSchedule] Dados do e-mail:', JSON.stringify(emailData, null, 2));
+
+          const emailResponse = await fetch('/api/calendar/new-appointment-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(emailData),
+          });
+
+          console.log('📥 [handleSchedule] Resposta da API de e-mail:', {
+            status: emailResponse.status,
+            statusText: emailResponse.statusText,
+            ok: emailResponse.ok
+          });
+
+          const emailResult = await emailResponse.json();
+          console.log('📋 [handleSchedule] Resultado do e-mail:', emailResult);
+
+          if (emailResponse.ok && emailResult.success) {
+            console.log('✅ [handleSchedule] E-mail enviado com sucesso!');
+            console.log('✉️ [handleSchedule] Message ID:', emailResult.messageId);
+          } else {
+            console.error('⚠️ [handleSchedule] Falha no envio do e-mail:', emailResult);
+            // Não quebrar o fluxo - agendamento já foi criado
+          }
+        } catch (emailError) {
+          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail:', emailError);
+          // Não bloquear a criação do agendamento por erro no e-mail
+        }
         
         // Redirecionar para a página de agendamentos baseado no role do usuário
         await redirectToMyAppointments();

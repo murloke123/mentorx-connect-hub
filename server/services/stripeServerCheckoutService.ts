@@ -1,25 +1,61 @@
+/**
+ * ===============================================================================
+ * 💳 STRIPE SERVER CHECKOUT SERVICE - Sistema de Pagamentos (Backend)
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar checkout e sessões de pagamento no Stripe Connect (Servidor)
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🛒 CRIAÇÃO DE SESSÕES:
+ * • createStripeCheckoutSession() - Cria sessão de checkout em conta conectada
+ * 
+ * 🔍 VERIFICAÇÃO E STATUS:
+ * • verifyStripeCheckoutSession() - Verifica status de sessão específica
+ * • verifyStripePaymentStatus() - Verifica status de payment intent
+ * 
+ * 📊 LISTAGEM E DADOS:
+ * • listStripeCheckoutSessions() - Lista sessões de uma conta conectada
+ * 
+ * 🔧 RECURSOS:
+ * • Integração completa com Stripe Connect
+ * • Chaves secretas seguras no servidor
+ * • Logs detalhados para debug (Network Chrome)
+ * • Localização em português brasileiro
+ * • Metadata customizada para tracking
+ * • Tratamento robusto de erros
+ * 
+ * 🏦 STRIPE CONNECT:
+ * • Operações em contas conectadas específicas
+ * • Pagamentos diretos para mentores
+ * • Sessões isoladas por conta
+ * • Webhooks para confirmação automática
+ * 
+ * 💡 INTERFACES:
+ * • CreateCheckoutSessionData - Parâmetros de criação
+ * • CheckoutSessionResult - Resultado da sessão
+ * • CheckoutSuccessResult - Resultado de verificação
+ * • PaymentStatusResult - Status de pagamento
+ * 
+ * ⚠️ SEGURANÇA:
+ * • Usa chave secreta do Stripe (nunca exposta)
+ * • Todas as validações críticas no servidor
+ * • Operações isoladas por conta conectada
+ * • Logs seguros para auditoria
+ * 
+ * 🔧 CONFIGURAÇÃO:
+ * • Requer STRIPE_SECRET_KEY no ambiente
+ * • API Version: 2025-06-30.basil
+ * • TypeScript habilitado
+ * ===============================================================================
+ */
+
 import Stripe from "stripe";
 import { config } from '../environment';
 
-// ##########################################################################################
-// ############ STRIPE SERVER CHECKOUT SERVICE - OPERAÇÕES DE CHECKOUT ###################
-// ##########################################################################################
-// 
-// 🎯 RESPONSABILIDADE: Apenas operações relacionadas a checkout e sessões Stripe
-// 📋 INCLUI: Criação de sessões, processamento de sucessos, verificação de status
-// ❌ NÃO INCLUI: Webhooks (ver stripePaymentsService.ts) ou produtos (ver stripeServerProductService.ts)
-//
-// 📚 EDUCATIVO PARA DEV JUNIOR:
-// - Este serviço executa APENAS no backend/servidor
-// - Usa a CHAVE SECRETA do Stripe (nunca exposta ao frontend)
-// - Lida com sessões de checkout e transações monetárias
-// - Todas as validações e processamentos críticos são feitos aqui
-//
-// ##########################################################################################
-
 // Inicializar cliente Stripe com chave secreta do servidor
 const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-05-28.basil',
+  apiVersion: '2025-06-30.basil',
   typescript: true,
 });
 

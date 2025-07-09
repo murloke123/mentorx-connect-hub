@@ -1,6 +1,47 @@
 /**
- * Serviço de E-mails - Frontend
- * Integração com a API de e-mails do Brevo
+ * ===============================================================================
+ * 📧 EMAIL SERVICE - Sistema de E-mails da Plataforma (Frontend)
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Interface frontend para envio de e-mails via API do backend
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 👋 E-MAILS DE BOAS-VINDAS:
+ * • enviarEmailBoasVindas() - Envia e-mail de boas-vindas para novos usuários
+ * 
+ * 🔧 TESTES E CONECTIVIDADE:
+ * • testarConectividadeEmail() - Testa conexão com sistema de e-mail
+ * 
+ * 🔧 RECURSOS:
+ * • Proxy para APIs do backend (/api/email/*)
+ * • Logs detalhados para debug
+ * • Validação de dados de entrada
+ * • Tratamento robusto de erros HTTP
+ * • URLs padrão configuráveis
+ * • Headers completos para debug
+ * 
+ * 🌐 INTEGRAÇÃO:
+ * • Chama endpoints do backend que usam Brevo
+ * • Não expõe credenciais sensíveis
+ * • JSON estruturado para todas as chamadas
+ * • Responses padronizadas
+ * 
+ * 💡 INTERFACES:
+ * • WelcomeEmailData - Dados para e-mail de boas-vindas
+ * • EmailResponse - Resposta padrão de e-mail
+ * 
+ * 🔄 FLUXO TÍPICO:
+ * 1. Frontend coleta dados do usuário
+ * 2. enviarEmailBoasVindas() → /api/email/boas-vindas
+ * 3. Backend processa via Brevo
+ * 4. Retorna messageId ou erro
+ * 
+ * ⚠️ CONFIGURAÇÃO:
+ * • URLs padrão para login e suporte
+ * • Dependente das APIs do backend
+ * • Logs podem ser desabilitados em produção
+ * ===============================================================================
  */
 
 interface WelcomeEmailData {

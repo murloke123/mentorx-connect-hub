@@ -1,8 +1,51 @@
-import { supabase } from '../utils/supabase';
+/**
+ * ===============================================================================
+ * 🔔 NOTIFICATION SERVICE - Sistema de Notificações da Plataforma
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar todas as notificações internas da plataforma MentorX
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔧 CORE FUNCTIONS:
+ * • createNotification() - Cria uma notificação genérica no banco
+ * 
+ * 📅 NOTIFICAÇÕES DE AGENDAMENTO:
+ * • notifyAppointmentCancellation() - Agendamento cancelado (genérico)
+ * • notifyScheduleCancelledByMentor() - Cancelamento específico do mentor
+ * • notifyNewAppointment() - Novo agendamento criado
+ * 
+ * 👥 NOTIFICAÇÕES SOCIAIS:
+ * • notifyNewFollower() - Novo seguidor adicionado
+ * • notifyLostFollower() - Seguidor removido/perdido
+ * 
+ * 🎓 NOTIFICAÇÕES EDUCACIONAIS:
+ * • notifyNewEnrollment() - Nova matrícula em curso
+ * • notifyCourseUpdate() - Atualização em curso
+ * 
+ * 🔧 RECURSOS:
+ * • Logs detalhados de todas as operações
+ * • Validação automática de dados obrigatórios
+ * • Tratamento robusto de erros
+ * • Formatação automática de mensagens
+ * • Integração direta com tabela notifications
+ * • Stack trace completo para debug
+ * 
+ * 📊 TIPOS DE NOTIFICAÇÃO:
+ * • new_follower - Novo seguidor
+ * • lost_follower - Seguidor perdido
+ * • appointment_cancelled - Agendamento cancelado
+ * • cancel_schedule - Cancelamento pelo mentor
+ * • schedule - Novo agendamento
+ * • new_enrollment - Nova matrícula
+ * • course_updated - Curso atualizado
+ * 
+ * 💡 INTERFACE:
+ * • CreateNotificationData - Estrutura base para notificações
+ * ===============================================================================
+ */
 
-// ##########################################################################################
-// ###################### SERVIÇO DE NOTIFICAÇÕES ########################################
-// ##########################################################################################
+import { supabase } from '../utils/supabase';
 
 export interface CreateNotificationData {
   receiver_id: string;

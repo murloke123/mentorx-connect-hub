@@ -1,3 +1,44 @@
+/**
+ * ===============================================================================
+ * 📚 COURSE SERVICE - Gerenciamento de Cursos da Plataforma
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar operações CRUD de cursos, integração com Stripe e matrículas
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔍 CONSULTA DE CURSOS:
+ * • getCourseById() - Busca curso específico por ID
+ * • getPublicCourses() - Lista todos os cursos públicos e publicados
+ * • getMentorCourses() - Lista cursos de um mentor específico com estatísticas
+ * 
+ * ✏️ CRIAÇÃO E EDIÇÃO:
+ * • createCourse() - Cria novo curso básico
+ * • createCourseWithStripe() - Cria curso + produto Stripe automaticamente
+ * • updateCourse() - Atualiza dados de um curso existente
+ * • updateCourseWithStripe() - Atualiza curso + sincroniza com Stripe
+ * • updateCoursePublicationStatus() - Publica/despublica curso
+ * 
+ * 🔄 INTEGRAÇÃO STRIPE:
+ * • syncExistingCourseWithStripe() - Sincroniza curso existente com Stripe
+ * 
+ * 🎓 MATRÍCULAS:
+ * • createFreeEnrollment() - Matricula estudante em curso gratuito
+ * • redirectAfterEnrollment() - Redireciona usuário após matrícula
+ * 
+ * 🔧 RECURSOS:
+ * • Integração automática com Stripe para cursos pagos
+ * • Contagem de matrículas ativas em tempo real
+ * • Validação de dados de entrada
+ * • Tratamento robusto de erros
+ * • Logs detalhados para debug
+ * 
+ * 💰 TIPOS DE CURSO:
+ * • Gratuitos: Matrícula direta sem pagamento
+ * • Pagos: Integração completa com Stripe + checkout
+ * ===============================================================================
+ */
+
 import { Course } from '@/types/database';
 import { supabase } from '../utils/supabase';
 import {

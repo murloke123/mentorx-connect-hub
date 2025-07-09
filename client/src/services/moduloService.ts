@@ -1,5 +1,55 @@
-import { supabase } from "@/utils/supabase";
+/**
+ * ===============================================================================
+ * 📚 MÓDULO SERVICE - Gerenciamento de Módulos de Cursos
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar módulos dentro dos cursos (estrutura hierárquica)
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔍 CONSULTA DE MÓDULOS:
+ * • getModulosByCursoId() - Lista todos os módulos de um curso
+ * • getModuloById() - Busca módulo específico por ID
+ * 
+ * ✏️ CRIAÇÃO E EDIÇÃO:
+ * • criarModulo() - Cria novo módulo em um curso
+ * • editarModulo() - Edita módulo existente (interface específica)
+ * • atualizarModulo() - Atualiza módulo existente (interface flexível)
+ * 
+ * 🗑️ EXCLUSÃO E ORGANIZAÇÃO:
+ * • deletarModulo() - Remove módulo do curso
+ * • reordenarModulos() - Reordena lista de módulos por drag&drop
+ * 
+ * 🔧 RECURSOS:
+ * • Sistema automático de ordenação (order_index)
+ * • Gestão automática da próxima ordem disponível
+ * • Toast notifications para feedback do usuário
+ * • Tratamento robusto de erros
+ * • TypeScript completo com interfaces tipadas
+ * • Validação automática de dados
+ * 
+ * 📝 ESTRUTURA HIERÁRQUICA:
+ * • Curso → Módulo → Conteúdo
+ * • Módulos organizam conteúdos em seções lógicas
+ * • Order_index determina ordem de exibição
+ * 
+ * 💡 INTERFACES:
+ * • Modulo - Estrutura completa do módulo
+ * • CriarModuloData - Dados para criação
+ * • EditarModuloData - Dados para edição completa
+ * • AtualizarModuloData - Dados para atualização parcial
+ * 
+ * 🔄 FLUXO TÍPICO:
+ * 1. getModulosByCursoId() - Carrega módulos do curso
+ * 2. criarModulo() - Adiciona novo módulo
+ * 3. reordenarModulos() - Organiza ordem
+ * 4. editarModulo() / atualizarModulo() - Modifica existente
+ * 5. deletarModulo() - Remove se necessário
+ * ===============================================================================
+ */
+
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/utils/supabase";
 
 export interface Modulo {
   id: string;

@@ -1,3 +1,42 @@
+/**
+ * ===============================================================================
+ * 🎓 MENTEE SERVICE - Gerenciamento de Mentorados e suas Atividades
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar matrículas, progresso e perfis dos mentorados
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🎓 GESTÃO DE MATRÍCULAS:
+ * • getEnrolledCourses() - Lista cursos em que o mentorado está matriculado
+ * • enrollInCourse() - Matricula o mentorado em um curso gratuito
+ * • updateProgress() - Atualiza progresso do mentorado em uma aula
+ * 
+ * 👤 PERFIL DO MENTORADO:
+ * • getMenteeProfile() - Busca perfil do mentorado logado
+ * • getMenteeCourses() - Lista cursos do mentorado (alternativa)
+ * • getMenteeFollowingCount() - Contagem de mentores seguidos
+ * 
+ * 🔧 RECURSOS:
+ * • Validação automática de autenticação
+ * • Prevenção de matrículas duplicadas
+ * • Cálculo automático de progresso
+ * • Relacionamento automático com mentor/proprietário do curso
+ * • Logs detalhados para debug
+ * • Tratamento robusto de erros
+ * 
+ * 📊 PROGRESSO E ESTATÍSTICAS:
+ * • Tracking de aulas completadas
+ * • Percentual de progresso por curso
+ * • Histórico de acesso e atividade
+ * 
+ * 💡 INTERFACES:
+ * • EnrolledCourseData - Dados de curso matriculado
+ * • Progress - Informações de progresso
+ * • Course - Estrutura completa de curso com progresso
+ * ===============================================================================
+ */
+
 import { supabase } from '../utils/supabase';
 
 interface EnrolledCourseData {

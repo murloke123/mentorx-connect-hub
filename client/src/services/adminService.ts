@@ -1,6 +1,44 @@
-import { supabase } from '../utils/supabase';
-import { QueryKey } from "@tanstack/react-query";
+/**
+ * ===============================================================================
+ * 👑 ADMIN SERVICE - Serviços de Administração da Plataforma
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar operações administrativas da plataforma MentorX
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔐 PERFIL E AUTENTICAÇÃO:
+ * • getAdminProfile() - Busca perfil do administrador logado
+ * • logAdminAction() - Registra ações do admin para auditoria
+ * • getAdminActions() - Lista histórico de ações administrativas
+ * 
+ * 👥 GESTÃO DE USUÁRIOS:
+ * • getAllMentors() - Lista todos os mentores com estatísticas
+ * • getAllMentorados() - Lista todos os mentorados com estatísticas  
+ * • deleteUser() - Remove usuário da plataforma (admin)
+ * 
+ * 📊 ESTATÍSTICAS DA PLATAFORMA:
+ * • getPlatformStats() - Estatísticas gerais (mentores, mentorados, cursos)
+ * 
+ * 📚 GESTÃO DE CURSOS:
+ * • getAllCourses() - Lista todos os cursos com detalhes do mentor
+ * • deleteCourse() - Remove curso da plataforma (admin)
+ * 
+ * 🔧 RECURSOS:
+ * • Validação de permissões de admin
+ * • Logs de auditoria automáticos
+ * • Tratamento de erros robusto
+ * • Integração com React Query
+ * 
+ * ⚠️ SEGURANÇA:
+ * • Apenas usuários com role 'admin' podem usar estas funções
+ * • Todas as ações são registradas para auditoria
+ * ===============================================================================
+ */
+
 import { Course, Profile } from '@/types/database';
+import { QueryKey } from "@tanstack/react-query";
+import { supabase } from '../utils/supabase';
 
 // Get admin profile
 export async function getAdminProfile() {

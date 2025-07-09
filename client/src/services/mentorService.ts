@@ -1,3 +1,47 @@
+/**
+ * ===============================================================================
+ * 👨‍🏫 MENTOR SERVICE - Gerenciamento de Mentores e suas Atividades
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar perfis, cursos, estatísticas e dados dos mentores
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔍 PERFIS DE MENTORES:
+ * • getMentorProfile() - Busca perfil do mentor logado
+ * • getMentorProfileById() - Busca perfil específico por ID
+ * • getFeaturedMentors() - Lista mentores em destaque
+ * • getAllPublicMentors() - Lista todos os mentores públicos
+ * 
+ * 📚 GESTÃO DE CURSOS:
+ * • getMentorCourses() - Lista cursos do mentor logado
+ * • getMentorCoursesById() - Lista cursos de mentor específico
+ * • getMentorModules() - Lista módulos recentes do mentor
+ * • getModulosByCurso() - Busca módulos de um curso específico
+ * 
+ * 📊 ESTATÍSTICAS E ANALYTICS:
+ * • getMentorEnrollmentStats() - Estatísticas de matrículas do mentor logado
+ * • getMentorEnrollmentStatsById() - Estatísticas de mentor específico
+ * • getEnrollmentStats() - Dados históricos de matrículas (gráficos)
+ * • getEnrollmentStatsById() - Dados históricos por mentor específico
+ * • getMentorFollowersCount() - Contagem de seguidores do mentor logado
+ * • getMentorFollowersCountById() - Contagem de seguidores por ID
+ * 
+ * 🔧 RECURSOS:
+ * • Funções otimizadas que recebem userId como parâmetro
+ * • Eliminação de chamadas desnecessárias ao getUser()
+ * • Cálculo automático de receita e estatísticas
+ * • Contagem de alunos únicos por mentor
+ * • Logs detalhados para debug
+ * • Tratamento robusto de erros com toast notifications
+ * 
+ * 💡 INTERFACES:
+ * • MentorEnrollmentStats - Estatísticas completas de matrículas
+ * • EnrollmentDataPoint - Pontos de dados para gráficos
+ * • Module - Estrutura de módulos de curso
+ * ===============================================================================
+ */
+
 import { Course, Mentor, Profile } from '@/types/database';
 import { toast } from '../hooks/use-toast';
 import { supabase } from '../utils/supabase';

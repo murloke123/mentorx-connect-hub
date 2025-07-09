@@ -1,5 +1,53 @@
-import { supabase } from '../utils/supabase';
+/**
+ * ===============================================================================
+ * 📝 CONTEÚDO SERVICE - Gerenciamento de Conteúdos de Módulos
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar conteúdos dentro dos módulos dos cursos (texto, vídeo, PDF)
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🔍 CONSULTA DE CONTEÚDOS:
+ * • getConteudosByModuloId() - Lista todos os conteúdos de um módulo
+ * • getConteudoById() - Busca conteúdo específico por ID
+ * 
+ * ✏️ CRIAÇÃO DE CONTEÚDOS:
+ * • criarConteudoTexto() - Cria conteúdo de texto rico/HTML
+ * • criarConteudoVideo() - Cria conteúdo de vídeo externo (YouTube, Vimeo)
+ * • criarConteudoPDF() - Cria conteúdo PDF com upload automático
+ * 
+ * 🔧 EDIÇÃO E GESTÃO:
+ * • atualizarConteudo() - Atualiza dados de um conteúdo existente
+ * • excluirConteudo() - Remove conteúdo do módulo
+ * • reordenarConteudos() - Reordena lista de conteúdos por drag&drop
+ * 
+ * 🔧 RECURSOS:
+ * • Sistema automático de ordenação (order_index)
+ * • Upload automático de PDFs para Supabase Storage
+ * • Validação de tipos de conteúdo
+ * • Toast notifications para feedback
+ * • Tratamento robusto de erros
+ * • TypeScript completo com interfaces
+ * 
+ * 📚 TIPOS DE CONTEÚDO SUPORTADOS:
+ * • texto_rico - Editor rich text (HTML)
+ * • video_externo - URLs de vídeo (YouTube, Vimeo, etc.)
+ * • pdf - Arquivos PDF com upload
+ * 
+ * 💡 INTERFACE:
+ * • Conteudo - Estrutura completa de conteúdo
+ * • content_data - Dados específicos por tipo de conteúdo
+ * 
+ * 🔄 FLUXO TÍPICO:
+ * 1. getConteudosByModuloId() - Carrega lista
+ * 2. criarConteudo*() - Adiciona novo conteúdo
+ * 3. reordenarConteudos() - Organiza ordem
+ * 4. atualizarConteudo() - Edita existente
+ * ===============================================================================
+ */
+
 import { toast } from '../hooks/use-toast';
+import { supabase } from '../utils/supabase';
 
 export interface Conteudo {
   id: string;

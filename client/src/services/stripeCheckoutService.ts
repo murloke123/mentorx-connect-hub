@@ -1,18 +1,51 @@
-// ##########################################################################################
-// ############ STRIPE CHECKOUT SERVICE - OPERAÇÕES DE CHECKOUT (FRONTEND) ###############
-// ##########################################################################################
-// 
-// 🎯 RESPONSABILIDADE: Apenas operações relacionadas a checkout e sessões Stripe no frontend
-// 📋 INCLUI: Criação de sessões, processamento de sucessos, verificação de status
-// ❌ NÃO INCLUI: Chamadas diretas à API Stripe (ver stripeServerCheckoutService.ts)
-//
-// 📚 EDUCATIVO PARA DEV JUNIOR:
-// - Este serviço executa APENAS no frontend/cliente
-// - NÃO usa chaves secretas do Stripe (apenas chaves públicas se necessário)
-// - Faz chamadas HTTP para nosso backend que por sua vez chama a Stripe
-// - Todas as operações críticas são delegadas ao backend
-//
-// ##########################################################################################
+/**
+ * ===============================================================================
+ * 💳 STRIPE CHECKOUT SERVICE - Sistema de Pagamentos (Frontend)
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Gerenciar checkout e pagamentos de cursos via Stripe Connect
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🛒 CHECKOUT E SESSÕES:
+ * • createCheckoutSession() - Cria sessão de checkout no Stripe
+ * • startCourseCheckout() - Inicia processo de compra de curso
+ * • handleCheckoutSuccess() - Processa pagamento bem-sucedido
+ * • testCheckout() - Teste de funcionalidade de checkout
+ * 
+ * 🔍 VERIFICAÇÃO DE STATUS:
+ * • checkCoursePaymentStatus() - Verifica status de pagamento de curso
+ * • checkUserPaymentIntents() - Lista payment intents do usuário
+ * • processPendingPayments() - Processa pagamentos pendentes
+ * 
+ * 📊 TRANSAÇÕES E DADOS:
+ * • getUserTransactions() - Lista transações do usuário (comprador/mentor)
+ * 
+ * 🔧 RECURSOS:
+ * • Integração completa com Stripe Connect
+ * • Logs detalhados para debug (Network Chrome)
+ * • Sistema de transações no banco de dados
+ * • Matrículas automáticas após pagamento
+ * • Redirecionamento inteligente por role do usuário
+ * • Tratamento robusto de erros
+ * 
+ * 🏦 STRIPE CONNECT:
+ * • Pagamentos diretos para conta do mentor
+ * • Zero taxa de plataforma (configurável)
+ * • Gestão de contas conectadas
+ * • Webhooks para confirmação de pagamento
+ * 
+ * 💡 INTERFACES:
+ * • CreateCheckoutSessionParams - Parâmetros de checkout
+ * • CheckoutSessionResult - Resultado da sessão
+ * • PaymentStatusResult - Status de pagamento
+ * 
+ * ⚠️ SEGURANÇA:
+ * • Todas as operações críticas delegadas ao backend
+ * • Nenhuma chave secreta exposta no frontend
+ * • Validação dupla: frontend + backend
+ * ===============================================================================
+ */
 
 import { supabase } from '../utils/supabase';
 

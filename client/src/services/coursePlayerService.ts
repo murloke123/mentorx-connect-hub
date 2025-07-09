@@ -1,3 +1,53 @@
+/**
+ * ===============================================================================
+ * 🎬 COURSE PLAYER SERVICE - Player de Cursos para Estudantes
+ * ===============================================================================
+ * 
+ * 🎯 OBJETIVO: Fornecer dados estruturados para o player de cursos dos mentorados
+ * 
+ * 📋 MÉTODOS DISPONÍVEIS:
+ * 
+ * 🎥 PLAYER DE CURSO:
+ * • getCursoCompleto() - Busca curso completo com módulos e conteúdos
+ * 
+ * 🔧 RECURSOS:
+ * • Estrutura hierárquica completa: Curso → Módulos → Conteúdos
+ * • Compatibilidade com múltiplos tipos de conteúdo
+ * • Ordem automática por order_index
+ * • Mapeamento de campos para compatibilidade
+ * • Tratamento robusto de erros por módulo
+ * • TypeScript completo com tipos específicos
+ * 
+ * 📚 TIPOS DE CONTEÚDO SUPORTADOS:
+ * • video_externo - Vídeos do YouTube, Vimeo, etc.
+ * • texto_rico - Conteúdo HTML/texto formatado
+ * • pdf - Documentos PDF para visualização
+ * 
+ * 🏗️ ESTRUTURA DE DADOS:
+ * • CursoItemLocal - Curso completo com metadados
+ * • ModuloItemLocal - Módulo com lista de conteúdos
+ * • ConteudoItemLocal - Conteúdo individual com dados específicos
+ * 
+ * 💡 INTERFACES ESPECÍFICAS:
+ * • ConteudoItemLocal - Conteúdo otimizado para player
+ * • ModuloItemLocal - Módulo com conteúdos carregados
+ * • CursoItemLocal - Curso completo para reprodução
+ * 
+ * 🔄 MAPEAMENTO DE CAMPOS:
+ * • nome_conteudo → title (compatibilidade)
+ * • tipo_conteudo → content_type
+ * • dados_conteudo → content_data
+ * • order_index → ordem (player local)
+ * • module_id (corrigido de modulo_id)
+ * 
+ * 🎯 USO PRINCIPAL:
+ * • Carregamento para CoursePlayerPage
+ * • Estrutura de navegação do player
+ * • Dados para controles de progresso
+ * • Base para funcionalidades de bookmark/favoritos
+ * ===============================================================================
+ */
+
 import { supabase } from '../utils/supabase';
 
 // Tipos para o player de curso - compatíveis com types.ts e schema

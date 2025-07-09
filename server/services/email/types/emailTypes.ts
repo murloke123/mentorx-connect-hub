@@ -62,5 +62,20 @@ export interface BrevoEmailParams {
   PLATFORM_URL?: string;
   SUPPORT_URL?: string;
   CURRENT_YEAR?: string;
+  // New schedule params
+  MENTOR_EMAIL?: string;
+  AGENDAMENTOS_URL?: string;
   [key: string]: string | undefined;
+}
+
+export interface NewScheduleEmailData {
+  mentorName: string;
+  mentorEmail: string;
+  menteeName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  timezone: string;
+  notes?: string;
+  agendamentosUrl: string;
+  supportUrl: string;
 } 
