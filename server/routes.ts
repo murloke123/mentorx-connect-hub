@@ -1183,13 +1183,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const menteeEmail = menteeByName?.[0]?.email || 'guilherme.ramalho@outlook.com';
         
         // Buscar mentor ID baseado no nome (fallback)
+        console.log('🔍 [DEBUG FALLBACK] Buscando mentor por nome:', mentorName);
         const { data: mentorByName, error: mentorNameError } = await supabase
           .from('profiles')
           .select('id')
           .eq('full_name', mentorName)
           .limit(1);
         
+        console.log('🔍 [DEBUG FALLBACK] Mentor encontrado:', mentorByName);
         const mentorId = mentorByName?.[0]?.id || 'mentor-id-nao-encontrado';
+        console.log('🔍 [DEBUG FALLBACK] mentorId final:', mentorId);
         
         console.log('\n📧 Preparando envio de email...');
         const emailData = {
@@ -1298,7 +1301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
       
       const testEmailData = {
-        mentorId: 'test-mentor-id-debug',
+        mentorId: req.body.mentorId || 'test-mentor-id-debug',
         mentorName: 'Mentor Teste',
         menteeName: 'Mentorado Teste',
         menteeEmail: req.body.email || 'teste@exemplo.com',
@@ -1309,6 +1312,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         platformUrl: 'https://app.mentoraai.com.br',
         supportUrl: 'https://app.mentoraai.com.br/suporte'
       };
+      
+      console.log('📋 ROUTES.TS: mentorId enviado para o email:', testEmailData.mentorId);
       
       console.log('📤 ROUTES.TS: Dados de teste:', testEmailData);
       
@@ -1470,6 +1475,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false, 
         error: error instanceof Error ? error.message : 'Erro interno do servidor'
       });
+    }
+  });
+
+  // ENDPOINT DEBUG: Verificar HTML final do email de cancelamento
+  app.post('/api/calendar/cancel-email/debug-html', async (req, res) => {
+    try {
+      console.log('🔍 DEBUG HTML: Testando geração do HTML com mentorId específico');
+      
+      const { calendarCancelTemplate } = await import('./services/email/templates/mentor/calendarCancelTemplate');
+      
+      const mentorId = req.body.mentorId || 'e5d9eab0-b1fc-4221-a2fd-4cb211c53dd1';
+      
+      console.log('📋 DEBUG HTML: mentorId usado:', mentorId);
+      
+      // Preparar parâmetros do template
+      const templateParams: Record<string, string> = {
+        MENTOR_ID: mentorId,
+        MENTOR_NAME: 'Dr. João Silva',
+        MENTEE_NAME: 'Maria Santos',
+        MENTEE_EMAIL: 'debug@test.com',
+        APPOINTMENT_DATE: 'Quinta-feira, 09 de janeiro de 2025',
+        APPOINTMENT_TIME: '15:00 - 16:00',
+        TIMEZONE: 'America/Sao_Paulo',
+        CANCELLATION_REASON: 'Imprevisto do mentor',
+        PLATFORM_URL: 'https://app.mentoraai.com.br',
+        SUPPORT_URL: 'https://app.mentoraai.com.br/suporte',
+        CURRENT_YEAR: new Date().getFullYear().toString()
+      };
+      
+      // Aplicar substituições
+      let htmlContent = calendarCancelTemplate.htmlContent;
+      Object.entries(templateParams).forEach(([key, value]) => {
+        const placeholder = `{{${key}}}`;
+        htmlContent = htmlContent.replace(new RegExp(placeholder, 'g'), value);
+      });
+      
+      // Buscar links específicos
+      const linkMatches = htmlContent.match(/https:\/\/mentoraai\.com\.br\/mentor\/publicschedule\/[^"\s]+/g);
+      
+      console.log('🔗 DEBUG HTML: Links encontrados:', linkMatches);
+      console.log('🎯 DEBUG HTML: Link esperado:', `https://mentoraai.com.br/mentor/publicschedule/${mentorId}`);
+      
+      // Extrair snippet do HTML com o link
+      const linkStartIndex = htmlContent.indexOf('href="https://mentoraai.com.br/mentor/publicschedule/');
+      const linkSnippet = linkStartIndex !== -1 ? 
+        htmlContent.substring(linkStartIndex, linkStartIndex + 120) : 'Link não encontrado';
+      
+      res.json({
+        success: true,
+        mentorIdUsado: mentorId,
+        linksEncontrados: linkMatches || [],
+        linkEsperado: `https://mentoraai.com.br/mentor/publicschedule/${mentorId}`,
+        linksCorretos: linkMatches ? linkMatches.every(link => link.includes(mentorId)) : false,
+        htmlSnippet: linkSnippet,
+        totalLinksEncontrados: linkMatches ? linkMatches.length : 0
+      });
+      
+    } catch (error) {
+      console.error('❗ DEBUG HTML: Erro:', error);
+      res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' });
     }
   });
 

@@ -29,10 +29,19 @@ export interface EmailResponse {
 export async function enviarEmailCancelamentoAgendamento(data: CalendarCancelEmailData): Promise<EmailResponse> {
   try {
     console.log('\n🚀 [EMAIL-SERVICE] Iniciando envio de email de cancelamento');
+    console.log('🔍 [DEBUG] mentorId recebido:', data.mentorId);
+    console.log('🔍 [DEBUG] tipo do mentorId:', typeof data.mentorId);
+    
+    // Validar e corrigir mentorId se for undefined/null/vazio
+    let validMentorId = data.mentorId;
+    if (!validMentorId || validMentorId === 'undefined' || validMentorId === 'null') {
+      console.log('⚠️ [WARNING] mentorId inválido, usando fallback');
+      validMentorId = 'mentor-generico'; // Fallback para mentor genérico
+    }
     
     // Preparar parâmetros do template
     const templateParams: Record<string, string> = {
-      MENTOR_ID: data.mentorId,
+      MENTOR_ID: validMentorId,
       MENTOR_NAME: data.mentorName,
       MENTEE_NAME: data.menteeName,
       MENTEE_EMAIL: data.menteeEmail,
@@ -44,6 +53,8 @@ export async function enviarEmailCancelamentoAgendamento(data: CalendarCancelEma
       SUPPORT_URL: data.supportUrl,
       CURRENT_YEAR: new Date().getFullYear().toString()
     };
+    
+    console.log('🔍 [DEBUG] templateParams MENTOR_ID:', templateParams.MENTOR_ID);
 
     // Substituir variáveis no template
     let htmlContent = calendarCancelTemplate.htmlContent;
@@ -53,10 +64,26 @@ export async function enviarEmailCancelamentoAgendamento(data: CalendarCancelEma
     // Substituir todas as variáveis
     Object.entries(templateParams).forEach(([key, value]) => {
       const placeholder = `{{${key}}}`;
+      console.log(`🔄 [DEBUG] Substituindo ${placeholder} por: ${value}`);
       htmlContent = htmlContent.replace(new RegExp(placeholder, 'g'), value);
       textContent = textContent.replace(new RegExp(placeholder, 'g'), value);
       subject = subject.replace(new RegExp(placeholder, 'g'), value);
     });
+    
+    // Verificar se o link foi substituído corretamente
+    const linkMatch = htmlContent.match(/https:\/\/mentoraai\.com\.br\/mentor\/publicschedule\/([^"\s]+)/);
+    console.log('🔗 [DEBUG] Link encontrado no HTML:', linkMatch ? linkMatch[0] : 'Link não encontrado');
+    
+    // SEGUNDA CAMADA DE PROTEÇÃO: Forçar substituição de qualquer {{MENTOR_ID}} restante
+    htmlContent = htmlContent.replace(/\{\{MENTOR_ID\}\}/g, validMentorId);
+    textContent = textContent.replace(/\{\{MENTOR_ID\}\}/g, validMentorId);
+    
+    // Verificar se ainda há links com 'undefined'
+    if (htmlContent.includes('/undefined') || htmlContent.includes('{{MENTOR_ID}}')) {
+      console.log('⚠️ [EMERGENCY FIX] Corrigindo links com undefined/placeholder');
+      htmlContent = htmlContent.replace(/\/undefined/g, `/${validMentorId}`);
+      htmlContent = htmlContent.replace(/\{\{MENTOR_ID\}\}/g, validMentorId);
+    }
 
     // Tratar condicionais do template
     if (data.cancellationReason) {
