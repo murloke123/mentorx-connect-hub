@@ -117,7 +117,7 @@ export async function notificarMentorNovoAgendamento(data: {
 
     const emailData = {
       ...data,
-      agendamentosUrl: 'https://app.mentoraai.com.br/mentor/agendamentos',
+      agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
       supportUrl: 'https://app.mentoraai.com.br/suporte'
     };
 

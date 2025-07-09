@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Mentor } from "@/types/database";
 import { motion } from "framer-motion";
-import { BarChart3, Code, Crown, Grid3X3, Handshake, MessageCircle, Star, User } from "lucide-react";
+import { BarChart3, Calendar, Code, Crown, Grid3X3, Handshake, MessageCircle, Star, User } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -76,8 +76,12 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
     }
   };
 
+  const handleViewSchedule = () => {
+    navigate(`/mentor/publicschedule/${mentor.id}`);
+  };
+
   // Obter ícone e cor da categoria
-  const categoryInfo = getCategoryIcon(mentor.category);
+  const categoryInfo = getCategoryIcon(mentor.category || null);
 
   return (
     <motion.div
@@ -289,6 +293,18 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                 >
                   <User className="w-4 h-4 mr-2" />
                   Ver Perfil Completo
+                </Button>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewSchedule();
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                  title="Agendar Conversa"
+                >
+                  <Calendar className="w-4 h-4" />
                 </Button>
                 {mentor.phone && (
                   <Button 

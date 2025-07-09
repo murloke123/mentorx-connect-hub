@@ -8,6 +8,7 @@ import brevoClient, { emailConfig } from '../../config/brevoClient';
 import { calendarCancelTemplate } from '../../templates/mentor/calendarCancelTemplate';
 
 export interface CalendarCancelEmailData {
+  mentorId: string;
   mentorName: string;
   menteeName: string;
   menteeEmail: string;
@@ -31,6 +32,7 @@ export async function enviarEmailCancelamentoAgendamento(data: CalendarCancelEma
     
     // Preparar parâmetros do template
     const templateParams: Record<string, string> = {
+      MENTOR_ID: data.mentorId,
       MENTOR_NAME: data.mentorName,
       MENTEE_NAME: data.menteeName,
       MENTEE_EMAIL: data.menteeEmail,

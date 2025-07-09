@@ -24,6 +24,7 @@ export const emailConfig = {
   replyTo: defaultSender,
   headers: {
     'X-Mailer': 'Mentora AI Platform',
-    'X-Priority': '1'
+    'X-Auto-Response-Suppress': 'OOF, DR, RN, NRN',
+    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
   }
 }; 

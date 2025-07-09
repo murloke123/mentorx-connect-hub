@@ -50,9 +50,10 @@ import {
     MentorMeusMentoradosPage,
     MentorModulosPage,
     MentorProfilePage, MentorPublicProfilePage,
+    MentorPublicSchedulePage,
     MentorRotasPage,
-    MentorsPage,
     MentorStripeOnboardingPage,
+    MentorsPage,
     NotFound,
     // Helpers
     preloadCriticalComponents
@@ -120,6 +121,7 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           <Route path="/mentor/publicview/:id" element={<MentorPublicProfilePage />} />
+          <Route path="/mentor/publicschedule/:id" element={<MentorPublicSchedulePage />} />
           <Route path="/mentorado/publicview/:id" element={<MentoradoPublicViewPage />} />
           <Route path="/mentor/meus-cursos" element={
             <ProtectedRoute allowedRoles={['mentor']}>

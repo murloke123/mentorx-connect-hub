@@ -1000,6 +1000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
       
       const emailData = {
+        mentorId: 'test-mentor-id',
         mentorName,
         menteeName,
         menteeEmail,
@@ -1181,8 +1182,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const menteeEmail = menteeByName?.[0]?.email || 'guilherme.ramalho@outlook.com';
         
+        // Buscar mentor ID baseado no nome (fallback)
+        const { data: mentorByName, error: mentorNameError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('full_name', mentorName)
+          .limit(1);
+        
+        const mentorId = mentorByName?.[0]?.id || 'mentor-id-nao-encontrado';
+        
         console.log('\n📧 Preparando envio de email...');
         const emailData = {
+          mentorId,
           mentorName,
           menteeName,
           menteeEmail,
@@ -1239,6 +1250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Preparar e enviar email
       console.log('\n📧 Preparando envio de email...');
       const emailData = {
+        mentorId: appointment.mentor_id,
         mentorName,
         menteeName,
         menteeEmail: menteeProfile.email,
@@ -1286,6 +1298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { enviarEmailCancelamentoAgendamento } = await import('./services/email/services/mentor/emailCalendarCancel');
       
       const testEmailData = {
+        mentorId: 'test-mentor-id-debug',
         mentorName: 'Mentor Teste',
         menteeName: 'Mentorado Teste',
         menteeEmail: req.body.email || 'teste@exemplo.com',
@@ -1389,7 +1402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentTime,
         timezone: timezone || 'America/Sao_Paulo (UTC-3)',
         notes: notes || undefined,
-        agendamentosUrl: 'https://app.mentoraai.com.br/mentor/agendamentos',
+        agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
         supportUrl: 'https://app.mentoraai.com.br/suporte'
       };
       
@@ -1436,7 +1449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentTime: '14:00 - 15:00',
         timezone: 'America/Sao_Paulo (UTC-3)',
         notes: req.body.notes || 'Este é um teste de novo agendamento',
-        agendamentosUrl: 'https://app.mentoraai.com.br/mentor/agendamentos',
+        agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
         supportUrl: 'https://app.mentoraai.com.br/suporte'
       };
       

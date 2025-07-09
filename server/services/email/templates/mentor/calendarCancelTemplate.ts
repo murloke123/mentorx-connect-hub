@@ -6,7 +6,7 @@
 import { EmailTemplate } from '../../types/emailTypes';
 
 export const calendarCancelTemplate: EmailTemplate = {
-  subject: '📅 Agendamento Cancelado - {{MENTOR_NAME}}',
+  subject: '⚠️ Agendamento Cancelado - {{MENTOR_NAME}}',
   htmlContent: `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -14,18 +14,32 @@ export const calendarCancelTemplate: EmailTemplate = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamento Cancelado</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f8fafc;">
+    <!--[if mso]>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc;">
+        <tr>
+            <td>
+    <![endif]-->
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
-                <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0;">
                     
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
-                            <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                📅 Agendamento Cancelado
+                        <td style="background-color: #e53e3e; padding: 40px 30px; text-align: center;">
+                            <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0;">
+                                ⚠️ Agendamento Cancelado
                             </h1>
                             <p style="color: #fed7d7; font-size: 16px; margin: 10px 0 0 0;">
                                 Informações sobre o cancelamento
@@ -66,9 +80,17 @@ export const calendarCancelTemplate: EmailTemplate = {
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 35px 0;">
-                                <a href="{{PLATFORM_URL}}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3); transition: all 0.3s ease;">
+                                <!--[if mso]>
+                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#667eea" fillcolor="#667eea">
+                                    <w:anchorlock/>
+                                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">🔄 Reagendar na Mentora AI</center>
+                                </v:roundrect>
+                                <![endif]-->
+                                <!--[if !mso]><!-->
+                                <a href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="display: inline-block; background-color: #667eea; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border: 2px solid #667eea; text-align: center; min-width: 200px;">
                                     🔄 Reagendar na Mentora AI
                                 </a>
+                                <!--<![endif]-->
                             </div>
                             
                             <!-- Support Section -->
@@ -121,11 +143,16 @@ export const calendarCancelTemplate: EmailTemplate = {
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+            </td>
+        </tr>
+    </table>
+    <![endif]-->
 </body>
 </html>
   `,
   textContent: `
-📅 Agendamento Cancelado
+⚠️ Agendamento Cancelado
 
 Olá, {{MENTEE_NAME}}!
 
