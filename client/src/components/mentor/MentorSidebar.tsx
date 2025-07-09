@@ -94,13 +94,6 @@ const MentorSidebar = () => {
       ),
     },
     {
-      label: "Agendamentos Adquiridos",
-      href: "/mentor/agendamentos-adquiridos",
-      icon: (
-        <CalendarCheck className="h-5 w-5 shrink-0 text-gray-300" />
-      ),
-    },
-    {
       label: "Configurações",
       href: "/mentor/configuracoes",
       icon: (

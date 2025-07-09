@@ -3,9 +3,12 @@ import AppointmentsList from '@/components/AppointmentsList';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
 import { supabase } from '@/utils/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CalendarCheck, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MentorAgendamentosAdquiridosPage: React.FC = () => {
+  const navigate = useNavigate();
   const [mentorId, setMentorId] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
@@ -47,13 +50,24 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
         <div className="container mx-auto px-6 py-8">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-2xl font-bold">
-                <CalendarCheck className="h-6 w-6 text-blue-600" />
-                Agendamentos Adquiridos
-              </CardTitle>
-              <p className="text-gray-600 dark:text-gray-400">
-                Visualize todos os agendamentos que você adquiriu com outros mentores
-              </p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                    <CalendarCheck className="h-6 w-6 text-blue-600" />
+                    Agendamentos Adquiridos
+                  </CardTitle>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">
+                    Visualize todos os agendamentos que você adquiriu com outros mentores
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => navigate('/mentor/agendamentos')}
+                  className="flex items-center gap-2"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Solicitações de Agendamento
+                </Button>
+              </div>
             </CardHeader>
           </Card>
 

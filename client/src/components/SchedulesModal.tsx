@@ -212,13 +212,16 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
               <h3 className="text-lg font-semibold">
                 Agendamentos ({appointments.length})
               </h3>
-              <Button 
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Agendar
-              </Button>
+              {/* Ocultar botão se o usuário atual for o próprio mentor */}
+              {user?.id !== mentorId && (
+                <Button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Agendar
+                </Button>
+              )}
             </div>
 
             {loading ? (
@@ -231,9 +234,11 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
                 <CardContent className="p-6 text-center">
                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600">Nenhum agendamento para este dia</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Clique em "Agendar" para criar um novo agendamento
-                  </p>
+                  {user?.id !== mentorId && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Clique em "Agendar" para criar um novo agendamento
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ) : (

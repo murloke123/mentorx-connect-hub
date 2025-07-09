@@ -3,9 +3,13 @@ import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const MentorAgendamentosPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [mentorName, setMentorName] = useState<string>('');
   const [refreshAppointments, setRefreshAppointments] = useState<number>(0);
 
@@ -44,7 +48,17 @@ const MentorAgendamentosPage = () => {
       <MentorSidebar />
       <div className="flex-1 transition-all duration-300 p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Meus Agendamentos</h1>
+          {/* Header com título e botão */}
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Solicitações de Mentoria para Você</h1>
+            <Button 
+              onClick={() => navigate('/mentor/agendamentos-adquiridos')}
+              className="flex items-center gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              Agendamentos Adquiridos
+            </Button>
+          </div>
           
           {/* Lista de agendamentos */}
           {user?.id && (
