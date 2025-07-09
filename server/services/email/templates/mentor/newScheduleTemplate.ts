@@ -88,7 +88,7 @@ export const newScheduleTemplate: EmailTemplate = {
                                 <tr>
                                     <td style="padding: 25px;">
                                         <h3 style="color: #2d3748; font-size: 18px; font-weight: 600; margin: 0 0 15px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 22px;">
-                                            📅 Detalhes do Novo Agendamento:
+                                            Detalhes do Novo Agendamento:
                                         </h3>
                                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
@@ -113,8 +113,15 @@ export const newScheduleTemplate: EmailTemplate = {
                                             </tr>
                                             {{#if NOTES}}
                                             <tr>
-                                                <td style="color: #4a5568; font-size: 15px; line-height: 22px; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; padding: 15px 0 5px 0; border-top: 1px solid #c6f6d5;">
+                                                <td style="color: #4a5568; font-size: 15px; line-height: 22px; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; padding: 5px 0;">
                                                     <strong>Observações:</strong> {{NOTES}}
+                                                </td>
+                                            </tr>
+                                            {{/if}}
+                                            {{#if MEET_LINK}}
+                                            <tr>
+                                                <td style="color: #4a5568; font-size: 15px; line-height: 22px; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; padding: 5px 0;">
+                                                    <strong>Link da Reunião:</strong> <a href="{{MEET_LINK}}" style="color: #667eea; text-decoration: underline; font-weight: 600;">Entrar na reunião</a>
                                                 </td>
                                             </tr>
                                             {{/if}}
@@ -123,6 +130,35 @@ export const newScheduleTemplate: EmailTemplate = {
                                 </tr>
                             </table>
                             
+                            {{#if MEET_LINK}}
+                            <!-- Meeting Link Button -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <!--[if mso]>
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td align="center" bgcolor="#667eea" style="padding: 15px 30px; border-radius: 5px;">
+                                        <![endif]-->
+                                        <a href="{{MEET_LINK}}" style="background-color: #667eea; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px; font-family: Arial, Helvetica, sans-serif; border: 1px solid #667eea; display: inline-block; mso-padding-alt: 0; text-align: center;">
+                                            <!--[if mso]>
+                                            <span style="mso-text-raise: 15px; color: #ffffff;">
+                                            <![endif]-->
+                                            Entrar na Reunião
+                                            <!--[if mso]>
+                                            </span>
+                                            <![endif]-->
+                                        </a>
+                                        <!--[if mso]>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <![endif]-->
+                                    </td>
+                                </tr>
+                            </table>
+                            {{/if}}
+                            
                             <!-- Action Button -->
                             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
                                 <tr>
@@ -130,7 +166,7 @@ export const newScheduleTemplate: EmailTemplate = {
                                         <!--[if mso]>
                                         <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{AGENDAMENTOS_URL}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#5a67d8" fillcolor="#5a67d8">
                                             <w:anchorlock/>
-                                            <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;">📅 Gerenciar Agendamentos</center>
+                                            <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;">Gerenciar Agendamentos</center>
                                         </v:roundrect>
                                         <![endif]-->
                                         <!--[if !mso]><!-->
@@ -138,7 +174,7 @@ export const newScheduleTemplate: EmailTemplate = {
                                             <tr>
                                                 <td style="background-color: #5a67d8; padding: 15px 35px; text-align: center; border: 2px solid #5a67d8;">
                                                     <a href="{{AGENDAMENTOS_URL}}" style="color: #ffffff; text-decoration: none; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; display: block;">
-                                                        📅 Gerenciar Agendamentos
+                                                        Gerenciar Agendamentos
                                                     </a>
                                                 </td>
                                             </tr>
@@ -181,7 +217,7 @@ export const newScheduleTemplate: EmailTemplate = {
                                 <tr>
                                     <td style="padding: 20px;">
                                         <h4 style="color: #92400e; font-size: 16px; font-weight: 600; margin: 0 0 10px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 20px;">
-                                            ⚠️ Importante:
+                                            Importante:
                                         </h4>
                                         <p style="color: #92400e; font-size: 14px; line-height: 20px; margin: 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
                                             Se você não conseguir atender no horário agendado, por favor cancele o quanto antes para que o mentorado possa escolher outro horário. Isso ajuda a manter uma boa experiência para todos.
@@ -268,6 +304,9 @@ DETALHES DO NOVO AGENDAMENTO:
 • Fuso Horário: {{TIMEZONE}}
 {{#if NOTES}}
 • Observações: {{NOTES}}
+{{/if}}
+{{#if MEET_LINK}}
+• Link da Reunião: {{MEET_LINK}}
 {{/if}}
 
 GERENCIAR AGENDAMENTOS: {{AGENDAMENTOS_URL}}

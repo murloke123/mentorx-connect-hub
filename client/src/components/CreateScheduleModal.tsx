@@ -249,6 +249,39 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         throw new Error('Erro ao buscar informações do usuário');
       }
 
+      console.log('🎥 [handleSchedule] Gerando link Jitsi Meet...');
+      
+      // Gerar link Jitsi Meet
+      let meetLink = '';
+      try {
+        const jitsiResponse = await fetch('/api/jitsi-meet/create-appointment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mentor: {
+              nome: mentorName
+            },
+            mentorado: {
+              nome: profile.full_name || 'Usuário'
+            },
+            dataInicio: `${formattedDate}T${startTime}:00`,
+            dataFim: `${formattedDate}T${endTime}:00`
+          })
+        });
+
+        if (jitsiResponse.ok) {
+          const jitsiData = await jitsiResponse.json();
+          meetLink = jitsiData.data?.linkMeet || '';
+          console.log('✅ [handleSchedule] Link Jitsi criado:', meetLink);
+        } else {
+          console.error('❌ [handleSchedule] Erro ao gerar link Jitsi:', await jitsiResponse.text());
+        }
+      } catch (jitsiError) {
+        console.error('❌ [handleSchedule] Erro ao gerar link Jitsi:', jitsiError);
+      }
+
       const appointmentData = {
         mentee_id: user.id,
         mentee_name: profile.full_name || 'Usuário',
@@ -258,7 +291,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         start_time: startTime + ':00',
         end_time: endTime + ':00',
         status: 'scheduled',
-        notes: notes.trim() || null
+        notes: notes.trim() || null,
+        meet_link: meetLink
       };
 
       console.log('📊 [handleSchedule] Dados do agendamento:', {
@@ -343,7 +377,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
             appointmentDate: formatDate(formattedDate),
             appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
             timezone: 'America/Sao_Paulo (UTC-3)',
-            notes: notes.trim() || undefined
+            notes: notes.trim() || undefined,
+            meetLink: meetLink || undefined
           };
 
           console.log('📤 [handleSchedule] Dados do e-mail:', JSON.stringify(emailData, null, 2));

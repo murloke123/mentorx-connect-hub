@@ -76,6 +76,7 @@ export interface NewScheduleEmailData {
   appointmentTime: string;
   timezone: string;
   notes?: string;
+  meetLink?: string;
   agendamentosUrl: string;
   supportUrl: string;
 } 

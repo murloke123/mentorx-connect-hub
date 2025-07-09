@@ -21,6 +21,7 @@ export async function enviarEmailNovoAgendamento(data: NewScheduleEmailData): Pr
       APPOINTMENT_TIME: data.appointmentTime,
       TIMEZONE: data.timezone,
       NOTES: data.notes || '',
+      MEET_LINK: data.meetLink || '',
       AGENDAMENTOS_URL: data.agendamentosUrl,
       SUPPORT_URL: data.supportUrl,
       CURRENT_YEAR: new Date().getFullYear().toString()
@@ -50,6 +51,19 @@ export async function enviarEmailNovoAgendamento(data: NewScheduleEmailData): Pr
       // Remover seção das observações
       htmlContent = htmlContent.replace(/\{\{#if NOTES\}\}[\s\S]*?\{\{\/if\}\}/g, '');
       textContent = textContent.replace(/\{\{#if NOTES\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+    }
+
+    // Tratar condicional do Meet Link
+    if (data.meetLink && data.meetLink.trim()) {
+      // Manter seção do Meet Link
+      htmlContent = htmlContent.replace(/\{\{#if MEET_LINK\}\}/g, '');
+      htmlContent = htmlContent.replace(/\{\{\/if\}\}/g, '');
+      textContent = textContent.replace(/\{\{#if MEET_LINK\}\}/g, '');
+      textContent = textContent.replace(/\{\{\/if\}\}/g, '');
+    } else {
+      // Remover seção do Meet Link
+      htmlContent = htmlContent.replace(/\{\{#if MEET_LINK\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+      textContent = textContent.replace(/\{\{#if MEET_LINK\}\}[\s\S]*?\{\{\/if\}\}/g, '');
     }
 
     // Configurar e-mail

@@ -1345,7 +1345,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentDate, 
         appointmentTime, 
         timezone,
-        notes 
+        notes,
+        meetLink 
       } = req.body;
       
       console.log('\n========== NOVO AGENDAMENTO - E-MAIL ==========');
@@ -1356,7 +1357,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentDate,
         appointmentTime,
         timezone,
-        notes
+        notes,
+        meetLink
       }, null, 2));
       
       // Validação dos campos obrigatórios
@@ -1407,6 +1409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentTime,
         timezone: timezone || 'America/Sao_Paulo (UTC-3)',
         notes: notes || undefined,
+        meetLink: meetLink || undefined,
         agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
         supportUrl: 'https://app.mentoraai.com.br/suporte'
       };
@@ -1454,6 +1457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentTime: '14:00 - 15:00',
         timezone: 'America/Sao_Paulo (UTC-3)',
         notes: req.body.notes || 'Este é um teste de novo agendamento',
+        meetLink: req.body.meetLink || 'https://meet.jit.si/mentoria-teste-12345',
         agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
         supportUrl: 'https://app.mentoraai.com.br/suporte'
       };
@@ -1471,6 +1475,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('❌ Erro no teste de e-mail:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT DEBUG: Verificar HTML final do email de novo agendamento
+  app.post('/api/calendar/new-appointment-email/debug-html', async (req, res) => {
+    try {
+      console.log('🔍 DEBUG HTML: Testando geração do HTML de novo agendamento');
+      
+      const { newScheduleTemplate } = await import('./services/email/templates/mentor/newScheduleTemplate');
+      
+      // Preparar parâmetros do template
+      const templateParams: Record<string, string> = {
+        MENTOR_NAME: 'Dr. João Silva',
+        MENTOR_EMAIL: 'mentor@teste.com',
+        MENTEE_NAME: 'Maria Santos',
+        APPOINTMENT_DATE: 'quinta-feira, 02 de janeiro de 2025',
+        APPOINTMENT_TIME: '14:00 - 15:00',
+        TIMEZONE: 'America/Sao_Paulo (UTC-3)',
+        NOTES: req.body.notes || 'Este é um teste de novo agendamento',
+        MEET_LINK: req.body.meetLink || 'https://meet.jit.si/mentoria-teste-12345',
+        AGENDAMENTOS_URL: 'https://mentoraai.com.br/mentor/agendamentos',
+        SUPPORT_URL: 'https://app.mentoraai.com.br/suporte',
+        CURRENT_YEAR: new Date().getFullYear().toString()
+      };
+
+      // Substituir variáveis no template
+      let htmlContent = newScheduleTemplate.htmlContent;
+      let textContent = newScheduleTemplate.textContent || '';
+      let subject = newScheduleTemplate.subject;
+
+      // Substituir todas as variáveis
+      Object.entries(templateParams).forEach(([key, value]) => {
+        const placeholder = `{{${key}}}`;
+        htmlContent = htmlContent.replace(new RegExp(placeholder, 'g'), value);
+        textContent = textContent.replace(new RegExp(placeholder, 'g'), value);
+        subject = subject.replace(new RegExp(placeholder, 'g'), value);
+      });
+
+      // Tratar condicionais do template
+      const hasNotes = req.body.notes && req.body.notes.trim();
+      const hasMeetLink = req.body.meetLink && req.body.meetLink.trim();
+      
+      if (hasNotes) {
+        htmlContent = htmlContent.replace(/\{\{#if NOTES\}\}/g, '');
+        htmlContent = htmlContent.replace(/\{\{\/if\}\}/g, '');
+        textContent = textContent.replace(/\{\{#if NOTES\}\}/g, '');
+        textContent = textContent.replace(/\{\{\/if\}\}/g, '');
+      } else {
+        htmlContent = htmlContent.replace(/\{\{#if NOTES\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+        textContent = textContent.replace(/\{\{#if NOTES\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+      }
+
+      if (hasMeetLink) {
+        htmlContent = htmlContent.replace(/\{\{#if MEET_LINK\}\}/g, '');
+        htmlContent = htmlContent.replace(/\{\{\/if\}\}/g, '');
+        textContent = textContent.replace(/\{\{#if MEET_LINK\}\}/g, '');
+        textContent = textContent.replace(/\{\{\/if\}\}/g, '');
+      } else {
+        htmlContent = htmlContent.replace(/\{\{#if MEET_LINK\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+        textContent = textContent.replace(/\{\{#if MEET_LINK\}\}[\s\S]*?\{\{\/if\}\}/g, '');
+      }
+      
+      console.log('📝 DEBUG HTML: HTML final gerado');
+      
+      res.json({
+        success: true,
+        debug: {
+          templateParams,
+          hasNotes,
+          hasMeetLink,
+          subject,
+          htmlContent,
+          textContent
+        }
+      });
+    } catch (error) {
+      console.error('❌ Erro no debug HTML:', error);
       res.status(500).json({ 
         success: false, 
         error: error instanceof Error ? error.message : 'Erro interno do servidor'
@@ -1535,6 +1620,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❗ DEBUG HTML: Erro:', error);
       res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' });
+    }
+  });
+
+  // ==================== JITSI MEET ROUTES ====================
+
+  // Importar Jitsi Meet Service
+  const JitsiMeetService = (await import('./services/GoogleMeetService')).default;
+  const meetService = new JitsiMeetService();
+
+  // Rota para testar conexão com Jitsi Meet
+  app.get('/api/jitsi-meet/test-connection', async (req, res) => {
+    try {
+      console.log('🧪 [API] Testando geração de link Jitsi...');
+      const resultado = await meetService.testarConexao();
+      
+      res.json({
+        success: true,
+        message: 'Teste de conexão concluído',
+        data: resultado
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro no teste de conexão:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
+  // Rota para criar agendamento com Jitsi Meet
+  app.post('/api/jitsi-meet/create-appointment', async (req, res) => {
+    try {
+      console.log('📅 [API] Criando agendamento com Jitsi Meet...');
+      console.log('📝 [API] Body recebido:', JSON.stringify(req.body, null, 2));
+      
+      const resultado = await meetService.criarAgendamentoComMeet(req.body);
+      
+      res.json({
+        success: true,
+        message: 'Agendamento criado com sucesso',
+        data: resultado
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro ao criar agendamento:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  });
+
+  // Rota para gerar link rápido Jitsi
+  app.post('/api/jitsi-meet/quick-link', async (req, res) => {
+    try {
+      console.log('⚡ [API] Gerando link rápido Jitsi...');
+      const { nomeReuniao } = req.body;
+      
+      const link = meetService.criarLinkMeet(nomeReuniao);
+      
+      res.json({
+        success: true,
+        message: 'Link gerado com sucesso',
+        data: {
+          link: link,
+          provider: 'Jitsi Meet',
+          criadoEm: new Date().toISOString()
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro ao gerar link:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
+  // Rota para gerar múltiplos links
+  app.post('/api/jitsi-meet/multiple-links', async (req, res) => {
+    try {
+      console.log('🎯 [API] Gerando múltiplos links Jitsi...');
+      const { quantidade = 3 } = req.body;
+      
+      const links = meetService.criarMultiplosLinks(quantidade);
+      
+      res.json({
+        success: true,
+        message: `${quantidade} links gerados com sucesso`,
+        data: {
+          links: links,
+          quantidade: links.length,
+          provider: 'Jitsi Meet',
+          criadoEm: new Date().toISOString()
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro ao gerar links:', error.message);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
     }
   });
 
