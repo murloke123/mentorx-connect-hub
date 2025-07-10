@@ -17,6 +17,7 @@ interface CalendarSettings {
   endTime: string;
   sessionDuration: number;
   timezone: string;
+  price?: number;
 }
 
 const MentorPublicSchedulePage: React.FC = () => {
@@ -28,7 +29,8 @@ const MentorPublicSchedulePage: React.FC = () => {
     startTime: '09:00',
     endTime: '18:00', 
     sessionDuration: 60,
-    timezone: 'America/Sao_Paulo'
+    timezone: 'America/Sao_Paulo',
+    price: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +89,8 @@ const MentorPublicSchedulePage: React.FC = () => {
             startTime: formatTime(settings.start_time) || '09:00',
             endTime: formatTime(settings.end_time) || '18:00',
             sessionDuration: settings.session_duration || 60,
-            timezone: settings.timezone || 'America/Sao_Paulo'
+            timezone: settings.timezone || 'America/Sao_Paulo',
+            price: settings.price || 0
           });
         }
       } catch (err) {
@@ -250,6 +253,26 @@ const MentorPublicSchedulePage: React.FC = () => {
                         <Calendar className="h-4 w-4 text-purple-600" />
                         <span>{mentorSettings.timezone}</span>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Valor do Agendamento */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Valor do Agendamento</h4>
+                    <div className="bg-white p-4 rounded-lg border">
+                      {mentorSettings.price && mentorSettings.price > 0 ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="font-semibold text-green-600">
+                            R$ {mentorSettings.price.toFixed(2).replace('.', ',')}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="text-sm">
+                          <span className="font-medium text-blue-600">
+                            🎉 Essa mentoria está gratuita no momento, aproveite!
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

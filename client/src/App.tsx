@@ -55,6 +55,7 @@ import {
     MentorPublicSchedulePage,
     MentorRotasPage,
     MentorStripeOnboardingPage,
+    MentorTemplatesEmailPage,
     MentorsPage,
     NotFound,
     // Helpers
@@ -208,6 +209,11 @@ const AppContent = () => {
           <Route path="/mentor/stripe-onboarding" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorStripeOnboardingPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/templates-email" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorTemplatesEmailPage />
             </ProtectedRoute>
           } />
           

@@ -2,7 +2,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
-import { BookOpen, Calendar, CalendarCheck, LayoutDashboard, LogOut, Play, Settings, User, Users } from "lucide-react";
+import { BookOpen, Calendar, CalendarCheck, LayoutDashboard, LogOut, Mail, Play, Settings, User, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
@@ -91,6 +91,13 @@ const MentorSidebar = () => {
       href: "/mentor/agendamentos",
       icon: (
         <Calendar className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Templates de Email",
+      href: "/mentor/templates-email",
+      icon: (
+        <Mail className="h-5 w-5 shrink-0 text-gray-300" />
       ),
     },
     {

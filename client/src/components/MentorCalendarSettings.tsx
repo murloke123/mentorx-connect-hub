@@ -1,4 +1,4 @@
-import { Calendar, Clock, Globe, Loader2, Settings } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Globe, Loader2, Settings } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
@@ -7,6 +7,7 @@ import { detectUserTimezone, findTimezoneByValue, timezones } from '../utils/tim
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Checkbox } from './ui/checkbox';
+import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface CalendarSettings {
@@ -15,6 +16,7 @@ interface CalendarSettings {
   endTime: string;
   sessionDuration: number;
   timezone: string;
+  price?: number;
 }
 
 interface MentorCalendarSettingsProps {
@@ -29,7 +31,8 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
     startTime: '09:00',
     endTime: '18:00',
     sessionDuration: 60,
-    timezone: detectUserTimezone() // Detecta automaticamente o fuso horário local
+    timezone: detectUserTimezone(), // Detecta automaticamente o fuso horário local
+    price: 0
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -109,7 +112,8 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
           startTime: formatTime(data.start_time) || settings.startTime,
           endTime: formatTime(data.end_time) || settings.endTime,
           sessionDuration: data.session_duration || settings.sessionDuration,
-          timezone: data.timezone || detectUserTimezone()
+          timezone: data.timezone || detectUserTimezone(),
+          price: data.price || settings.price
         };
         
         console.log('🔄 [loadSettings] Configurações processadas:', loadedSettings);
@@ -162,14 +166,33 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
 
     setSaving(true);
     try {
+      // Buscar o full_name do mentor
+      const { data: mentorData, error: mentorError } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (mentorError) {
+        console.error('❌ [saveSettings] Erro ao buscar dados do mentor:', mentorError);
+        toast({
+          title: "Erro ao salvar",
+          description: "Erro ao buscar dados do mentor",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Preparar dados para o banco
       const dataToSave = {
         mentor_id: user.id,
+        mentor_name: mentorData?.full_name || 'Nome não informado',
         working_days: settings.workingDays,
         start_time: settings.startTime,
         end_time: settings.endTime,
         session_duration: settings.sessionDuration,
         timezone: settings.timezone,
+        price: settings.price,
         is_active: true
       };
 
@@ -257,6 +280,17 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
   const handleTimezoneChange = (value: string) => {
     console.log(`🌍 [handleTimezone] Novo fuso horário: ${value}`);
     const newSettings = { ...settings, timezone: value };
+    setSettings(newSettings);
+    // Chamar onSettingsChange apenas se não estiver salvando
+    if (!saving) {
+      onSettingsChange(newSettings);
+    }
+  };
+
+  const handlePriceChange = (value: string) => {
+    console.log(`💰 [handlePrice] Novo preço: ${value}`);
+    const priceValue = value === '' ? 0 : parseFloat(value);
+    const newSettings = { ...settings, price: priceValue };
     setSettings(newSettings);
     // Chamar onSettingsChange apenas se não estiver salvando
     if (!saving) {
@@ -405,6 +439,26 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
           </Select>
           <p className="text-xs text-gray-500">
             Detectado automaticamente: {getSelectedTimezoneLabel()}
+          </p>
+        </div>
+
+        {/* Valor do Agendamento */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Valor do Agendamento (R$)
+          </label>
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            value={settings.price || ''}
+            onChange={(e) => handlePriceChange(e.target.value)}
+            className="w-full"
+          />
+          <p className="text-xs text-gray-500">
+            Defina o valor que será cobrado por cada agendamento (opcional)
           </p>
         </div>
 

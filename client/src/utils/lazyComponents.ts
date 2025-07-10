@@ -50,6 +50,7 @@ export const MentorConfiguracoesPage = lazy(() => import('@/pages/mentor/MentorC
 export const MentorRotasPage = lazy(() => import('@/pages/mentor/MentorRotasPage'));
 export const MentorMapeamentoDBPage = lazy(() => import('@/pages/mentor/MentorMapeamentoDBPage'));
 export const MentorStripeOnboardingPage = lazy(() => import('@/pages/mentor/MentorStripeOnboardingPage'));
+export const MentorTemplatesEmailPage = lazy(() => import('@/pages/mentor/TemplatesEmail'));
 
 // ===== MENTORADO PAGES - Chunk separado =====
 export const MentoradoDashboardPage = lazy(() => import('@/pages/mentorado/MentoradoDashboardPage'));

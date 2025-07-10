@@ -38,7 +38,12 @@ export const newScheduleTemplate: EmailTemplate = {
                     
                     <!-- Header -->
                     <tr>
-                        <td style="background-color: #48bb78; padding: 40px 30px; text-align: center;">
+                        <!--[if mso]>
+                        <td bgcolor="#1a1a1a" style="padding: 40px 30px; text-align: center;">
+                        <![endif]-->
+                        <!--[if !mso]><!-->
+                        <td style="background-color: #1a1a1a; padding: 40px 30px; text-align: center;">
+                        <!--<![endif]-->
                             <!--[if mso]>
                             <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                 <tr>
@@ -47,7 +52,7 @@ export const newScheduleTemplate: EmailTemplate = {
                             <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 32px;">
                                 🎉 Novo Agendamento!
                             </h1>
-                            <p style="color: #e6fffa; font-size: 16px; margin: 10px 0 0 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 20px;">
+                            <p style="color: #e2e8f0; font-size: 16px; margin: 10px 0 0 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 20px;">
                                 Um mentorado agendou uma sessão com você
                             </p>
                             <!--[if mso]>
@@ -121,7 +126,7 @@ export const newScheduleTemplate: EmailTemplate = {
                                             {{#if MEET_LINK}}
                                             <tr>
                                                 <td style="color: #4a5568; font-size: 15px; line-height: 22px; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; padding: 5px 0;">
-                                                    <strong>Link da Reunião:</strong> <a href="{{MEET_LINK}}" style="color: #667eea; text-decoration: underline; font-weight: 600;">Entrar na reunião</a>
+                                                    <strong>🚀 Link da Reunião:</strong> <a href="{{MEET_LINK}}" style="color: #667eea; text-decoration: underline; font-weight: 600;">Entrar na reunião</a>
                                                 </td>
                                             </tr>
                                             {{/if}}
@@ -136,27 +141,22 @@ export const newScheduleTemplate: EmailTemplate = {
                                 <tr>
                                     <td align="center">
                                         <!--[if mso]>
-                                        <table cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td align="center" bgcolor="#667eea" style="padding: 15px 30px; border-radius: 5px;">
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{MEET_LINK}}" style="height:56px;v-text-anchor:middle;width:300px;" arcsize="15%" strokecolor="#1a1a1a" fillcolor="#1a1a1a">
+                                            <w:anchorlock/>
+                                            <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">▶️ Entrar na Reunião</center>
+                                        </v:roundrect>
                                         <![endif]-->
-                                        <a href="{{MEET_LINK}}" style="background-color: #667eea; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px; font-family: Arial, Helvetica, sans-serif; border: 1px solid #667eea; display: inline-block; mso-padding-alt: 0; text-align: center;">
-                                            <!--[if mso]>
-                                            <span style="mso-text-raise: 15px; color: #ffffff;">
-                                            <![endif]-->
-                                            Entrar na Reunião
-                                            <!--[if mso]>
-                                            </span>
-                                            <![endif]-->
+                                        <!--[if !mso]><!-->
+                                        <a href="{{MEET_LINK}}" style="background-color: #1a1a1a; color: #ffffff; padding: 18px 36px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px; font-family: Arial, Helvetica, sans-serif; border: 2px solid #1a1a1a; display: inline-block; text-align: center; box-shadow: 0 4px 12px rgba(26,26,26,0.3); min-width: 220px; -webkit-text-size-adjust: none; mso-hide: all;">
+                                            ▶️ Entrar na Reunião
                                         </a>
-                                        <!--[if mso]>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        <![endif]-->
+                                        <!--<![endif]-->
                                     </td>
                                 </tr>
                             </table>
+                            <p style="color: #6b7280; font-size: 14px; margin: 15px 0 0 0; font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 18px;">
+                                Clique no botão acima para entrar na reunião apenas quando estiver no dia e horário agendado.
+                            </p>
                             {{/if}}
                             
                             <!-- Action Button -->
@@ -164,17 +164,19 @@ export const newScheduleTemplate: EmailTemplate = {
                                 <tr>
                                     <td align="center">
                                         <!--[if mso]>
-                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{AGENDAMENTOS_URL}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#5a67d8" fillcolor="#5a67d8">
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{AGENDAMENTOS_URL}}" style="height:56px;v-text-anchor:middle;width:300px;" arcsize="15%" strokecolor="#1a1a1a" fillcolor="#1a1a1a">
                                             <w:anchorlock/>
-                                            <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;">Gerenciar Agendamentos</center>
+                                            <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:600;">
+                                                📊 Gerenciar Agendamentos
+                                            </center>
                                         </v:roundrect>
                                         <![endif]-->
                                         <!--[if !mso]><!-->
                                         <table cellpadding="0" cellspacing="0" border="0">
                                             <tr>
-                                                <td style="background-color: #5a67d8; padding: 15px 35px; text-align: center; border: 2px solid #5a67d8;">
-                                                    <a href="{{AGENDAMENTOS_URL}}" style="color: #ffffff; text-decoration: none; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; display: block;">
-                                                        Gerenciar Agendamentos
+                                                <td style="background-color: #1a1a1a; padding: 16px 40px; text-align: center; border-radius: 12px; border: 2px solid #1a1a1a;">
+                                                    <a href="{{AGENDAMENTOS_URL}}" style="color: #ffffff; text-decoration: none; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; display: block;">
+                                                        📊 Gerenciar Agendamentos
                                                     </a>
                                                 </td>
                                             </tr>
@@ -228,36 +230,6 @@ export const newScheduleTemplate: EmailTemplate = {
                         </td>
                     </tr>
                     
-                    <!-- Support Section -->
-                    <tr>
-                        <td style="background-color: #f8fafc; padding: 30px;">
-                            <!--[if mso]>
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td align="center">
-                            <![endif]-->
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td align="center">
-                                        <h3 style="color: #2d3748; font-size: 18px; font-weight: 600; margin: 0 0 15px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 22px;">
-                                            Precisa de ajuda?
-                                        </h3>
-                                        <p style="color: #4a5568; font-size: 15px; line-height: 22px; margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
-                                            Nossa equipe está sempre disponível para ajudá-lo com qualquer dúvida sobre os agendamentos.
-                                        </p>
-                                        <a href="{{SUPPORT_URL}}" style="color: #667eea; text-decoration: underline; font-weight: 600; font-size: 15px; font-family: Arial, Helvetica, sans-serif;">
-                                            Entrar em contato com o suporte
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            <!--[if mso]>
-                                    </td>
-                                </tr>
-                            </table>
-                            <![endif]-->
-                        </td>
-                    </tr>
                     
                     <!-- Footer -->
                     <tr>

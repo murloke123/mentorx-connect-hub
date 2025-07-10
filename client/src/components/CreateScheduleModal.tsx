@@ -15,6 +15,7 @@ interface CalendarSettings {
   endTime: string;
   sessionDuration: number;
   timezone: string;
+  price?: number;
 }
 
 interface Appointment {

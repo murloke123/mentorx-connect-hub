@@ -38,7 +38,12 @@ export const emailNewScheduleMenteeTemplate: EmailTemplate = {
                     
                     <!-- Header -->
                     <tr>
-                        <td style="background-color: #667eea; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0; -webkit-border-radius: 8px 8px 0 0; -moz-border-radius: 8px 8px 0 0;">
+                        <!--[if mso]>
+                        <td bgcolor="#1a1a1a" style="padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                        <![endif]-->
+                        <!--[if !mso]><!-->
+                        <td style="background-color: #1a1a1a; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0; -webkit-border-radius: 8px 8px 0 0; -moz-border-radius: 8px 8px 0 0;">
+                        <!--<![endif]-->
                             <!--[if mso]>
                             <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                 <tr>
@@ -133,21 +138,21 @@ export const emailNewScheduleMenteeTemplate: EmailTemplate = {
                             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f0fff4; border-left: 4px solid #48bb78; margin: 30px 0; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px;">
                                 <tr>
                                     <td style="padding: 25px; text-align: center;">
-                                        <h3 style="color: #2d3748; font-size: 18px; font-weight: 600; margin: 0 0 15px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 22px;">
-                                            🎥 Link da Reunião
+                                        <h3 style="color: #1a202c; font-size: 18px; font-weight: 600; margin: 0 0 15px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 22px;">
+                                            🚀 Link da Reunião
                                         </h3>
-                                        <p style="color: #4a5568; font-size: 15px; line-height: 22px; margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
-                                            Clique no botão abaixo para entrar na reunião no horário agendado:
+                                        <p style="color: #2d3748; font-size: 15px; line-height: 22px; margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
+                                            Clique no botão abaixo para entrar na reunião apenas quando estiver no dia e horário agendado:
                                         </p>
                                         <!--[if mso]>
-                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{MEET_LINK}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="8%" strokecolor="#48bb78" fillcolor="#48bb78">
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{MEET_LINK}}" style="height:56px;v-text-anchor:middle;width:300px;" arcsize="15%" strokecolor="#1a1a1a" fillcolor="#1a1a1a">
                                             <w:anchorlock/>
-                                            <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">🎥 Entrar na Reunião</center>
+                                            <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">▶️ Entrar na Reunião</center>
                                         </v:roundrect>
                                         <![endif]-->
                                         <!--[if !mso]><!-->
-                                        <a href="{{MEET_LINK}}" style="display: inline-block; background-color: #48bb78; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 6px; -webkit-border-radius: 6px; -moz-border-radius: 6px; font-weight: bold; font-size: 16px; font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 20px; min-width: 200px; -webkit-text-size-adjust: none; mso-hide: all;">
-                                            🎥 Entrar na Reunião
+                                        <a href="{{MEET_LINK}}" style="display: inline-block; background-color: #1a1a1a; color: #ffffff; text-decoration: none; padding: 18px 36px; border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; font-weight: 700; font-size: 16px; font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 20px; min-width: 220px; box-shadow: 0 4px 12px rgba(26,26,26,0.3); border: 2px solid #1a1a1a; -webkit-text-size-adjust: none; mso-hide: all;">
+                                            ▶️ Entrar na Reunião
                                         </a>
                                         <!--<![endif]-->
                                         <p style="color: #718096; font-size: 13px; line-height: 18px; margin: 15px 0 0 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
@@ -158,31 +163,6 @@ export const emailNewScheduleMenteeTemplate: EmailTemplate = {
                                 </tr>
                             </table>
                             {{/if}}
-                            
-                            <!-- Action Buttons -->
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 30px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <table cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td style="padding: 0 10px 20px 0;">
-                                                    <!--[if mso]>
-                                                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{AGENDAMENTOS_URL}}" style="height:44px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#667eea" fillcolor="#667eea">
-                                                        <w:anchorlock/>
-                                                        <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:14px;font-weight:600;">📅 Meus Agendamentos</center>
-                                                    </v:roundrect>
-                                                    <![endif]-->
-                                                    <!--[if !mso]><!-->
-                                                    <a href="{{AGENDAMENTOS_URL}}" style="display: inline-block; background-color: #667eea; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; font-weight: 600; font-size: 14px; font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 20px; min-width: 160px; -webkit-text-size-adjust: none; mso-hide: all;">
-                                                        📅 Meus Agendamentos
-                                                    </a>
-                                                    <!--<![endif]-->
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
                             
                             <!--[if mso]>
                             <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -203,23 +183,6 @@ export const emailNewScheduleMenteeTemplate: EmailTemplate = {
                                             <li style="margin-bottom: 8px;">Tenha papel e caneta para anotações importantes</li>
                                             <li style="margin-bottom: 0;">Seja pontual - chegue alguns minutos antes do horário</li>
                                         </ul>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <!-- Help Section -->
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td style="padding: 20px 0;">
-                                        <h3 style="color: #2d3748; font-size: 16px; font-weight: 600; margin: 0 0 10px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly; line-height: 20px;">
-                                            Precisa de ajuda?
-                                        </h3>
-                                        <p style="color: #4a5568; font-size: 15px; line-height: 22px; margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; mso-line-height-rule: exactly;">
-                                            Se você tiver qualquer dúvida ou precisar alterar seu agendamento, nossa equipe está sempre pronta para ajudar.
-                                        </p>
-                                        <a href="{{SUPPORT_URL}}" style="color: #667eea; text-decoration: underline; font-weight: 600; font-size: 15px; font-family: Arial, Helvetica, sans-serif;">
-                                            🆘 Entrar em contato com o suporte
-                                        </a>
                                     </td>
                                 </tr>
                             </table>

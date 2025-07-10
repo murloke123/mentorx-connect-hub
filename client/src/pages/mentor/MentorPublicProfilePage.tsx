@@ -40,7 +40,8 @@ const MentorPublicProfilePage = () => {
     startTime: '09:00',
     endTime: '18:00',
     sessionDuration: 60,
-    timezone: 'America/Sao_Paulo'
+    timezone: 'America/Sao_Paulo',
+    price: 0
   });
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -232,7 +233,8 @@ const MentorPublicProfilePage = () => {
             startTime: formatTime(data.start_time) || mentorSettings.startTime,
             endTime: formatTime(data.end_time) || mentorSettings.endTime,
             sessionDuration: data.session_duration || mentorSettings.sessionDuration,
-            timezone: data.timezone || mentorSettings.timezone
+            timezone: data.timezone || mentorSettings.timezone,
+            price: data.price || mentorSettings.price
           };
           
           console.log('🔄 [MENTOR-SETTINGS] Configurações processadas:', loadedSettings);
@@ -869,6 +871,26 @@ const MentorPublicProfilePage = () => {
                             <Clock className="h-4 w-4 text-purple-600" />
                             <span>{mentorSettings.timezone}</span>
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Valor do Agendamento */}
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Valor do Agendamento</h4>
+                        <div className="bg-white p-4 rounded-lg border">
+                          {mentorSettings.price && mentorSettings.price > 0 ? (
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-semibold text-green-600">
+                                R$ {mentorSettings.price.toFixed(2).replace('.', ',')}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="text-sm">
+                              <span className="font-medium text-blue-600">
+                                🎉 Essa mentoria está gratuita no momento, aproveite!
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
