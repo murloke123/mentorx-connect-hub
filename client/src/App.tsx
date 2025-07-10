@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import DocumentTestPage from "@/pages/DocumentTestPage";
 import { TestDocumentVerificationPage } from "@/pages/TestDocumentVerificationPage";
-import GoogleMeetTestPage from "@/pages/test/GoogleMeetTestPage";
+
 import JitsiMeetTestPage from "@/pages/test/JitsiMeetTestPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo } from "react";
@@ -296,7 +296,7 @@ const AppContent = () => {
           } />
           
           {/* Rotas de Teste */}
-          <Route path="/test/google-meet" element={<GoogleMeetTestPage />} />
+
           <Route path="/test/jitsi-meet" element={<JitsiMeetTestPage />} />
           
           {/* Rota 404 - deve ser a última */}

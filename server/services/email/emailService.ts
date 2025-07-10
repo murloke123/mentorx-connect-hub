@@ -48,6 +48,7 @@
 import { enviarEmailBoasVindasMentor } from './services/mentor/emailBoasVindasMentor';
 import { enviarEmailNovoAgendamento } from './services/mentor/emailNewSchedule';
 import { enviarEmailBoasVindasMentorado } from './services/mentorado/emailBoasVindasMentorado';
+import { sendNewScheduleEmailToMentee } from './services/mentorado/emailNewScheduleMentee';
 import { EmailResponse, WelcomeEmailData } from './types/emailTypes';
 
 /**
@@ -147,6 +148,66 @@ export async function notificarMentorNovoAgendamento(data: {
 }
 
 /**
+ * Envia e-mail de notificação para mentorado sobre novo agendamento
+ */
+export async function notificarMentoradoNovoAgendamento(data: {
+  mentorName: string;
+  menteeName: string;
+  menteeEmail: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  timezone: string;
+  notes?: string;
+  meetLink?: string;
+}): Promise<EmailResponse> {
+  try {
+    console.log(`📧 Enviando notificação de novo agendamento para mentorado:`, {
+      email: data.menteeEmail,
+      mentor: data.mentorName,
+      mentorado: data.menteeName,
+      data: data.appointmentDate,
+      horario: data.appointmentTime
+    });
+
+    const emailData = {
+      mentorName: data.mentorName,
+      menteeName: data.menteeName,
+      menteeEmail: data.menteeEmail,
+      appointmentDate: data.appointmentDate,
+      appointmentTime: data.appointmentTime,
+      timezone: data.timezone,
+      notes: data.notes,
+      meetLink: data.meetLink,
+      agendamentosUrl: 'https://mentoraai.com.br/mentorado/meus-agendamentos',
+      supportUrl: 'https://app.mentoraai.com.br/suporte'
+    };
+
+    const result = await sendNewScheduleEmailToMentee(emailData);
+
+    if (result.success) {
+      console.log('✅ Notificação de novo agendamento enviada para mentorado com sucesso:', {
+        messageId: result.messageId,
+        email: data.menteeEmail,
+        mentorado: data.menteeName
+      });
+    } else {
+      console.error('❌ Falha no envio da notificação de novo agendamento para mentorado:', result.error);
+    }
+
+    return result;
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.error('❌ Erro crítico na notificação de novo agendamento para mentorado:', errorMessage);
+    
+    return {
+      success: false,
+      error: errorMessage
+    };
+  }
+}
+
+/**
  * Testa a conectividade com o serviço Brevo
  */
 export async function testarConectividadeBrevo(): Promise<{ success: boolean; message: string }> {
@@ -183,14 +244,17 @@ export async function testarConectividadeBrevo(): Promise<{ success: boolean; me
 export { enviarEmailBoasVindasMentor } from './services/mentor/emailBoasVindasMentor';
 export { enviarEmailNovoAgendamento } from './services/mentor/emailNewSchedule';
 export { enviarEmailBoasVindasMentorado } from './services/mentorado/emailBoasVindasMentorado';
+export { sendNewScheduleEmailToMentee } from './services/mentorado/emailNewScheduleMentee';
 export * from './types/emailTypes';
 
 // Export default
 export default {
   enviarEmailBoasVindas,
   notificarMentorNovoAgendamento,
+  notificarMentoradoNovoAgendamento,
   testarConectividadeBrevo,
   enviarEmailBoasVindasMentor,
   enviarEmailBoasVindasMentorado,
-  enviarEmailNovoAgendamento
+  enviarEmailNovoAgendamento,
+  sendNewScheduleEmailToMentee
 }; 

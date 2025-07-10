@@ -79,4 +79,17 @@ export interface NewScheduleEmailData {
   meetLink?: string;
   agendamentosUrl: string;
   supportUrl: string;
+}
+
+export interface NewScheduleEmailDataMentee {
+  mentorName: string;
+  menteeName: string;
+  menteeEmail: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  timezone: string;
+  notes?: string;
+  meetLink?: string;
+  agendamentosUrl: string;
+  supportUrl: string;
 } 

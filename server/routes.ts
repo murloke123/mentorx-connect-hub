@@ -1563,6 +1563,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ENDPOINT 28: Enviar e-mail de novo agendamento para mentorado
+  app.post('/api/calendar/new-appointment-email/mentee', async (req, res) => {
+    try {
+      const { 
+        menteeId,
+        mentorName, 
+        menteeName, 
+        menteeEmail,
+        appointmentDate, 
+        appointmentTime, 
+        timezone,
+        notes,
+        meetLink 
+      } = req.body;
+      
+      console.log('\n========== NOVO AGENDAMENTO - E-MAIL MENTORADO ==========');
+      console.log('📥 Dados recebidos:', JSON.stringify({
+        menteeId,
+        mentorName,
+        menteeName,
+        menteeEmail,
+        appointmentDate,
+        appointmentTime,
+        timezone,
+        notes,
+        meetLink
+      }, null, 2));
+      
+      // Validação dos campos obrigatórios
+      if (!mentorName || !menteeName || !menteeEmail || !appointmentDate || !appointmentTime) {
+        console.error('❌ Campos obrigatórios faltando');
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios faltando'
+        });
+      }
+      
+      // Preparar dados para o e-mail do mentorado
+      console.log('\n📧 Preparando envio de e-mail de confirmação para mentorado...');
+      const emailData = {
+        mentorName,
+        menteeName,
+        menteeEmail,
+        appointmentDate,
+        appointmentTime,
+        timezone: timezone || 'America/Sao_Paulo (UTC-3)',
+        notes: notes || undefined,
+        meetLink: meetLink || undefined,
+        agendamentosUrl: 'https://mentoraai.com.br/mentorado/agendamentos',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 Dados para o e-mail do mentorado:', JSON.stringify(emailData, null, 2));
+      
+      // Importar e chamar o serviço de e-mail para mentorado
+      const { sendNewScheduleEmailToMentee } = await import('./services/email/services/mentorado/emailNewScheduleMentee');
+      const result = await sendNewScheduleEmailToMentee(emailData);
+      
+      console.log('\n📨 Resultado do envio de e-mail para mentorado:', JSON.stringify(result, null, 2));
+      console.log('=========================================================\n');
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 'E-mail de confirmação enviado para mentorado com sucesso' : 'Erro ao enviar e-mail',
+        messageId: result.messageId,
+        details: result
+      });
+      
+    } catch (error) {
+      console.error('\n❌ ERRO CRÍTICO no envio de e-mail para mentorado:', error);
+      console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+      console.log('=========================================================\n');
+      
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ENDPOINT 29: Teste de e-mail de confirmação para mentorado (debug)
+  app.post('/api/calendar/new-appointment-email/mentee/test', async (req, res) => {
+    try {
+      console.log('🧪 TESTE: Endpoint de teste de e-mail de confirmação para mentorado');
+      
+      const { testNewScheduleEmailToMentee } = await import('./services/email/services/mentorado/emailNewScheduleMentee');
+      
+      const testEmail = req.body.email || 'teste.mentorado@exemplo.com';
+      console.log('📧 Enviando teste para:', testEmail);
+      
+      const result = await testNewScheduleEmailToMentee(testEmail);
+      
+      console.log('📥 Resultado do teste:', result);
+      
+      res.json({
+        success: true,
+        message: 'Teste de email de confirmação para mentorado executado',
+        result
+      });
+    } catch (error) {
+      console.error('❌ Erro no teste de email para mentorado:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
   // ENDPOINT DEBUG: Verificar HTML final do email de cancelamento
   app.post('/api/calendar/cancel-email/debug-html', async (req, res) => {
     try {
@@ -1623,10 +1731,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ENDPOINT BÁSICO: E-mail simples para mentorado (sem condicionais)
+  app.post('/api/calendar/new-appointment-email/mentee/basic', async (req, res) => {
+    try {
+      console.log('\n🧪 [BASIC-EMAIL] Teste de email BÁSICO para mentorado');
+      console.log('📥 [BASIC-EMAIL] Dados recebidos:', JSON.stringify(req.body, null, 2));
+      
+      const emailData = {
+        mentorName: req.body.mentorName || 'João Silva',
+        menteeName: req.body.menteeName || 'Maria Santos',
+        menteeEmail: req.body.menteeEmail || 'guilherme.galdino391@gmail.com',
+        appointmentDate: req.body.appointmentDate || '10 de janeiro de 2025',
+        appointmentTime: req.body.appointmentTime || '14:00 - 15:00',
+        timezone: req.body.timezone || 'UTC-3',
+        notes: req.body.notes || 'Nenhuma observação',
+        meetLink: req.body.meetLink || 'https://meet.jit.si/teste-basico',
+        agendamentosUrl: 'https://mentoraai.com.br/mentorado/agendamentos',
+        supportUrl: 'https://app.mentoraai.com.br/suporte'
+      };
+      
+      console.log('📤 [BASIC-EMAIL] Enviando email básico...');
+      
+      // Importar e usar o serviço básico
+      const { sendNewScheduleEmailToMenteeBasic } = await import('./services/email/services/mentorado/emailNewScheduleMenteeBasic');
+      const result = await sendNewScheduleEmailToMenteeBasic(emailData);
+      
+      console.log('✅ [BASIC-EMAIL] Resultado:', JSON.stringify(result, null, 2));
+      
+      res.json({
+        success: result.success,
+        message: result.success ? 'Email BÁSICO enviado com sucesso' : 'Erro no email básico',
+        messageId: result.messageId,
+        type: 'BASIC_EMAIL',
+        details: result
+      });
+      
+    } catch (error) {
+      console.error('❌ [BASIC-EMAIL] Erro crítico:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro desconhecido',
+        type: 'BASIC_EMAIL_ERROR'
+      });
+    }
+  });
+
   // ==================== JITSI MEET ROUTES ====================
 
   // Importar Jitsi Meet Service
-  const JitsiMeetService = (await import('./services/GoogleMeetService')).default;
+  const JitsiMeetService = (await import('./services/JitsiMeetService')).default;
   const meetService = new JitsiMeetService();
 
   // Rota para testar conexão com Jitsi Meet

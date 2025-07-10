@@ -241,13 +241,32 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       // Buscar informações do usuário
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, email')
         .eq('id', user.id)
         .single();
 
       if (profileError) {
         throw new Error('Erro ao buscar informações do usuário');
       }
+
+      console.log('👤 [handleSchedule] Profile do usuário:', JSON.stringify(profile, null, 2));
+      console.log('📧 [handleSchedule] Email do usuário (profile.email):', profile.email);
+      console.log('📧 [handleSchedule] Email do usuário (user.email):', user.email);
+
+      // Funções auxiliares para formatação
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString + 'T00:00:00');
+        return date.toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      };
+
+      const formatTime = (timeString: string) => {
+        return timeString.substring(0, 5);
+      };
 
       console.log('🎥 [handleSchedule] Gerando link Jitsi Meet...');
       
@@ -356,19 +375,6 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         // 📧 ENVIAR E-MAIL PARA O MENTOR SOBRE NOVO AGENDAMENTO
         console.log('📧 [handleSchedule] Enviando e-mail para o mentor...');
         try {
-          const formatDate = (dateString: string) => {
-            const date = new Date(dateString + 'T00:00:00');
-            return date.toLocaleDateString('pt-BR', {
-              weekday: 'long',
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric'
-            });
-          };
-
-          const formatTime = (timeString: string) => {
-            return timeString.substring(0, 5);
-          };
 
           const emailData = {
             mentorId: mentorId,
@@ -401,14 +407,59 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           console.log('📋 [handleSchedule] Resultado do e-mail:', emailResult);
 
           if (emailResponse.ok && emailResult.success) {
-            console.log('✅ [handleSchedule] E-mail enviado com sucesso!');
-            console.log('✉️ [handleSchedule] Message ID:', emailResult.messageId);
+            console.log('✅ [handleSchedule] E-mail do mentor enviado com sucesso!');
+            console.log('✉️ [handleSchedule] Message ID do mentor:', emailResult.messageId);
           } else {
-            console.error('⚠️ [handleSchedule] Falha no envio do e-mail:', emailResult);
+            console.error('⚠️ [handleSchedule] Falha no envio do e-mail do mentor:', emailResult);
             // Não quebrar o fluxo - agendamento já foi criado
           }
         } catch (emailError) {
-          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail:', emailError);
+          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail do mentor:', emailError);
+          // Não bloquear a criação do agendamento por erro no e-mail
+        }
+
+        // 📧 ENVIAR E-MAIL PARA O MENTORADO SOBRE NOVO AGENDAMENTO
+        console.log('📧 [handleSchedule] Enviando e-mail para o mentorado...');
+        try {
+          const menteeEmailData = {
+            mentorName: mentorName,
+            menteeName: profile.full_name || 'Usuário',
+            menteeEmail: profile.email || user.email,
+            appointmentDate: formatDate(formattedDate),
+            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+            timezone: 'America/Sao_Paulo (UTC-3)',
+            notes: notes.trim() || undefined,
+            meetLink: meetLink || undefined
+          };
+
+          console.log('📤 [handleSchedule] Dados do e-mail do mentorado:', JSON.stringify(menteeEmailData, null, 2));
+
+          const menteeEmailResponse = await fetch('/api/calendar/new-appointment-email/mentee', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(menteeEmailData),
+          });
+
+          console.log('📥 [handleSchedule] Resposta da API de e-mail do mentorado:', {
+            status: menteeEmailResponse.status,
+            statusText: menteeEmailResponse.statusText,
+            ok: menteeEmailResponse.ok
+          });
+
+          const menteeEmailResult = await menteeEmailResponse.json();
+          console.log('📋 [handleSchedule] Resultado do e-mail do mentorado:', menteeEmailResult);
+
+          if (menteeEmailResponse.ok && menteeEmailResult.success) {
+            console.log('✅ [handleSchedule] E-mail do mentorado enviado com sucesso!');
+            console.log('✉️ [handleSchedule] Message ID do mentorado:', menteeEmailResult.messageId);
+          } else {
+            console.error('⚠️ [handleSchedule] Falha no envio do e-mail do mentorado:', menteeEmailResult);
+            // Não quebrar o fluxo - agendamento já foi criado
+          }
+        } catch (menteeEmailError) {
+          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail do mentorado:', menteeEmailError);
           // Não bloquear a criação do agendamento por erro no e-mail
         }
         
