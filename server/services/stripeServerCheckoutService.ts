@@ -120,22 +120,24 @@ export interface PaymentStatusResult {
  * 4. Clique para ver os dados enviados
  */
 async function logToNetworkChrome(type: string, action: string, data: any): Promise<void> {
-  try {
-    await fetch('/api/stripe-network-logs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type,
-        action,
-        data,
-        timestamp: new Date().toISOString(),
-        service: 'stripeServerCheckoutService',
-        location: 'backend'
-      })
-    });
-  } catch (error) {
-    // Falha silenciosa - logs não devem quebrar o fluxo
-  }
+  // TEMPORARIAMENTE DESABILITADO - causava erro "supabaseKey is required"
+  // try {
+  //   await fetch('/api/stripe-network-logs', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       type,
+  //       action,
+  //       data,
+  //       timestamp: new Date().toISOString(),
+  //       service: 'stripeServerCheckoutService',
+  //       location: 'backend'
+  //     })
+  //   });
+  // } catch (error) {
+  //   // Falha silenciosa - logs não devem quebrar o fluxo
+  // }
+  console.log(`🔄 [${type}] ${action}:`, data);
 }
 
 // ##########################################################################################
@@ -232,6 +234,14 @@ export async function verifyStripeCheckoutSession(accountId: string, sessionId: 
     console.log('🔍 [SERVER-STRIPE] Verificando sessão na conta conectada:', accountId);
     console.log('📦 [SERVER-STRIPE] Session ID:', sessionId);
     
+    // Log do payload da requisição para o Stripe
+    const requestParams = {
+      sessionId,
+      expand: ['payment_intent', 'line_items'],
+      stripeAccount: accountId
+    };
+    console.log('📤 [SERVER-STRIPE] Request para Stripe API:', JSON.stringify(requestParams, null, 2));
+    
     // 🎯 CORREÇÃO CRÍTICA: Verificar sessão na conta conectada específica
     const session = await stripe.checkout.sessions.retrieve(
       sessionId, 
@@ -242,6 +252,17 @@ export async function verifyStripeCheckoutSession(accountId: string, sessionId: 
         stripeAccount: accountId  // 🔥 ESSENCIAL: Especificar conta conectada
       }
     );
+    
+    // Log do payload completo da resposta do Stripe
+    console.log('📥 [SERVER-STRIPE] Response completa do Stripe:', JSON.stringify({
+      id: session.id,
+      payment_status: session.payment_status,
+      amount_total: session.amount_total,
+      currency: session.currency,
+      customer_email: session.customer_email,
+      payment_intent: session.payment_intent,
+      metadata: session.metadata
+    }, null, 2));
     
     console.log('✅ [SERVER-STRIPE] Sessão verificada:', {
       id: session.id,
@@ -263,6 +284,9 @@ export async function verifyStripeCheckoutSession(accountId: string, sessionId: 
         metadata: session.metadata
       }
     };
+    
+    // Log do resultado final que será retornado
+    console.log('📤 [SERVER-STRIPE] Resultado final:', JSON.stringify(result, null, 2));
     
     await logToNetworkChrome('STRIPE_CHECKOUT', 'VERIFY_SESSION_SUCESSO', {
       account_id: accountId,

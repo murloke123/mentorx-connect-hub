@@ -537,15 +537,11 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                       className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
                       onClick={() => {
                         if (showAcquiredOnly) {
-                          // Na página do mentorado, clica no mentor -> vai para mentor/publicview
-                          window.location.href = `/mentor/publicview/${appointment.mentor_id}`;
+                          // Na página do mentorado, clica no mentor -> vai para mentor/publicschedule
+                          window.location.href = `/mentor/publicschedule/${appointment.mentor_id}`;
                         } else {
-                          // Na página do mentor, usa mentee_role para navegação inteligente
-                          if (appointment.mentee_role === 'mentor') {
-                            window.location.href = `/mentor/publicview/${appointment.mentee_id}`;
-                          } else {
-                            window.location.href = `/mentorado/publicview/${appointment.mentee_id}`;
-                          }
+                          // Na página do mentor, clica no mentorado -> vai para mentor/publicschedule do mentor
+                          window.location.href = `/mentor/publicschedule/${appointment.mentor_id}`;
                         }
                       }}
                     >
@@ -637,4 +633,4 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
   );
 };
 
-export default AppointmentsList; 
+export default AppointmentsList;

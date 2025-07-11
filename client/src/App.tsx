@@ -25,20 +25,22 @@ import {
     AdminMentoradosPage,
     AdminMentoresPage,
     AdminProfilePage,
+    AppointmentCheckoutSuccessPage,
     CourseLandingPage, CourseLandingPublicPage,
     // Páginas públicas
     CoursePlayerPage,
     CoursePublicView,
     CoursesPage,
     LoginPage,
-    MentoradoMeusAgendamentosPage, MentoradoConfiguracoesPage,
+    MentoradoConfiguracoesPage,
     // Mentorado
     MentoradoDashboardPage,
+    MentoradoMeusAgendamentosPage,
     MentoradoMeusCursosPage, MentoradoMeusMentoresPage,
     MentoradoProfilePage,
     MentoradoPublicViewPage,
-    MentorAgendamentosPage,
     MentorAgendamentosAdquiridosPage,
+    MentorAgendamentosPage,
     MentorCategoriasPage,
     MentorConfiguracoesPage,
     MentorConteudosPage,
@@ -54,9 +56,9 @@ import {
     MentorProfilePage, MentorPublicProfilePage,
     MentorPublicSchedulePage,
     MentorRotasPage,
+    MentorsPage,
     MentorStripeOnboardingPage,
     MentorTemplatesEmailPage,
-    MentorsPage,
     NotFound,
     // Helpers
     preloadCriticalComponents
@@ -107,6 +109,7 @@ const AppContent = () => {
           <Route path="/document-test" element={<DocumentTestPage />} />
           <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
+          <Route path="/appointment-checkout-success" element={<AppointmentCheckoutSuccessPage />} />
           <Route path="/course/:courseId" element={<CoursePublicView />} />
           <Route path="/course-page/:courseId" element={<CourseLandingPublicPage />} />
           <Route path="/course-landing/:courseId" element={<CourseLandingPublicPage />} />

@@ -3,6 +3,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
+import {
+    canProcessAppointmentPayment,
+    startAppointmentCheckout,
+    type AppointmentInputData
+} from '../services/appointmentStripeService';
 import { notifyNewAppointment } from '../services/notificationService';
 import { supabase } from '../utils/supabase';
 import { Button } from './ui/button';
@@ -93,6 +98,300 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
     }
   };
 
+  // Função auxiliar para calcular duração da sessão
+  const calculateSessionDuration = (startTime: string, endTime: string) => {
+    const start = new Date(`2000-01-01T${startTime}:00`);
+    const end = new Date(`2000-01-01T${endTime}:00`);
+    const diffMs = end.getTime() - start.getTime();
+    return Math.round(diffMs / (1000 * 60)); // Retorna em minutos
+  };
+
+  // Função para processar pagamento de agendamento
+  const processAppointmentPayment = async () => {
+    if (!user) return false;
+
+    // Verificar se o agendamento pode ser pago
+    const appointmentPrice = settings.price || 0;
+    const { canPay, reason } = await canProcessAppointmentPayment(mentorId, appointmentPrice);
+
+    if (!canPay) {
+      console.log('💡 [processAppointmentPayment] Não precisa processar pagamento:', reason);
+      return false; // Não precisa processar pagamento
+    }
+
+    // Buscar informações do usuário
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      throw new Error('Erro ao buscar informações do usuário');
+    }
+
+    // Preparar dados do agendamento para checkout
+    const appointmentData: AppointmentInputData = {
+      mentorId,
+      mentorName,
+      menteeName: profile.full_name || 'Usuário',
+      scheduledDate: formatDateForDatabase(selectedDate),
+      startTime: startTime + ':00',
+      endTime: endTime + ':00',
+      sessionDuration: calculateSessionDuration(startTime, endTime),
+      price: appointmentPrice,
+      notes: notes.trim() || undefined
+    };
+
+    console.log('🛒 [processAppointmentPayment] Iniciando checkout:', appointmentData);
+
+    // Iniciar checkout
+    const checkoutResult = await startAppointmentCheckout(
+      appointmentData,
+      user.id,
+      profile.email || user.email || ''
+    );
+
+    if (!checkoutResult.success) {
+      throw new Error(checkoutResult.error || 'Erro ao iniciar checkout');
+    }
+
+    console.log('✅ [processAppointmentPayment] Checkout criado:', checkoutResult);
+
+    // Redirecionar para o checkout
+    if (checkoutResult.sessionUrl) {
+      window.location.href = checkoutResult.sessionUrl;
+      return true; // Pagamento processado
+    }
+
+    throw new Error('URL de checkout não encontrada');
+  };
+
+  // Função para criar agendamento gratuito
+  const createFreeAppointment = async () => {
+    if (!user) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para agendar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const formattedDate = formatDateForDatabase(selectedDate);
+    
+    console.log('💾 [createFreeAppointment] Criando agendamento gratuito:', {
+      mentee_id: user.id,
+      mentor_id: mentorId,
+      date: formattedDate,
+      selectedDate: selectedDate,
+      startTime,
+      endTime,
+      price: settings.price || 0
+    });
+
+    try {
+      // Buscar informações do usuário
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        throw new Error('Erro ao buscar informações do usuário');
+      }
+
+      console.log('👤 [createFreeAppointment] Profile do usuário:', JSON.stringify(profile, null, 2));
+
+      // Funções auxiliares para formatação
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString + 'T00:00:00');
+        return date.toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        });
+      };
+
+      const formatTime = (timeString: string) => {
+        return timeString.substring(0, 5);
+      };
+
+      console.log('🎥 [createFreeAppointment] Gerando link Jitsi Meet...');
+      
+      // Gerar link Jitsi Meet
+      let meetLink = '';
+      try {
+        const jitsiResponse = await fetch('/api/jitsi-meet/create-appointment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mentor: {
+              nome: mentorName
+            },
+            mentorado: {
+              nome: profile.full_name || 'Usuário'
+            },
+            dataInicio: `${formattedDate}T${startTime}:00`,
+            dataFim: `${formattedDate}T${endTime}:00`
+          })
+        });
+
+        if (jitsiResponse.ok) {
+          const jitsiData = await jitsiResponse.json();
+          meetLink = jitsiData.data?.linkMeet || '';
+          console.log('✅ [createFreeAppointment] Link Jitsi criado:', meetLink);
+        } else {
+          console.error('❌ [createFreeAppointment] Erro ao gerar link Jitsi:', await jitsiResponse.text());
+        }
+      } catch (jitsiError) {
+        console.error('❌ [createFreeAppointment] Erro ao gerar link Jitsi:', jitsiError);
+      }
+
+      const appointmentData = {
+        mentee_id: user.id,
+        mentee_name: profile.full_name || 'Usuário',
+        mentor_id: mentorId,
+        mentor_name: mentorName,
+        scheduled_date: formattedDate,
+        start_time: startTime + ':00',
+        end_time: endTime + ':00',
+        status: 'scheduled',
+        notes: notes.trim() || null,
+        meet_link: meetLink,
+        price: settings.price || 0,
+        payment_status: 'free' // Agendamento gratuito
+      };
+
+      console.log('📊 [createFreeAppointment] Dados do agendamento:', appointmentData);
+
+      const { data, error } = await supabase
+        .from('calendar')
+        .insert(appointmentData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ [createFreeAppointment] Erro:', error);
+        throw new Error(error.message);
+      }
+
+      console.log('✅ [createFreeAppointment] Agendamento criado:', data);
+      
+      // Criar notificação para o mentor sobre o novo agendamento
+      console.log('🔔 [createFreeAppointment] Criando notificação para o mentor...');
+      try {
+        await notifyNewAppointment({
+          receiverId: mentorId,
+          receiverName: mentorName,
+          senderId: user.id,
+          senderName: profile.full_name || 'Usuário',
+          appointmentDate: formatDate(formattedDate),
+          appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+        });
+        console.log('✅ [createFreeAppointment] Notificação criada com sucesso');
+      } catch (notificationError) {
+        console.error('⚠️ [createFreeAppointment] Erro ao criar notificação:', notificationError);
+      }
+
+      // Enviar e-mails de confirmação
+      await sendAppointmentEmails(profile, formattedDate, meetLink);
+
+      // Redirecionar para a página de agendamentos
+      await redirectToMyAppointments();
+      
+      onSuccess();
+    } catch (error) {
+      console.error('❌ [createFreeAppointment] Erro:', error);
+      throw error;
+    }
+  };
+
+  // Função para enviar e-mails de confirmação
+  const sendAppointmentEmails = async (profile: any, formattedDate: string, meetLink: string) => {
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString + 'T00:00:00');
+      return date.toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+    };
+
+    const formatTime = (timeString: string) => {
+      return timeString.substring(0, 5);
+    };
+
+    // Enviar e-mail para o mentor
+    try {
+      console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentor...');
+      const emailData = {
+        mentorId: mentorId,
+        mentorName: mentorName,
+        menteeName: profile.full_name || 'Usuário',
+        appointmentDate: formatDate(formattedDate),
+        appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+        timezone: 'America/Sao_Paulo (UTC-3)',
+        notes: notes.trim() || undefined,
+        meetLink: meetLink || undefined
+      };
+
+      const emailResponse = await fetch('/api/calendar/new-appointment-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      if (emailResponse.ok) {
+        const emailResult = await emailResponse.json();
+        console.log('✅ [sendAppointmentEmails] E-mail do mentor enviado:', emailResult.messageId);
+      } else {
+        console.error('⚠️ [sendAppointmentEmails] Falha no envio do e-mail do mentor');
+      }
+    } catch (emailError) {
+      console.error('💥 [sendAppointmentEmails] Erro crítico no envio de e-mail do mentor:', emailError);
+    }
+
+    // Enviar e-mail para o mentorado
+    try {
+      console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentorado...');
+      const menteeEmailData = {
+        mentorName: mentorName,
+        menteeName: profile.full_name || 'Usuário',
+        menteeEmail: profile.email || user?.email,
+        appointmentDate: formatDate(formattedDate),
+        appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+        timezone: 'America/Sao_Paulo (UTC-3)',
+        notes: notes.trim() || undefined,
+        meetLink: meetLink || undefined
+      };
+
+      const menteeEmailResponse = await fetch('/api/calendar/new-appointment-email/mentee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(menteeEmailData),
+      });
+
+      if (menteeEmailResponse.ok) {
+        const menteeEmailResult = await menteeEmailResponse.json();
+        console.log('✅ [sendAppointmentEmails] E-mail do mentorado enviado:', menteeEmailResult.messageId);
+      } else {
+        console.error('⚠️ [sendAppointmentEmails] Falha no envio do e-mail do mentorado');
+      }
+    } catch (menteeEmailError) {
+      console.error('💥 [sendAppointmentEmails] Erro crítico no envio de e-mail do mentorado:', menteeEmailError);
+    }
+  };
+
   // Gerar opções de horário baseadas nas configurações do mentor
   const generateTimeOptions = () => {
     const options = [];
@@ -118,13 +417,11 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   // Verificar se um horário específico está ocupado
   const isTimeOccupied = (time: string) => {
     return existingAppointments.some(appointment => {
-      // Ignorar agendamentos cancelados
       if (appointment.status === 'cancelled') return false;
       
       const appointmentStart = appointment.start_time.substring(0, 5);
       const appointmentEnd = appointment.end_time.substring(0, 5);
       
-      // Verificar se o horário está dentro do intervalo ocupado (incluindo o horário de início)
       return time >= appointmentStart && time < appointmentEnd;
     });
   };
@@ -134,11 +431,10 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
     return timeOptions.filter(time => !isTimeOccupied(time));
   };
 
-  // Filtrar horários disponíveis para fim (baseado no horário de início selecionado)
+  // Filtrar horários disponíveis para fim
   const getAvailableEndTimes = () => {
     if (!startTime) return [];
     
-    // Criar lista de horários ocupados (incluindo todos os slots dentro de cada agendamento)
     const occupiedTimes = new Set<string>();
     
     existingAppointments.forEach(appointment => {
@@ -147,7 +443,6 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       const appointmentStart = appointment.start_time.substring(0, 5);
       const appointmentEnd = appointment.end_time.substring(0, 5);
       
-      // Marcar todos os slots de 30 minutos dentro do agendamento como ocupados
       timeOptions.forEach(time => {
         if (time >= appointmentStart && time < appointmentEnd) {
           occupiedTimes.add(time);
@@ -156,13 +451,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
     });
     
     const availableEndTimes = timeOptions.filter(time => {
-      // Deve ser posterior ao horário de início
       if (time <= startTime) return false;
-      
-      // Não pode ser um horário ocupado
       if (occupiedTimes.has(time)) return false;
       
-      // Verificar se algum slot entre startTime e time está ocupado
       const hasOccupiedSlotInBetween = timeOptions.some(slotTime => {
         return slotTime > startTime && slotTime < time && occupiedTimes.has(slotTime);
       });
@@ -184,7 +475,6 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       const appointmentStart = appointment.start_time.substring(0, 5);
       const appointmentEnd = appointment.end_time.substring(0, 5);
       
-      // Verifica se há sobreposição
       return (start < appointmentEnd && end > appointmentStart);
     });
   };
@@ -226,254 +516,52 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       return;
     }
 
-    const formattedDate = formatDateForDatabase(selectedDate);
-    
-    console.log('💾 [handleSchedule] Criando agendamento:', {
-      mentee_id: user.id,
-      mentor_id: mentorId,
-      date: formattedDate,
-      selectedDate: selectedDate,
-      startTime,
-      endTime
-    });
-
     setSaving(true);
     try {
-      // Buscar informações do usuário
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, email')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        throw new Error('Erro ao buscar informações do usuário');
-      }
-
-      console.log('👤 [handleSchedule] Profile do usuário:', JSON.stringify(profile, null, 2));
-      console.log('📧 [handleSchedule] Email do usuário (profile.email):', profile.email);
-      console.log('📧 [handleSchedule] Email do usuário (user.email):', user.email);
-
-      // Funções auxiliares para formatação
-      const formatDate = (dateString: string) => {
-        const date = new Date(dateString + 'T00:00:00');
-        return date.toLocaleDateString('pt-BR', {
-          weekday: 'long',
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        });
-      };
-
-      const formatTime = (timeString: string) => {
-        return timeString.substring(0, 5);
-      };
-
-      console.log('🎥 [handleSchedule] Gerando link Jitsi Meet...');
-      
-      // Gerar link Jitsi Meet
-      let meetLink = '';
-      try {
-        const jitsiResponse = await fetch('/api/jitsi-meet/create-appointment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            mentor: {
-              nome: mentorName
-            },
-            mentorado: {
-              nome: profile.full_name || 'Usuário'
-            },
-            dataInicio: `${formattedDate}T${startTime}:00`,
-            dataFim: `${formattedDate}T${endTime}:00`
-          })
-        });
-
-        if (jitsiResponse.ok) {
-          const jitsiData = await jitsiResponse.json();
-          meetLink = jitsiData.data?.linkMeet || '';
-          console.log('✅ [handleSchedule] Link Jitsi criado:', meetLink);
-        } else {
-          console.error('❌ [handleSchedule] Erro ao gerar link Jitsi:', await jitsiResponse.text());
-        }
-      } catch (jitsiError) {
-        console.error('❌ [handleSchedule] Erro ao gerar link Jitsi:', jitsiError);
-      }
-
-      const appointmentData = {
-        mentee_id: user.id,
-        mentee_name: profile.full_name || 'Usuário',
-        mentor_id: mentorId,
-        mentor_name: mentorName,
-        scheduled_date: formattedDate,
-        start_time: startTime + ':00',
-        end_time: endTime + ':00',
-        status: 'scheduled',
-        notes: notes.trim() || null,
-        meet_link: meetLink
-      };
-
-      console.log('📊 [handleSchedule] Dados do agendamento:', {
-        appointmentData,
-        formattedDate,
-        selectedDate: selectedDate,
-        dateComparison: {
-          formattedDate,
-          selectedDateISO: selectedDate.toISOString().split('T')[0],
-          isEqual: formattedDate === selectedDate.toISOString().split('T')[0]
-        }
+      const appointmentPrice = settings.price || 0;
+      console.log('🔄 [handleSchedule] Processando agendamento...', {
+        mentorId,
+        mentorName,
+        appointmentPrice
       });
 
-      const { data, error } = await supabase
-        .from('calendar')
-        .insert(appointmentData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('❌ [handleSchedule] Erro:', error);
-        toast({
-          title: "Erro ao agendar",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        console.log('✅ [handleSchedule] Agendamento criado:', data);
+      // ✅ VALIDAÇÃO CRÍTICA: Verificar se o mentor pode receber pagamentos
+      if (appointmentPrice > 0) {
+        const { canPay, reason } = await canProcessAppointmentPayment(mentorId, appointmentPrice);
         
-        // Criar notificação para o mentor sobre o novo agendamento
-        console.log('🔔 [handleSchedule] Criando notificação para o mentor...');
-        try {
-          const formatDate = (dateString: string) => {
-            const date = new Date(dateString + 'T00:00:00');
-            return date.toLocaleDateString('pt-BR', {
-              weekday: 'long',
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric'
-            });
-          };
-
-          const formatTime = (timeString: string) => {
-            return timeString.substring(0, 5);
-          };
-
-          await notifyNewAppointment({
-            receiverId: mentorId,
-            receiverName: mentorName,
-            senderId: user.id,
-            senderName: profile.full_name || 'Usuário',
-            appointmentDate: formatDate(formattedDate),
-            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+        if (!canPay) {
+          console.warn('🚫 [handleSchedule] Mentor não pode receber pagamentos:', reason);
+          toast({
+            title: "Agendamento indisponível",
+            description: `Este mentor está impossibilitado de receber agendamentos pagos. Motivo: ${reason}`,
+            variant: "destructive"
           });
-          console.log('✅ [handleSchedule] Notificação criada com sucesso');
-        } catch (notificationError) {
-          console.error('⚠️ [handleSchedule] Erro ao criar notificação:', notificationError);
-          // Não bloquear a criação do agendamento por erro na notificação
+          return;
         }
 
-        // 📧 ENVIAR E-MAIL PARA O MENTOR SOBRE NOVO AGENDAMENTO
-        console.log('📧 [handleSchedule] Enviando e-mail para o mentor...');
-        try {
-
-          const emailData = {
-            mentorId: mentorId,
-            mentorName: mentorName,
-            menteeName: profile.full_name || 'Usuário',
-            appointmentDate: formatDate(formattedDate),
-            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
-            timezone: 'America/Sao_Paulo (UTC-3)',
-            notes: notes.trim() || undefined,
-            meetLink: meetLink || undefined
-          };
-
-          console.log('📤 [handleSchedule] Dados do e-mail:', JSON.stringify(emailData, null, 2));
-
-          const emailResponse = await fetch('/api/calendar/new-appointment-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(emailData),
-          });
-
-          console.log('📥 [handleSchedule] Resposta da API de e-mail:', {
-            status: emailResponse.status,
-            statusText: emailResponse.statusText,
-            ok: emailResponse.ok
-          });
-
-          const emailResult = await emailResponse.json();
-          console.log('📋 [handleSchedule] Resultado do e-mail:', emailResult);
-
-          if (emailResponse.ok && emailResult.success) {
-            console.log('✅ [handleSchedule] E-mail do mentor enviado com sucesso!');
-            console.log('✉️ [handleSchedule] Message ID do mentor:', emailResult.messageId);
-          } else {
-            console.error('⚠️ [handleSchedule] Falha no envio do e-mail do mentor:', emailResult);
-            // Não quebrar o fluxo - agendamento já foi criado
-          }
-        } catch (emailError) {
-          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail do mentor:', emailError);
-          // Não bloquear a criação do agendamento por erro no e-mail
-        }
-
-        // 📧 ENVIAR E-MAIL PARA O MENTORADO SOBRE NOVO AGENDAMENTO
-        console.log('📧 [handleSchedule] Enviando e-mail para o mentorado...');
-        try {
-          const menteeEmailData = {
-            mentorName: mentorName,
-            menteeName: profile.full_name || 'Usuário',
-            menteeEmail: profile.email || user.email,
-            appointmentDate: formatDate(formattedDate),
-            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
-            timezone: 'America/Sao_Paulo (UTC-3)',
-            notes: notes.trim() || undefined,
-            meetLink: meetLink || undefined
-          };
-
-          console.log('📤 [handleSchedule] Dados do e-mail do mentorado:', JSON.stringify(menteeEmailData, null, 2));
-
-          const menteeEmailResponse = await fetch('/api/calendar/new-appointment-email/mentee', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(menteeEmailData),
-          });
-
-          console.log('📥 [handleSchedule] Resposta da API de e-mail do mentorado:', {
-            status: menteeEmailResponse.status,
-            statusText: menteeEmailResponse.statusText,
-            ok: menteeEmailResponse.ok
-          });
-
-          const menteeEmailResult = await menteeEmailResponse.json();
-          console.log('📋 [handleSchedule] Resultado do e-mail do mentorado:', menteeEmailResult);
-
-          if (menteeEmailResponse.ok && menteeEmailResult.success) {
-            console.log('✅ [handleSchedule] E-mail do mentorado enviado com sucesso!');
-            console.log('✉️ [handleSchedule] Message ID do mentorado:', menteeEmailResult.messageId);
-          } else {
-            console.error('⚠️ [handleSchedule] Falha no envio do e-mail do mentorado:', menteeEmailResult);
-            // Não quebrar o fluxo - agendamento já foi criado
-          }
-        } catch (menteeEmailError) {
-          console.error('💥 [handleSchedule] Erro crítico no envio de e-mail do mentorado:', menteeEmailError);
-          // Não bloquear a criação do agendamento por erro no e-mail
-        }
+        // Mentor pode receber pagamentos - processar checkout
+        const needsPayment = await processAppointmentPayment();
         
-        // Redirecionar para a página de agendamentos baseado no role do usuário
-        await redirectToMyAppointments();
-        
-        onSuccess();
+        if (needsPayment) {
+          // Pagamento foi processado, usuário será redirecionado para checkout
+          console.log('💳 [handleSchedule] Usuário redirecionado para checkout');
+          return;
+        }
       }
+
+      // Criar agendamento gratuito (price = 0 OU mentor sem Stripe configurado)
+      await createFreeAppointment();
+
+      toast({
+        title: "Agendamento realizado!",
+        description: "Seu agendamento foi criado com sucesso."
+      });
+
     } catch (err) {
       console.error('💥 [handleSchedule] Erro inesperado:', err);
       toast({
         title: "Erro inesperado",
-        description: "Não foi possível criar o agendamento",
+        description: err instanceof Error ? err.message : "Não foi possível criar o agendamento",
         variant: "destructive"
       });
     } finally {
@@ -482,6 +570,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+  const appointmentPrice = settings.price || 0;
+  const isPaid = appointmentPrice > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -505,12 +596,22 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
             </p>
           </div>
 
+          {/* Mostrar informações de preço se for pago */}
+          {isPaid && (
+            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+              <p className="text-sm text-green-700">
+                <strong>💰 Valor da mentoria:</strong> R$ {appointmentPrice.toFixed(2).replace('.', ',')}
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                Você será redirecionado para o pagamento após confirmar o agendamento
+              </p>
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Horário de Início</label>
             <Select value={startTime} onValueChange={(value) => {
               setStartTime(value);
-              // Sempre limpar horário de fim quando mudar o horário de início
-              // para forçar o usuário a selecionar um novo horário de fim válido
               setEndTime('');
             }}>
               <SelectTrigger>
@@ -581,7 +682,7 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
               className="flex-1"
               disabled={saving || !startTime || !endTime || !isTimeSlotAvailable(startTime, endTime)}
             >
-              {saving ? 'Agendando...' : 'Agendar'}
+              {saving ? 'Processando...' : (isPaid ? 'Pagar e Agendar' : 'Agendar')}
             </Button>
           </div>
         </div>

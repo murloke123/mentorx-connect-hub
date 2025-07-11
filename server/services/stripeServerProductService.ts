@@ -19,7 +19,7 @@ import { config } from '../environment';
 
 // Inicializar cliente Stripe com chave secreta do servidor
 const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-05-28.basil',
+  apiVersion: '2025-06-30.basil',
   typescript: true,
 });
 
@@ -129,11 +129,10 @@ async function logToNetworkChrome(type: string, action: string, data: any): Prom
  * - metadata: Dados customizados (ex: course_id, mentor_id)
  */
 export async function createStripeProduct(accountId: string, productData: ProductCreateData): Promise<ProductResult> {
-  await logToNetworkChrome('STRIPE_PRODUCT', 'CREATE_INICIADO', { accountId, productData });
-  
   try {
     console.log('🆕 [SERVER-STRIPE] Criando produto na conta conectada:', accountId);
     console.log('📦 [SERVER-STRIPE] Nome do produto:', productData.name);
+    console.log('📦 [SERVER-STRIPE] Dados completos:', JSON.stringify(productData, null, 2));
     
     // 🎯 CORREÇÃO CRÍTICA: Criar produto na conta conectada específica
     const product = await stripe.products.create({
@@ -146,26 +145,21 @@ export async function createStripeProduct(accountId: string, productData: Produc
     });
     
     console.log('✅ [SERVER-STRIPE] Produto criado na conta conectada:', product.id);
-    
-    const result = { success: true, product };
-    await logToNetworkChrome('STRIPE_PRODUCT', 'CREATE_SUCESSO', {
-      account_id: accountId,
-      product_id: product.id,
+    console.log('✅ [SERVER-STRIPE] Detalhes do produto:', {
+      id: product.id,
       name: product.name,
-      active: product.active
+      active: product.active,
+      metadata: product.metadata
     });
     
-    return result;
+    return { success: true, product };
     
   } catch (error) {
+    console.error('❌ [SERVER-STRIPE] Erro ao criar produto:', error);
     const errorResult = {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao criar produto'
     };
-    await logToNetworkChrome('STRIPE_PRODUCT', 'CREATE_ERRO', { 
-      accountId, 
-      error: errorResult.error 
-    });
     return errorResult;
   }
 }

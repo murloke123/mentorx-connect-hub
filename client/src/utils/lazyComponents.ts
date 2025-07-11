@@ -17,6 +17,9 @@ export const CourseLandingPage = lazy(() => import('@/pages/mentor/CourseLanding
 export const CourseLandingPublicPage = lazy(() => import('@/pages/CourseLandingPublicPage'));
 export const CoursePublicView = lazy(() => import('@/pages/CoursePublicView'));
 
+// ===== PÁGINAS DE CHECKOUT =====
+export const AppointmentCheckoutSuccessPage = lazy(() => import('@/pages/AppointmentCheckoutSuccessPage'));
+
 // ===== ADMIN PAGES - Chunk separado =====
 export const AdminDashboardPage = lazy(() => 
   import('@/pages/admin/AdminDashboardPage').then(module => ({ 

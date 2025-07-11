@@ -587,6 +587,279 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ##########################################################################################
+  // ###################### ENDPOINTS STRIPE - AGENDAMENTOS ############################
+  // ##########################################################################################
+
+  // ENDPOINT: Criar produto Stripe para agendamento
+  app.post('/api/stripe/appointments/products', async (req, res) => {
+    try {
+      const { accountId, ...productData } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/appointments/products');
+      console.log('📦 ROUTES.TS: Account ID:', accountId);
+      console.log('📦 ROUTES.TS: Dados do produto de agendamento:', JSON.stringify(productData, null, 2));
+      
+      // 🔍 VALIDAÇÃO: accountId é obrigatório
+      if (!accountId) {
+        return res.status(400).json({
+          success: false,
+          error: 'accountId é obrigatório para criar produto de agendamento na conta conectada'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de produtos
+      const { createStripeProduct } = await import('./services/stripeServerProductService');
+      
+      const result = await createStripeProduct(accountId, productData);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/stripe/appointments/products:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ENDPOINT: Criar preço Stripe para agendamento
+  app.post('/api/stripe/appointments/prices', async (req, res) => {
+    try {
+      const { accountId, ...priceData } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/appointments/prices');
+      console.log('📦 ROUTES.TS: Account ID:', accountId);
+      console.log('📦 ROUTES.TS: Dados do preço de agendamento:', JSON.stringify(priceData, null, 2));
+      
+      // 🔍 VALIDAÇÃO: accountId é obrigatório
+      if (!accountId) {
+        return res.status(400).json({
+          success: false,
+          error: 'accountId é obrigatório para criar preço de agendamento na conta conectada'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de preços
+      const { createStripePrice } = await import('./services/stripeServerProductService');
+      
+      const result = await createStripePrice(accountId, priceData);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/stripe/appointments/prices:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ENDPOINT: Criar checkout Stripe para agendamento
+  app.post('/api/stripe/appointments/checkout', async (req, res) => {
+    try {
+      const { 
+        priceId, 
+        buyerId, 
+        buyerEmail, 
+        mentorId, 
+        mentorStripeAccountId, 
+        appointmentData, 
+        stripeProductId, 
+        successUrl, 
+        cancelUrl 
+      } = req.body;
+      
+      console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/appointments/checkout');
+      console.log('📦 ROUTES.TS: Checkout de agendamento:', {
+        priceId,
+        buyerId,
+        mentorId,
+        mentorStripeAccountId,
+        price: appointmentData?.price
+      });
+      
+      // 🔍 VALIDAÇÃO: campos obrigatórios
+      if (!priceId || !buyerId || !mentorId || !mentorStripeAccountId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios: priceId, buyerId, mentorId, mentorStripeAccountId'
+        });
+      }
+      
+      // Importar dinamicamente o serviço de checkout
+      const { createStripeCheckoutSession } = await import('./services/stripeServerCheckoutService');
+      
+      // Criar registro inicial da transação no banco
+      const supabase = (await import('@supabase/supabase-js')).createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE!
+      );
+
+      const totalAmount = appointmentData?.price || 0;
+      const platformFee = 0; // Sem taxa da plataforma
+      const mentorAmount = totalAmount;
+
+      const { data: transaction, error: transactionError } = await supabase
+        .from('stripe_connect_transactions')
+        .insert({
+          appointment_id: null, // Será atualizado após criar o agendamento
+          buyer_id: buyerId,
+          mentor_id: mentorId,
+          stripe_session_id: '', // Será atualizado após criar a sessão
+          stripe_payment_intent_id: null,
+          total_amount: totalAmount,
+          platform_fee: platformFee,
+          mentor_amount: mentorAmount,
+          amount: totalAmount * 100, // amount em centavos
+          currency: 'brl',
+          status: 'pending',
+          stripe_account_id: mentorStripeAccountId,
+          application_fee_amount: 0, // Sem taxa da plataforma
+          type: 'appointment', // Tipo agendamento
+          metadata: {
+            buyer_email: buyerEmail,
+            appointment_data: appointmentData,
+            stripe_product_id: stripeProductId
+          }
+        })
+        .select()
+        .single();
+
+      if (transactionError || !transaction) {
+        console.error('❌ ROUTES.TS: Erro ao criar registro de transação:', transactionError);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao criar registro de transação'
+        });
+      }
+
+      // Criar sessão de checkout - usando courseId temporário para agendamentos
+      const sessionResult = await createStripeCheckoutSession({
+        accountId: mentorStripeAccountId,
+        priceId,
+        courseId: 'appointment-pending', // Agendamentos usam este valor especial
+        buyerId,
+        buyerEmail,
+        mentorId,
+        successUrl,
+        cancelUrl
+      });
+
+      if (!sessionResult.success) {
+        return res.status(400).json(sessionResult);
+      }
+
+      // Atualizar transação com session ID
+      const { error: updateError } = await supabase
+        .from('stripe_connect_transactions')
+        .update({
+          stripe_session_id: sessionResult.sessionId
+        })
+        .eq('id', transaction.id);
+
+      if (updateError) {
+        console.error('❌ ROUTES.TS: Erro ao atualizar transação com session ID:', updateError);
+      }
+
+      const result = {
+        success: true,
+        sessionId: sessionResult.sessionId,
+        sessionUrl: sessionResult.sessionUrl,
+        transactionId: transaction.id
+      };
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro em /api/stripe/appointments/checkout:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro interno do servidor',
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
+
+  // ENDPOINT: Verificar pagamento de agendamento (para página de sucesso)
+  app.post('/api/stripe/appointments/verify-payment', async (req, res) => {
+    try {
+      const { sessionId, transactionId } = req.body;
+      
+      console.log('🔍 ROUTES.TS: Verificando pagamento de agendamento:', {
+        sessionId,
+        transactionId
+      });
+      
+      // Validação: sessionId é obrigatório
+      if (!sessionId) {
+        return res.status(400).json({
+          success: false,
+          error: 'sessionId é obrigatório'
+        });
+      }
+
+      // Buscar transação no banco
+      const supabase = (await import('@supabase/supabase-js')).createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      const { data: transaction, error: transactionError } = await supabase
+        .from('stripe_connect_transactions')
+        .select('*')
+        .eq('stripe_session_id', sessionId)
+        .eq('type', 'appointment')
+        .single();
+
+      if (transactionError || !transaction) {
+        console.error('❌ ROUTES.TS: Transação não encontrada:', transactionError);
+        return res.status(404).json({
+          success: false,
+          error: 'Transação não encontrada'
+        });
+      }
+
+      // Verificar status no Stripe
+      const { verifyStripeCheckoutSession } = await import('./services/stripeServerCheckoutService');
+      const stripeResult = await verifyStripeCheckoutSession(
+        transaction.stripe_account_id,
+        sessionId
+      );
+
+      if (!stripeResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: 'Erro ao verificar pagamento no Stripe'
+        });
+      }
+
+      // Retornar dados da transação e status do pagamento
+      res.json({
+        success: true,
+        transaction,
+        stripeSession: stripeResult.transaction,
+        isPaid: stripeResult.transaction.payment_status === 'paid'
+      });
+
+    } catch (error) {
+      console.error('❌ ROUTES.TS: Erro ao verificar pagamento de agendamento:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ##########################################################################################
   // ###################### ENDPOINTS STRIPE - CHECKOUT ####################################
   // ##########################################################################################
 
