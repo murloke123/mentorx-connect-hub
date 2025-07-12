@@ -178,6 +178,7 @@ export interface Database {
           enrolled_at: string | null;
           completed_at: string | null;
           progress_percentage: number | null;
+          price: number | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -189,6 +190,7 @@ export interface Database {
           enrolled_at?: string | null;
           completed_at?: string | null;
           progress_percentage?: number | null;
+          price?: number | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -200,6 +202,7 @@ export interface Database {
           enrolled_at?: string | null;
           completed_at?: string | null;
           progress_percentage?: number | null;
+          price?: number | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -467,4 +470,4 @@ import { clientConfig } from '../config/environment';
 const supabaseUrl = clientConfig.SUPABASE_URL;
 const supabaseAnonKey = clientConfig.SUPABASE_ANON_KEY;
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey); 
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);

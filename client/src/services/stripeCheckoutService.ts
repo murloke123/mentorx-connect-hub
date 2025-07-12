@@ -211,7 +211,7 @@ export async function createCheckoutSession({
         buyerId,
         buyerEmail,
         mentorId,
-        successUrl: `${window.location.origin}${baseUrl}?checkout=success`,
+        successUrl: `${window.location.origin}/checkout-success`,
         cancelUrl: `${window.location.origin}${baseUrl}?checkout=canceled`
       })
     });
@@ -405,6 +405,15 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
 
     const ownerName = courseOwner?.full_name || 'Mentor não informado';
 
+    // Buscar preço do curso para popular o campo price na matrícula
+    const { data: courseData } = await supabase
+      .from('cursos')
+      .select('price')
+      .eq('id', transaction.course_id)
+      .single();
+
+    const coursePrice = courseData?.price || 0;
+
     if (existingEnrollment) {
       // Ativar matrícula existente
       await supabase
@@ -414,7 +423,8 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
           enrolled_at: new Date().toISOString(),
           studant_name: studentName,
           course_owner_id: transaction.mentor_id,
-          course_owner_name: ownerName
+          course_owner_name: ownerName,
+          price: coursePrice
         })
         .eq('course_id', transaction.course_id)
         .eq('student_id', transaction.buyer_id);
@@ -432,7 +442,8 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
           progress_percentage: 0,
           studant_name: studentName,
           course_owner_id: transaction.mentor_id,
-          course_owner_name: ownerName
+          course_owner_name: ownerName,
+          price: coursePrice
         });
       
       console.log('✅ [CLIENT-STRIPE] Nova matrícula criada');
@@ -976,4 +987,4 @@ export async function testCheckout() {
     console.error('❌ Erro no teste:', error);
     throw error;
   }
-} 
+}

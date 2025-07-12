@@ -116,25 +116,60 @@ const MentorCursosAdquiridosPage = () => {
 
   const userId = currentSession?.user?.id;
 
-  // Verificar pagamentos pendentes a cada 30 segundos
+  // 🚀 OTIMIZAÇÃO: Verificar pagamentos pendentes apenas se houver matrículas inativas
   useEffect(() => {
     const checkPendingPayments = async () => {
+      if (!userId) return;
+      
       try {
-        await processPendingPayments();
-        // Recarregar cursos matriculados após verificar pagamentos
-        if (userId) {
+        // Verificar se há matrículas inativas antes de processar pagamentos pendentes
+        const { data: inactiveEnrollments } = await supabase
+          .from('matriculas')
+          .select('id')
+          .eq('student_id', userId)
+          .eq('status', 'inactive')
+          .limit(1);
+        
+        if (inactiveEnrollments && inactiveEnrollments.length > 0) {
+          console.log('🔄 [Mentor] Há matrículas inativas, verificando pagamentos pendentes...');
+          await processPendingPayments();
+          // Recarregar cursos matriculados após verificar pagamentos
+          loadEnrolledCourses(userId);
+        } else {
+          console.log('✅ [Mentor] Todas as matrículas estão ativas, pulando verificação de pagamentos');
+          // Carregar apenas as matrículas sem verificação de pagamento
           loadEnrolledCourses(userId);
         }
       } catch (error) {
         console.error('Erro ao verificar pagamentos pendentes:', error);
+        // Em caso de erro, carregar as matrículas normalmente
+        loadEnrolledCourses(userId);
       }
     };
 
     // Verificar imediatamente ao carregar a página
     checkPendingPayments();
 
-    // Configurar verificação periódica a cada 30 segundos
-    const interval = setInterval(checkPendingPayments, 30000);
+    // 🚀 OTIMIZAÇÃO: Configurar verificação periódica mais espaçada (60 segundos) e condicional
+    const interval = setInterval(async () => {
+      if (!userId) return;
+      
+      // Verificar se há matrículas inativas antes de executar verificação completa
+      const { data: inactiveEnrollments } = await supabase
+        .from('matriculas')
+        .select('id')
+        .eq('student_id', userId)
+        .eq('status', 'inactive')
+        .limit(1);
+      
+      if (inactiveEnrollments && inactiveEnrollments.length > 0) {
+        console.log('🔄 [Mentor] Verificação periódica: há matrículas inativas');
+        await processPendingPayments();
+        loadEnrolledCourses(userId);
+      } else {
+        console.log('✅ [Mentor] Verificação periódica: todas as matrículas ativas, pulando');
+      }
+    }, 60000); // Aumentado para 60 segundos
 
     return () => clearInterval(interval);
   }, [userId]);
@@ -142,13 +177,6 @@ const MentorCursosAdquiridosPage = () => {
   const loadEnrolledCourses = async (userId: string) => {
     try {
       setLoadingEnrolled(true);
-      
-      // PRIMEIRO: Verificar payment intents via API do Stripe
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData.user?.email) {
-        console.log('🔄 [Mentor] Iniciando verificação de payment intents...');
-        await checkUserPaymentIntents(userId, userData.user.email);
-      }
       
       const { data: enrollments, error } = await supabase
         .from('matriculas')
@@ -175,23 +203,48 @@ const MentorCursosAdquiridosPage = () => {
 
       if (error) throw error;
       
-      // Verificar status de pagamento para cada curso pago
-      const updatedEnrollments = await Promise.all(
-        (enrollments || []).map(async (enrollment) => {
-          if (enrollment.course.is_paid && enrollment.status === 'inactive') {
-            console.log(`🔍 [Mentor] Verificando pagamento do curso: ${enrollment.course.title}`);
-            const paymentStatus = await checkCoursePaymentStatus(enrollment.course_id, userId);
-            
-            if (paymentStatus.isPaid) {
-              // Se o pagamento foi confirmado, a matrícula já foi ativada pela função
-              return { ...enrollment, status: 'active' };
-            }
-          }
-          return enrollment;
-        })
-      );
+      // 🚀 OTIMIZAÇÃO: Separar matrículas ativas das inativas
+      const activeEnrollments = (enrollments || []).filter(e => e.status === 'active');
+      const inactiveEnrollments = (enrollments || []).filter(e => e.status === 'inactive');
       
-      setEnrolledCourses(updatedEnrollments);
+      console.log('📊 [Mentor] Status das matrículas:', {
+        total: enrollments?.length || 0,
+        ativas: activeEnrollments.length,
+        inativas: inactiveEnrollments.length
+      });
+      
+      // ✅ OTIMIZAÇÃO: Verificar pagamento APENAS para matrículas inativas
+      // Matrículas ativas já foram pagas e não precisam de verificação
+      let updatedInactiveEnrollments = inactiveEnrollments;
+      
+      if (inactiveEnrollments.length > 0) {
+        // Verificar payment intents via API do Stripe apenas se há matrículas inativas
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData.user?.email) {
+          console.log('🔄 [Mentor] Verificando payment intents apenas para matrículas inativas...');
+          await checkUserPaymentIntents(userId, userData.user.email);
+        }
+        
+        // Verificar status de pagamento apenas para cursos pagos inativos
+        updatedInactiveEnrollments = await Promise.all(
+          inactiveEnrollments.map(async (enrollment) => {
+            if (enrollment.course.is_paid) {
+              console.log(`🔍 [Mentor] Verificando pagamento do curso: ${enrollment.course.title}`);
+              const paymentStatus = await checkCoursePaymentStatus(enrollment.course_id, userId);
+              
+              if (paymentStatus.isPaid) {
+                // Se o pagamento foi confirmado, a matrícula já foi ativada pela função
+                return { ...enrollment, status: 'active' };
+              }
+            }
+            return enrollment;
+          })
+        );
+      }
+      
+      // Combinar matrículas ativas (sem verificação) com inativas (verificadas)
+      const allEnrollments = [...activeEnrollments, ...updatedInactiveEnrollments];
+      setEnrolledCourses(allEnrollments);
     } catch (error) {
       console.error('Erro ao carregar cursos matriculados:', error);
     } finally {
@@ -420,4 +473,4 @@ const MentorCursosAdquiridosPage = () => {
   );
 };
 
-export default MentorCursosAdquiridosPage; 
+export default MentorCursosAdquiridosPage;

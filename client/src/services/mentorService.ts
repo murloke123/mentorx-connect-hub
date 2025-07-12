@@ -56,6 +56,8 @@ export interface MentorEnrollmentStats {
   totalRevenue: number;
   stripePendingAmount: number;
   stripePaidAmount: number;
+  totalMatriculasValue: number;
+  totalAppointmentsValue: number;
 }
 
 export interface EnrollmentDataPoint {
@@ -221,12 +223,46 @@ export async function getMentorEnrollmentStatsById(userId: string): Promise<Ment
       return sum + Number(price);
     }, 0) || 0;
 
+    // Buscar valor total das matrículas dos cursos do mentor (apenas status 'active')
+    const { data: matriculasData, error: matriculasError } = await supabase
+      .from('matriculas')
+      .select(`
+        price,
+        course_id,
+        cursos!inner(mentor_id)
+      `)
+      .eq('cursos.mentor_id', userId)
+      .eq('status', 'active')
+      .not('price', 'is', null);
+
+    if (matriculasError) {
+      console.error('❌ Erro ao buscar matrículas:', matriculasError);
+    }
+
+    // Buscar valor total dos appointments do mentor (apenas payment_status 'paid')
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('calendar')
+      .select('price')
+      .eq('mentor_id', userId)
+      .eq('payment_status', 'paid')
+      .not('price', 'is', null);
+
+    if (appointmentsError) {
+      console.error('❌ Erro ao buscar appointments:', appointmentsError);
+    }
+
+    // Calcular totais
+    const totalMatriculasValue = matriculasData?.reduce((sum, item) => sum + (Number(item.price) || 0), 0) || 0;
+    const totalAppointmentsValue = appointmentsData?.reduce((sum, item) => sum + (Number(item.price) || 0), 0) || 0;
+
     const stats = {
       activeEnrollments: activeCount || 0,
       totalStudents: totalStudents,
       totalRevenue: totalRevenue,
       stripePendingAmount: 0, // Será atualizado no dashboard
-      stripePaidAmount: 0 // Será atualizado no dashboard
+      stripePaidAmount: 0, // Será atualizado no dashboard
+      totalMatriculasValue: totalMatriculasValue,
+      totalAppointmentsValue: totalAppointmentsValue
     };
 
     console.log('📊 Estatísticas finais calculadas:', stats);

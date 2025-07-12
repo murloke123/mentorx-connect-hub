@@ -197,10 +197,10 @@ export async function enrollInCourse(courseId: string) {
 
     const userName = userProfile?.full_name || 'Nome não informado';
 
-    // Buscar dados do proprietário do curso
+    // Buscar dados do proprietário do curso e preço
     const { data: course } = await supabase
       .from('cursos')
-      .select('mentor_id')
+      .select('mentor_id, price, is_paid')
       .eq('id', courseId)
       .single();
 
@@ -211,6 +211,7 @@ export async function enrollInCourse(courseId: string) {
       .single();
 
     const ownerName = courseOwner?.full_name || 'Mentor não informado';
+    const coursePrice = course?.is_paid ? (course?.price || 0) : 0;
 
     // Criar nova matrícula
     const { data, error } = await supabase
@@ -223,7 +224,8 @@ export async function enrollInCourse(courseId: string) {
         progress_percentage: 0,
         studant_name: userName, // Adicionar nome do estudante
         course_owner_id: course?.mentor_id, // ID do proprietário do curso
-        course_owner_name: ownerName // Nome do proprietário do curso
+        course_owner_name: ownerName, // Nome do proprietário do curso
+        price: coursePrice // Preço do curso no momento da matrícula
       })
       .select()
       .single();

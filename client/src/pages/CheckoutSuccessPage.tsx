@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Clock } from 'lucide-react';
 
 const CheckoutSuccessPage = () => {
   const navigate = useNavigate();
@@ -89,17 +91,30 @@ const CheckoutSuccessPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-        <h2 className="text-xl font-semibold mb-2">Redirecionando...</h2>
-        <p className="text-gray-600">Você será redirecionado para seus cursos.</p>
-        {/* Debug info - remover depois */}
-        <div className="mt-4 text-xs text-gray-400">
-          Loading: {loading ? 'Sim' : 'Não'} | Role: {userRole || 'Buscando...'}
-        </div>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+            <Clock className="w-6 h-6 text-blue-600 animate-spin" />
+          </div>
+          <CardTitle>Processando Pagamento</CardTitle>
+          <CardDescription>
+            Aguarde, estamos processando seu pagamento...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-2 bg-blue-200 rounded w-full mb-2"></div>
+              <div className="h-2 bg-blue-200 rounded w-3/4 mx-auto"></div>
+            </div>
+            <p className="text-sm text-gray-600 mt-4">
+              Você será redirecionado para seus cursos em instantes.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default CheckoutSuccessPage; 
+export default CheckoutSuccessPage;

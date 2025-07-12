@@ -554,10 +554,10 @@ export async function createFreeEnrollment(courseId: string, studentId: string) 
   try {
     console.log('🆓 Criando matrícula para curso gratuito:', { courseId, studentId });
 
-    // Buscar dados do curso
+    // Buscar dados do curso incluindo o preço
     const { data: course, error: courseError } = await supabase
       .from('cursos')
-      .select('id, title, mentor_id')
+      .select('id, title, mentor_id, price, is_paid')
       .eq('id', courseId)
       .single();
 
@@ -614,7 +614,8 @@ export async function createFreeEnrollment(courseId: string, studentId: string) 
             enrolled_at: new Date().toISOString(),
             studant_name: studentName,
             course_owner_id: course.mentor_id,
-            course_owner_name: courseOwnerName
+            course_owner_name: courseOwnerName,
+            price: course.is_paid ? course.price : 0
           })
           .eq('course_id', courseId)
           .eq('student_id', studentId);
@@ -637,7 +638,8 @@ export async function createFreeEnrollment(courseId: string, studentId: string) 
         progress_percentage: 0,
         studant_name: studentName,
         course_owner_id: course.mentor_id,
-        course_owner_name: courseOwnerName
+        course_owner_name: courseOwnerName,
+        price: course.is_paid ? course.price : 0
       });
 
     if (insertError) throw insertError;

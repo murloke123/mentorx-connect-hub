@@ -124,6 +124,37 @@ const MentoradoMeusCursosPage = () => {
     }
   }, [searchParams, user]);
 
+  // 🚀 OTIMIZAÇÃO: Verificação periódica condicional para pagamentos pendentes
+  useEffect(() => {
+    if (!user) return;
+
+    const checkPendingPaymentsConditional = async () => {
+      try {
+        // Verificar se há matrículas inativas antes de processar pagamentos pendentes
+        const { data: inactiveEnrollments } = await supabase
+          .from('matriculas')
+          .select('id')
+          .eq('student_id', user.id)
+          .eq('status', 'inactive')
+          .limit(1);
+        
+        if (inactiveEnrollments && inactiveEnrollments.length > 0) {
+          console.log('🔄 [Mentorado] Verificação periódica: há matrículas inativas, recarregando dados...');
+          await loadData();
+        } else {
+          console.log('✅ [Mentorado] Verificação periódica: todas as matrículas ativas, pulando');
+        }
+      } catch (error) {
+        console.error('Erro na verificação periódica:', error);
+      }
+    };
+
+    // 🚀 OTIMIZAÇÃO: Configurar verificação periódica apenas se necessário (60 segundos)
+    const interval = setInterval(checkPendingPaymentsConditional, 60000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   const processCheckoutReturn = async (sessionId: string, transactionId: string) => {
     try {
       setLoading(true);
@@ -149,10 +180,6 @@ const MentoradoMeusCursosPage = () => {
     
     try {
       setLoading(true);
-      
-      // PRIMEIRO: Verificar payment intents via API do Stripe
-      console.log('🔄 Iniciando verificação de payment intents...');
-      await checkUserPaymentIntents(user.id, user.email || '');
       
       // Carregar cursos matriculados
       const { data: enrollments, error: enrollmentsError } = await supabase
@@ -180,56 +207,82 @@ const MentoradoMeusCursosPage = () => {
 
       if (enrollmentsError) throw enrollmentsError;
       
-      // Verificar status de pagamento para cada curso pago
-      const updatedEnrollments = await Promise.all(
-        (enrollments || []).map(async (enrollment) => {
-          if (enrollment.course.is_paid && enrollment.status === 'inactive') {
-            console.log(`🔍 Verificando pagamento do curso: ${enrollment.course.title}`);
-            const paymentStatus = await checkCoursePaymentStatus(enrollment.course_id, user.id);
-            
-            if (paymentStatus.isPaid) {
-              // Se o pagamento foi confirmado, a matrícula já foi ativada pela função
-              return { ...enrollment, status: 'active' };
-            }
-          }
-          return enrollment;
-        })
-      );
+      // 🚀 OTIMIZAÇÃO: Separar matrículas ativas das inativas
+      const activeEnrollments = (enrollments || []).filter(e => e.status === 'active');
+      const inactiveEnrollments = (enrollments || []).filter(e => e.status === 'inactive');
       
-      setEnrolledCourses(updatedEnrollments);
-
-      // Carregar transações falhadas/pendentes
-      const transactions = await getUserTransactions(user.id, 'buyer');
-      const allFailed = transactions.filter(t => 
-        t.status === 'failed' || t.status === 'pending'
-      );
-      
-      // ✅ CORREÇÃO: Agrupar por course_id e pegar apenas a transação mais recente de cada curso
-      const groupedByCourse = allFailed.reduce((acc, transaction) => {
-        const courseId = transaction.course_id;
-        
-        // Se não existe ou se a atual é mais recente
-        if (!acc[courseId] || new Date(transaction.created_at) > new Date(acc[courseId].created_at)) {
-          acc[courseId] = transaction;
-        }
-        
-        return acc;
-      }, {} as Record<string, Transaction>);
-      
-      // Converter de volta para array apenas com uma transação por curso
-      const uniqueFailedTransactions: Transaction[] = Object.values(groupedByCourse);
-      
-      console.log('📊 Transações agrupadas por curso:', {
-        totalTransacoes: allFailed.length,
-        cursosUnicos: uniqueFailedTransactions.length,
-        cursos: uniqueFailedTransactions.map(t => ({ 
-          course_id: t.course_id, 
-          status: t.status, 
-          created_at: t.created_at 
-        }))
+      console.log('📊 Status das matrículas:', {
+        total: enrollments?.length || 0,
+        ativas: activeEnrollments.length,
+        inativas: inactiveEnrollments.length
       });
       
-      setFailedTransactions(uniqueFailedTransactions);
+      // ✅ OTIMIZAÇÃO: Verificar pagamento APENAS para matrículas inativas
+      // Matrículas ativas já foram pagas e não precisam de verificação
+      let updatedInactiveEnrollments = inactiveEnrollments;
+      
+      if (inactiveEnrollments.length > 0) {
+        console.log('🔄 Verificando payment intents apenas para matrículas inativas...');
+        await checkUserPaymentIntents(user.id, user.email || '');
+        
+        // Verificar status de pagamento apenas para cursos pagos inativos
+        updatedInactiveEnrollments = await Promise.all(
+          inactiveEnrollments.map(async (enrollment) => {
+            if (enrollment.course.is_paid) {
+              console.log(`🔍 Verificando pagamento do curso: ${enrollment.course.title}`);
+              const paymentStatus = await checkCoursePaymentStatus(enrollment.course_id, user.id);
+              
+              if (paymentStatus.isPaid) {
+                // Se o pagamento foi confirmado, a matrícula já foi ativada pela função
+                return { ...enrollment, status: 'active' };
+              }
+            }
+            return enrollment;
+          })
+        );
+      }
+      
+      // Combinar matrículas ativas (sem verificação) com inativas (verificadas)
+      const allEnrollments = [...activeEnrollments, ...updatedInactiveEnrollments];
+      setEnrolledCourses(allEnrollments);
+
+      // 🚀 OTIMIZAÇÃO: Carregar transações falhadas/pendentes apenas se há matrículas inativas
+      if (inactiveEnrollments.length > 0) {
+        const transactions = await getUserTransactions(user.id, 'buyer');
+        const allFailed = transactions.filter(t => 
+          t.status === 'failed' || t.status === 'pending'
+        );
+        
+        // ✅ CORREÇÃO: Agrupar por course_id e pegar apenas a transação mais recente de cada curso
+        const groupedByCourse = allFailed.reduce((acc, transaction) => {
+          const courseId = transaction.course_id;
+          
+          // Se não existe ou se a atual é mais recente
+          if (!acc[courseId] || new Date(transaction.created_at) > new Date(acc[courseId].created_at)) {
+            acc[courseId] = transaction;
+          }
+          
+          return acc;
+        }, {} as Record<string, Transaction>);
+        
+        // Converter de volta para array apenas com uma transação por curso
+        const uniqueFailedTransactions: Transaction[] = Object.values(groupedByCourse);
+        
+        console.log('📊 Transações agrupadas por curso:', {
+          totalTransacoes: allFailed.length,
+          cursosUnicos: uniqueFailedTransactions.length,
+          cursos: uniqueFailedTransactions.map(t => ({ 
+            course_id: t.course_id, 
+            status: t.status, 
+            created_at: t.created_at 
+          }))
+        });
+        
+        setFailedTransactions(uniqueFailedTransactions);
+      } else {
+        // Se não há matrículas inativas, não há transações pendentes para mostrar
+        setFailedTransactions([]);
+      }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       toast.error('Erro ao carregar seus cursos');
@@ -532,4 +585,4 @@ const MentoradoMeusCursosPage = () => {
   );
 };
 
-export default MentoradoMeusCursosPage; 
+export default MentoradoMeusCursosPage;

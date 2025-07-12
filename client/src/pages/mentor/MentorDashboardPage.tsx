@@ -61,6 +61,8 @@ const MentorDashboardPage = () => {
     enabled: !!user?.id,
   });
 
+
+
   // Log dos dados do Stripe para debug - MOVIDO PARA ANTES DO EARLY RETURN
   useEffect(() => {
     if (lastUpdated) {
@@ -173,6 +175,8 @@ const MentorDashboardPage = () => {
           totalStudents={totalStudents}
           totalRevenue={totalRevenue}
           totalPaidAmount={totalPaidAmount}
+          totalMatriculasValue={enrollmentStats?.totalMatriculasValue || 0}
+          totalAppointmentsValue={enrollmentStats?.totalAppointmentsValue || 0}
         />
 
         {/* Analytics Section */}

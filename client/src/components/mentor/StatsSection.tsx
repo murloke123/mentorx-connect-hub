@@ -1,6 +1,6 @@
 import StatsCard from '@/components/shared/StatsCard';
 import { formatCurrency } from '@/utils/formatters';
-import { CircleDollarSign, DollarSign, Library, Users } from 'lucide-react';
+import { CircleDollarSign, DollarSign, Library, Users, GraduationCap, Calendar } from 'lucide-react';
 
 interface StatsSectionProps {
   followersCount: number;
@@ -9,11 +9,13 @@ interface StatsSectionProps {
   totalStudents: number;
   totalRevenue: number;
   totalPaidAmount: number;
+  totalMatriculasValue: number;
+  totalAppointmentsValue: number;
 }
 
-const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalStudents, totalRevenue, totalPaidAmount }: StatsSectionProps) => {
+const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalStudents, totalRevenue, totalPaidAmount, totalMatriculasValue, totalAppointmentsValue }: StatsSectionProps) => {
   return (
-    <div className="mb-8 grid gap-6 grid-cols-5">
+    <div className="mb-8 grid gap-6 grid-cols-6">
       <StatsCard 
         title="Seguidores" 
         value={followersCount}
@@ -33,16 +35,22 @@ const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalSt
         description="Total de alunos que adquiriram seus cursos" 
       />
       <StatsCard 
+        title="Valor Total" 
+        value={formatCurrency(totalMatriculasValue + totalAppointmentsValue)} 
+        description={`Cursos: ${formatCurrency(totalMatriculasValue)} Agendamentos: ${formatCurrency(totalAppointmentsValue)}`} 
+      />
+      <StatsCard 
         title="Receita Estimada" 
         value={formatCurrency(totalRevenue)} 
-        icon={<DollarSign />} 
-        description="Saldo pendente no Stripe" 
+        description="Taxa base Stripe 2.9% + R$0,30 por transação" 
+        tooltipText="A plataforma Mentora Ai não cobra nenhuma taxa adicional na venda de seus produtos, essas taxas são cobradas pela empresa que processa os pagamentos via cartão, é uma das empresas mais seguras e famosas para processamento de pagamentos de nome Stripe." 
       />
       <StatsCard 
         title="Valores Pagos" 
         value={formatCurrency(totalPaidAmount)} 
         icon={<CircleDollarSign />} 
-        description="Já está na sua conta" 
+        description="Valor disponível na sua conta" 
+        valueColor="text-green-700"
       />
     </div>
   );

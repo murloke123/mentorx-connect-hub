@@ -262,10 +262,10 @@ const MentorProfilePage = () => {
 
   // Mock data
   const stats = [
-    { value: "1.250+", label: "Mentorados de Sucesso", icon: "/src/assets/icons/group.png" },
-    { value: "98%", label: "Taxa de Satisfação", icon: "/src/assets/icons/star.png" },
-    { value: "15+", label: "Anos de Experiência", icon: "/src/assets/icons/goal.png" },
-    { value: "R$ 50M+", label: "Movimentados pelos Alunos", icon: "/src/assets/icons/value.png" }
+    { value: "1.250+", label: "Mentorados de Sucesso", icon: "/icons/group.svg" },
+    { value: "98%", label: "Taxa de Satisfação", icon: "/icons/star.svg" },
+    { value: "15+", label: "Anos de Experiência", icon: "/icons/goal.svg" },
+    { value: "R$ 50M+", label: "Movimentados pelos Alunos", icon: "/icons/value.svg" }
   ];
 
   const testimonials = [

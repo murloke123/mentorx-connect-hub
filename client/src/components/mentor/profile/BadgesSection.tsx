@@ -7,7 +7,7 @@ const BadgesSection = () => {
       <div className="text-center mb-6">
         <div className="flex items-center justify-center mb-4">
           <img 
-            src="/src/assets/icons/trophy.png" 
+            src="/icons/trophy.svg" 
             alt="Troféu" 
             className="w-8 h-8 mr-3"
           />
@@ -32,7 +32,7 @@ const BadgesSection = () => {
           {/* Badge Image - Aumentado mais 20% e subido 50px */}
           <div className="w-58 h-58 mx-auto" style={{ transform: 'translateY(-50px)' }}>
             <img 
-              src="/src/assets/images/brasoessemfundo.png"
+              src="/images/brasoessemfundo.png"
               alt="Brasões do Mentor"
               className="w-full h-full object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
               style={{ 

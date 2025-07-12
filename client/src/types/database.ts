@@ -80,6 +80,7 @@ export interface Matricula {
   enrolled_at: string;
   completed_at: string | null;
   progress_percentage: number | null;
+  price: number | null;
   created_at: string;
   updated_at: string;
 }
