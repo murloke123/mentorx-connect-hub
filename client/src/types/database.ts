@@ -46,6 +46,40 @@ export interface Profile {
     phone?: string | null;
     account_already_verified?: boolean | null;
     document_verification_status?: 'pending' | 'verified' | 'rejected' | null;
+    social_media?: {
+        instagram: string;
+        facebook: string;
+        youtube: string;
+    } | null;
+    cx_diferenciais?: {
+        dif_title_1?: string;
+        dif_description_1?: string;
+        dif_title_2?: string;
+        dif_description_2?: string;
+        dif_title_3?: string;
+        dif_description_3?: string;
+    } | null;
+    review_comments?: {
+        photo_1?: string;
+        name_1?: string;
+        profession_1?: string;
+        comment_1?: string;
+        photo_2?: string;
+        name_2?: string;
+        profession_2?: string;
+        comment_2?: string;
+        photo_3?: string;
+        name_3?: string;
+        profession_3?: string;
+        comment_3?: string;
+    } | null;
+    verified?: {
+        cards_sucesso_verificado?: boolean;
+        por_que_me_seguir_verificado?: boolean;
+        meus_cursos_verificado?: boolean;
+        elogios_verificado?: boolean;
+        calendario_verificado?: boolean;
+    } | null;
 }
 
 export interface Course {

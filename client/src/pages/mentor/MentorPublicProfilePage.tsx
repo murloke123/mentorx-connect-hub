@@ -1,6 +1,5 @@
 import BadgesSection from "@/components/mentor/profile/BadgesSection";
 import ContactForm from "@/components/mentor/profile/ContactForm";
-import TestimonialCard from "@/components/mentor/profile/TestimonialCard";
 import CourseCard from "@/components/shared/CourseCard";
 import { FollowSuccessModal } from "@/components/shared/FollowSuccessModal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -488,13 +487,29 @@ const MentorPublicProfilePage = () => {
     }
   };
 
-  // Mock data - same as in the editing page
+  // Hero cards data from database or default values
   const stats = [
-    { value: "1.250+", label: "Mentorados de Sucesso", icon: "/icons/group.svg" },
-    { value: "98%", label: "Taxa de Satisfação", icon: "/icons/star.svg" },
-    { value: "15+", label: "Anos de Experiência", icon: "/icons/goal.svg" },
-    { value: "R$ 50M+", label: "Movimentados pelos Alunos", icon: "/icons/value.svg" }
-  ];
+    { 
+      value: mentorData?.hero_cards?.hero_card_1 || "1.250+", 
+      label: mentorData?.hero_cards?.hero_card_desc_1 || "Mentorados de Sucesso", 
+      icon: "/icons/group.svg" 
+    },
+    { 
+      value: mentorData?.hero_cards?.hero_card_2 || "98%", 
+      label: mentorData?.hero_cards?.hero_card_desc_2 || "Taxa de Satisfação", 
+      icon: "/icons/star.svg" 
+    },
+    { 
+      value: mentorData?.hero_cards?.hero_card_3 || "15+", 
+      label: mentorData?.hero_cards?.hero_card_desc_3 || "Anos de Experiência", 
+      icon: "/icons/goal.svg" 
+    },
+    { 
+       value: mentorData?.hero_cards?.hero_card_4 || "R$ 50M+", 
+       label: mentorData?.hero_cards?.hero_card_desc_4 || "Movimentados pelos Alunos", 
+       icon: "/icons/value.svg" 
+     }
+   ];
 
   const testimonials = [
     {
@@ -643,13 +658,37 @@ const MentorPublicProfilePage = () => {
           )}
             
             <div className="flex gap-3">
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+              <a 
+                href={mentorData?.social_media?.instagram || "#"} 
+                target={mentorData?.social_media?.instagram ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !mentorData?.social_media?.instagram ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !mentorData?.social_media?.instagram && e.preventDefault()}
+              >
                 <Instagram className="h-6 w-6 text-pink-600" />
               </a>
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+              <a 
+                href={mentorData?.social_media?.facebook || "#"} 
+                target={mentorData?.social_media?.facebook ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !mentorData?.social_media?.facebook ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !mentorData?.social_media?.facebook && e.preventDefault()}
+              >
                 <Facebook className="h-6 w-6 text-blue-600" />
               </a>
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+              <a 
+                href={mentorData?.social_media?.youtube || "#"} 
+                target={mentorData?.social_media?.youtube ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !mentorData?.social_media?.youtube ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !mentorData?.social_media?.youtube && e.preventDefault()}
+              >
                 <Youtube className="h-6 w-6 text-red-600" />
               </a>
             </div>
@@ -713,28 +752,28 @@ const MentorPublicProfilePage = () => {
                   <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
                       <h4 className="font-bold text-lg mb-2">
-                        {mentorData.sm_tit1 || "🎯 Resultados Comprovados"}
+                        {mentorData.cx_diferenciais?.dif_title_1 || "🎯 Resultados Comprovados"}
                       </h4>
                         <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.sm_desc1 || "Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas."}
+                        {mentorData.cx_diferenciais?.dif_description_1 || "Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas."}
                       </p>
                     </div>
                     
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
                       <h4 className="font-bold text-lg mb-2">
-                        {mentorData.sm_tit2 || "🚀 Metodologia Exclusiva"}
+                        {mentorData.cx_diferenciais?.dif_title_2 || "🚀 Metodologia Exclusiva"}
                       </h4>
                         <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.sm_desc2 || "Sistema proprietário desenvolvido ao longo de 15 anos de experiência."}
+                        {mentorData.cx_diferenciais?.dif_description_2 || "Sistema proprietário desenvolvido ao longo de 15 anos de experiência."}
                       </p>
                     </div>
                     
                     <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
                       <h4 className="font-bold text-lg mb-2">
-                        {mentorData.sm_tit3 || "💰 ROI Garantido"}
+                        {mentorData.cx_diferenciais?.dif_title_3 || "💰 ROI Garantido"}
                       </h4>
                         <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.sm_desc3 || "Investimento retorna em até 90 dias ou seu dinheiro de volta."}
+                        {mentorData.cx_diferenciais?.dif_description_3 || "Investimento retorna em até 90 dias ou seu dinheiro de volta."}
                       </p>
                     </div>
                   </div>
@@ -787,8 +826,36 @@ const MentorPublicProfilePage = () => {
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
               <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Depoimentos</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {testimonials.map((testimonial, index) => (
-                  <TestimonialCard key={index} {...testimonial} />
+                {[1, 2, 3].map((index) => (
+                  <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-sm border">
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
+                        <img
+                          src={mentorData.review_comments?.[`photo_${index}`] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                          alt={mentorData.review_comments?.[`name_${index}`] || 'Pessoa'}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                          }}
+                        />
+                      </div>
+                      <h4 className="font-semibold text-gray-800 mb-1">
+                        {mentorData.review_comments?.[`name_${index}`] || 'Nome da Pessoa'}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {mentorData.review_comments?.[`profession_${index}`] || 'Profissão'}
+                      </p>
+                      <p className="text-gray-700 text-sm leading-relaxed italic">
+                        "{mentorData.review_comments?.[`comment_${index}`] || 'Comentário do depoimento'}"
+                      </p>
+                      <div className="flex justify-center mt-3">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={i} className="text-yellow-400 text-lg">⭐</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

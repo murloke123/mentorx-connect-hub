@@ -1,31 +1,23 @@
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import BadgesSection from "@/components/mentor/profile/BadgesSection";
 import ContactForm from "@/components/mentor/profile/ContactForm";
-import TestimonialCard from "@/components/mentor/profile/TestimonialCard";
 import MentorCalendarComponent from "@/components/MentorCalendarComponent";
 import MentorCalendarSettings from "@/components/MentorCalendarSettings";
 import ProfileForm from "@/components/profile/ProfileForm";
 import CourseCard from "@/components/shared/CourseCard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import VerificationSwitch from "@/components/ui/VerificationSwitch";
 import { useToast } from "@/hooks/use-toast";
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
 import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, Youtube } from "lucide-react";
+import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, X, Youtube } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CourseWithProfile extends Course {
@@ -56,6 +48,38 @@ const MentorProfilePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
+  // Estados para edição dos hero cards
+  const [isEditingHeroCards, setIsEditingHeroCards] = useState(false);
+  const [heroCardsData, setHeroCardsData] = useState({
+    hero_card_1: '1.250+',
+    hero_card_desc_1: 'Mentorados de Sucesso',
+    hero_card_2: '98%',
+    hero_card_desc_2: 'Taxa de Satisfação',
+    hero_card_3: '15+',
+    hero_card_desc_3: 'Anos de Experiência',
+    hero_card_4: 'R$ 50M+',
+    hero_card_desc_4: 'Movimentados pelos Alunos'
+  });
+  
+  // Estados para edição das redes sociais
+  const [isSocialMediaModalOpen, setIsSocialMediaModalOpen] = useState(false);
+  const [socialMediaData, setSocialMediaData] = useState({
+    instagram: '',
+    facebook: '',
+    youtube: ''
+  });
+  
+  // Estados para edição inline dos diferenciais
+  const [isEditingDiferenciais, setIsEditingDiferenciais] = useState(false);
+  const [diferenciaisData, setDiferenciaisData] = useState({
+    dif_title_1: '🎯 Resultados Comprovados',
+    dif_description_1: 'Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas.',
+    dif_title_2: '🚀 Metodologia Exclusiva',
+    dif_description_2: 'Sistema proprietário desenvolvido ao longo de 15 anos de experiência.',
+    dif_title_3: '💰 ROI Garantido',
+    dif_description_3: 'Investimento retorna em até 90 dias ou seu dinheiro de volta.'
+  });
+  
   // Estados para o calendário
   const [calendarSettings, setCalendarSettings] = useState<CalendarSettings>({
     workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -74,6 +98,32 @@ const MentorProfilePage = () => {
     sm_desc2: '',
     sm_tit3: '',
     sm_desc3: ''
+  });
+  
+  // Estados para edição dos depoimentos
+  const [isEditingReviews, setIsEditingReviews] = useState(false);
+  const [reviewsData, setReviewsData] = useState({
+    photo_1: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    name_1: 'Maria Silva',
+    profession_1: 'Empreendedora Digital',
+    comment_1: 'A mentoria transformou completamente meu negócio. Em 6 meses consegui aumentar meu faturamento em 300%!',
+    photo_2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    name_2: 'João Santos',
+    profession_2: 'Desenvolvedor',
+    comment_2: 'Graças aos ensinamentos do mentor, consegui minha primeira promoção e dobrei meu salário.',
+    photo_3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    name_3: 'Ana Costa',
+    profession_3: 'Consultora Financeira',
+    comment_3: 'O curso de finanças me deu todas as ferramentas que eu precisava para prosperar no mercado.'
+  });
+  
+  // Estados para os checkboxes de verificação
+  const [verifiedData, setVerifiedData] = useState({
+    cards_sucesso: false,
+    por_que_me_seguir: false,
+    meus_cursos: false,
+    elogios: false,
+    calendario: false
   });
 
   // Fetch mentor courses
@@ -150,6 +200,41 @@ const MentorProfilePage = () => {
           setCurrentAvatarPath(extractPathFromUrl(profile.avatar_url));
         }
         
+        // Inicializar dados dos hero cards
+        if (profile.hero_cards) {
+          setHeroCardsData({
+            hero_card_1: profile.hero_cards.hero_card_1 || '1.250+',
+            hero_card_desc_1: profile.hero_cards.hero_card_desc_1 || 'Mentorados de Sucesso',
+            hero_card_2: profile.hero_cards.hero_card_2 || '98%',
+            hero_card_desc_2: profile.hero_cards.hero_card_desc_2 || 'Taxa de Satisfação',
+            hero_card_3: profile.hero_cards.hero_card_3 || '15+',
+            hero_card_desc_3: profile.hero_cards.hero_card_desc_3 || 'Anos de Experiência',
+            hero_card_4: profile.hero_cards.hero_card_4 || 'R$ 50M+',
+            hero_card_desc_4: profile.hero_cards.hero_card_desc_4 || 'Movimentados pelos Alunos'
+          });
+        }
+        
+        // Inicializar dados das redes sociais
+        if (profile.social_media) {
+          setSocialMediaData({
+            instagram: profile.social_media.instagram || '',
+            facebook: profile.social_media.facebook || '',
+            youtube: profile.social_media.youtube || ''
+          });
+        }
+        
+        // Inicializar dados dos diferenciais
+        if (profile.cx_diferenciais) {
+          setDiferenciaisData({
+            dif_title_1: profile.cx_diferenciais.dif_title_1 || '🎯 Resultados Comprovados',
+            dif_description_1: profile.cx_diferenciais.dif_description_1 || 'Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas.',
+            dif_title_2: profile.cx_diferenciais.dif_title_2 || '🚀 Metodologia Exclusiva',
+            dif_description_2: profile.cx_diferenciais.dif_description_2 || 'Sistema proprietário desenvolvido ao longo de 15 anos de experiência.',
+            dif_title_3: profile.cx_diferenciais.dif_title_3 || '💰 ROI Garantido',
+            dif_description_3: profile.cx_diferenciais.dif_description_3 || 'Investimento retorna em até 90 dias ou seu dinheiro de volta.'
+          });
+        }
+        
         // Inicializar dados de edição das caixas
         setEditData({
           sm_tit1: profile.sm_tit1 || '',
@@ -159,6 +244,35 @@ const MentorProfilePage = () => {
           sm_tit3: profile.sm_tit3 || '',
           sm_desc3: profile.sm_desc3 || ''
         });
+        
+        // Inicializar dados dos depoimentos
+        if (profile.review_comments) {
+          setReviewsData({
+            photo_1: profile.review_comments.photo_1 || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+            name_1: profile.review_comments.name_1 || 'Maria Silva',
+            profession_1: profile.review_comments.profession_1 || 'Empreendedora Digital',
+            comment_1: profile.review_comments.comment_1 || 'A mentoria transformou completamente meu negócio. Em 6 meses consegui aumentar meu faturamento em 300%!',
+            photo_2: profile.review_comments.photo_2 || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            name_2: profile.review_comments.name_2 || 'João Santos',
+            profession_2: profile.review_comments.profession_2 || 'Desenvolvedor',
+            comment_2: profile.review_comments.comment_2 || 'Graças aos ensinamentos do mentor, consegui minha primeira promoção e dobrei meu salário.',
+            photo_3: profile.review_comments.photo_3 || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+            name_3: profile.review_comments.name_3 || 'Ana Costa',
+            profession_3: profile.review_comments.profession_3 || 'Consultora Financeira',
+            comment_3: profile.review_comments.comment_3 || 'O curso de finanças me deu todas as ferramentas que eu precisava para prosperar no mercado.'
+          });
+        }
+        
+        // Inicializar dados de verificação
+        if (profile.verified) {
+          setVerifiedData({
+            cards_sucesso: profile.verified.cards_sucesso || false,
+            por_que_me_seguir: profile.verified.por_que_me_seguir || false,
+            meus_cursos: profile.verified.meus_cursos || false,
+            elogios: profile.verified.elogios || false,
+            calendario: profile.verified.calendario || false
+          });
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -251,6 +365,203 @@ const MentorProfilePage = () => {
     }
   };
 
+  const handleSaveHeroCards = async () => {
+    if (!currentUser?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          hero_cards: heroCardsData
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // Atualizar o estado local
+      setCurrentUser(prev => ({
+        ...prev,
+        hero_cards: heroCardsData
+      }));
+
+      toast({
+        title: "Hero cards atualizados",
+        description: "Seus cards foram atualizados com sucesso.",
+      });
+      setIsEditingHeroCards(false);
+    } catch (error) {
+      console.error('Erro ao salvar hero cards:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar os hero cards. Tente novamente.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveSocialMedia = async () => {
+    if (!currentUser?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          social_media: socialMediaData
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // Atualizar o estado local
+      setCurrentUser(prev => ({
+        ...prev,
+        social_media: socialMediaData
+      }));
+
+      toast({
+        title: "Redes sociais atualizadas",
+        description: "Seus links de redes sociais foram atualizados com sucesso.",
+      });
+      setIsSocialMediaModalOpen(false);
+    } catch (error) {
+      console.error('Erro ao salvar redes sociais:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar as redes sociais. Tente novamente.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveDiferenciais = async () => {
+    if (!currentUser?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          cx_diferenciais: diferenciaisData
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // Atualizar o estado local
+      setCurrentUser(prev => ({
+        ...prev,
+        cx_diferenciais: diferenciaisData
+      }));
+
+      toast({
+        title: "Diferenciais atualizados",
+        description: "Seus diferenciais foram atualizados com sucesso.",
+      });
+      setIsEditingDiferenciais(false);
+    } catch (error) {
+      console.error('Erro ao salvar diferenciais:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar os diferenciais. Tente novamente.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveReviews = async () => {
+    if (!currentUser?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          review_comments: reviewsData
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // Atualizar o estado local
+      setCurrentUser(prev => ({
+        ...prev,
+        review_comments: reviewsData
+      }));
+
+      toast({
+        title: "Depoimentos atualizados",
+        description: "Seus depoimentos foram atualizados com sucesso.",
+      });
+      setIsEditingReviews(false);
+    } catch (error) {
+      console.error('Erro ao salvar depoimentos:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar os depoimentos. Tente novamente.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveVerified = async (dataToSave?: typeof verifiedData) => {
+    if (!currentUser?.id) return;
+    
+    const dataForSaving = dataToSave || verifiedData;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          verified: dataForSaving
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // Atualizar o estado local
+      setCurrentUser(prev => ({
+        ...prev,
+        verified: dataForSaving
+      }));
+
+      toast({
+        title: "Status de verificação atualizado",
+        description: "As configurações de verificação foram salvas com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao salvar dados de verificação:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar os dados de verificação. Tente novamente.",
+      });
+    }
+  };
+
+  const handleVerifiedChange = (field: keyof typeof verifiedData, value: boolean) => {
+    const newData = {
+      ...verifiedData,
+      [field]: value
+    };
+    
+    setVerifiedData(newData);
+    
+    // Salvar automaticamente quando o checkbox for alterado
+    setTimeout(() => {
+      handleSaveVerified(newData);
+    }, 100);
+  };
+
   const handleSettingsChange = (newSettings: CalendarSettings) => {
     setCalendarSettings(newSettings);
   };
@@ -260,12 +571,12 @@ const MentorProfilePage = () => {
     setRefreshAppointments(prev => prev + 1);
   };
 
-  // Mock data
+  // Dados dos stats baseados nos hero cards
   const stats = [
-    { value: "1.250+", label: "Mentorados de Sucesso", icon: "/icons/group.svg" },
-    { value: "98%", label: "Taxa de Satisfação", icon: "/icons/star.svg" },
-    { value: "15+", label: "Anos de Experiência", icon: "/icons/goal.svg" },
-    { value: "R$ 50M+", label: "Movimentados pelos Alunos", icon: "/icons/value.svg" }
+    { value: heroCardsData.hero_card_1, label: heroCardsData.hero_card_desc_1, icon: "/icons/group.svg", key: 'hero_card_1', descKey: 'hero_card_desc_1' },
+    { value: heroCardsData.hero_card_2, label: heroCardsData.hero_card_desc_2, icon: "/icons/star.svg", key: 'hero_card_2', descKey: 'hero_card_desc_2' },
+    { value: heroCardsData.hero_card_3, label: heroCardsData.hero_card_desc_3, icon: "/icons/goal.svg", key: 'hero_card_3', descKey: 'hero_card_desc_3' },
+    { value: heroCardsData.hero_card_4, label: heroCardsData.hero_card_desc_4, icon: "/icons/value.svg", key: 'hero_card_4', descKey: 'hero_card_desc_4' }
   ];
 
   const testimonials = [
@@ -357,7 +668,7 @@ const MentorProfilePage = () => {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group relative">
                     <div className="mb-2 flex justify-center">
                       <img 
                         src={stat.icon} 
@@ -365,10 +676,77 @@ const MentorProfilePage = () => {
                         className="w-8 h-8 object-contain"
                       />
                     </div>
-                    <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
+                    {isEditingHeroCards ? (
+                      <div className="space-y-2">
+                        <Input
+                          value={stat.value}
+                          onChange={(e) => setHeroCardsData(prev => ({
+                            ...prev,
+                            [stat.key]: e.target.value
+                          }))}
+                          className="text-center text-lg font-bold h-8 p-1"
+                        />
+                        <Input
+                          value={stat.label}
+                          onChange={(e) => setHeroCardsData(prev => ({
+                            ...prev,
+                            [stat.descKey]: e.target.value
+                          }))}
+                          className="text-center text-xs h-6 p-1"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
+                        <div className="text-sm text-gray-600">{stat.label}</div>
+                      </>
+                    )}
                   </div>
                 ))}
+              </div>
+              
+              {/* Checkbox de verificação */}
+              <div className="absolute top-4 right-4">
+                <VerificationSwitch
+                  id="verified-cards"
+                  checked={verifiedData.cards_sucesso}
+                  onChange={(checked) => handleVerifiedChange('cards_sucesso', checked)}
+                />
+              </div>
+              
+              {/* Botão de edição no canto inferior direito */}
+              <div className="absolute bottom-4 right-4">
+                {isEditingHeroCards ? (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setIsEditingHeroCards(false)}
+                      className="bg-white/90 backdrop-blur-sm"
+                      disabled={isSaving}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveHeroCards}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditingHeroCards(true)}
+                    className="bg-white/90 backdrop-blur-sm hover:bg-white flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Editar Cards
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -439,16 +817,51 @@ const MentorProfilePage = () => {
           )}
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
-            <div className="flex gap-3">
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+            <div className="flex gap-3 relative">
+              <a 
+                href={currentUser?.social_media?.instagram || "#"} 
+                target={currentUser?.social_media?.instagram ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !currentUser?.social_media?.instagram ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !currentUser?.social_media?.instagram && e.preventDefault()}
+              >
                 <Instagram className="h-6 w-6 text-pink-600" />
               </a>
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+              <a 
+                href={currentUser?.social_media?.facebook || "#"} 
+                target={currentUser?.social_media?.facebook ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !currentUser?.social_media?.facebook ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !currentUser?.social_media?.facebook && e.preventDefault()}
+              >
                 <Facebook className="h-6 w-6 text-blue-600" />
               </a>
-              <a href="#" className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border">
+              <a 
+                href={currentUser?.social_media?.youtube || "#"} 
+                target={currentUser?.social_media?.youtube ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                  !currentUser?.social_media?.youtube ? 'opacity-50 cursor-default' : ''
+                }`}
+                onClick={(e) => !currentUser?.social_media?.youtube && e.preventDefault()}
+              >
                 <Youtube className="h-6 w-6 text-red-600" />
               </a>
+              
+              {/* Botão de edição das redes sociais */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsSocialMediaModalOpen(true)}
+                className="ml-2 bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Editar
+              </Button>
             </div>
           </div>
         </div>
@@ -489,8 +902,17 @@ const MentorProfilePage = () => {
           
           {/* Sobre Mim Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Por que me seguir?</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Por que me seguir?</h2>
+                
+                {/* Checkbox de verificação */}
+                <VerificationSwitch
+                  id="verified-seguir"
+                  checked={verifiedData.por_que_me_seguir}
+                  onChange={(checked) => handleVerifiedChange('por_que_me_seguir', checked)}
+                />
+              </div>
               
               <div className="grid lg:grid-cols-2 gap-12 mb-8">
                 <div className="space-y-6">
@@ -523,150 +945,132 @@ const MentorProfilePage = () => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
-                      <h3 className="font-bold text-lg mb-2">
-                        {currentUser?.sm_tit1 || "🎯 Resultados Comprovados"}
-                      </h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">
-                        {currentUser?.sm_desc1 || "Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas."}
-                      </p>
+                      {isEditingDiferenciais ? (
+                        <div className="space-y-3">
+                          <Input
+                            value={diferenciaisData.dif_title_1}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_1: e.target.value}))}
+                            className="font-bold text-lg border-purple-200 focus:border-purple-400"
+                            placeholder="Ex: 🎯 Resultados Comprovados"
+                          />
+                          <Textarea
+                            value={diferenciaisData.dif_description_1}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_1: e.target.value}))}
+                            className="text-gray-700 border-purple-200 focus:border-purple-400"
+                            placeholder="Descrição dos seus resultados comprovados"
+                            rows={3}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <h3 className="font-bold text-lg mb-2">
+                            {diferenciaisData.dif_title_1}
+                          </h3>
+                          <p className="text-gray-700 whitespace-pre-wrap">
+                            {diferenciaisData.dif_description_1}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
-                      <h3 className="font-bold text-lg mb-2">
-                        {currentUser?.sm_tit2 || "🚀 Metodologia Exclusiva"}
-                      </h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">
-                        {currentUser?.sm_desc2 || "Sistema proprietário desenvolvido ao longo de 15 anos de experiência."}
-                      </p>
+                      {isEditingDiferenciais ? (
+                        <div className="space-y-3">
+                          <Input
+                            value={diferenciaisData.dif_title_2}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_2: e.target.value}))}
+                            className="font-bold text-lg border-green-200 focus:border-green-400"
+                            placeholder="Ex: 🚀 Metodologia Exclusiva"
+                          />
+                          <Textarea
+                            value={diferenciaisData.dif_description_2}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_2: e.target.value}))}
+                            className="text-gray-700 border-green-200 focus:border-green-400"
+                            placeholder="Descrição da sua metodologia exclusiva"
+                            rows={3}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <h3 className="font-bold text-lg mb-2">
+                            {diferenciaisData.dif_title_2}
+                          </h3>
+                          <p className="text-gray-700 whitespace-pre-wrap">
+                            {diferenciaisData.dif_description_2}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
-                      <h3 className="font-bold text-lg mb-2">
-                        {currentUser?.sm_tit3 || "💰 ROI Garantido"}
-                      </h3>
-                      <p className="text-gray-700 whitespace-pre-wrap">
-                        {currentUser?.sm_desc3 || "Investimento retorna em até 90 dias ou seu dinheiro de volta."}
-                      </p>
+                      {isEditingDiferenciais ? (
+                        <div className="space-y-3">
+                          <Input
+                            value={diferenciaisData.dif_title_3}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_3: e.target.value}))}
+                            className="font-bold text-lg border-orange-200 focus:border-orange-400"
+                            placeholder="Ex: 💰 ROI Garantido"
+                          />
+                          <Textarea
+                            value={diferenciaisData.dif_description_3}
+                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_3: e.target.value}))}
+                            className="text-gray-700 border-orange-200 focus:border-orange-400"
+                            placeholder="Descrição do ROI ou garantia"
+                            rows={3}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <h3 className="font-bold text-lg mb-2">
+                            {diferenciaisData.dif_title_3}
+                          </h3>
+                          <p className="text-gray-700 whitespace-pre-wrap">
+                            {diferenciaisData.dif_description_3}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   <div className="border-t pt-4 mt-6">
-                    <div className="flex justify-end">
-                      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="flex items-center gap-2">
-                            <Edit className="h-4 w-4" />
-                            Editar Caixas de Diferenciais
+                    <div className="flex justify-end gap-2">
+                      {isEditingDiferenciais ? (
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => setIsEditingDiferenciais(false)}
+                            disabled={isSaving}
+                            className="flex items-center gap-2"
+                          >
+                            <X className="h-4 w-4" />
+                            Cancelar
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Editar Caixas de Diferenciais</DialogTitle>
-                          </DialogHeader>
-                          
-                          <div className="space-y-6">
-                            {/* Caixa 1 - Roxa */}
-                            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
-                              <h3 className="text-lg font-semibold mb-4 text-purple-700">Diferencial 1</h3>
-                              <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_tit1">Título</Label>
-                                  <Input
-                                    id="sm_tit1"
-                                    value={editData.sm_tit1}
-                                    onChange={(e) => setEditData({...editData, sm_tit1: e.target.value})}
-                                    placeholder="Ex: 🎯 Resultados Comprovados"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_desc1">Descrição</Label>
-                                  <Textarea
-                                    id="sm_desc1"
-                                    value={editData.sm_desc1}
-                                    onChange={(e) => setEditData({...editData, sm_desc1: e.target.value})}
-                                    placeholder="Descrição dos seus resultados comprovados"
-                                    rows={3}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Caixa 2 - Verde */}
-                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
-                              <h3 className="text-lg font-semibold mb-4 text-green-700">Diferencial 2</h3>
-                              <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_tit2">Título</Label>
-                                  <Input
-                                    id="sm_tit2"
-                                    value={editData.sm_tit2}
-                                    onChange={(e) => setEditData({...editData, sm_tit2: e.target.value})}
-                                    placeholder="Ex: 🚀 Metodologia Exclusiva"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_desc2">Descrição</Label>
-                                  <Textarea
-                                    id="sm_desc2"
-                                    value={editData.sm_desc2}
-                                    onChange={(e) => setEditData({...editData, sm_desc2: e.target.value})}
-                                    placeholder="Descrição da sua metodologia exclusiva"
-                                    rows={3}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Caixa 3 - Laranja */}
-                            <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
-                              <h3 className="text-lg font-semibold mb-4 text-orange-700">Diferencial 3</h3>
-                              <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_tit3">Título</Label>
-                                  <Input
-                                    id="sm_tit3"
-                                    value={editData.sm_tit3}
-                                    onChange={(e) => setEditData({...editData, sm_tit3: e.target.value})}
-                                    placeholder="Ex: 💰 ROI Garantido"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="sm_desc3">Descrição</Label>
-                                  <Textarea
-                                    id="sm_desc3"
-                                    value={editData.sm_desc3}
-                                    onChange={(e) => setEditData({...editData, sm_desc3: e.target.value})}
-                                    placeholder="Descrição do ROI ou garantia"
-                                    rows={3}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="flex justify-end gap-2 pt-4 border-t">
-                              <Button 
-                                variant="outline" 
-                                onClick={() => setIsEditModalOpen(false)}
-                                disabled={isSaving}
-                              >
-                                Cancelar
-                              </Button>
-                              <Button 
-                                onClick={handleSaveBoxes}
-                                disabled={isSaving}
-                                className="flex items-center gap-2"
-                              >
-                                {isSaving ? (
-                                  <Spinner className="h-4 w-4" />
-                                ) : (
-                                  <Save className="h-4 w-4" />
-                                )}
-                                Salvar Alterações
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                          <Button 
+                            size="sm" 
+                            onClick={handleSaveDiferenciais}
+                            disabled={isSaving}
+                            className="flex items-center gap-2"
+                          >
+                            {isSaving ? (
+                              <Spinner className="h-4 w-4" />
+                            ) : (
+                              <Save className="h-4 w-4" />
+                            )}
+                            Salvar
+                          </Button>
+                        </>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setIsEditingDiferenciais(true)}
+                          className="flex items-center gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Editar
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -679,8 +1083,17 @@ const MentorProfilePage = () => {
 
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Meus Cursos</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Meus Cursos</h2>
+                
+                {/* Checkbox de verificação */}
+                <VerificationSwitch
+                  id="verified-cursos"
+                  checked={verifiedData.meus_cursos}
+                  onChange={(checked) => handleVerifiedChange('meus_cursos', checked)}
+                />
+              </div>
               
               {coursesLoading ? (
                 <div className="flex justify-center">
@@ -718,12 +1131,137 @@ const MentorProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">O que dizem meus mentorados</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">O que dizem meus mentorados</h2>
+                
+                {/* Checkbox de verificação */}
+                <VerificationSwitch
+                  id="verified-elogios"
+                  checked={verifiedData.elogios}
+                  onChange={(checked) => handleVerifiedChange('elogios', checked)}
+                />
+              </div>
+              
+              {/* Botão de edição no canto inferior direito */}
+              <div className="absolute bottom-4 right-4">
+                {isEditingReviews ? (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setIsEditingReviews(false)}
+                      disabled={isSaving}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveReviews}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditingReviews(true)}
+                    className="hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Editar
+                  </Button>
+                )}
+              </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {testimonials.map((testimonial, index) => (
-                  <TestimonialCard key={index} {...testimonial} />
+                {[1, 2, 3].map((index) => (
+                  <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-sm border">
+                    {isEditingReviews ? (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">URL da Foto</label>
+                          <Input
+                            value={reviewsData[`photo_${index}` as keyof typeof reviewsData]}
+                            onChange={(e) => setReviewsData(prev => ({
+                              ...prev,
+                              [`photo_${index}`]: e.target.value
+                            }))}
+                            placeholder="https://exemplo.com/foto.jpg"
+                            className="text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Nome</label>
+                          <Input
+                            value={reviewsData[`name_${index}` as keyof typeof reviewsData]}
+                            onChange={(e) => setReviewsData(prev => ({
+                              ...prev,
+                              [`name_${index}`]: e.target.value
+                            }))}
+                            placeholder="Nome da pessoa"
+                            className="text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Profissão</label>
+                          <Input
+                            value={reviewsData[`profession_${index}` as keyof typeof reviewsData]}
+                            onChange={(e) => setReviewsData(prev => ({
+                              ...prev,
+                              [`profession_${index}`]: e.target.value
+                            }))}
+                            placeholder="Profissão da pessoa"
+                            className="text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Comentário</label>
+                          <Textarea
+                            value={reviewsData[`comment_${index}` as keyof typeof reviewsData]}
+                            onChange={(e) => setReviewsData(prev => ({
+                              ...prev,
+                              [`comment_${index}`]: e.target.value
+                            }))}
+                            placeholder="Comentário do depoimento"
+                            className="text-sm min-h-[100px]"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
+                          <img
+                            src={reviewsData[`photo_${index}` as keyof typeof reviewsData]}
+                            alt={reviewsData[`name_${index}` as keyof typeof reviewsData]}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                            }}
+                          />
+                        </div>
+                        <h4 className="font-semibold text-gray-800 mb-1">
+                          {reviewsData[`name_${index}` as keyof typeof reviewsData]}
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {reviewsData[`profession_${index}` as keyof typeof reviewsData]}
+                        </p>
+                        <p className="text-gray-700 text-sm leading-relaxed italic">
+                          "{reviewsData[`comment_${index}` as keyof typeof reviewsData]}"
+                        </p>
+                        <div className="flex justify-center mt-3">
+                          {Array.from({ length: 5 }, (_, i) => (
+                            <span key={i} className="text-yellow-400 text-lg">⭐</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -731,8 +1269,17 @@ const MentorProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Agenda uma Conversa</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Agenda uma Conversa</h2>
+                
+                {/* Checkbox de verificação */}
+                <VerificationSwitch
+                  id="verified-calendario"
+                  checked={verifiedData.calendario}
+                  onChange={(checked) => handleVerifiedChange('calendario', checked)}
+                />
+              </div>
               
               {/* Layout com dois componentes lado a lado */}
               <div className="grid lg:grid-cols-2 gap-12 mb-8">
@@ -833,6 +1380,64 @@ const MentorProfilePage = () => {
           }
         `}</style>
       </div>
+
+      {/* Modal de edição das redes sociais */}
+      {isSocialMediaModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Editar Redes Sociais</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Instagram</label>
+                <Input
+                  type="url"
+                  placeholder="https://instagram.com/seu_usuario"
+                  value={socialMediaData.instagram}
+                  onChange={(e) => setSocialMediaData(prev => ({ ...prev, instagram: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Facebook</label>
+                <Input
+                  type="url"
+                  placeholder="https://facebook.com/seu_usuario"
+                  value={socialMediaData.facebook}
+                  onChange={(e) => setSocialMediaData(prev => ({ ...prev, facebook: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">YouTube</label>
+                <Input
+                  type="url"
+                  placeholder="https://youtube.com/@seu_canal"
+                  value={socialMediaData.youtube}
+                  onChange={(e) => setSocialMediaData(prev => ({ ...prev, youtube: e.target.value }))}
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsSocialMediaModalOpen(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSaveSocialMedia}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Salvar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

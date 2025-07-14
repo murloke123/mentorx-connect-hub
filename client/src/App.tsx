@@ -8,6 +8,7 @@ import DocumentTestPage from "@/pages/DocumentTestPage";
 import { TestDocumentVerificationPage } from "@/pages/TestDocumentVerificationPage";
 
 import JitsiMeetTestPage from "@/pages/test/JitsiMeetTestPage";
+import TestMCPPage from "@/pages/TestMCPPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
@@ -305,7 +306,7 @@ const AppContent = () => {
           } />
           
           {/* Rotas de Teste */}
-
+          <Route path="/testemcp" element={<TestMCPPage />} />
           <Route path="/test/jitsi-meet" element={<JitsiMeetTestPage />} />
           
           {/* Rota 404 - deve ser a última */}

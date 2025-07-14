@@ -1,4 +1,4 @@
-import React from "react";
+import { Trophy } from "lucide-react";
 
 const BadgesSection = () => {
   return (
@@ -6,11 +6,9 @@ const BadgesSection = () => {
       {/* Header */}
       <div className="text-center mb-6">
         <div className="flex items-center justify-center mb-4">
-          <img 
-            src="/icons/trophy.svg" 
-            alt="Troféu" 
-            className="w-8 h-8 mr-3"
-          />
+          <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-600 p-3 rounded-xl shadow-lg mr-3 transform hover:scale-105 transition-transform duration-200">
+            <Trophy className="w-6 h-6 text-white drop-shadow-sm" />
+          </div>
           <h5 className="text-lg font-bold text-white">
             Brasões do Mentor
           </h5>
@@ -26,27 +24,10 @@ const BadgesSection = () => {
         </p>
       </div>
 
-      {/* Badges Container */}
-      <div className="flex justify-center items-center">
-        <div className="relative">
-          {/* Badge Image - Aumentado mais 20% e subido 50px */}
-          <div className="w-58 h-58 mx-auto" style={{ transform: 'translateY(-50px)' }}>
-            <img 
-              src="/images/brasoessemfundo.png"
-              alt="Brasões do Mentor"
-              className="w-full h-full object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
-              style={{ 
-                imageRendering: 'crisp-edges',
-                filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))',
-                transform: 'perspective(1000px) rotateX(5deg)',
-                width: '230px',
-                height: '230px'
-              }}
-            />
-          </div>
-          
-          {/* Reflection Effect */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent rounded-full"></div>
+      {/* Placeholder for future badges */}
+      <div className="flex justify-center items-center py-8">
+        <div className="text-center text-gray-400">
+          <p className="text-sm">Brasões em desenvolvimento</p>
         </div>
       </div>
     </div>
