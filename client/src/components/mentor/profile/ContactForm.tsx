@@ -49,9 +49,6 @@ const ContactForm = () => {
         rows={4}
         required
       />
-      <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold">
-        Enviar Mensagem
-      </Button>
     </form>
   );
 };

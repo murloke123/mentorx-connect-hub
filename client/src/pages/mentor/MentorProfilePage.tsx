@@ -1,6 +1,8 @@
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import BadgesSection from "@/components/mentor/profile/BadgesSection";
 import ContactForm from "@/components/mentor/profile/ContactForm";
+import { PublishAccountModal } from "@/components/mentor/PublishAccountModal";
+import { UnpublishAccountModal } from "@/components/mentor/UnpublishAccountModal";
 import MentorCalendarComponent from "@/components/MentorCalendarComponent";
 import MentorCalendarSettings from "@/components/MentorCalendarSettings";
 import ProfileForm from "@/components/profile/ProfileForm";
@@ -17,7 +19,7 @@ import { supabase } from "@/utils/supabase";
 import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, X, Youtube } from "lucide-react";
+import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, X, Youtube, UserPlus, BookOpen, Quote, CalendarDays, Mail, Check } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CourseWithProfile extends Course {
@@ -47,6 +49,9 @@ const MentorProfilePage = () => {
   const [activeSection, setActiveSection] = useState('sobre');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isUnpublishModalOpen, setIsUnpublishModalOpen] = useState(false);
+  const [isPublicAccount, setIsPublicAccount] = useState(false);
   
   // Estados para edição dos hero cards
   const [isEditingHeroCards, setIsEditingHeroCards] = useState(false);
@@ -179,107 +184,109 @@ const MentorProfilePage = () => {
     return urlParts[urlParts.length - 1].split('?')[0];
   };
 
+  // Função para buscar dados do usuário
+  const fetchUserData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+
+      setCurrentUser(profile);
+      setMentorAvatarUrl(profile.avatar_url);
+      setIsPublicAccount(profile.is_public || false);
+      if (profile.avatar_url) {
+        setCurrentAvatarPath(extractPathFromUrl(profile.avatar_url));
+      }
+      
+      // Inicializar dados dos hero cards
+      if (profile.hero_cards) {
+        setHeroCardsData({
+          hero_card_1: profile.hero_cards.hero_card_1 || '1.250+',
+          hero_card_desc_1: profile.hero_cards.hero_card_desc_1 || 'Mentorados de Sucesso',
+          hero_card_2: profile.hero_cards.hero_card_2 || '98%',
+          hero_card_desc_2: profile.hero_cards.hero_card_desc_2 || 'Taxa de Satisfação',
+          hero_card_3: profile.hero_cards.hero_card_3 || '15+',
+          hero_card_desc_3: profile.hero_cards.hero_card_desc_3 || 'Anos de Experiência',
+          hero_card_4: profile.hero_cards.hero_card_4 || 'R$ 50M+',
+          hero_card_desc_4: profile.hero_cards.hero_card_desc_4 || 'Movimentados pelos Alunos'
+        });
+      }
+      
+      // Inicializar dados das redes sociais
+      if (profile.social_media) {
+        setSocialMediaData({
+          instagram: profile.social_media.instagram || '',
+          facebook: profile.social_media.facebook || '',
+          youtube: profile.social_media.youtube || ''
+        });
+      }
+      
+      // Inicializar dados dos diferenciais
+      if (profile.cx_diferenciais) {
+        setDiferenciaisData({
+          dif_title_1: profile.cx_diferenciais.dif_title_1 || '🎯 Resultados Comprovados',
+          dif_description_1: profile.cx_diferenciais.dif_description_1 || 'Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas.',
+          dif_title_2: profile.cx_diferenciais.dif_title_2 || '🚀 Metodologia Exclusiva',
+          dif_description_2: profile.cx_diferenciais.dif_description_2 || 'Sistema proprietário desenvolvido ao longo de 15 anos de experiência.',
+          dif_title_3: profile.cx_diferenciais.dif_title_3 || '💰 ROI Garantido',
+          dif_description_3: profile.cx_diferenciais.dif_description_3 || 'Investimento retorna em até 90 dias ou seu dinheiro de volta.'
+        });
+      }
+      
+      // Inicializar dados de edição das caixas
+      setEditData({
+        sm_tit1: profile.sm_tit1 || '',
+        sm_desc1: profile.sm_desc1 || '',
+        sm_tit2: profile.sm_tit2 || '',
+        sm_desc2: profile.sm_desc2 || '',
+        sm_tit3: profile.sm_tit3 || '',
+        sm_desc3: profile.sm_desc3 || ''
+      });
+      
+      // Inicializar dados dos depoimentos
+      if (profile.review_comments) {
+        setReviewsData({
+          photo_1: profile.review_comments.photo_1 || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+          name_1: profile.review_comments.name_1 || 'Maria Silva',
+          profession_1: profile.review_comments.profession_1 || 'Empreendedora Digital',
+          comment_1: profile.review_comments.comment_1 || 'A mentoria transformou completamente meu negócio. Em 6 meses consegui aumentar meu faturamento em 300%!',
+          photo_2: profile.review_comments.photo_2 || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+          name_2: profile.review_comments.name_2 || 'João Santos',
+          profession_2: profile.review_comments.profession_2 || 'Desenvolvedor',
+          comment_2: profile.review_comments.comment_2 || 'Graças aos ensinamentos do mentor, consegui minha primeira promoção e dobrei meu salário.',
+          photo_3: profile.review_comments.photo_3 || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+          name_3: profile.review_comments.name_3 || 'Ana Costa',
+          profession_3: profile.review_comments.profession_3 || 'Consultora Financeira',
+          comment_3: profile.review_comments.comment_3 || 'O curso de finanças me deu todas as ferramentas que eu precisava para prosperar no mercado.'
+        });
+      }
+      
+      // Inicializar dados de verificação
+      if (profile.verified) {
+        setVerifiedData({
+          cards_sucesso: profile.verified.cards_sucesso || false,
+          por_que_me_seguir: profile.verified.por_que_me_seguir || false,
+          meus_cursos: profile.verified.meus_cursos || false,
+          elogios: profile.verified.elogios || false,
+          calendario: profile.verified.calendario || false
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Fetch current user data and avatar
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (error) throw error;
-
-        setCurrentUser(profile);
-        setMentorAvatarUrl(profile.avatar_url);
-        if (profile.avatar_url) {
-          setCurrentAvatarPath(extractPathFromUrl(profile.avatar_url));
-        }
-        
-        // Inicializar dados dos hero cards
-        if (profile.hero_cards) {
-          setHeroCardsData({
-            hero_card_1: profile.hero_cards.hero_card_1 || '1.250+',
-            hero_card_desc_1: profile.hero_cards.hero_card_desc_1 || 'Mentorados de Sucesso',
-            hero_card_2: profile.hero_cards.hero_card_2 || '98%',
-            hero_card_desc_2: profile.hero_cards.hero_card_desc_2 || 'Taxa de Satisfação',
-            hero_card_3: profile.hero_cards.hero_card_3 || '15+',
-            hero_card_desc_3: profile.hero_cards.hero_card_desc_3 || 'Anos de Experiência',
-            hero_card_4: profile.hero_cards.hero_card_4 || 'R$ 50M+',
-            hero_card_desc_4: profile.hero_cards.hero_card_desc_4 || 'Movimentados pelos Alunos'
-          });
-        }
-        
-        // Inicializar dados das redes sociais
-        if (profile.social_media) {
-          setSocialMediaData({
-            instagram: profile.social_media.instagram || '',
-            facebook: profile.social_media.facebook || '',
-            youtube: profile.social_media.youtube || ''
-          });
-        }
-        
-        // Inicializar dados dos diferenciais
-        if (profile.cx_diferenciais) {
-          setDiferenciaisData({
-            dif_title_1: profile.cx_diferenciais.dif_title_1 || '🎯 Resultados Comprovados',
-            dif_description_1: profile.cx_diferenciais.dif_description_1 || 'Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas.',
-            dif_title_2: profile.cx_diferenciais.dif_title_2 || '🚀 Metodologia Exclusiva',
-            dif_description_2: profile.cx_diferenciais.dif_description_2 || 'Sistema proprietário desenvolvido ao longo de 15 anos de experiência.',
-            dif_title_3: profile.cx_diferenciais.dif_title_3 || '💰 ROI Garantido',
-            dif_description_3: profile.cx_diferenciais.dif_description_3 || 'Investimento retorna em até 90 dias ou seu dinheiro de volta.'
-          });
-        }
-        
-        // Inicializar dados de edição das caixas
-        setEditData({
-          sm_tit1: profile.sm_tit1 || '',
-          sm_desc1: profile.sm_desc1 || '',
-          sm_tit2: profile.sm_tit2 || '',
-          sm_desc2: profile.sm_desc2 || '',
-          sm_tit3: profile.sm_tit3 || '',
-          sm_desc3: profile.sm_desc3 || ''
-        });
-        
-        // Inicializar dados dos depoimentos
-        if (profile.review_comments) {
-          setReviewsData({
-            photo_1: profile.review_comments.photo_1 || 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-            name_1: profile.review_comments.name_1 || 'Maria Silva',
-            profession_1: profile.review_comments.profession_1 || 'Empreendedora Digital',
-            comment_1: profile.review_comments.comment_1 || 'A mentoria transformou completamente meu negócio. Em 6 meses consegui aumentar meu faturamento em 300%!',
-            photo_2: profile.review_comments.photo_2 || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-            name_2: profile.review_comments.name_2 || 'João Santos',
-            profession_2: profile.review_comments.profession_2 || 'Desenvolvedor',
-            comment_2: profile.review_comments.comment_2 || 'Graças aos ensinamentos do mentor, consegui minha primeira promoção e dobrei meu salário.',
-            photo_3: profile.review_comments.photo_3 || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-            name_3: profile.review_comments.name_3 || 'Ana Costa',
-            profession_3: profile.review_comments.profession_3 || 'Consultora Financeira',
-            comment_3: profile.review_comments.comment_3 || 'O curso de finanças me deu todas as ferramentas que eu precisava para prosperar no mercado.'
-          });
-        }
-        
-        // Inicializar dados de verificação
-        if (profile.verified) {
-          setVerifiedData({
-            cards_sucesso: profile.verified.cards_sucesso || false,
-            por_que_me_seguir: profile.verified.por_que_me_seguir || false,
-            meus_cursos: profile.verified.meus_cursos || false,
-            elogios: profile.verified.elogios || false,
-            calendario: profile.verified.calendario || false
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchUserData();
   }, []);
 
@@ -548,7 +555,7 @@ const MentorProfilePage = () => {
     }
   };
 
-  const handleVerifiedChange = (field: keyof typeof verifiedData, value: boolean) => {
+  const handleVerifiedChange = async (field: keyof typeof verifiedData, value: boolean) => {
     const newData = {
       ...verifiedData,
       [field]: value
@@ -556,10 +563,65 @@ const MentorProfilePage = () => {
     
     setVerifiedData(newData);
     
+    // Se qualquer checkbox for desmarcado (value = false), forçar is_public para false
+    if (!value && isPublicAccount) {
+      try {
+        // Atualizar is_public para false no banco de dados
+        const { error } = await supabase
+          .from('profiles')
+          .update({ is_public: false })
+          .eq('id', currentUser?.id);
+
+        if (error) {
+          console.error('Erro ao atualizar is_public:', error);
+          toast({
+            variant: "destructive",
+            title: "Erro ao despublicar",
+            description: "Ocorreu um erro ao despublicar sua conta. Tente novamente.",
+          });
+        } else {
+          setIsPublicAccount(false);
+          toast({
+            title: "Conta despublicada automaticamente",
+            description: "Sua conta foi despublicada porque uma seção foi desmarcada como verificada.",
+          });
+        }
+      } catch (error) {
+        console.error('Erro inesperado ao atualizar is_public:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro inesperado",
+          description: "Ocorreu um erro inesperado. Tente novamente.",
+        });
+      }
+    }
+    
     // Salvar automaticamente quando o checkbox for alterado
     setTimeout(() => {
       handleSaveVerified(newData);
     }, 100);
+  };
+
+  // Função para atualizar os dados do usuário após publicação bem-sucedida
+  const handlePublishSuccess = async () => {
+    // Recarregar os dados do usuário
+    await fetchUserData();
+    setIsPublicAccount(true);
+    toast({
+      title: "Conta publicada",
+      description: "Sua conta agora está visível para o público.",
+    });
+  };
+
+  // Função para atualizar os dados do usuário após despublicação bem-sucedida
+  const handleUnpublishSuccess = async () => {
+    // Recarregar os dados do usuário
+    await fetchUserData();
+    setIsPublicAccount(false);
+    toast({
+      title: "Conta despublicada",
+      description: "Sua conta não está mais visível para o público.",
+    });
   };
 
   const handleSettingsChange = (newSettings: CalendarSettings) => {
@@ -573,10 +635,10 @@ const MentorProfilePage = () => {
 
   // Dados dos stats baseados nos hero cards
   const stats = [
-    { value: heroCardsData.hero_card_1, label: heroCardsData.hero_card_desc_1, icon: "/icons/group.svg", key: 'hero_card_1', descKey: 'hero_card_desc_1' },
-    { value: heroCardsData.hero_card_2, label: heroCardsData.hero_card_desc_2, icon: "/icons/star.svg", key: 'hero_card_2', descKey: 'hero_card_desc_2' },
-    { value: heroCardsData.hero_card_3, label: heroCardsData.hero_card_desc_3, icon: "/icons/goal.svg", key: 'hero_card_3', descKey: 'hero_card_desc_3' },
-    { value: heroCardsData.hero_card_4, label: heroCardsData.hero_card_desc_4, icon: "/icons/value.svg", key: 'hero_card_4', descKey: 'hero_card_desc_4' }
+    { value: heroCardsData.hero_card_1, label: heroCardsData.hero_card_desc_1, icon: "/icons/pessoas.png", key: 'hero_card_1', descKey: 'hero_card_desc_1' },
+    { value: heroCardsData.hero_card_2, label: heroCardsData.hero_card_desc_2, icon: "/icons/review.png", key: 'hero_card_2', descKey: 'hero_card_desc_2' },
+    { value: heroCardsData.hero_card_3, label: heroCardsData.hero_card_desc_3, icon: "/icons/montanha.png", key: 'hero_card_3', descKey: 'hero_card_desc_3' },
+    { value: heroCardsData.hero_card_4, label: heroCardsData.hero_card_desc_4, icon: "/icons/money.png", key: 'hero_card_4', descKey: 'hero_card_desc_4' }
   ];
 
   const testimonials = [
@@ -668,12 +730,12 @@ const MentorProfilePage = () => {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group relative">
+                  <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group relative">
                     <div className="mb-2 flex justify-center">
                       <img 
                         src={stat.icon} 
                         alt={stat.label}
-                        className="w-8 h-8 object-contain"
+                        className="w-10 h-10 object-contain"
                       />
                     </div>
                     {isEditingHeroCards ? (
@@ -697,7 +759,7 @@ const MentorProfilePage = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
+                        <div className="text-2xl font-semibold text-gray-800 drop-shadow-lg" style={{textShadow: '0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6)'}}>{stat.value}</div>
                         <div className="text-sm text-gray-600">{stat.label}</div>
                       </>
                     )}
@@ -744,7 +806,7 @@ const MentorProfilePage = () => {
                     className="bg-white/90 backdrop-blur-sm hover:bg-white flex items-center gap-2"
                   >
                     <Edit className="h-4 w-4" />
-                    Editar Cards
+                    Editar Cards de Sucesso
                   </Button>
                 )}
               </div>
@@ -778,8 +840,8 @@ const MentorProfilePage = () => {
                     </div>
                   ) : (
                     <Avatar className="w-full h-full">
-                      <AvatarFallback>
-                        {currentUser?.full_name ? currentUser.full_name.charAt(0).toUpperCase() : "?"}
+                      <AvatarFallback className="bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white flex items-center justify-center">
+                        <User className="w-12 h-12" />
                       </AvatarFallback>
                     </Avatar>
                   )}
@@ -853,16 +915,50 @@ const MentorProfilePage = () => {
               </a>
               
               {/* Botão de edição das redes sociais */}
-              <Button
-                size="sm"
-                variant="outline"
+              <button
                 onClick={() => setIsSocialMediaModalOpen(true)}
-                className="ml-2 bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border flex items-center gap-2"
+                className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ml-2 flex items-center justify-center"
+                title="Editar redes sociais"
               >
-                <Edit className="h-4 w-4" />
-                Editar
-              </Button>
+                <Edit className="h-6 w-6 text-gray-600" />
+              </button>
             </div>
+          </div>
+
+          {/* Alerta de instruções com botão CTA ou botão de despublicar */}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            {!isPublicAccount ? (
+              <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-xl p-4 max-w-2xl mx-auto shadow-md">
+                <div className="flex-1">
+                  <p className="text-black font-medium leading-relaxed text-center mb-4">
+                    <span className="font-bold text-yellow-800">Atenção:</span> Sua conta só poderá ser publicada depois que você ajustar as informações das sessões colocando seus dados reais e marcar como verificado.
+                  </p>
+                  
+                  {/* Botão CTA dentro do alerta */}
+                  <div className="flex justify-center">
+                    <Button 
+                      className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                      size="sm"
+                      onClick={() => setIsPublishModalOpen(true)}
+                    >
+                      <Check className="h-4 w-4 mr-2 text-green-400" />
+                      Publicar minha conta
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <Button 
+                  className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                  size="sm"
+                  onClick={() => setIsUnpublishModalOpen(true)}
+                >
+                  <X className="h-4 w-4 mr-2 text-red-400" />
+                  Despublicar minha conta
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         
@@ -884,8 +980,8 @@ const MentorProfilePage = () => {
                     onClick={() => scrollToSection(item.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                       activeSection === item.id
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                        ? 'text-gray-700 drop-shadow-[0_0_8px_rgba(75,85,99,0.8)] font-semibold'
+                        : 'text-gray-600 hover:text-gray-700 hover:drop-shadow-[0_0_4px_rgba(75,85,99,0.4)]'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -904,7 +1000,10 @@ const MentorProfilePage = () => {
           <section id="sobre" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
               <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Por que me seguir?</h2>
+                <div className="flex items-center gap-3">
+                  <UserPlus className="h-8 w-8 text-black" />
+                  <h2 className="text-3xl font-bold text-black">Por que me seguir?</h2>
+                </div>
                 
                 {/* Checkbox de verificação */}
                 <VerificationSwitch
@@ -919,44 +1018,25 @@ const MentorProfilePage = () => {
                   <ProfileForm 
                     user={currentUser} 
                     profileData={currentUser}
-                    onProfileUpdate={() => {
-                      const fetchUserData = async () => {
-                        try {
-                          const { data: { user } } = await supabase.auth.getUser();
-                          if (!user) return;
-
-                          const { data: profile, error } = await supabase
-                            .from("profiles")
-                            .select("*")
-                            .eq("id", user.id)
-                            .single();
-
-                          if (error) throw error;
-                          setCurrentUser(profile);
-                        } catch (error) {
-                          console.error("Error fetching user data:", error);
-                        }
-                      };
-                      fetchUserData();
-                    }}
+                    onProfileUpdate={fetchUserData}
                   />
                 </div>
                 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
+                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
                       {isEditingDiferenciais ? (
                         <div className="space-y-3">
                           <Input
                             value={diferenciaisData.dif_title_1}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_1: e.target.value}))}
-                            className="font-bold text-lg border-purple-200 focus:border-purple-400"
+                            className="font-bold text-lg"
                             placeholder="Ex: 🎯 Resultados Comprovados"
                           />
                           <Textarea
                             value={diferenciaisData.dif_description_1}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_1: e.target.value}))}
-                            className="text-gray-700 border-purple-200 focus:border-purple-400"
+                            className="text-gray-700"
                             placeholder="Descrição dos seus resultados comprovados"
                             rows={3}
                           />
@@ -973,19 +1053,19 @@ const MentorProfilePage = () => {
                       )}
                     </div>
                     
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
+                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
                       {isEditingDiferenciais ? (
                         <div className="space-y-3">
                           <Input
                             value={diferenciaisData.dif_title_2}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_2: e.target.value}))}
-                            className="font-bold text-lg border-green-200 focus:border-green-400"
+                            className="font-bold text-lg"
                             placeholder="Ex: 🚀 Metodologia Exclusiva"
                           />
                           <Textarea
                             value={diferenciaisData.dif_description_2}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_2: e.target.value}))}
-                            className="text-gray-700 border-green-200 focus:border-green-400"
+                            className="text-gray-700"
                             placeholder="Descrição da sua metodologia exclusiva"
                             rows={3}
                           />
@@ -1002,19 +1082,19 @@ const MentorProfilePage = () => {
                       )}
                     </div>
                     
-                    <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
+                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
                       {isEditingDiferenciais ? (
                         <div className="space-y-3">
                           <Input
                             value={diferenciaisData.dif_title_3}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_3: e.target.value}))}
-                            className="font-bold text-lg border-orange-200 focus:border-orange-400"
+                            className="font-bold text-lg"
                             placeholder="Ex: 💰 ROI Garantido"
                           />
                           <Textarea
                             value={diferenciaisData.dif_description_3}
                             onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_3: e.target.value}))}
-                            className="text-gray-700 border-orange-200 focus:border-orange-400"
+                            className="text-gray-700"
                             placeholder="Descrição do ROI ou garantia"
                             rows={3}
                           />
@@ -1068,7 +1148,7 @@ const MentorProfilePage = () => {
                           className="flex items-center gap-2"
                         >
                           <Edit className="h-4 w-4" />
-                          Editar
+                          Editar Diferenciais
                         </Button>
                       )}
                     </div>
@@ -1085,7 +1165,10 @@ const MentorProfilePage = () => {
           <section id="cursos" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
               <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Meus Cursos</h2>
+                <div className="flex items-center gap-3">
+                  <BookOpen className="h-8 w-8 text-black" />
+                  <h2 className="text-3xl font-bold text-black">Meus Cursos</h2>
+                </div>
                 
                 {/* Checkbox de verificação */}
                 <VerificationSwitch
@@ -1133,7 +1216,10 @@ const MentorProfilePage = () => {
           <section id="depoimentos" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
               <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">O que dizem meus mentorados</h2>
+                <div className="flex items-center gap-3">
+                  <MessageCircle className="h-8 w-8 text-black" />
+                  <h2 className="text-3xl font-bold text-black">O que dizem meus mentorados ...</h2>
+                </div>
                 
                 {/* Checkbox de verificação */}
                 <VerificationSwitch
@@ -1141,41 +1227,6 @@ const MentorProfilePage = () => {
                   checked={verifiedData.elogios}
                   onChange={(checked) => handleVerifiedChange('elogios', checked)}
                 />
-              </div>
-              
-              {/* Botão de edição no canto inferior direito */}
-              <div className="absolute bottom-4 right-4">
-                {isEditingReviews ? (
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setIsEditingReviews(false)}
-                      disabled={isSaving}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Cancelar
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleSaveReviews}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                      disabled={isSaving}
-                    >
-                      {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsEditingReviews(true)}
-                    className="hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Editar
-                  </Button>
-                )}
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1233,7 +1284,8 @@ const MentorProfilePage = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center">
+                      <div className="text-center relative">
+                        <Quote className="absolute top-2 left-2 h-6 w-6 text-gray-400" />
                         <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
                           <img
                             src={reviewsData[`photo_${index}` as keyof typeof reviewsData]}
@@ -1254,15 +1306,48 @@ const MentorProfilePage = () => {
                         <p className="text-gray-700 text-sm leading-relaxed italic">
                           "{reviewsData[`comment_${index}` as keyof typeof reviewsData]}"
                         </p>
-                        <div className="flex justify-center mt-3">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <span key={i} className="text-yellow-400 text-lg">⭐</span>
-                          ))}
-                        </div>
                       </div>
                     )}
                   </div>
                 ))}
+              </div>
+              
+              {/* Rodapé da seção de depoimentos */}
+              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+                {isEditingReviews ? (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setIsEditingReviews(false)}
+                      disabled={isSaving}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveReviews}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditingReviews(true)}
+                    className="justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:text-accent-foreground h-9 rounded-md px-3 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen h-4 w-4">
+                      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
+                    </svg>
+                    Editar Depoimentos
+                  </Button>
+                )}
               </div>
             </div>
           </section>
@@ -1271,7 +1356,10 @@ const MentorProfilePage = () => {
           <section id="agenda" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
               <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-bold text-gray-800 text-center flex-1">Agenda uma Conversa</h2>
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="h-8 w-8 text-black" />
+                  <h2 className="text-3xl font-bold text-black">Agenda uma Conversa</h2>
+                </div>
                 
                 {/* Checkbox de verificação */}
                 <VerificationSwitch
@@ -1285,9 +1373,7 @@ const MentorProfilePage = () => {
               <div className="grid lg:grid-cols-2 gap-12 mb-8">
                 {/* Lado esquerdo - Configurações */}
                 <div className="relative">
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
-                    MentorCalendarSettings
-                  </div>
+
                   <MentorCalendarSettings 
                     onSettingsChange={handleSettingsChange}
                   />
@@ -1295,9 +1381,7 @@ const MentorProfilePage = () => {
                 
                 {/* Lado direito - Calendário */}
                 <div className="relative">
-                  <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold z-10">
-                    MentorCalendarComponent
-                  </div>
+
                   <MentorCalendarComponent 
                     settings={calendarSettings}
                     mentorId={currentUser?.id}
@@ -1313,33 +1397,56 @@ const MentorProfilePage = () => {
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Entre em Contato</h2>
-              
-              <div className="grid lg:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                  <h3 className="text-xl font-semibold">Formas de Contato</h3>
+              <div className="flex items-center justify-center gap-3 mb-10">
+                 <Mail className="h-8 w-8 text-black" />
+                 <h2 className="text-3xl font-bold text-black">Entre em Contato</h2>
+               </div>
+                <div className="grid lg:grid-cols-2 gap-12 mb-8">
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-semibold">Formas de Contato</h3>
+                    
+                    <div className="space-y-4">
+                      {currentUser?.phone && (
+                        <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <MessageCircle className="h-6 w-6 text-green-600" />
+                          <div>
+                            <p className="font-medium">Telefone/WhatsApp</p>
+                            <p className="text-gray-600 blur-sm select-none">{currentUser.phone}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <p className="text-sm text-gray-600 text-center italic">
+                        Em breve você poderá entrar em contato diretamente com o mentor através do WhatsApp
+                      </p>
+                    </div>
+                  </div>
                   
-                  <div className="space-y-4">
-                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2">
-                      <span>💬</span>
-                      Chamar no WhatsApp
-                    </Button>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4">Envie uma Mensagem</h3>
+                    <ContactForm />
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Envie uma Mensagem</h3>
-                  <ContactForm />
+                {/* Rodapé com os botões */}
+                <div className="border-t pt-6 mt-8">
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Chamar no WhatsApp
+                    </Button>
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Enviar Mensagem
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
           {/* CTA Final */}
           <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-16 text-center text-white">
             <h2 className="text-4xl font-bold mb-4">Pronto para Transformar sua Vida?</h2>
             <p className="text-xl mb-8 opacity-90">
-              Junte-se a mais de 1.250 pessoas que já transformaram suas vidas e negócios
+              Junte-se aos seguidores de {currentUser?.full_name?.split(' ')[0]} e comece sua jornada de transformação
             </p>
             
             <div className="space-y-4 mb-8">
@@ -1438,6 +1545,20 @@ const MentorProfilePage = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de publicação da conta */}
+      <PublishAccountModal 
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onPublishSuccess={handlePublishSuccess}
+      />
+
+      {/* Modal de despublicar conta */}
+      <UnpublishAccountModal 
+        isOpen={isUnpublishModalOpen}
+        onClose={() => setIsUnpublishModalOpen(false)}
+        onUnpublishSuccess={handleUnpublishSuccess}
+      />
     </div>
   );
 };

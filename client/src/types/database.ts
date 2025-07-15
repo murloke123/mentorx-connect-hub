@@ -80,6 +80,7 @@ export interface Profile {
         elogios_verificado?: boolean;
         calendario_verificado?: boolean;
     } | null;
+    is_public?: boolean | null;
 }
 
 export interface Course {
@@ -136,6 +137,7 @@ export interface Mentor {
   category_id?: string | null;
   courses_count?: number;
   followers_count?: number;
+  is_public?: boolean | null;
 }
 
 export interface Category {

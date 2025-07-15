@@ -408,10 +408,27 @@ export async function getFeaturedMentors(): Promise<Profile[]> {
   try {
     const { data, error } = await supabase
       .from("profiles")
-      .select('*')
+      .select(`
+        id,
+        full_name,
+        bio,
+        avatar_url,
+        highlight_message,
+        phone,
+        sm_tit1,
+        sm_desc1,
+        sm_tit2,
+        sm_desc2,
+        sm_tit3,
+        sm_desc3,
+        category,
+        category_id,
+        is_public
+      `)
       .eq("role", "mentor")
+      .eq("is_public", true)
       .order("updated_at", { ascending: false })
-      .limit(3);
+      .limit(6);
 
     if (error) throw error;
 
@@ -426,8 +443,25 @@ export async function getAllPublicMentors(): Promise<Mentor[]> {
   try {
     const { data, error } = await supabase
       .from("profiles")
-      .select('*')
+      .select(`
+        id,
+        full_name,
+        bio,
+        avatar_url,
+        highlight_message,
+        phone,
+        sm_tit1,
+        sm_desc1,
+        sm_tit2,
+        sm_desc2,
+        sm_tit3,
+        sm_desc3,
+        category,
+        category_id,
+        is_public
+      `)
       .eq("role", "mentor")
+      .eq("is_public", true)
       .order("updated_at", { ascending: false });
 
     if (error) throw error;
@@ -560,3 +594,18 @@ export async function getEnrollmentStats(periodDays = 30): Promise<EnrollmentDat
     return [];
   }
 }
+
+export const updateMentorPublicStatus = async (userId: string, isPublic: boolean) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ is_public: isPublic })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};

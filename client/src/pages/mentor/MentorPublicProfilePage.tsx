@@ -10,7 +10,7 @@ import { notifyLostFollower, notifyNewFollower } from "@/services/notificationSe
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Clock, Facebook, GraduationCap, Heart, Instagram, MessageCircle, Star, User, Youtube } from "lucide-react";
+import { Calendar, Clock, Facebook, GraduationCap, Heart, Instagram, MessageCircle, Star, User, Youtube, UserPlus, BookOpen, Quote, CalendarDays, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -492,22 +492,22 @@ const MentorPublicProfilePage = () => {
     { 
       value: mentorData?.hero_cards?.hero_card_1 || "1.250+", 
       label: mentorData?.hero_cards?.hero_card_desc_1 || "Mentorados de Sucesso", 
-      icon: "/icons/group.svg" 
+      icon: "/icons/pessoas.png" 
     },
     { 
       value: mentorData?.hero_cards?.hero_card_2 || "98%", 
       label: mentorData?.hero_cards?.hero_card_desc_2 || "Taxa de Satisfação", 
-      icon: "/icons/star.svg" 
+      icon: "/icons/review.png" 
     },
     { 
       value: mentorData?.hero_cards?.hero_card_3 || "15+", 
       label: mentorData?.hero_cards?.hero_card_desc_3 || "Anos de Experiência", 
-      icon: "/icons/goal.svg" 
+      icon: "/icons/montanha.png" 
     },
     { 
        value: mentorData?.hero_cards?.hero_card_4 || "R$ 50M+", 
        label: mentorData?.hero_cards?.hero_card_desc_4 || "Movimentados pelos Alunos", 
-       icon: "/icons/value.svg" 
+       icon: "/icons/money.png" 
      }
    ];
 
@@ -577,15 +577,15 @@ const MentorPublicProfilePage = () => {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                 {stats.map((stat, index) => (
-                    <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       <div className="mb-2 flex justify-center">
                         <img 
                           src={stat.icon} 
                           alt={stat.label}
-                          className="w-8 h-8 object-contain"
+                          className="w-10 h-10 object-contain"
                         />
                       </div>
-                      <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
+                      <div className="text-2xl font-semibold text-gray-800 drop-shadow-lg" style={{textShadow: '0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6)'}}>{stat.value}</div>
                       <div className="text-sm text-gray-600">{stat.label}</div>
                     </div>
                 ))}
@@ -610,8 +610,8 @@ const MentorPublicProfilePage = () => {
                 />
               ) : (
                 <Avatar className="w-full h-full">
-                  <AvatarFallback className="text-2xl">
-                    {mentorData.full_name ? mentorData.full_name.charAt(0).toUpperCase() : "?"}
+                  <AvatarFallback className="bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white flex items-center justify-center">
+                    <User className="w-12 h-12" />
                   </AvatarFallback>
                 </Avatar>
               )}
@@ -713,8 +713,8 @@ const MentorPublicProfilePage = () => {
                     onClick={() => scrollToSection(item.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                       activeSection === item.id
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                        ? 'bg-gradient-to-br from-gray-400/80 via-gray-500/80 to-gray-600/80 text-white shadow-lg backdrop-blur-sm'
+                        : 'text-gray-600 hover:text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -746,9 +746,11 @@ const MentorPublicProfilePage = () => {
                 </div>
                 
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold mb-4">
-                      Por que me seguir?
-                  </h3>
+                  <div className="mb-4">
+                    <h3 className="text-3xl font-bold text-black">
+                        Por que me seguir?
+                    </h3>
+                  </div>
                   <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
                       <h4 className="font-bold text-lg mb-2">
@@ -788,7 +790,10 @@ const MentorPublicProfilePage = () => {
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Cursos Disponíveis</h2>
+              <div className="flex items-center justify-center gap-3 mb-10">
+                <BookOpen className="h-8 w-8 text-black" />
+                <h2 className="text-3xl font-bold text-black">Cursos Disponíveis</h2>
+              </div>
               
                 {coursesLoading ? (
                   <div className="flex justify-center">
@@ -824,10 +829,14 @@ const MentorPublicProfilePage = () => {
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">Depoimentos</h2>
+              <div className="flex items-center justify-center gap-3 mb-10">
+                <MessageCircle className="h-8 w-8 text-black" />
+                <h2 className="text-3xl font-bold text-black">O que dizem meus mentorados ...</h2>
+              </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3].map((index) => (
-                  <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-sm border">
+                  <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-sm border relative">
+                    <Quote className="absolute top-4 left-4 h-6 w-6 text-gray-400" />
                     <div className="text-center">
                       <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
                         <img
@@ -849,11 +858,6 @@ const MentorPublicProfilePage = () => {
                       <p className="text-gray-700 text-sm leading-relaxed italic">
                         "{mentorData.review_comments?.[`comment_${index}`] || 'Comentário do depoimento'}"
                       </p>
-                      <div className="flex justify-center mt-3">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} className="text-yellow-400 text-lg">⭐</span>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -864,16 +868,18 @@ const MentorPublicProfilePage = () => {
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">
-                Agende uma Conversa
-              </h2>
+              <div className="flex items-center justify-center gap-3 mb-10">
+                <CalendarDays className="h-8 w-8 text-black" />
+                <h2 className="text-3xl font-bold text-black">
+                  Agende uma Conversa
+                </h2>
+              </div>
               
               <div className="grid lg:grid-cols-2 gap-12">
                 {/* Lado esquerdo - Configurações de Disponibilidade (visualização) */}
                 <div className="md:col-span-1">
-                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-100 h-full">
-                    <h3 className="text-lg font-semibold mb-6 text-gray-800 flex items-center gap-2">
-                      <Calendar className="h-5 w-5" />
+                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-8 rounded-2xl border border-purple-100 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 className="text-2xl font-bold mb-6 text-gray-800">
                       Disponibilidade
                     </h3>
                     
@@ -983,7 +989,11 @@ const MentorPublicProfilePage = () => {
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-                <div className="grid lg:grid-cols-2 gap-12">
+              <div className="flex items-center justify-center gap-3 mb-10">
+                 <Mail className="h-8 w-8 text-black" />
+                 <h2 className="text-3xl font-bold text-black">Entre em Contato</h2>
+               </div>
+                <div className="grid lg:grid-cols-2 gap-12 mb-8">
                   <div className="space-y-6">
                     <h3 className="text-xl font-semibold">Formas de Contato</h3>
                     
@@ -993,21 +1003,32 @@ const MentorPublicProfilePage = () => {
                           <MessageCircle className="h-6 w-6 text-green-600" />
                           <div>
                             <p className="font-medium">Telefone/WhatsApp</p>
-                            <p className="text-gray-600">{mentorData.phone}</p>
+                            <p className="text-gray-600 blur-sm select-none">{mentorData.phone}</p>
                           </div>
                         </div>
                       )}
                       
-                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2">
-                        <span>💬</span>
-                        Chamar no WhatsApp
-                      </Button>
+                      <p className="text-sm text-gray-600 text-center italic">
+                        Em breve você poderá entrar em contato diretamente com o mentor através do WhatsApp
+                      </p>
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-xl font-semibold mb-4">Envie uma Mensagem</h3>
                     <ContactForm />
+                  </div>
+                </div>
+                
+                {/* Rodapé com os botões */}
+                <div className="border-t pt-6 mt-8">
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Chamar no WhatsApp
+                    </Button>
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Enviar Mensagem
+                    </Button>
                   </div>
                 </div>
               </div>

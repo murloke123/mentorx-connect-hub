@@ -209,7 +209,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     } else if (!isWorking) {
       return `${baseClass} bg-red-100 text-red-600 cursor-not-allowed hover:scale-100 hover:shadow-none`;
     } else {
-      return `${baseClass} bg-white text-gray-800 hover:bg-purple-100 border-2 border-gray-200 hover:border-purple-300`;
+      return `${baseClass} bg-white text-gray-800 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-400`;
     }
   };
 
@@ -217,12 +217,12 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     <>
       <div 
         key={`calendar-${monthOffset}`}
-        className={`bg-gradient-to-br from-purple-50 to-blue-50 p-8 rounded-2xl border border-purple-200 shadow-sm ${className}`}
+        className={`bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex flex-col ${className}`}
       >
         {/* Cabeçalho com ícone, título e botão de navegação */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-purple-600" />
+            <Calendar className="h-6 w-6 text-gray-800" />
             <h3 className="text-2xl font-bold text-gray-800">
               {calendarData.currentMonthName} {calendarData.currentYear}
             </h3>
@@ -232,7 +232,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {monthOffset === 0 ? (
             <button
               onClick={goToNextMonth}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 hover:text-purple-700 transition-all duration-200 hover:scale-105"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 hover:text-gray-900 transition-all duration-200 hover:scale-105"
               title="Avançar para o próximo mês"
             >
               <ChevronRight className="h-5 w-5" />
@@ -240,7 +240,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           ) : (
             <button
               onClick={goToPreviousMonth}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 hover:text-purple-700 transition-all duration-200 hover:scale-105"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 hover:text-gray-900 transition-all duration-200 hover:scale-105"
               title="Voltar para o mês anterior"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -248,7 +248,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           )}
         </div>
         
-        <div key={`calendar-grid-${monthOffset}`} className="grid grid-cols-7 gap-3">
+        <div key={`calendar-grid-${monthOffset}`} className="grid grid-cols-7 gap-3 flex-1">
           {/* Cabeçalho dos dias da semana */}
           {weekDays.map((day) => (
             <div 
@@ -300,7 +300,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
         </div>
         
         {/* Legenda melhorada */}
-        <div className="mt-8 p-4 bg-white/50 rounded-xl border border-purple-100">
+        <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-300">
           <h4 className="text-sm font-semibold text-gray-700 mb-3 text-center">Legenda</h4>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-center gap-3">
@@ -341,4 +341,4 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
   );
 };
 
-export default MentorCalendarComponent; 
+export default MentorCalendarComponent;

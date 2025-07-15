@@ -1,36 +1,35 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Info } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Profile } from "../../utils/supabase";
-import { supabase } from '../../utils/supabase';
 import { useToast } from "../../hooks/use-toast";
 import { useCategories } from "../../hooks/useCategories";
+import { Profile, supabase } from "../../utils/supabase";
+import RichTextEditor from "../mentor/content/RichTextEditor";
 import { Button } from "../ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "../ui/dialog";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
 } from "../ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import { Info } from "lucide-react";
-import RichTextEditor from "../mentor/content/RichTextEditor";
 
 interface ProfileData {
   id: string;
@@ -65,13 +64,51 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
   const [isLoading, setIsLoading] = useState(false);
   const [isHighlightModalOpen, setIsHighlightModalOpen] = useState(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
-  const [bioContent, setBioContent] = useState(profileData?.bio || "");
+  
+  // Texto padrão para mentores
+  const defaultBioText = `<p class="p1"><span class="s1"></span></p><h2>
+
+
+
+
+<p class="p1"><span class="s1"></span></p></h2><h2><b>👋 </b><span style="color: rgb(2, 8, 23); font-size: inherit; font-weight: inherit;">Olá! Sou um(a) profissional com mais de [X] anos de experiência nas áreas de [coloque aqui suas áreas de atuação, como vendas, marketing, finanças, tecnologia, recursos humanos, entre outras]. Ao longo da minha carreira, atuei em empresas de diferentes tamanhos e segmentos, participando de projetos que contribuíram para o crescimento e a organização dos times e dos negócios.</span></h2><h2><p class="p3"><br></p>
+<p class="p1"><span class="s1"></span></p><hr><p></p>
+<p class="p1"><span class="s1"></span></p></h2><h2><b><br></b></h2><h2><b>🚀 Minha Trajetória</b></h2><h2><p></p>
+<p class="p2"><br></p>
+<p class="p3">Comecei minha carreira como [coloque sua primeira função ou área de atuação], e ao longo do tempo fui me desenvolvendo em diferentes áreas, sempre buscando novos aprendizados e desafios. Essa jornada me trouxe uma visão prática e estratégica sobre o mercado de trabalho e as diversas formas de atuação profissional.</p><p class="p3"><br></p>
+<p class="p1"><span class="s1"></span></p><hr><p></p>
+<p class="p1"><span class="s1"></span></p></h2><h2><b><br></b></h2><h2><b>🧠 Minha Abordagem</b></h2><h2><p></p>
+<p class="p2"><br></p>
+<p class="p3">Gosto de ensinar de forma clara, objetiva e personalizada. Acredito que cada pessoa tem um ritmo e uma história, por isso adapto minhas mentorias de acordo com os objetivos e desafios de quem me procura. Compartilho experiências reais, dicas úteis e ferramentas que podem ser aplicadas no dia a dia.</p><p class="p3"><br></p>
+<p class="p1"><span class="s1"></span></p><hr><p></p>
+<p class="p1"><span class="s1"></span></p></h2><h2><b><br></b></h2><h2><b>💡 Por Que Me Seguir?</b></h2><h2><p></p>
+<p class="p2"><br></p>
+<p class="p3">Se você está buscando crescer na carreira, se desenvolver em uma nova área ou entender melhor os caminhos possíveis no mercado, aqui é o seu espaço. Compartilho conteúdos voltados para o desenvolvimento profissional, planejamento de carreira, estratégias de mercado e dicas práticas para quem quer sair do lugar.</p><p class="p3"><br></p>
+<p class="p1"><span class="s1"></span></p><hr><p></p>
+<p class="p1"><span class="s1"></span></p></h2><h2><b><br></b></h2><h2><b>🎁 O Que Você Encontra Comigo</b></h2><h2><p></p>
+<p class="p2"><br></p>
+<p class="p3">Mentorias acessíveis, com uma linguagem simples, foco em resultados e atenção às suas necessidades. Além disso, ofereço conteúdos exclusivos sobre o mercado de trabalho, como se destacar em processos seletivos, como planejar mudanças de carreira e como se posicionar de forma mais confiante.</p></h2>`;
+
+  // Usar texto padrão se for mentor e não tiver bio
+  const initialBioContent = profileData?.role === 'mentor' && (!profileData?.bio || profileData?.bio.trim() === '') 
+    ? defaultBioText 
+    : (profileData?.bio || "");
+    
+  const [bioContent, setBioContent] = useState(initialBioContent);
+
+  // Atualizar bioContent quando profileData mudar
+  useEffect(() => {
+    const newBioContent = profileData?.role === 'mentor' && (!profileData?.bio || profileData?.bio.trim() === '') 
+      ? defaultBioText 
+      : (profileData?.bio || "");
+    setBioContent(newBioContent);
+  }, [profileData, defaultBioText]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: profileData?.full_name || "",
-      bio: profileData?.bio || "",
+      bio: initialBioContent,
       highlight_message: profileData?.highlight_message || "",
       category_id: profileData?.category_id || "",
     },
@@ -240,8 +277,19 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Salvando..." : "Salvar Alterações"}
+            <Button type="submit" disabled={isLoading} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+              {isLoading ? (
+                "Salvando..."
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-save h-4 w-4">
+                    <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
+                    <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+                    <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+                  </svg>
+                  Salvar Alterações
+                </>
+              )}
             </Button>
           </div>
         </form>

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/utils/supabase';
 import MentorCalendarComponent from '@/components/MentorCalendarComponent';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/utils/supabase';
+import { ArrowLeft, Calendar, User } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface MentorData {
   id: string;
@@ -197,7 +197,7 @@ const MentorPublicSchedulePage: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Painel de Disponibilidade */}
             <div className="md:col-span-1">
-              <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-100 h-full">
+              <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-8 rounded-2xl border border-purple-100 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <h3 className="text-lg font-semibold mb-6 text-gray-800 flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   Disponibilidade

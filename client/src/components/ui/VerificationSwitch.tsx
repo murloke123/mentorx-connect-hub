@@ -14,7 +14,7 @@ const VerificationSwitch: React.FC<VerificationSwitchProps> = ({
   label = "Verificado"
 }) => {
   return (
-    <div className="flex items-center gap-2 bg-gray-500/80 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-lg">
+    <div className="flex items-center gap-2 bg-gradient-to-br from-gray-400/80 via-gray-500/80 to-gray-600/80 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-lg">
       <div className="checkbox-apple">
         <input
           className="yep"
@@ -66,7 +66,7 @@ const VerificationSwitch: React.FC<VerificationSwitchProps> = ({
         }
 
         .checkbox-apple input[type="checkbox"]:checked + label {
-          background: linear-gradient(to bottom, #4cd964, #5de24e);
+          background: linear-gradient(to bottom, #1f2937, #111827);
         }
 
         .checkbox-apple input[type="checkbox"]:checked + label:after {
@@ -78,7 +78,7 @@ const VerificationSwitch: React.FC<VerificationSwitchProps> = ({
         }
 
         .checkbox-apple input[type="checkbox"]:checked + label:hover {
-          background: linear-gradient(to bottom, #4cd964, #5de24e);
+          background: linear-gradient(to bottom, #111827, #030712);
         }
 
         .checkbox-apple label:hover:after {

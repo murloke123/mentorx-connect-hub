@@ -1,11 +1,10 @@
-import { Calendar, Clock, DollarSign, Globe, Loader2, Settings } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Globe, Loader2, Save, Settings } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../utils/supabase';
 import { detectUserTimezone, findTimezoneByValue, timezones } from '../utils/timezones';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Checkbox } from './ui/checkbox';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -315,158 +314,158 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
 
   if (loading) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Carregando configurações...</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="ml-2">Carregando configurações...</span>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          Configurações de Disponibilidade
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Dias da Semana */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Dias Disponíveis
-          </label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={getSelectedDaysText()} />
-            </SelectTrigger>
-            <SelectContent>
-              <div className="p-2">
-                {weekDays.map((day) => (
-                  <div key={day.key} className="flex items-center justify-between py-2">
-                    <span className="text-sm">{day.label}</span>
-                    <Checkbox
-                      checked={settings.workingDays.includes(day.key)}
-                      onCheckedChange={(checked) => handleDayToggle(day.key, checked as boolean)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-gray-500">
-            {getSelectedDaysText()}
-          </p>
-        </div>
-
-        {/* Horários */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+    <div className="bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex flex-col">
+      <div className="mb-8">
+        <h3 className="text-2xl font-bold text-black">
+          Disponibilidade
+        </h3>
+      </div>
+      <div className="space-y-6 flex-1 flex flex-col justify-between">
+        <div className="space-y-6">
+          {/* Dias da Semana */}
+          <div className="space-y-3">
             <label className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Início
+              <Calendar className="h-4 w-4" />
+              Dias Disponíveis
             </label>
-            <Select value={settings.startTime} onValueChange={(value) => handleTimeChange('startTime', value)}>
-              <SelectTrigger>
-                <SelectValue />
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={getSelectedDaysText()} />
               </SelectTrigger>
               <SelectContent>
-                {timeOptions.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
+                <div className="p-2">
+                  {weekDays.map((day) => (
+                    <div key={day.key} className="flex items-center justify-between py-2">
+                      <span className="text-sm">{day.label}</span>
+                      <Checkbox
+                        checked={settings.workingDays.includes(day.key)}
+                        onCheckedChange={(checked) => handleDayToggle(day.key, checked as boolean)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </SelectContent>
             </Select>
+            <p className="text-xs text-gray-500">
+              {getSelectedDaysText()}
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Fim
-            </label>
-            <Select value={settings.endTime} onValueChange={(value) => handleTimeChange('endTime', value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timeOptions.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Horários */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Início
+              </label>
+              <Select value={settings.startTime} onValueChange={(value) => handleTimeChange('startTime', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeOptions.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Fim
+              </label>
+              <Select value={settings.endTime} onValueChange={(value) => handleTimeChange('endTime', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeOptions.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
 
-        {/* Duração da Sessão */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Duração da Sessão (minutos)</label>
-          <Select value={settings.sessionDuration.toString()} onValueChange={handleSessionDurationChange}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30">30 minutos</SelectItem>
-              <SelectItem value="60">60 minutos</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          {/* Duração da Sessão e Fuso Horário */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Duração da Sessão (minutos)</label>
+              <Select value={settings.sessionDuration.toString()} onValueChange={handleSessionDurationChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30 minutos</SelectItem>
+                  <SelectItem value="60">60 minutos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Fuso Horário */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium flex items-center gap-2">
-            <Globe className="h-4 w-4" />
-            Fuso Horário
-          </label>
-          <Select value={settings.timezone} onValueChange={handleTimezoneChange}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione seu fuso horário" />
-            </SelectTrigger>
-            <SelectContent>
-              {timezones.map((timezone) => (
-                <SelectItem key={timezone.value} value={timezone.value}>
-                  {timezone.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Fuso Horário
+              </label>
+              <Select value={settings.timezone} onValueChange={handleTimezoneChange}>
+                <SelectTrigger className="w-full" style={{ marginTop: '11px' }}>
+                  <SelectValue placeholder="Selecione seu fuso horário" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map((timezone) => (
+                    <SelectItem key={timezone.value} value={timezone.value}>
+                      {timezone.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <p className="text-xs text-gray-500">
             Detectado automaticamente: {getSelectedTimezoneLabel()}
           </p>
-        </div>
 
-        {/* Valor do Agendamento */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            Valor do Agendamento (R$)
-          </label>
-          <Input
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            value={settings.price || ''}
-            onChange={(e) => handlePriceChange(e.target.value)}
-            className="w-full"
-          />
-          <p className="text-xs text-gray-500">
-            Defina o valor que será cobrado por cada agendamento (opcional)
-          </p>
+          {/* Valor do Agendamento */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Valor do Agendamento (R$)
+            </label>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              value={settings.price || ''}
+              onChange={(e) => handlePriceChange(e.target.value)}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500">
+              Defina o valor que será cobrado por cada agendamento (opcional)
+            </p>
+          </div>
         </div>
 
         {/* Botão Salvar */}
         <Button 
           onClick={saveSettings} 
           disabled={saving}
-          className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white border-none"
+          className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white border-none mt-6"
         >
           {saving ? (
             <>
@@ -474,12 +473,15 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
               Salvando...
             </>
           ) : (
-            'Salvar Configurações'
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Salvar Configurações
+            </>
           )}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
-export default MentorCalendarSettings; 
+export default MentorCalendarSettings;

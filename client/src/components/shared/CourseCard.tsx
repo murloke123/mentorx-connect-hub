@@ -258,24 +258,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
-      {/* Label de identificação do componente */}
-      <div style={{
-        position: 'absolute',
-        top: '-8px',
-        left: '8px',
-        background: '#ffeb3b',
-        color: '#000',
-        fontSize: '10px',
-        fontWeight: 'bold',
-        padding: '2px 6px',
-        borderRadius: '4px',
-        zIndex: 1000,
-        border: '1px solid #000'
-      }}>
-        CourseCard
-      </div>
-      
     <div 
       style={cardStyles}
       onMouseEnter={(e) => {
@@ -370,7 +352,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         </button>
         </div>
       </div>
-    </div>
   );
 };
 
