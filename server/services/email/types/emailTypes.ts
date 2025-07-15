@@ -65,6 +65,11 @@ export interface BrevoEmailParams {
   // New schedule params
   MENTOR_EMAIL?: string;
   AGENDAMENTOS_URL?: string;
+  // Contact mentor params
+  SENDER_NAME?: string;
+  SENDER_EMAIL?: string;
+  MESSAGE_CONTENT?: string;
+  MESSAGE_DATE?: string;
   [key: string]: string | undefined;
 }
 
@@ -92,4 +97,12 @@ export interface NewScheduleEmailDataMentee {
   meetLink?: string;
   agendamentosUrl: string;
   supportUrl: string;
-} 
+}
+
+export interface SendToMentorEmailData {
+  mentorName: string;
+  mentorEmail: string;
+  senderName: string;
+  senderEmail: string;
+  messageContent: string;
+}

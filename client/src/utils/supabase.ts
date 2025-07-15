@@ -229,6 +229,14 @@ export interface Database {
           stripe_capabilities: Record<string, unknown> | null;
           account_already_verified: boolean | null;
           document_verification_status: 'pending' | 'verified' | 'rejected' | null;
+          is_public: boolean | null;
+          phone: string | null;
+          sm_tit1: string | null;
+          sm_desc1: string | null;
+          sm_tit2: string | null;
+          sm_desc2: string | null;
+          sm_tit3: string | null;
+          sm_desc3: string | null;
         };
         Insert: {
           id: string;
@@ -250,6 +258,14 @@ export interface Database {
           stripe_capabilities?: Record<string, unknown> | null;
           account_already_verified?: boolean | null;
           document_verification_status?: 'pending' | 'verified' | 'rejected' | null;
+          is_public?: boolean | null;
+          phone?: string | null;
+          sm_tit1?: string | null;
+          sm_desc1?: string | null;
+          sm_tit2?: string | null;
+          sm_desc2?: string | null;
+          sm_tit3?: string | null;
+          sm_desc3?: string | null;
         };
         Update: {
           id?: string;
@@ -271,6 +287,14 @@ export interface Database {
           stripe_capabilities?: Record<string, unknown> | null;
           account_already_verified?: boolean | null;
           document_verification_status?: 'pending' | 'verified' | 'rejected' | null;
+          is_public?: boolean | null;
+          phone?: string | null;
+          sm_tit1?: string | null;
+          sm_desc1?: string | null;
+          sm_tit2?: string | null;
+          sm_desc2?: string | null;
+          sm_tit3?: string | null;
+          sm_desc3?: string | null;
         };
       };
 

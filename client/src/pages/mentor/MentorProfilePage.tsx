@@ -19,7 +19,7 @@ import { supabase } from "@/utils/supabase";
 import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Camera, Edit, Facebook, GraduationCap, Instagram, MessageCircle, Save, Star, User, X, Youtube, UserPlus, BookOpen, Quote, CalendarDays, Mail, Check } from "lucide-react";
+import { BookOpen, Calendar, CalendarDays, Camera, Check, Edit, Facebook, GraduationCap, Instagram, Mail, MessageCircle, Quote, Save, Star, User, UserPlus, X, Youtube } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CourseWithProfile extends Course {
@@ -1416,26 +1416,29 @@ const MentorProfilePage = () => {
                         </div>
                       )}
                       
-                      <p className="text-sm text-gray-600 text-center italic">
-                        Em breve você poderá entrar em contato diretamente com o mentor através do WhatsApp
+                      <p className="text-sm text-gray-600 text-left italic">
+                        Em breve você poderá entrar em contato diretamente com o mentor através do WhatsApp e com seus Agentes automatizados para personalizar sua jornada de mentoria.
                       </p>
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-xl font-semibold mb-4">Envie uma Mensagem</h3>
-                    <ContactForm />
+                    <ContactForm 
+                      mentorName={currentUser?.full_name || ''}
+                      mentorEmail={currentUser?.email || ''}
+                      onSubmitSuccess={() => {
+                        console.log('Mensagem enviada com sucesso!');
+                      }}
+                    />
                   </div>
                 </div>
                 
                 {/* Rodapé com os botões */}
                 <div className="border-t pt-6 mt-8">
-                  <div className="grid lg:grid-cols-2 gap-4">
+                  <div className="grid lg:grid-cols-1 gap-4">
                     <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                       Chamar no WhatsApp
-                    </Button>
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      Enviar Mensagem
                     </Button>
                   </div>
                 </div>

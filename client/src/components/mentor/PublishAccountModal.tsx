@@ -9,10 +9,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/utils/supabase';
 import { updateMentorPublicStatus } from '@/services/mentorService';
-import { AlertTriangle, CheckCircle, Loader2, X } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { supabase } from '@/utils/supabase';
+import { CheckCircle, Loader2, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface PublishAccountModalProps {
   isOpen: boolean;

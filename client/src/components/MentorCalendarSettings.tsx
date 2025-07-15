@@ -1,4 +1,4 @@
-import { Calendar, Clock, DollarSign, Globe, Loader2, Save, Settings } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Globe, Loader2, Save } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';

@@ -236,29 +236,29 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
               </CardHeader>
               <CardContent className="flex-grow">
                 <div 
-                  className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 hover:shadow-md"
+                  className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-50 to-slate-100 hover:from-gray-100 hover:to-slate-200 transition-all duration-200 hover:shadow-lg hover:border-gray-400"
                   onClick={() => navigate(`/mentor/meus-cursos/${course.id}/alunos`)}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <BookOpen className="w-4 h-4 text-slate-700" />
                       <span className="text-sm font-medium text-gray-900">Inscrições</span>
                     </div>
-                    <div className="bg-white px-3 py-1 rounded-full shadow-sm border">
-                      <span className="text-sm font-semibold text-blue-600">
+                    <div className="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                      <span className="text-sm font-semibold text-slate-700">
                         {course.enrollments_count || 0}
                       </span>
                     </div>
                   </div>
                   <Progress 
                     value={Math.min((course.enrollments_count || 0) * 10, 100)}
-                    className="w-full h-2 mb-3" 
+                    className="w-full h-2 mb-3 bg-gray-200 [&>div]:bg-slate-600" 
                   />
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-600 font-medium">
                       {course.enrollments_count || 0} alunos ativos
                     </span>
-                    <span className="text-xs text-blue-600 font-medium">
+                    <span className="text-xs text-slate-700 font-medium">
                       Meta: 10+ alunos
                     </span>
                   </div>

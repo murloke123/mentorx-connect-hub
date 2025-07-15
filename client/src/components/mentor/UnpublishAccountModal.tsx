@@ -9,8 +9,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/utils/supabase';
 import { updateMentorPublicStatus } from '@/services/mentorService';
+import { supabase } from '@/utils/supabase';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 

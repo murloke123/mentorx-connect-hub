@@ -206,26 +206,14 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                 </div>
               )}
 
-              {/* Especialidades */}
-              {(mentor.sm_tit1 || mentor.sm_tit2 || mentor.sm_tit3) && (
+              {/* Categoria como especialidade */}
+              {mentor.category && (
                 <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Especialidades:</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Especialidade:</h4>
                   <div className="flex flex-wrap gap-1 justify-center">
-                    {mentor.sm_tit1 && (
-                      <Badge variant="outline" className="text-xs">
-                        {mentor.sm_tit1}
-                      </Badge>
-                    )}
-                    {mentor.sm_tit2 && (
-                      <Badge variant="outline" className="text-xs">
-                        {mentor.sm_tit2}
-                      </Badge>
-                    )}
-                    {mentor.sm_tit3 && (
-                      <Badge variant="outline" className="text-xs">
-                        {mentor.sm_tit3}
-                      </Badge>
-                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {mentor.category}
+                    </Badge>
                   </div>
                 </div>
               )}

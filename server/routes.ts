@@ -2049,6 +2049,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== EMAIL CONTACT MENTOR ROUTE ====================
+
+  // Rota para enviar email de contato para o mentor
+  app.post('/api/email/contact-mentor', async (req, res) => {
+    try {
+      console.log('📧 [API] Enviando email de contato para mentor...');
+      console.log('📝 [API] Dados recebidos:', JSON.stringify(req.body, null, 2));
+      
+      const { mentorName, mentorEmail, senderName, senderEmail, messageContent } = req.body;
+      
+      // Validar campos obrigatórios
+      if (!mentorName || !mentorEmail || !senderName || !senderEmail || !messageContent) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios: mentorName, mentorEmail, senderName, senderEmail, messageContent'
+        });
+      }
+      
+      // Importar o serviço de email
+      const { enviarEmailParaMentor } = await import('./services/email/services/mentor/emailSendToMentor');
+      
+      const emailData = {
+        mentorName,
+        mentorEmail,
+        senderName,
+        senderEmail,
+        messageContent
+      };
+      
+      console.log('📤 [API] Enviando email...');
+      const result = await enviarEmailParaMentor(emailData);
+      
+      if (result.success) {
+        console.log('✅ [API] Email enviado com sucesso');
+        res.json({
+          success: true,
+          message: 'Email enviado com sucesso para o mentor',
+          messageId: result.messageId
+        });
+      } else {
+        console.error('❌ [API] Falha no envio do email:', result.error);
+        res.status(500).json({
+          success: false,
+          error: result.error || 'Erro ao enviar email'
+        });
+      }
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro crítico no envio de email:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno do servidor'
+      });
+    }
+  });
+
   // ==================== JITSI MEET ROUTES ====================
 
   // Importar Jitsi Meet Service

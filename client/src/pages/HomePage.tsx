@@ -1,13 +1,13 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Hero from "@/components/shared/Hero";
 import CourseCard from "@/components/shared/CourseCard";
+import Hero from "@/components/shared/Hero";
 import MentorCard from "@/components/shared/MentorCard";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicCourses } from "@/services/courseService";
 import { getFeaturedMentors } from "@/services/mentorService";
 import { Course, Mentor } from '@/types/database';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const { toast } = useToast();
