@@ -105,7 +105,7 @@ const ConteudosPage = () => {
           title: values.title,
           description: values.description,
           content_data: values.content_type === 'texto_rico' 
-            ? { html_content: values.html_content }
+            ? { texto: values.html_content }
             : values.content_type === 'video_externo'
             ? { provider: values.provider, url: values.video_url }
             : { pdf_file: values.pdf_file },

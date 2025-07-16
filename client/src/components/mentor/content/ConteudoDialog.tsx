@@ -55,7 +55,7 @@ const ConteudoDialog = ({
               title: conteudoParaEditar?.title,
               description: conteudoParaEditar?.description,
               content_type: conteudoParaEditar?.content_type,
-              html_content: conteudoParaEditar?.content_data?.html_content,
+              html_content: conteudoParaEditar?.content_data?.texto,
               video_url: conteudoParaEditar?.content_data?.video_url,
               provider: conteudoParaEditar?.content_data?.provider,
               pdf_url: conteudoParaEditar?.content_data?.pdf_url,

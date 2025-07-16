@@ -104,7 +104,7 @@ const ContentRenderer: React.FC<{
         return (
           <div 
             className="prose max-w-none p-8"
-            dangerouslySetInnerHTML={{ __html: content_data?.html_content || '' }}
+            dangerouslySetInnerHTML={{ __html: content_data?.texto || '' }}
           />
         );
 

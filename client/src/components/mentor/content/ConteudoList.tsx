@@ -141,7 +141,7 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                       <div 
                         className="text-sm text-gray-700 line-clamp-3"
                         dangerouslySetInnerHTML={{ 
-                          __html: conteudo.content_data?.html_content || '<p>Sem conteúdo</p>'
+                          __html: conteudo.content_data?.texto || '<p>Sem conteúdo</p>'
                         }} 
                       />
                     </div>
