@@ -1,3 +1,4 @@
+import ChatModal from '@/components/chat/ChatModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -181,6 +182,8 @@ const CourseSidebar: React.FC<{
   hasPreviousContent,
   hasNextContent
 }) => {
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+
   return (
     <div className="w-80 bg-white border-l flex flex-col">
       {/* Progress Header */}
@@ -242,26 +245,36 @@ const CourseSidebar: React.FC<{
         ))}
       </div>
 
-      {/* Navigation Footer */}
-      <div className="p-4 border-t space-y-2">
-        <Button 
-          variant="outline" 
-          onClick={onPreviousContent}
-          disabled={!hasPreviousContent}
-          className="w-full"
+      {/* AI Assistant Footer */}
+      <div className="p-4 border-t space-y-2 flex justify-center">
+        <div 
+          className="cursor-pointer hover:scale-105 transition-transform duration-200 relative group"
+          onClick={() => setIsChatModalOpen(true)}
+          title="Clique para conversar com o assistente de IA"
         >
-          <ChevronLeft className="w-4 h-4 mr-2" />
-          Anterior
-        </Button>
-        <Button 
-          onClick={onNextContent}
-          disabled={!hasNextContent}
-          className="w-full"
-        >
-          Próximo
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            className="rounded-lg"
+          >
+            <source src="/images/robo2.webm" type="video/webm" />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+          <div className="absolute inset-0 bg-cyan-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
+              Chat IA
+            </span>
+          </div>
+        </div>
       </div>
+
+      {/* Chat Modal */}
+      <ChatModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
+        contentData={currentConteudo?.content_data}
+      />
     </div>
   );
 };

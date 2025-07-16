@@ -2211,6 +2211,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ##########################################################################################
+  // ###################### PROXY PARA N8N WEBHOOK (CORS) ####################################
+  // ##########################################################################################
+  
+  // ENDPOINT PROXY: Contornar problema de CORS com webhook N8N
+  app.post('/api/n8n-webhook-proxy', async (req, res) => {
+    try {
+      console.log('🚀 PROXY N8N: Requisição recebida');
+      console.log('📦 PROXY N8N: Dados:', JSON.stringify(req.body, null, 2));
+      
+      // URL do webhook N8N
+      const webhookUrl = 'https://remotely-welcome-stallion.ngrok-free.app/webhook/5120bb5f-b740-4681-983f-48a3693f89d9';
+      
+      // Fazer requisição para o webhook N8N
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+          'User-Agent': 'MentorX-Connect-Hub-Proxy/1.0'
+        },
+        body: JSON.stringify(req.body)
+      });
+      
+      console.log('📡 PROXY N8N: Status da resposta:', response.status);
+      
+      // Ler resposta do webhook
+      const webhookResponse = await response.text();
+      console.log('📥 PROXY N8N: Resposta do webhook:', webhookResponse);
+      
+      // Retornar resposta do webhook para o frontend
+      res.status(response.status).json({
+        success: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        data: webhookResponse
+      });
+      
+    } catch (error) {
+      console.error('❌ PROXY N8N: Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

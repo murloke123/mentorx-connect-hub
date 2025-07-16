@@ -1,20 +1,20 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
-import { Separator } from '../../ui/separator';
-import { 
-  Edit, 
-  Trash2, 
-  Play, 
-  FileText, 
-  Video, 
-  FileIcon,
-  Eye,
-  Download
-} from 'lucide-react';
-import VideoPlayer from './VideoPlayer';
 import { Conteudo } from '@/types/database';
+import {
+    ChevronDown,
+    ChevronUp,
+    Download,
+    Edit,
+    Eye,
+    FileIcon,
+    FileText,
+    Trash2,
+    Video
+} from 'lucide-react';
+import React, { useState } from 'react';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import VideoPlayer from './VideoPlayer';
 
 interface ConteudoListProps {
   conteudos: Conteudo[];
@@ -29,6 +29,17 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
   onDelete,
   isLoading = false
 }) => {
+  const [expandedPreviews, setExpandedPreviews] = useState<Set<string>>(new Set());
+
+  const togglePreview = (conteudoId: string) => {
+    const newExpanded = new Set(expandedPreviews);
+    if (newExpanded.has(conteudoId)) {
+      newExpanded.delete(conteudoId);
+    } else {
+      newExpanded.add(conteudoId);
+    }
+    setExpandedPreviews(newExpanded);
+  };
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -63,7 +74,7 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
     );
   }
 
-      const getContentIcon = (contentType: Conteudo['content_type']) => {
+  const getContentIcon = (contentType: Conteudo['content_type']) => {
     switch (contentType) {
       case 'texto_rico':
         return <FileText className="w-5 h-5 text-blue-600" />;
@@ -78,7 +89,10 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
 
   return (
     <div className="space-y-4">
-      {conteudos.map((conteudo, index) => (
+      {conteudos.map((conteudo, index) => {
+        const isExpanded = expandedPreviews.has(conteudo.id);
+        
+        return (
         <Card key={conteudo.id} className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
@@ -112,7 +126,17 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                 && conteudo.content_data?.video_url) || conteudo.content_type === 'pdf' ? (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-700">Preview</span>
+                    <button
+                      onClick={() => togglePreview(conteudo.id)}
+                      className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                    >
+                      <span>Preview</span>
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
                     <div className="flex space-x-2">
                       <Button
                         variant="outline"
@@ -139,7 +163,9 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                   {conteudo.content_type === 'texto_rico' && (
                     <div className="prose prose-sm max-w-none">
                       <div 
-                        className="text-sm text-gray-700 line-clamp-3"
+                        className={`text-sm text-gray-700 transition-all duration-300 ${
+                          isExpanded ? '' : 'line-clamp-3 max-h-[60px] overflow-hidden'
+                        }`}
                         dangerouslySetInnerHTML={{ 
                           __html: conteudo.content_data?.texto || '<p>Sem conteúdo</p>'
                         }} 
@@ -149,11 +175,24 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
 
                   {/* Conteúdo Vídeo */}
                   {conteudo.content_type === 'video_externo' && conteudo.content_data?.video_url && (
-                    <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                      <VideoPlayer
-                        provider={conteudo.content_data.provider || 'youtube'}
-                        url={conteudo.content_data.video_url}
-                      />
+                    <div className={`transition-all duration-300 ${
+                      isExpanded 
+                        ? 'aspect-video bg-black rounded-lg overflow-hidden' 
+                        : 'h-[60px] bg-black rounded-lg overflow-hidden relative'
+                    }`}>
+                      {isExpanded ? (
+                        <VideoPlayer
+                          provider={conteudo.content_data.provider || 'youtube'}
+                          url={conteudo.content_data.video_url}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-r from-gray-800 to-gray-900 flex items-center justify-center">
+                          <div className="flex items-center space-x-2 text-white text-sm">
+                            <Video className="w-4 h-4" />
+                            <span>Vídeo: {conteudo.content_data.provider || 'YouTube'}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -168,10 +207,13 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                       </div>
                       <iframe
                         src={conteudo.content_data.pdf_url}
-                        className="w-full h-48 border rounded"
+                        className={`w-full border rounded transition-all duration-300 ${
+                          isExpanded ? 'h-96' : 'h-[60px]'
+                        }`}
                         title={conteudo.title}
                       />
-                      <div className="flex space-x-2">
+                      {isExpanded && (
+                        <div className="flex space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -195,7 +237,8 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                           <Download className="w-4 h-4" />
                           <span>Download</span>
                         </Button>
-                      </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -230,7 +273,8 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 };

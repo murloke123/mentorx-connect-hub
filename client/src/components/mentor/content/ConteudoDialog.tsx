@@ -1,12 +1,12 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import ConteudoForm from './ConteudoForm';
 import { Conteudo } from '@/types/database';
+import ConteudoForm from './ConteudoForm';
 import { ConteudoFormValues } from './types';
 
 interface ConteudoDialogProps {
