@@ -1,5 +1,6 @@
 export interface ContentData {
   html_content?: string;
+  texto?: string;
   video_url?: string;
   provider?: 'youtube' | 'vimeo';
   pdf_url?: string;

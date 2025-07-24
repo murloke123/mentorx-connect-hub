@@ -8,7 +8,7 @@ import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } 
 import { supabase } from '@/utils/supabase';
 import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 // Função para converter URLs do YouTube para embed
 const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -281,6 +281,7 @@ const CourseSidebar: React.FC<{
 
 const CoursePlayerPage = () => {
   const { id: cursoId } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [curso, setCurso] = useState<CursoItemLocal | null>(null);
@@ -298,6 +299,23 @@ const CoursePlayerPage = () => {
     hasAccess,
     currentPath: window.location.pathname
   });
+
+  // Função para encontrar um conteúdo específico por ID
+  const findConteudoById = (conteudoId: string, modulos: ModuloItemLocal[]): ConteudoItemLocal | null => {
+    for (const modulo of modulos) {
+      const conteudo = modulo.conteudos.find(c => c.id === conteudoId);
+      if (conteudo) return conteudo;
+    }
+    return null;
+  };
+
+  // Função para atualizar a URL com o conteúdo selecionado
+  const updateUrlWithContent = (conteudo: ConteudoItemLocal) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('conteudo', conteudo.id);
+    newSearchParams.set('modulo', conteudo.module_id);
+    setSearchParams(newSearchParams, { replace: true });
+  };
 
   // Função para verificar se o usuário está na rota correta baseado no role
   const checkRoutePermission = async () => {
@@ -421,10 +439,26 @@ const CoursePlayerPage = () => {
         // Sistema de progresso removido - sem controle de conteúdos concluídos
         setConteudosConcluidos(new Set());
         
-        // Set initial content if available
-        if (data && data.modulos.length > 0 && data.modulos[0].conteudos.length > 0) {
-          setCurrentConteudo(data.modulos[0].conteudos[0]);
-          console.log('🎯 CoursePlayerPage: Primeiro conteúdo definido:', data.modulos[0].conteudos[0].title);
+        // Verificar se há um conteúdo específico na URL
+        const conteudoIdFromUrl = searchParams.get('conteudo');
+        let initialContent: ConteudoItemLocal | null = null;
+        
+        if (conteudoIdFromUrl) {
+          // Tentar encontrar o conteúdo específico da URL
+          initialContent = findConteudoById(conteudoIdFromUrl, data.modulos);
+          console.log('🔗 CoursePlayerPage: Conteúdo da URL encontrado:', initialContent?.title || 'Não encontrado');
+        }
+        
+        // Se não encontrou o conteúdo da URL ou não há parâmetro, usar o primeiro disponível
+        if (!initialContent && data.modulos.length > 0 && data.modulos[0].conteudos.length > 0) {
+          initialContent = data.modulos[0].conteudos[0];
+          console.log('🎯 CoursePlayerPage: Usando primeiro conteúdo:', initialContent.title);
+        }
+        
+        if (initialContent) {
+          setCurrentConteudo(initialContent);
+          // Atualizar a URL para refletir o conteúdo selecionado
+          updateUrlWithContent(initialContent);
         }
         
         setError(null);
@@ -451,6 +485,9 @@ const CoursePlayerPage = () => {
 
   const handleConteudoSelection = (conteudo: ConteudoItemLocal) => {
     setCurrentConteudo(conteudo);
+    // Atualizar a URL para persistir a seleção
+    updateUrlWithContent(conteudo);
+    console.log('🎯 CoursePlayerPage: Conteúdo selecionado:', conteudo.title);
   };
 
   const handleToggleConteudoConcluido = async (conteudoId: string, moduloId: string) => {
@@ -522,6 +559,8 @@ const CoursePlayerPage = () => {
     const nextContent = findNextContent();
     if (nextContent) {
       setCurrentConteudo(nextContent);
+      updateUrlWithContent(nextContent);
+      console.log('➡️ CoursePlayerPage: Próximo conteúdo:', nextContent.title);
     } else {
       toast({
         title: "Fim do curso",
@@ -534,6 +573,8 @@ const CoursePlayerPage = () => {
     const previousContent = findPreviousContent();
     if (previousContent) {
       setCurrentConteudo(previousContent);
+      updateUrlWithContent(previousContent);
+      console.log('⬅️ CoursePlayerPage: Conteúdo anterior:', previousContent.title);
     } else {
       toast({
         title: "Início do curso",

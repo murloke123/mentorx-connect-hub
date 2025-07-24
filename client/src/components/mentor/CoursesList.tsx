@@ -1,10 +1,10 @@
 import { Course } from "@/types/database";
 import { useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, BookOpen, Edit2, Eye, Filter, PlusCircle, Search } from 'lucide-react';
+import { AlertTriangle, BookOpen, Edit2, Eye, Filter, PlusCircle, Search, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from "../../hooks/use-toast";
-import { updateCoursePublicationStatus } from "../../services/courseService";
+import { updateCoursePublicationStatus, deleteCourse } from "../../services/courseService";
 import { Badge } from "../ui/badge";
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
@@ -13,6 +13,17 @@ import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
 import { Switch } from "../ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { useAuth } from "../../hooks/useAuth";
 
 interface CoursesListProps {
   courses: Course[];
@@ -25,9 +36,13 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
   const [visibilityFilter, setVisibilityFilter] = useState<string | null>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Set<string>>(new Set());
   const [isUpdating, setIsUpdating] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Filtrar cursos com base na busca e filtro de visibilidade
   const filteredCourses = courses.filter(course => {
@@ -97,6 +112,53 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
         return next;
       });
     }
+  };
+
+  // Função para abrir o modal de confirmação de exclusão
+  const handleDeleteClick = (course: Course) => {
+    setCourseToDelete(course);
+    setDeleteDialogOpen(true);
+  };
+
+  // Função para confirmar a exclusão do curso
+  const handleConfirmDelete = async () => {
+    if (!courseToDelete || !user?.id) return;
+
+    try {
+      setIsDeleting(prev => new Set([...prev, courseToDelete.id]));
+      await deleteCourse(courseToDelete.id, user.id);
+      
+      toast({
+        title: "Curso excluído",
+        description: `O curso "${courseToDelete.title}" foi excluído com sucesso.`,
+      });
+
+      // Invalidate the query to refresh the courses list
+      queryClient.invalidateQueries({ queryKey: ['mentorCourses'] });
+      
+      // Fechar o modal
+      setDeleteDialogOpen(false);
+      setCourseToDelete(null);
+    } catch (error: any) {
+      console.error('Error deleting course:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao excluir curso",
+        description: error.message || "Não foi possível excluir o curso.",
+      });
+    } finally {
+      setIsDeleting(prev => {
+        const next = new Set(prev);
+        next.delete(courseToDelete.id);
+        return next;
+      });
+    }
+  };
+
+  // Função para cancelar a exclusão
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setCourseToDelete(null);
   };
 
   if (isLoading) {
@@ -223,13 +285,23 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       <Eye className="mr-2 h-4 w-4" /> Ver Curso
                     </Button>
                     <Button 
-                      variant="default" 
+                      variant="outline" 
                       asChild
                       size="sm"
+                      className="h-auto py-2 px-2"
                     >
                       <Link to={`/mentor/meus-cursos/${course.id}/editar`}>
-                        <Edit2 className="mr-2 h-4 w-4" /> Editar
+                        <Edit2 className="h-4 w-4" />
                       </Link>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleDeleteClick(course)}
+                      className="h-auto py-2 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      size="sm"
+                      disabled={isDeleting.has(course.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -323,6 +395,33 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
       {/* Conteúdo dinâmico */}
       {renderContent()}
+
+      {/* Modal de confirmação de exclusão */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza de que deseja excluir o curso "{courseToDelete?.title}"?
+              <br />
+              <br />
+              <strong>Esta ação não pode ser desfeita.</strong> O curso será permanentemente removido e todos os dados associados serão perdidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={courseToDelete ? isDeleting.has(courseToDelete.id) : false}
+            >
+              {courseToDelete && isDeleting.has(courseToDelete.id) ? "Excluindo..." : "Excluir Curso"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,17 +1,19 @@
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { PlusCircle } from "lucide-react";
-import { useEffect } from 'react';
+import { Bot, PlusCircle } from "lucide-react";
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import CoursesList from "../../components/mentor/CoursesList";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
 import { Button } from "../../components/ui/button";
+import ChatModal from "../../components/chat/ChatModal";
 import { getMentorCourses } from '../../services/courseService';
 import { supabase } from '../../utils/supabase';
 
 const MeusCursosPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -70,6 +72,14 @@ const MeusCursosPage = () => {
     navigate('/mentor/meus-cursos/novo');
   };
 
+  const handleOpenChatModal = () => {
+    setIsChatModalOpen(true);
+  };
+
+  const handleCloseChatModal = () => {
+    setIsChatModalOpen(false);
+  };
+
   const listIsLoading = isLoading || isFetching;
 
   return (
@@ -81,9 +91,18 @@ const MeusCursosPage = () => {
             <h1 className="text-3xl font-bold">Meus Cursos</h1>
             <p className="text-muted-foreground">Gerencie e acompanhe seus cursos criados</p>
           </div>
-          <Button onClick={handleCreateCourse}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Criar Novo Curso
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={handleOpenChatModal}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+            >
+              <Bot className="mr-2 h-4 w-4" /> Criar com IA
+            </Button>
+            <Button onClick={handleCreateCourse}>
+              <PlusCircle className="mr-2 h-4 w-4" /> Criar Novo Curso
+            </Button>
+          </div>
         </div>
         
         {isError && (
@@ -99,6 +118,15 @@ const MeusCursosPage = () => {
               totalEnrollments={totalEnrollments} 
             />
       </div>
+
+      {/* ChatModal para criação de curso com IA */}
+      <ChatModal
+        isOpen={isChatModalOpen}
+        onClose={handleCloseChatModal}
+        contentData={{
+          texto: "Você está criando um novo curso. Descreva o tema, público-alvo, objetivos de aprendizagem e estrutura desejada para o seu curso. A IA irá ajudá-lo a desenvolver o conteúdo e organizar as informações de forma pedagógica."
+        }}
+      />
     </div>
   );
 };

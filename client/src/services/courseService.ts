@@ -687,3 +687,59 @@ export async function redirectAfterEnrollment(userId: string, navigate: (path: s
     navigate('/mentorado/cursos');
   }
 }
+
+/**
+ * Função para deletar um curso (apenas o mentor proprietário pode deletar)
+ */
+export async function deleteCourse(courseId: string, mentorId: string): Promise<{ success: boolean }> {
+  try {
+    console.log('🗑️ Iniciando exclusão do curso:', { courseId, mentorId });
+
+    // Verificar se o curso pertence ao mentor
+    const { data: course, error: courseError } = await supabase
+      .from('cursos')
+      .select('id, mentor_id, title')
+      .eq('id', courseId)
+      .eq('mentor_id', mentorId)
+      .single();
+
+    if (courseError || !course) {
+      throw new Error('Curso não encontrado ou você não tem permissão para deletá-lo');
+    }
+
+    // Verificar se há matrículas ativas
+    const { count: enrollmentsCount, error: countError } = await supabase
+      .from('matriculas')
+      .select('*', { count: 'exact', head: true })
+      .eq('course_id', courseId)
+      .eq('status', 'active');
+
+    if (countError) {
+      console.error('❌ Erro ao verificar matrículas:', countError);
+      throw new Error('Erro ao verificar matrículas do curso');
+    }
+
+    if (enrollmentsCount && enrollmentsCount > 0) {
+      throw new Error(`Não é possível deletar o curso. Há ${enrollmentsCount} aluno(s) matriculado(s).`);
+    }
+
+    // Deletar o curso
+    const { error: deleteError } = await supabase
+      .from('cursos')
+      .delete()
+      .eq('id', courseId)
+      .eq('mentor_id', mentorId);
+
+    if (deleteError) {
+      console.error('❌ Erro ao deletar curso:', deleteError);
+      throw new Error('Erro ao deletar o curso');
+    }
+
+    console.log('✅ Curso deletado com sucesso:', course.title);
+    return { success: true };
+
+  } catch (error) {
+    console.error('❌ Exception in deleteCourse:', error);
+    throw error;
+  }
+}

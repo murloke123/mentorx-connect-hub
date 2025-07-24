@@ -2224,6 +2224,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // URL do webhook N8N
       const webhookUrl = 'https://remotely-welcome-stallion.ngrok-free.app/webhook/5120bb5f-b740-4681-983f-48a3693f89d9';
       
+      console.log('🎯 PROXY N8N: URL do webhook sendo chamada:', webhookUrl);
+      
       // Fazer requisição para o webhook N8N
       const response = await fetch(webhookUrl, {
         method: 'POST',

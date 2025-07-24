@@ -21,6 +21,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [mentorId, setMentorId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -31,23 +32,37 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
     scrollToBottom();
   }, [messages]);
 
-  // Obter e-mail do usuário logado quando o modal abrir
+  // Obter e-mail e ID do usuário logado quando o modal abrir
   useEffect(() => {
-    if (isOpen && !userEmail) {
-      const getUserEmail = async () => {
+    if (isOpen && (!userEmail || !mentorId)) {
+      const getUserData = async () => {
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user?.email) {
             setUserEmail(user.email);
             console.log('👤 ChatModal: E-mail do usuário obtido:', user.email);
+            
+            // Buscar o ID do usuário na tabela profile
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('email', user.email)
+              .single();
+            
+            if (error) {
+              console.error('❌ ChatModal: Erro ao buscar profile do usuário:', error);
+            } else if (profile?.id) {
+              setMentorId(profile.id);
+              console.log('🆔 ChatModal: ID do usuário obtido:', profile.id);
+            }
           }
         } catch (error) {
-          console.error('❌ ChatModal: Erro ao obter e-mail do usuário:', error);
+          console.error('❌ ChatModal: Erro ao obter dados do usuário:', error);
         }
       };
-      getUserEmail();
+      getUserData();
     }
-  }, [isOpen, userEmail]);
+  }, [isOpen, userEmail, mentorId]);
 
   // Função para processar e limpar a resposta do webhook
   const processWebhookResponse = (rawResponse: string): string => {
@@ -153,6 +168,51 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
     return formattedText;
   };
 
+  // Função para renderizar texto com formatação (quebras de linha e negrito)
+  const renderFormattedText = (text: string) => {
+    // Primeiro, processar quebras de linha explícitas (\n, \n1, \n2, etc.)
+    let processedText = text
+      .replace(/\\n\d*/g, '\n') // Substitui \n, \n1, \n2, etc. por quebras de linha
+      .replace(/\n/g, '|||LINEBREAK|||'); // Marca temporária para quebras de linha
+
+    // Dividir o texto em partes, separando por quebras de linha
+    const parts = processedText.split('|||LINEBREAK|||');
+    
+    return parts.map((part, partIndex) => {
+      if (!part.trim()) return <br key={partIndex} />;
+      
+      // Processar negrito (**texto**)
+      const boldRegex = /\*\*(.*?)\*\*/g;
+      const segments = [];
+      let lastIndex = 0;
+      let match;
+
+      while ((match = boldRegex.exec(part)) !== null) {
+        // Adicionar texto antes do negrito
+        if (match.index > lastIndex) {
+          segments.push(part.slice(lastIndex, match.index));
+        }
+        
+        // Adicionar texto em negrito
+        segments.push(<strong key={`bold-${partIndex}-${match.index}`}>{match[1]}</strong>);
+        
+        lastIndex = match.index + match[0].length;
+      }
+      
+      // Adicionar texto restante
+      if (lastIndex < part.length) {
+        segments.push(part.slice(lastIndex));
+      }
+
+      return (
+        <div key={partIndex}>
+          {segments.length > 0 ? segments : part}
+          {partIndex < parts.length - 1 && <br />}
+        </div>
+      );
+    });
+  };
+
   // Função para extrair texto puro do content_data
   const extractTextFromContentData = (data: any): string => {
     console.log('🔍 ChatModal: Extraindo texto do content_data:', {
@@ -224,7 +284,8 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
 
       const payload = {
         message: bodyText,
-        sessionId: userEmail || 'anonymous'
+        sessionId: userEmail || 'anonymous',
+        mentor_id: mentorId || 'anonymous'
       };
 
       const webhookUrl = 'https://remotely-welcome-stallion.ngrok-free.app/webhook/5120bb5f-b740-4681-983f-48a3693f89d9';
@@ -234,6 +295,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
         method: 'POST',
         payload: payload,
         sessionId: userEmail || 'anonymous',
+        mentorId: mentorId || 'anonymous',
         headers: {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true'
@@ -373,7 +435,9 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
                     <User className="w-4 h-4 mt-1 text-white flex-shrink-0" />
                   )}
                   <div className="flex-1">
-                    <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
+                    <div className="text-sm leading-relaxed">
+                      {renderFormattedText(message.text)}
+                    </div>
                     <p className="text-xs opacity-70 mt-1">
                       {message.timestamp.toLocaleTimeString()}
                     </p>
