@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
 import MentoradoSidebar from "@/components/mentorado/MentoradoSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Monitor, Bell, Shield } from "lucide-react";
-import { supabase } from "@/utils/supabase";
-import { useUserSettings } from "@/hooks/useUserSettings";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { Profile } from "@/types/database";
+import { supabase } from "@/utils/supabase";
+import { Bell, Monitor, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const MentoradoConfiguracoesPage = () => {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
@@ -65,15 +65,15 @@ const MentoradoConfiguracoesPage = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300  p-8 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Configurações</h1>
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
             <p className="text-gray-600">Gerencie suas preferências e configurações da conta</p>
           </div>
 
           {/* Configurações de Interface */}
-          <Card className="mb-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Monitor className="h-5 w-5" />
@@ -115,7 +115,7 @@ const MentoradoConfiguracoesPage = () => {
           </Card>
 
           {/* Configurações de Notificações */}
-          <Card className="mb-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
@@ -193,4 +193,4 @@ const MentoradoConfiguracoesPage = () => {
   );
 };
 
-export default MentoradoConfiguracoesPage; 
+export default MentoradoConfiguracoesPage;

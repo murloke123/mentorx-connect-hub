@@ -2,32 +2,31 @@ import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import {
-  ArrowLeft,
-  BookOpen,
-  Calendar,
-  Clock,
-  DollarSign,
-  Mail,
-  Phone,
-  Search,
-  TrendingUp,
-  User,
-  Users,
-  AlertTriangle,
-  CheckCircle,
-  PlayCircle,
-  Award,
-  MessageSquare
+    AlertTriangle,
+    ArrowLeft,
+    Award,
+    BookOpen,
+    Calendar,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    Mail,
+    MessageSquare,
+    Phone,
+    PlayCircle,
+    Search,
+    TrendingUp,
+    Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface StudentProgress {
   student_id: string;

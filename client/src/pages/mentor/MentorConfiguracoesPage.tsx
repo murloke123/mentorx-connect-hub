@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Monitor, Bell, Shield } from "lucide-react";
-import { supabase } from "@/utils/supabase";
-import { useUserSettings } from "@/hooks/useUserSettings";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { Profile } from "@/types/database";
+import { supabase } from "@/utils/supabase";
+import { Bell, Monitor, Settings, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const MentorConfiguracoesPage = () => {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
@@ -57,12 +57,14 @@ const MentorConfiguracoesPage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 p-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="space-y-4">
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
+        <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+          <div className="space-y-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-32 bg-gray-200 rounded"></div>
+                <div className="h-32 bg-gray-200 rounded"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -73,9 +75,9 @@ const MentorConfiguracoesPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 flex items-center">
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="space-y-8">
+          <h1 className="text-3xl font-bold flex items-center">
             <Settings className="mr-3" />
             Configurações
           </h1>
@@ -242,4 +244,4 @@ const MentorConfiguracoesPage = () => {
   );
 };
 
-export default MentorConfiguracoesPage; 
+export default MentorConfiguracoesPage;

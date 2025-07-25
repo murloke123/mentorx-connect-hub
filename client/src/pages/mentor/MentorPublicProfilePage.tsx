@@ -10,7 +10,7 @@ import { notifyLostFollower, notifyNewFollower } from "@/services/notificationSe
 import { Course, Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Calendar, CalendarDays, Clock, Facebook, GraduationCap, Heart, Instagram, Mail, MessageCircle, Quote, Star, User, Youtube } from "lucide-react";
+import { BookOpen, Calendar, CalendarDays, Clock, Facebook, FileText, GraduationCap, Heart, Instagram, Mail, MessageCircle, Quote, Star, User, UserPlus, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -732,57 +732,61 @@ const MentorPublicProfilePage = () => {
           {/* Sobre Section */}
           <section id="sobre" className="scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-xl p-10 border">
-              <div className="grid lg:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                  {mentorData.bio && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4">Minha História</h3>
-                        <div 
-                          className="text-gray-700 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: mentorData.bio }}
-                        />
-                    </div>
-                  )}
+              {/* Minha História - Agora ocupa toda a largura */}
+              {mentorData.bio && (
+                <div className="mb-12">
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <FileText className="h-8 w-8 text-black" />
+                    <h3 className="text-3xl font-bold text-black">Minha História</h3>
+                  </div>
+                  <div 
+                    className="text-gray-700 leading-relaxed text-lg max-w-none"
+                    dangerouslySetInnerHTML={{ __html: mentorData.bio }}
+                  />
                 </div>
-                
-                <div className="space-y-6">
-                  <div className="mb-4">
-                    <h3 className="text-3xl font-bold text-black">
-                        Por que me seguir?
-                    </h3>
+              )}
+              
+              {/* Por que me seguir - Agora em layout horizontal */}
+              <div className="mb-12">
+                <div className="flex items-center justify-center gap-3 mb-8">
+                  <UserPlus className="h-8 w-8 text-black" />
+                  <h3 className="text-3xl font-bold text-black">
+                    Por que me seguir?
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
+                    <h4 className="font-bold text-lg mb-2">
+                      {mentorData.cx_diferenciais?.dif_title_1 || "🎯 Resultados Comprovados"}
+                    </h4>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {mentorData.cx_diferenciais?.dif_description_1 || "Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas."}
+                    </p>
                   </div>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border-l-4 border-purple-500">
-                      <h4 className="font-bold text-lg mb-2">
-                        {mentorData.cx_diferenciais?.dif_title_1 || "🎯 Resultados Comprovados"}
-                      </h4>
-                        <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.cx_diferenciais?.dif_description_1 || "Mais de 1.250 vidas transformadas com metodologias testadas e aprovadas."}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
-                      <h4 className="font-bold text-lg mb-2">
-                        {mentorData.cx_diferenciais?.dif_title_2 || "🚀 Metodologia Exclusiva"}
-                      </h4>
-                        <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.cx_diferenciais?.dif_description_2 || "Sistema proprietário desenvolvido ao longo de 15 anos de experiência."}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
-                      <h4 className="font-bold text-lg mb-2">
-                        {mentorData.cx_diferenciais?.dif_title_3 || "💰 ROI Garantido"}
-                      </h4>
-                        <p className="text-gray-700 whitespace-pre-wrap">
-                        {mentorData.cx_diferenciais?.dif_description_3 || "Investimento retorna em até 90 dias ou seu dinheiro de volta."}
-                      </p>
-                    </div>
+                  
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-l-4 border-green-500">
+                    <h4 className="font-bold text-lg mb-2">
+                      {mentorData.cx_diferenciais?.dif_title_2 || "🚀 Metodologia Exclusiva"}
+                    </h4>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {mentorData.cx_diferenciais?.dif_description_2 || "Sistema proprietário desenvolvido ao longo de 15 anos de experiência."}
+                    </p>
                   </div>
+                  
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-l-4 border-orange-500">
+                    <h4 className="font-bold text-lg mb-2">
+                      {mentorData.cx_diferenciais?.dif_title_3 || "💰 ROI Garantido"}
+                    </h4>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {mentorData.cx_diferenciais?.dif_description_3 || "Investimento retorna em até 90 dias ou seu dinheiro de volta."}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-                    {/* Add Badges Section here in the right column */}
-                    <BadgesSection />
-                </div>
+              {/* Badges Section - Agora centralizada */}
+              <div className="flex justify-center">
+                <BadgesSection />
               </div>
             </div>
           </section>

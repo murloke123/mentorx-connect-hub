@@ -328,14 +328,12 @@ const MentoradoMeusCursosPage = () => {
     return (
       <div className="flex min-h-screen bg-gray-50">
         <MentoradoSidebar />
-        <div className="flex-1 transition-all duration-300  p-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
-              <div className="space-y-4">
-                <div className="h-32 bg-gray-200 rounded"></div>
-                <div className="h-32 bg-gray-200 rounded"></div>
-              </div>
+        <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
             </div>
           </div>
         </div>
@@ -346,9 +344,13 @@ const MentoradoMeusCursosPage = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300  p-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Meus Cursos</h1>
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Meus Cursos</h1>
+            <p className="text-muted-foreground">Cursos que eu adquiri</p>
+          </div>
+        </div>
           
           {/* Alerta de transações pendentes/falhadas */}
           {(() => {
@@ -378,7 +380,6 @@ const MentoradoMeusCursosPage = () => {
 
           {/* Cursos Matriculados */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Cursos Matriculados</h2>
             {enrolledCourses.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -543,7 +544,7 @@ const MentoradoMeusCursosPage = () => {
                                   try {
                                     setAccessingStripe(enrollment.course_id);
                                     console.log('🆕 Criando nova sessão de checkout para curso:', enrollment.course_id);
-                                    const result = await startCourseCheckout(enrollment.course_id, user.id);
+                                    const result = await startCourseCheckout(enrollment.course_id, user!.id);
                                     if (result.sessionUrl) {
                                       // ✅ DELAY REMOVIDO: Redirect imediato para Stripe
                                       window.location.href = result.sessionUrl;
@@ -581,7 +582,6 @@ const MentoradoMeusCursosPage = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

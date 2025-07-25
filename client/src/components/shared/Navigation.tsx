@@ -2,17 +2,17 @@ import { NotificationBell } from "@/components/shared/NotificationBell";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { preloadUserRoutes } from '@/utils/lazyComponents';
-import { Bot, Calendar, LayoutDashboard, LogOut, Settings, UserCircle } from "lucide-react";
+import { Bot, LayoutDashboard, LogOut, Settings, UserCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from '../../utils/supabase';
@@ -179,12 +179,6 @@ const Navigation = () => {
             </Link>
             <Link to="/mentors" className="text-gray-700 hover:text-primary">
               Mentores
-            </Link>
-            <Link to="/schedule">
-              <Button variant="outline" size="sm" className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                Agendar
-              </Button>
             </Link>
             
             {user && (

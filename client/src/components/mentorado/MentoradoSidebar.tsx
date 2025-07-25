@@ -2,7 +2,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/utils/utils";
-import { BookOpen, Calendar, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
+import { BookOpen, Calendar, LayoutDashboard, LogOut, Settings, User, Users } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
@@ -54,6 +54,13 @@ const MentoradoSidebar = () => {
       href: "/mentorado/cursos",
       icon: (
         <BookOpen className="h-5 w-5 shrink-0 text-gray-300" />
+      ),
+    },
+    {
+      label: "Meus Mentores",
+      href: "/mentorado/mentores",
+      icon: (
+        <Users className="h-5 w-5 shrink-0 text-gray-300" />
       ),
     },
     {

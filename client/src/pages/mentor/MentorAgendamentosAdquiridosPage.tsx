@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import AppointmentsList from '@/components/AppointmentsList';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
-import { supabase } from '@/utils/supabase';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/utils/supabase';
 import { CalendarCheck, MessageSquare } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MentorAgendamentosAdquiridosPage: React.FC = () => {
@@ -31,9 +31,9 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex min-h-screen bg-gray-50">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 flex items-center justify-center">
+        <div className="flex-1 transition-all duration-300 p-6 overflow-auto flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando...</p>
@@ -44,11 +44,11 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-50">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 overflow-auto">
-        <div className="container mx-auto px-6 py-8">
-          <Card className="mb-6">
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="space-y-8">
+          <Card>
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>

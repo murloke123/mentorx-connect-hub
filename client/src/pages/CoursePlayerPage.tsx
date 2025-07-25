@@ -5,9 +5,10 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } from '@/services/coursePlayerService';
-import { supabase } from '@/utils/supabase';
 import { triggerSuccessConfetti } from '@/utils/confetti';
-import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video, Check } from 'lucide-react';
+import { supabase } from '@/utils/supabase';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -355,6 +356,7 @@ const CoursePlayerPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [curso, setCurso] = useState<CursoItemLocal | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -848,26 +850,23 @@ const CoursePlayerPage = () => {
   const hasNextContent = findNextContent() !== null;
   const hasPreviousContent = findPreviousContent() !== null;
   
-  // Função para voltar aos meus cursos baseado no role
+  // Função para voltar à página anterior e invalidar cache para atualizar dados em tempo real
   const handleGoBack = async () => {
     try {
-      if (user?.email) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('email', user.email)
-          .single();
-        
-        if (profile?.role === 'mentor') {
-          navigate('/mentor/cursos-adquiridos');
-        } else {
-          navigate('/mentorado/cursos');
-        }
-      } else {
-        navigate('/mentorado/cursos');
-      }
+      // Invalidar cache do React Query para atualizar dados em tempo real
+      await queryClient.invalidateQueries({ 
+        queryKey: ['menteeCourses', user?.id] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: ['menteeProfile', user?.id] 
+      });
+      
+      // Voltar para a página anterior
+      navigate(-1);
     } catch (error) {
-      navigate('/mentorado/cursos');
+      console.error('Erro ao invalidar cache:', error);
+      // Fallback: voltar para página anterior mesmo se houver erro
+      navigate(-1);
     }
   };
 
@@ -886,7 +885,7 @@ const CoursePlayerPage = () => {
               onClick={handleGoBack}
               className="w-full"
             >
-              Voltar aos Meus Cursos
+              Voltar
             </Button>
           </CardContent>
         </Card>

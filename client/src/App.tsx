@@ -46,6 +46,7 @@ import {
     MentorConfiguracoesPage,
     MentorConteudosPage,
     MentorCriarCursoPage,
+    MentorCursoInscricoesPage,
     MentorCursosAdquiridosPage,
     // Mentor
     MentorDashboardPage,
@@ -53,7 +54,6 @@ import {
     MentorMapeamentoDBPage,
     MentorMeusCursosPage,
     MentorMeusMentoradosPage,
-    MentorCursoInscricoesPage,
     MentorModulosPage,
     MentorProfilePage, MentorPublicProfilePage,
     MentorPublicSchedulePage,

@@ -1,10 +1,10 @@
 import AppointmentsList from "@/components/AppointmentsList";
 import MentorSidebar from "@/components/mentor/MentorSidebar";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const MentorAgendamentosPage = () => {
@@ -46,10 +46,10 @@ const MentorAgendamentosPage = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="space-y-8">
           {/* Header com título e botão */}
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Solicitações de Mentoria para Você</h1>
             <Button 
               onClick={() => navigate('/mentor/agendamentos-adquiridos')}
@@ -73,4 +73,4 @@ const MentorAgendamentosPage = () => {
   );
 };
 
-export default MentorAgendamentosPage; 
+export default MentorAgendamentosPage;

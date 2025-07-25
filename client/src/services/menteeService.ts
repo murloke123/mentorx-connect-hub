@@ -77,8 +77,6 @@ export async function getEnrolledCourses() {
       throw new Error("Usuário não autenticado");
     }
 
-    console.log('🔍 Buscando cursos para o usuário:', user.id);
-
     // Primeiro buscar as matrículas
     const { data: matriculas, error: matriculasError } = await supabase
       .from("matriculas")
@@ -93,14 +91,10 @@ export async function getEnrolledCourses() {
       .eq("status", "active"); // Apenas matrículas ativas
 
     if (matriculasError) {
-      console.error('❌ Erro ao buscar matrículas:', matriculasError);
       throw matriculasError;
     }
 
-    console.log('📚 Matrículas encontradas:', matriculas?.length || 0, matriculas);
-
     if (!matriculas || matriculas.length === 0) {
-      console.log('📭 Nenhuma matrícula ativa encontrada');
       return [];
     }
 
@@ -118,11 +112,8 @@ export async function getEnrolledCourses() {
       .in("id", courseIds);
 
     if (cursosError) {
-      console.error('❌ Erro ao buscar cursos:', cursosError);
       throw cursosError;
     }
-
-    console.log('📖 Cursos encontrados:', cursos?.length || 0, cursos);
 
     // Buscar informações dos mentores
     const mentorIds = Array.from(new Set(cursos?.map(c => c.mentor_id) || []));
@@ -132,10 +123,8 @@ export async function getEnrolledCourses() {
       .in("id", mentorIds);
 
     if (mentoresError) {
-      console.error('❌ Erro ao buscar mentores:', mentoresError);
+      // Continuar mesmo com erro nos mentores
     }
-
-    console.log('👨‍🏫 Mentores encontrados:', mentores?.length || 0, mentores);
 
     // Combinar os dados
     const enrolledCourses = matriculas.map(matricula => {
@@ -154,8 +143,6 @@ export async function getEnrolledCourses() {
         image_url: curso?.image_url
       };
     });
-
-    console.log('✅ Cursos formatados:', enrolledCourses);
     
     return enrolledCourses;
   } catch (error) {
@@ -330,7 +317,8 @@ export async function getMenteeCourses(): Promise<Course[]> {
       throw new Error("Usuário não autenticado");
     }
     
-    const { data, error } = await supabase
+    // Buscar matrículas com dados do curso e mentor
+    const { data: enrollments, error } = await supabase
       .from("matriculas")
       .select(`
         *,
@@ -349,17 +337,93 @@ export async function getMenteeCourses(): Promise<Course[]> {
       
     if (error) throw error;
     
+    if (!enrollments || enrollments.length === 0) {
+      return [];
+    }
+
+    // Extrair IDs dos cursos
+    const courseIds = enrollments.map((enrollment: any) => enrollment.course.id);
+    
+    // Buscar todos os módulos dos cursos de uma vez
+    const { data: modules, error: modulesError } = await supabase
+      .from("modulos")
+      .select("id, course_id")
+      .in("course_id", courseIds);
+      
+    if (modulesError) {
+      console.error("Error fetching modules:", modulesError);
+    }
+    
+    // Extrair IDs dos módulos
+    const moduleIds = modules?.map(m => m.id) || [];
+    
+    // Buscar todos os conteúdos dos módulos de uma vez
+    const { data: contents, error: contentsError } = await supabase
+      .from("conteudos")
+      .select("id, module_id")
+      .in("module_id", moduleIds);
+      
+    if (contentsError) {
+      console.error("Error fetching contents:", contentsError);
+    }
+    
+    // Buscar todos os conteúdos concluídos pelo usuário de uma vez
+    const { data: completedContents, error: completedError } = await supabase
+      .from("conteudo_concluido")
+      .select("id, course_id, content_id")
+      .eq("user_id", user.id)
+      .in("course_id", courseIds);
+      
+    if (completedError) {
+      console.error("Error fetching completed contents:", completedError);
+    }
+    
+    // Criar mapas para facilitar o cálculo
+    const modulesByCourse = modules?.reduce((acc: any, module: any) => {
+      if (!acc[module.course_id]) acc[module.course_id] = [];
+      acc[module.course_id].push(module.id);
+      return acc;
+    }, {}) || {};
+    
+    const contentsByModule = contents?.reduce((acc: any, content: any) => {
+      if (!acc[content.module_id]) acc[content.module_id] = [];
+      acc[content.module_id].push(content.id);
+      return acc;
+    }, {}) || {};
+    
+    const completedByCourse = completedContents?.reduce((acc: any, completed: any) => {
+      if (!acc[completed.course_id]) acc[completed.course_id] = 0;
+      acc[completed.course_id]++;
+      return acc;
+    }, {}) || {};
+    
     // Transform the data to match the Course interface
-    const courses: Course[] = (data || []).map((enrollment: any) => ({
-      id: enrollment.course.id,
-      title: enrollment.course.title,
-      description: enrollment.course.description,
-      mentor_id: enrollment.course.mentor_id,
-      mentor_name: enrollment.course.mentor?.full_name,
-      progress: enrollment.progress_percentage || 0,
-      completed_lessons: 0, // You might want to calculate this based on actual lesson completion
-      total_lessons: 0, // You might want to get this from the course structure
-    }));
+    const courses: Course[] = enrollments.map((enrollment: any) => {
+      const courseId = enrollment.course.id;
+      
+      // Calcular total de conteúdos do curso
+      const courseModules = modulesByCourse[courseId] || [];
+      const totalLessons = courseModules.reduce((total: number, moduleId: string) => {
+        return total + (contentsByModule[moduleId]?.length || 0);
+      }, 0);
+      
+      // Conteúdos concluídos
+      const completedLessons = completedByCourse[courseId] || 0;
+      
+      // Calcular progresso baseado nas aulas concluídas
+      const calculatedProgress = totalLessons > 0 ? (completedLessons / totalLessons) : 0;
+
+      return {
+        id: courseId,
+        title: enrollment.course.title,
+        description: enrollment.course.description,
+        mentor_id: enrollment.course.mentor_id,
+        mentor_name: enrollment.course.mentor?.full_name,
+        progress: calculatedProgress, // Valor entre 0 e 1
+        completed_lessons: completedLessons,
+        total_lessons: totalLessons,
+      };
+    });
     
     return courses;
   } catch (error) {

@@ -3,7 +3,8 @@ import MentoradoSidebar from '@/components/mentorado/MentoradoSidebar';
 import StatsSection from '@/components/mentorado/StatsSection';
 import { useAuth } from '@/hooks/useAuth';
 import { getMenteeCourses, getMenteeFollowingCount, getMenteeProfile } from '@/services/menteeService';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 interface Course {
   id: string;
@@ -18,6 +19,20 @@ interface Course {
 
 const MentoradoDashboardPage = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  // Revalidar dados quando a página ganha foco (usuário retorna de outra página)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ['menteeCourses', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['menteeProfile', user.id] });
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user?.id, queryClient]);
   
   // Fetch the mentee profile
   const { data: profile } = useQuery({

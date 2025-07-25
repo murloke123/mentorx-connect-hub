@@ -98,8 +98,8 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
                   </div>
                 </div>
                 <Button className="w-full" variant="outline" asChild>
-                  <Link to={`/mentorado/cursos/${course.id}`}>
-                    Continuar curso
+                  <Link to={`/mentorado/cursoplayer/${course.id}`}>
+                    {progressPercent === 0 ? "Iniciar Curso" : "Continuar Curso"}
                   </Link>
                 </Button>
               </CardContent>

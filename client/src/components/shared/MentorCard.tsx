@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Mentor } from "@/types/database";
 import { motion } from "framer-motion";
@@ -92,62 +91,49 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
         delay: index * 0.1,
         ease: "easeOut"
       }}
-      className="w-full max-w-sm mx-auto h-96"
-      onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-      onClick={handleViewProfile}
-      style={{ position: 'relative' }}
+      className="w-full max-w-sm mx-auto"
     >
-      {/* Label de identificação do componente */}
-      <div style={{
-        position: 'absolute',
-        top: '-8px',
-        left: '8px',
-        background: '#ffeb3b',
-        color: '#000',
-        fontSize: '10px',
-        fontWeight: 'bold',
-        padding: '2px 6px',
-        borderRadius: '4px',
-        zIndex: 1000,
-        border: '1px solid #000'
-      }}>
-        MentorCard
-      </div>
-      
-      <div className="relative w-full h-full [perspective:1000px] cursor-pointer">
-        <motion.div
-          className="relative w-full h-full [transform-style:preserve-3d]"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
+      {/* Container principal que conecta os dois cards */}
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1">
+        {/* Card principal com efeito flip */}
+        <div 
+          className="relative w-full h-80 [perspective:1000px] cursor-pointer"
+          onMouseEnter={() => setIsFlipped(true)}
+          onMouseLeave={() => setIsFlipped(false)}
+          onClick={handleViewProfile}
         >
+          <motion.div
+            className="relative w-full h-full [transform-style:preserve-3d]"
+            animate={{ rotateY: isFlipped ? 180 : 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+          >
           {/* Frente do Card */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-white rounded-xl shadow-xl border overflow-hidden">
-            {/* Header com Efeito de Nuvens Roxas */}
-            <div className="relative overflow-hidden" style={{ height: '110px' }}>
-              {/* Efeito de Nuvens Roxas */}
-              <div className="absolute inset-0 overflow-hidden">
-                {/* Base Gradient for Sky */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700"></div>
+           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-white overflow-hidden">
+             {/* Header com Efeito de Nuvens Roxas */}
+             <div className="relative overflow-hidden" style={{ height: '110px' }}>
+               {/* Efeito de Nuvens Roxas */}
+               <div className="absolute inset-0 overflow-hidden">
+                 {/* Base Gradient for Sky */}
+                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700"></div>
 
-                {/* Cloud 1 - Lighter, larger, more blurred */}
-                <div
-                  className="absolute -top-10 -left-20 w-72 h-72 bg-purple-300/30 rounded-full blur-3xl opacity-80 animate-pulse"
-                  style={{ animationDuration: '10s' }}
-                ></div>
+                 {/* Cloud 1 - Lighter, larger, more blurred */}
+                 <div
+                   className="absolute -top-10 -left-20 w-72 h-72 bg-purple-300/30 rounded-full blur-3xl opacity-80 animate-pulse"
+                   style={{ animationDuration: '10s' }}
+                 ></div>
 
-                {/* Cloud 2 - Slightly darker, medium size, less blurred */}
-                <div
-                  className="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-400/40 rounded-full blur-2xl opacity-70 animate-pulse"
-                  style={{ animationDuration: '12s', animationDelay: '2s' }}
-                ></div>
-                
-                {/* Cloud 3 - Different shade, smaller, more defined */}
-                <div
-                  className="absolute top-5 left-1/3 w-48 h-48 bg-indigo-300/30 rounded-full blur-xl opacity-90 animate-pulse"
-                  style={{ animationDuration: '11s', animationDelay: '1s' }}
-                ></div>
-              </div>
+                 {/* Cloud 2 - Slightly darker, medium size, less blurred */}
+                 <div
+                   className="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-400/40 rounded-full blur-2xl opacity-70 animate-pulse"
+                   style={{ animationDuration: '12s', animationDelay: '2s' }}
+                 ></div>
+                 
+                 {/* Cloud 3 - Different shade, smaller, more defined */}
+                 <div
+                   className="absolute top-5 left-1/3 w-48 h-48 bg-indigo-300/30 rounded-full blur-xl opacity-90 animate-pulse"
+                   style={{ animationDuration: '11s', animationDelay: '1s' }}
+                 ></div>
+               </div>
               
               {/* Tag Mentor Verificado à Esquerda (onde era a categoria) */}
               <div className="absolute top-4 left-4 z-20">
@@ -206,18 +192,6 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                 </div>
               )}
 
-              {/* Categoria como especialidade */}
-              {mentor.category && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Especialidade:</h4>
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    <Badge variant="outline" className="text-xs">
-                      {mentor.category}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-
               {/* Indicação para virar o card */}
               <div className="mt-auto pt-4">
                 <p className="text-xs text-gray-500 italic">Passe o mouse para saber mais</p>
@@ -226,7 +200,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
           </div>
 
           {/* Verso do Card */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-white rounded-xl shadow-xl border overflow-hidden">
+           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-white overflow-hidden">
             <div className="p-6 h-full flex flex-col">
               {/* Header do verso com foto */}
               <div className="text-center mb-4">
@@ -312,6 +286,25 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
           </div>
         </motion.div>
       </div>
+      
+      {/* Rodapé fixo que não vira com o card - integrado ao container */}
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200 p-3">
+        <div className="flex justify-center">
+          {/* Botão de agendar centralizado */}
+          <Button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewSchedule();
+            }}
+            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 w-full"
+            size="sm"
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Agendar
+          </Button>
+        </div>
+      </div>
+    </div>
       
       {/* Estilos CSS para o efeito Aurora e Grid Pattern da MagicUI */}
       <style>{`

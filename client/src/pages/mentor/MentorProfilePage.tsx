@@ -1001,8 +1001,8 @@ const MentorProfilePage = () => {
             <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
-                  <UserPlus className="h-8 w-8 text-black" />
-                  <h2 className="text-3xl font-bold text-black">Por que me seguir?</h2>
+                  <User className="h-8 w-8 text-black" />
+                  <h2 className="text-3xl font-bold text-black">Meu Perfil</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
@@ -1013,8 +1013,9 @@ const MentorProfilePage = () => {
                 />
               </div>
               
-              <div className="grid lg:grid-cols-2 gap-12 mb-8">
-                <div className="space-y-6">
+              <div className="space-y-8 mb-8">
+                {/* ProfileForm expandido para largura total */}
+                <div className="w-full">
                   <ProfileForm 
                     user={currentUser} 
                     profileData={currentUser}
@@ -1022,8 +1023,15 @@ const MentorProfilePage = () => {
                   />
                 </div>
                 
+                {/* Diferenciais em grid de 3 colunas */}
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 gap-4">
+                  {/* Título "Por que me seguir?" */}
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <UserPlus className="h-8 w-8 text-black" />
+                    <h3 className="text-3xl font-bold text-black">Por que me seguir?</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
                       {isEditingDiferenciais ? (
                         <div className="space-y-3">
@@ -1153,8 +1161,10 @@ const MentorProfilePage = () => {
                       )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Add Badges Section here in the right column */}
+                {/* BadgesSection expandida para largura total */}
+                <div className="w-full">
                   <BadgesSection />
                 </div>
               </div>

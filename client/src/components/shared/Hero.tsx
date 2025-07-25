@@ -3,24 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Link } from "react-router-dom";
 const Hero = () => {
   return (
-    <div style={{ position: 'relative' }}>
-      {/* Label de identificação do componente */}
-      <div style={{
-        position: 'absolute',
-        top: '8px',
-        left: '8px',
-        background: '#ffeb3b',
-        color: '#000',
-        fontSize: '10px',
-        fontWeight: 'bold',
-        padding: '2px 6px',
-        borderRadius: '4px',
-        zIndex: 1000,
-        border: '1px solid #000'
-      }}>
-        Hero
-      </div>
-      
+    <div>
       <section className="relative bg-gradient-to-br from-purple-50 to-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row items-center">
