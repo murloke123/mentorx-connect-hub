@@ -47,6 +47,7 @@ export const MentorModulosPage = lazy(() => import('@/pages/mentor/MentorModulos
 export const MentorConteudosPage = lazy(() => import('@/pages/mentor/MentorConteudosPage'));
 export const MentorCategoriasPage = lazy(() => import('@/pages/mentor/MentorCategoriasPage'));
 export const MentorMeusMentoradosPage = lazy(() => import('@/pages/mentor/MentorMeusMentoradosPage'));
+export const MentorCursoInscricoesPage = lazy(() => import('@/pages/mentor/MentorCursoInscricoesPage'));
 export const MentorAgendamentosPage = lazy(() => import('@/pages/mentor/MentorAgendamentosPage'));
 export const MentorAgendamentosAdquiridosPage = lazy(() => import('@/pages/mentor/MentorAgendamentosAdquiridosPage'));
 export const MentorConfiguracoesPage = lazy(() => import('@/pages/mentor/MentorConfiguracoesPage'));
@@ -93,4 +94,4 @@ export const preloadCriticalComponents = () => {
   import('@/components/shared/Footer');
   import('@/components/ui/button');
   import('@/components/ui/card');
-}; 
+};

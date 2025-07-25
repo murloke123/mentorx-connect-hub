@@ -4,7 +4,18 @@ import { AlertTriangle, BookOpen, Edit2, Eye, Filter, PlusCircle, Search, Trash2
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from "../../hooks/use-toast";
-import { updateCoursePublicationStatus, deleteCourse } from "../../services/courseService";
+import { useAuth } from "../../hooks/useAuth";
+import { deleteCourse, updateCoursePublicationStatus } from "../../services/courseService";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
@@ -13,17 +24,6 @@ import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
 import { Switch } from "../ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog";
-import { useAuth } from "../../hooks/useAuth";
 
 interface CoursesListProps {
   courses: Course[];
@@ -309,7 +309,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
               <CardContent className="flex-grow">
                 <div 
                   className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-50 to-slate-100 hover:from-gray-100 hover:to-slate-200 transition-all duration-200 hover:shadow-lg hover:border-gray-400"
-                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/alunos`)}
+                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/inscricoes`)}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">

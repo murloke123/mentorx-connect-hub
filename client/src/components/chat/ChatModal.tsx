@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/utils/supabase';
 import { Bot, Loader2, Send, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from '@/utils/supabase';
 
 interface Message {
   id: string;

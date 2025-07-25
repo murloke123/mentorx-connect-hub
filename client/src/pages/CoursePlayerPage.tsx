@@ -6,7 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } from '@/services/coursePlayerService';
 import { supabase } from '@/utils/supabase';
-import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video } from 'lucide-react';
+import { triggerSuccessConfetti } from '@/utils/confetti';
+import { ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video, Check } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -35,7 +36,16 @@ const ContentRenderer: React.FC<{
   modulos: ModuloItemLocal[];
   onNextContent: () => void;
   onPreviousContent: () => void;
-}> = ({ currentConteudo, modulos, onNextContent, onPreviousContent }) => {
+  isCurrentContentCompleted: boolean;
+  onToggleCurrentContentCompleted: () => void;
+}> = ({ 
+  currentConteudo, 
+  modulos, 
+  onNextContent, 
+  onPreviousContent,
+  isCurrentContentCompleted,
+  onToggleCurrentContentCompleted
+}) => {
   const { toast } = useToast();
 
   const renderContent = () => {
@@ -137,22 +147,36 @@ const ContentRenderer: React.FC<{
 
       {/* Navigation Footer */}
       <div className="bg-white border-t p-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center gap-2">
           <Button 
             variant="outline" 
             onClick={onPreviousContent}
-            className="w-full mr-2"
+            className="flex-1"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Anterior
           </Button>
-          <Button 
-            onClick={onNextContent}
-            className="w-full"
-          >
-            Próximo
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </Button>
+          
+          <div className="flex gap-2 flex-1">
+            <Button 
+              onClick={onNextContent}
+              className="flex-1"
+            >
+              Próximo
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+            
+            <button
+              onClick={onToggleCurrentContentCompleted}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors shadow-sm border border-gray-200"
+              title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Marcar como concluído"}
+            >
+              <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-600' : 'text-gray-400'}`} />
+              <span className="hidden sm:inline">
+                {isCurrentContentCompleted ? "Concluído" : "Marcar como Concluído"}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -183,6 +207,18 @@ const CourseSidebar: React.FC<{
   hasNextContent
 }) => {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
+
+  // Efeito para expandir automaticamente o módulo do conteúdo atual
+  useEffect(() => {
+    if (currentConteudo) {
+      setExpandedModuleId(currentConteudo.module_id);
+    }
+  }, [currentConteudo]);
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModuleId(expandedModuleId === moduleId ? null : moduleId);
+  };
 
   return (
     <div className="w-80 bg-white border-l flex flex-col">
@@ -197,52 +233,87 @@ const CourseSidebar: React.FC<{
 
       {/* Modules and Content List */}
       <div className="flex-1 overflow-y-auto">
-        {modulos.map((modulo) => (
-          <div key={modulo.id} className="border-b">
-            <div className="p-4 bg-gray-50">
-              <h3 className="font-medium text-sm">{modulo.title}</h3>
-              {modulo.description && (
-                <p className="text-xs text-gray-600 mt-1">{modulo.description}</p>
+        {modulos.map((modulo) => {
+          const isExpanded = expandedModuleId === modulo.id;
+          const hasCurrentContent = currentConteudo?.module_id === modulo.id;
+          
+          return (
+            <div key={modulo.id} className="border-b">
+              <div 
+                className={`p-4 cursor-pointer hover:bg-gray-100 transition-colors ${
+                  hasCurrentContent ? 'bg-gray-50' : 'bg-gray-50'
+                }`}
+                onClick={() => toggleModule(modulo.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className={`font-medium text-sm ${hasCurrentContent ? 'text-blue-700' : ''}`}>
+                      {modulo.title}
+                    </h3>
+                    {modulo.description && (
+                      <p className="text-xs text-gray-600 mt-1">{modulo.description}</p>
+                    )}
+                  </div>
+                  <ChevronRight 
+                    className={`w-4 h-4 text-gray-500 transition-transform ${
+                      isExpanded ? 'rotate-90' : ''
+                    }`}
+                  />
+                </div>
+              </div>
+              
+              {/* Conteúdos do módulo - só aparecem quando expandido */}
+              {isExpanded && (
+                <div className="space-y-1 bg-white">
+                  {modulo.conteudos.map((conteudo) => {
+                    const isActive = currentConteudo?.id === conteudo.id;
+                    const isConcluido = conteudosConcluidos.has(conteudo.id);
+                    
+                    return (
+                      <div
+                        key={conteudo.id}
+                        className={`p-3 ml-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between border-l-2 ${
+                          isActive ? 'bg-blue-50 border-l-blue-500' : 'border-l-gray-200'
+                        }`}
+                        onClick={() => onConteudoSelect(conteudo)}
+                      >
+                        <div className="flex-1">
+                          <p className={`text-sm ${isActive ? 'font-medium text-blue-700' : ''}`}>
+                            {conteudo.title}
+                          </p>
+                          {conteudo.description && (
+                            <p 
+                              className="text-xs text-gray-500" 
+                              title={conteudo.description}
+                            >
+                              {conteudo.description.length > 30 
+                                ? `${conteudo.description.substring(0, 30)} ...`
+                                : conteudo.description
+                              }
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleConteudoConcluido(conteudo.id, conteudo.module_id);
+                          }}
+                          className="ml-2"
+                        >
+                          {isConcluido ? (
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <Circle className="w-5 h-5 text-gray-300" />
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
-            <div className="space-y-1">
-              {modulo.conteudos.map((conteudo) => {
-                const isActive = currentConteudo?.id === conteudo.id;
-                const isConcluido = conteudosConcluidos.has(conteudo.id);
-                
-                return (
-                  <div
-                    key={conteudo.id}
-                    className={`p-3 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
-                      isActive ? 'bg-blue-50 border-r-2 border-blue-500' : ''
-                    }`}
-                    onClick={() => onConteudoSelect(conteudo)}
-                  >
-                    <div className="flex-1">
-                      <p className={`text-sm ${isActive ? 'font-medium text-blue-700' : ''}`}>
-                        {conteudo.title}
-                      </p>
-                      <p className="text-xs text-gray-500 capitalize">{conteudo.content_type}</p>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleConteudoConcluido(conteudo.id, conteudo.module_id);
-                      }}
-                      className="ml-2"
-                    >
-                      {isConcluido ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Circle className="w-5 h-5 text-gray-300" />
-                      )}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* AI Assistant Footer */}
@@ -291,14 +362,8 @@ const CoursePlayerPage = () => {
   const [conteudosConcluidos, setConteudosConcluidos] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState(0);
   const [hasAccess, setHasAccess] = useState(false);
+  const [isCurrentContentCompleted, setIsCurrentContentCompleted] = useState(false);
   const { toast } = useToast();
-
-  console.log('🎓 CoursePlayerPage: Verificando acesso ao curso:', {
-    cursoId,
-    userId: user?.id,
-    hasAccess,
-    currentPath: window.location.pathname
-  });
 
   // Função para encontrar um conteúdo específico por ID
   const findConteudoById = (conteudoId: string, modulos: ModuloItemLocal[]): ConteudoItemLocal | null => {
@@ -478,9 +543,136 @@ const CoursePlayerPage = () => {
     checkEnrollmentAndFetchData();
   }, [cursoId, user, toast]);
 
+
+
+  // Carregar conteúdos concluídos do usuário
   useEffect(() => {
-    // Sistema de progresso simplificado - sempre 0% sem controle de conclusão
-    setProgress(0);
+    const loadCompletedContent = async () => {
+      // Aguardar user e curso estarem disponíveis
+      if (!user?.id || !cursoId || !curso) {
+        console.log('⏳ Aguardando dados necessários...', { 
+          hasUser: !!user?.id, 
+          hasCursoId: !!cursoId, 
+          hasCurso: !!curso 
+        });
+        return;
+      }
+
+      try {
+        console.log('📡 Carregando conteúdos concluídos...');
+        
+        const { data, error } = await supabase
+          .from('conteudo_concluido')
+          .select('content_id')
+          .eq('user_id', user.id)
+          .eq('course_id', cursoId);
+
+        if (error) {
+          console.error('❌ Erro ao carregar conteúdos concluídos:', error);
+          return;
+        }
+
+        const completedIds = new Set(data.map(item => item.content_id));
+        console.log('✅ Conteúdos concluídos carregados:', completedIds.size, 'itens');
+        
+        setConteudosConcluidos(completedIds);
+      } catch (error) {
+        console.error('❌ Erro ao carregar conteúdos concluídos:', error);
+      }
+    };
+
+    loadCompletedContent();
+  }, [user?.id, cursoId, curso]); // Adicionado curso como dependência
+
+  // Atualizar estado do conteúdo atual quando mudar
+  useEffect(() => {
+    if (currentConteudo?.id) {
+      const isCompleted = conteudosConcluidos.has(currentConteudo.id);
+      setIsCurrentContentCompleted(isCompleted);
+      console.log('📄 Conteúdo atual:', currentConteudo.title, '- Concluído:', isCompleted);
+    }
+  }, [currentConteudo, conteudosConcluidos]);
+
+  // Função para alternar conclusão do conteúdo atual
+  const onToggleCurrentContentCompleted = async () => {
+    if (!currentConteudo || !user || !curso) return;
+
+    try {
+      const isCompleted = conteudosConcluidos.has(currentConteudo.id);
+      
+      if (isCompleted) {
+        // Remover da conclusão
+        const { error } = await supabase
+          .from('conteudo_concluido')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('course_id', curso.id)
+          .eq('content_id', currentConteudo.id);
+
+        if (error) throw error;
+
+        const newSet = new Set(conteudosConcluidos);
+        newSet.delete(currentConteudo.id);
+        setConteudosConcluidos(newSet);
+        setIsCurrentContentCompleted(false);
+
+        toast({
+          title: "Conteúdo desmarcado",
+          description: "Conteúdo removido dos concluídos.",
+        });
+      } else {
+        // Marcar como concluído
+        const { error } = await supabase
+          .from('conteudo_concluido')
+          .insert({
+            user_id: user.id,
+            course_id: curso.id,
+            module_id: currentConteudo.module_id,
+            content_id: currentConteudo.id
+          });
+
+        if (error) throw error;
+
+        const newSet = new Set(conteudosConcluidos);
+        newSet.add(currentConteudo.id);
+        setConteudosConcluidos(newSet);
+        setIsCurrentContentCompleted(true);
+
+        // Verificar se todos os conteúdos foram concluídos
+        const totalContent = curso.modulos.reduce((total, modulo) => total + modulo.conteudos.length, 0);
+        if (newSet.size === totalContent) {
+          // Curso 100% concluído!
+          triggerSuccessConfetti();
+          toast({
+            title: "🎉 Parabéns!",
+            description: "Você concluiu 100% do curso! Excelente trabalho!",
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: "Conteúdo concluído",
+            description: "Conteúdo marcado como concluído!",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao alterar conclusão do conteúdo:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível alterar o status do conteúdo.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Calcular progresso baseado nos conteúdos concluídos
+  useEffect(() => {
+    if (curso) {
+      const totalContent = curso.modulos.reduce((total, modulo) => total + modulo.conteudos.length, 0);
+      const completedCount = conteudosConcluidos.size;
+      const progressPercentage = totalContent > 0 ? (completedCount / totalContent) * 100 : 0;
+      setProgress(progressPercentage);
+    }
   }, [conteudosConcluidos, curso]);
 
   const handleConteudoSelection = (conteudo: ConteudoItemLocal) => {
@@ -491,12 +683,82 @@ const CoursePlayerPage = () => {
   };
 
   const handleToggleConteudoConcluido = async (conteudoId: string, moduloId: string) => {
-    // Função desabilitada - sistema de progresso removido
-    toast({ 
-      title: "Sistema de progresso desabilitado",
-      description: "O controle de conteúdos concluídos foi removido.",
-      variant: "destructive" 
-    });
+    if (!user || !curso) return;
+
+    try {
+      const isCompleted = conteudosConcluidos.has(conteudoId);
+      
+      if (isCompleted) {
+        // Remover da conclusão
+        const { error } = await supabase
+          .from('conteudo_concluido')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('course_id', curso.id)
+          .eq('content_id', conteudoId);
+
+        if (error) throw error;
+
+        const newSet = new Set(conteudosConcluidos);
+        newSet.delete(conteudoId);
+        setConteudosConcluidos(newSet);
+
+        // Atualizar estado do conteúdo atual se for o mesmo
+        if (currentConteudo?.id === conteudoId) {
+          setIsCurrentContentCompleted(false);
+        }
+
+        toast({
+          title: "Conteúdo desmarcado",
+          description: "Conteúdo removido dos concluídos.",
+        });
+      } else {
+        // Marcar como concluído
+        const { error } = await supabase
+          .from('conteudo_concluido')
+          .insert({
+            user_id: user.id,
+            course_id: curso.id,
+            module_id: moduloId,
+            content_id: conteudoId
+          });
+
+        if (error) throw error;
+
+        const newSet = new Set(conteudosConcluidos);
+        newSet.add(conteudoId);
+        setConteudosConcluidos(newSet);
+
+        // Atualizar estado do conteúdo atual se for o mesmo
+        if (currentConteudo?.id === conteudoId) {
+          setIsCurrentContentCompleted(true);
+        }
+
+        // Verificar se todos os conteúdos foram concluídos
+        const totalContent = curso.modulos.reduce((total, modulo) => total + modulo.conteudos.length, 0);
+        if (newSet.size === totalContent) {
+          // Curso 100% concluído!
+          triggerSuccessConfetti();
+          toast({
+            title: "🎉 Parabéns!",
+            description: "Você concluiu 100% do curso! Excelente trabalho!",
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: "Conteúdo concluído",
+            description: "Conteúdo marcado como concluído!",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao alterar conclusão do conteúdo:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível alterar o status do conteúdo.",
+        variant: "destructive"
+      });
+    }
   };
 
   const findNextContent = () => {
@@ -717,6 +979,8 @@ const CoursePlayerPage = () => {
             modulos={curso?.modulos || []}
             onNextContent={handleNextContent}
             onPreviousContent={handlePreviousContent}
+            isCurrentContentCompleted={isCurrentContentCompleted}
+            onToggleCurrentContentCompleted={onToggleCurrentContentCompleted}
           />
         </main>
 

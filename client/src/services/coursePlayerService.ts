@@ -54,11 +54,13 @@ import { supabase } from '../utils/supabase';
 export type ConteudoItemLocal = {
   id: string;
   title: string; // nome_conteudo -> title
+  description?: string; // Campo para descrição do conteúdo
   content_type: 'video_externo' | 'texto_rico' | 'pdf'; // tipo_conteudo -> content_type
   content_data: { // dados_conteudo -> content_data
     url?: string;
     video_url?: string; // Campo usado no banco de dados
     html_content?: string;
+    texto?: string; // Campo para texto rico
     pdf_url?: string;
     pdf_filename?: string;
     provider?: 'youtube' | 'vimeo';
@@ -140,6 +142,7 @@ export async function getCursoCompleto(cursoId: string): Promise<CursoItemLocal 
         conteudos: (conteudos || []).map(conteudo => ({
           id: conteudo.id,
           title: conteudo.title, // nome_conteudo -> title
+          description: conteudo.description, // Campo para descrição do conteúdo
           content_type: conteudo.content_type as 'texto_rico' | 'video_externo' | 'pdf', // tipo_conteudo -> content_type
           content_data: conteudo.content_data, // dados_conteudo -> content_data
           ordem: conteudo.order_index, // order_index -> ordem (compatibilidade)

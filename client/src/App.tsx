@@ -53,6 +53,7 @@ import {
     MentorMapeamentoDBPage,
     MentorMeusCursosPage,
     MentorMeusMentoradosPage,
+    MentorCursoInscricoesPage,
     MentorModulosPage,
     MentorProfilePage, MentorPublicProfilePage,
     MentorPublicSchedulePage,
@@ -173,6 +174,11 @@ const AppContent = () => {
           <Route path="/mentor/meus-cursos/:cursoId/modulos/:moduloId" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorConteudosPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/meus-cursos/:courseId/inscricoes" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorCursoInscricoesPage />
             </ProtectedRoute>
           } />
           <Route path="/mentor/categorias" element={
