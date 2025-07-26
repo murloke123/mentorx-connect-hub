@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
+import { createNotification } from "@/services/notificationService";
 import { supabase } from "@/utils/supabase";
 import {
   BookOpen,
@@ -53,6 +54,7 @@ const MentoradoMeusMentoresPage = () => {
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [messageText, setMessageText] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [openDialogs, setOpenDialogs] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (user) {
@@ -247,16 +249,42 @@ const MentoradoMeusMentoresPage = () => {
 
     setSendingMessage(true);
     try {
-      // Aqui você pode implementar o sistema de mensagens
-      // Por enquanto, vamos simular o envio
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('🔔 Enviando notificação para mentor:', selectedMentor.full_name);
+      console.log('👤 Dados do usuário:', {
+        id: user.id,
+        email: user.email,
+        user_metadata: user.user_metadata
+      });
+      console.log('🎯 Mentor selecionado:', {
+        id: selectedMentor.id,
+        name: selectedMentor.full_name
+      });
       
-      toast.success(`Mensagem enviada para ${selectedMentor.full_name}`);
-      setMessageText("");
-      setSelectedMentor(null);
+      // Criar notificação no banco de dados
+      const result = await createNotification({
+        receiver_id: selectedMentor.id,
+        receiver_name: selectedMentor.full_name || 'Mentor',
+        receiver_role: 'mentor', // Receptor é sempre mentor
+        sender_id: user.id,
+        sender_name: user.user_metadata?.full_name || user.email || 'Mentorado',
+        sender_role: 'mentorado', // Quem envia mensagem é sempre mentorado
+        type: 'message',
+        title: 'Nova mensagem de mentorado',
+        message: messageText.trim()
+      });
+
+      if (result.success) {
+        toast.success(`Notificação enviada para ${selectedMentor.full_name}`);
+        setMessageText("");
+        setSelectedMentor(null);
+        setOpenDialogs(prev => ({ ...prev, [selectedMentor.id]: false })); // Fechar o dialog específico
+        console.log('✅ Notificação criada com sucesso:', result.data);
+      } else {
+        throw new Error('Falha ao criar notificação');
+      }
     } catch (error) {
-      console.error("Erro ao enviar mensagem:", error);
-      toast.error("Erro ao enviar mensagem");
+      console.error("❌ Erro ao enviar notificação:", error);
+      toast.error("Erro ao enviar notificação");
     } finally {
       setSendingMessage(false);
     }
@@ -466,7 +494,7 @@ const MentoradoMeusMentoresPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/schedule/${mentor.id}`)}
+                        onClick={() => navigate(`/mentor/publicschedule/${mentor.id}`)}
                         className="w-full justify-start text-xs"
                       >
                         <Calendar className="h-3 w-3 mr-2" />
@@ -476,12 +504,18 @@ const MentoradoMeusMentoresPage = () => {
 
                     {/* Coluna 4: Botões de ação 2 */}
                     <div className="h-24 bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow flex flex-col justify-center gap-2">
-                      <Dialog>
+                      <Dialog 
+                        open={openDialogs[mentor.id] || false} 
+                        onOpenChange={(open) => setOpenDialogs(prev => ({ ...prev, [mentor.id]: open }))}
+                      >
                         <DialogTrigger asChild>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setSelectedMentor(mentor)}
+                            onClick={() => {
+                              setSelectedMentor(mentor);
+                              setOpenDialogs(prev => ({ ...prev, [mentor.id]: true }));
+                            }}
                             className="w-full justify-start text-xs"
                           >
                             <MessageCircle className="h-3 w-3 mr-2" />
@@ -490,7 +524,7 @@ const MentoradoMeusMentoresPage = () => {
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Enviar Notificação para {mentor.full_name}</DialogTitle>
+                            <DialogTitle>Enviar Notificação para {selectedMentor?.full_name || mentor.full_name}</DialogTitle>
                             <DialogDescription>
                               Envie uma mensagem de notificação para este mentor.
                             </DialogDescription>

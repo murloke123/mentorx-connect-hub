@@ -122,9 +122,17 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     setShowDeleteConfirm(false);
   };
 
-  const handleUserClick = (userId: string | null) => {
+  const handleUserClick = (userId: string | null, senderRole: string | null) => {
     if (userId) {
-      navigate(`/mentor/publicview/${userId}`);
+      // Redirecionar baseado no sender_role
+      if (senderRole === 'mentor') {
+        navigate(`/mentor/publicview/${userId}`);
+      } else if (senderRole === 'mentorado') {
+        navigate(`/mentorado/publicview/${userId}`);
+      } else {
+        // Fallback para mentor se o role não estiver definido (compatibilidade com dados antigos)
+        navigate(`/mentor/publicview/${userId}`);
+      }
       onClose(); // Fechar modal após navegar
     }
   };
@@ -210,7 +218,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     <div className="flex items-center space-x-2 flex-1">
                       <div 
                         className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200 hover:shadow-lg"
-                        onClick={() => handleUserClick(notification.sender_id || null)}
+                        onClick={() => handleUserClick(notification.sender_id || null, notification.sender_role || null)}
                         title={`Ver perfil de ${notification.sender_name || 'usuário'}`}
                       >
                         <span className="text-white text-xs font-bold">
@@ -286,4 +294,4 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

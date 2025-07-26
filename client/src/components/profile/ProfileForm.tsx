@@ -279,82 +279,84 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
               </CardContent>
             </Card>
 
-            {/* Informações Importantes */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Info className="h-5 w-5 text-blue-600" />
-                  Informações Importantes
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Campo de Categoria - visível apenas para mentores */}
-                {profileData?.role === 'mentor' && (
-                  <FormField
-                    control={form.control}
-                    name="category_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">Categoria do Mentor</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value || ""}
-                          disabled={isLoading || categoriesLoading}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="h-11">
-                              <SelectValue placeholder={categoriesLoading ? "Carregando categorias..." : "Selecione uma categoria"} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+            {/* Informações Importantes - oculto para mentorados */}
+            {profileData?.role !== 'mentorado' && (
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Info className="h-5 w-5 text-blue-600" />
+                    Informações Importantes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Campo de Categoria - visível apenas para mentores */}
+                  {profileData?.role === 'mentor' && (
+                    <FormField
+                      control={form.control}
+                      name="category_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">Categoria do Mentor</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value || ""}
+                            disabled={isLoading || categoriesLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder={categoriesLoading ? "Carregando categorias..." : "Selecione uma categoria"} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-                {/* Campo de Mensagem de Destaque - visível apenas para mentores */}
-                {profileData?.role === 'mentor' && (
-                  <FormField
-                    control={form.control}
-                    name="highlight_message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <Star className="h-4 w-4 text-yellow-500" />
-                          Mensagem de Destaque
-                        </FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input 
-                              {...field} 
-                              value={field.value || ""}
-                              placeholder="Digite uma mensagem que destaque seu diferencial como mentor" 
-                              className="h-11 pr-16"
-                              maxLength={100}
-                            />
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                              {(field.value || "").length}/100
+                  {/* Campo de Mensagem de Destaque - visível apenas para mentores */}
+                  {profileData?.role === 'mentor' && (
+                    <FormField
+                      control={form.control}
+                      name="highlight_message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <Star className="h-4 w-4 text-yellow-500" />
+                            Mensagem de Destaque
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input 
+                                {...field} 
+                                value={field.value || ""}
+                                placeholder="Digite uma mensagem que destaque seu diferencial como mentor" 
+                                className="h-11 pr-16"
+                                maxLength={100}
+                              />
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                                {(field.value || "").length}/100
+                              </div>
                             </div>
+                          </FormControl>
+                          <div className="text-xs text-gray-500">
+                            Máximo de 100 caracteres para destacar seu diferencial como mentor
                           </div>
-                        </FormControl>
-                        <div className="text-xs text-gray-500">
-                          Máximo de 100 caracteres para destacar seu diferencial como mentor
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </CardContent>
-            </Card>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Sobre Mim */}
             <Card className="shadow-sm">

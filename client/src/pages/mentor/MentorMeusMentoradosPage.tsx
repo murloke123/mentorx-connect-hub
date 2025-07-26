@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
+import { redirectToUserProfile } from "@/utils/userUtils";
 import {
     BookOpen,
     ChevronDown,
@@ -20,6 +21,7 @@ import {
     Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Mentorado {
   id: string;
@@ -37,6 +39,7 @@ type SortDirection = 'asc' | 'desc';
 type FilterType = 'students' | 'followers';
 
 const MentorMeusMentoradosPage = () => {
+  const navigate = useNavigate();
   const [mentorados, setMentorados] = useState<Mentorado[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -478,7 +481,10 @@ const MentorMeusMentoradosPage = () => {
                           </td>
                           <td className="p-4">
                             <div className="flex items-center gap-3">
-                              <Avatar className="w-10 h-10">
+                              <Avatar 
+                                className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+                                onClick={() => redirectToUserProfile(mentorado.id, navigate)}
+                              >
                                 {mentorado.avatar_url ? (
                                   <AvatarImage src={mentorado.avatar_url} alt={mentorado.full_name || ''} />
                                 ) : (

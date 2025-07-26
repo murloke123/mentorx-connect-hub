@@ -39,20 +39,48 @@
  * • schedule - Novo agendamento
  * • new_enrollment - Nova matrícula
  * • course_updated - Curso atualizado
+ * • message - Mensagem de mentorado
  * 
  * 💡 INTERFACE:
  * • CreateNotificationData - Estrutura base para notificações
+ * • sender_role/receiver_role - Roles automáticos (mentor/mentorado)
+ * • getUserRole() - Função utilitária para buscar role do usuário
  * ===============================================================================
  */
 
 import { supabase } from '../utils/supabase';
 
+/**
+ * Buscar o role de um usuário pelo ID
+ */
+async function getUserRole(userId: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('❌ [NOTIFICATION] Erro ao buscar role do usuário:', error);
+      return null;
+    }
+
+    return data?.role || null;
+  } catch (error) {
+    console.error('💥 [NOTIFICATION] Erro ao buscar role do usuário:', error);
+    return null;
+  }
+}
+
 export interface CreateNotificationData {
   receiver_id: string;
   receiver_name: string;
+  receiver_role?: string;
   sender_id?: string;
   sender_name?: string;
-  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'schedule' | 'new_enrollment' | 'course_updated';
+  sender_role?: string;
+  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'schedule' | 'new_enrollment' | 'course_updated' | 'message';
   title: string;
   message: string;
 }
@@ -65,11 +93,27 @@ export async function createNotification(data: CreateNotificationData) {
   console.log('📦 [NOTIFICATION] Dados recebidos:', data);
   
   try {
+    // Buscar roles automaticamente se não fornecidos
+    let receiverRole = data.receiver_role;
+    let senderRole = data.sender_role;
+
+    if (!receiverRole) {
+      console.log('🔍 [NOTIFICATION] Buscando role do receiver:', data.receiver_id);
+      receiverRole = await getUserRole(data.receiver_id) || undefined;
+    }
+
+    if (data.sender_id && !senderRole) {
+      console.log('🔍 [NOTIFICATION] Buscando role do sender:', data.sender_id);
+      senderRole = await getUserRole(data.sender_id) || undefined;
+    }
+
     const insertData = {
       receiver_id: data.receiver_id,
       receiver_name: data.receiver_name,
+      receiver_role: receiverRole,
       sender_id: data.sender_id,
       sender_name: data.sender_name,
+      sender_role: senderRole,
       type: data.type,
       title: data.title,
       message: data.message,
@@ -196,8 +240,10 @@ export async function notifyNewFollower({
   return createNotification({
     receiver_id: mentorId,
     receiver_name: mentorName,
+    receiver_role: 'mentor', // Receptor é sempre mentor
     sender_id: followerId,
     sender_name: followerName,
+    sender_role: 'mentorado', // Quem segue é sempre mentorado
     type: 'new_follower',
     title,
     message,
@@ -234,8 +280,10 @@ export async function notifyLostFollower({
   return createNotification({
     receiver_id: mentorId,
     receiver_name: mentorName,
+    receiver_role: 'mentor', // Receptor é sempre mentor
     sender_id: followerId,
     sender_name: followerName,
+    sender_role: 'mentorado', // Quem deixa de seguir é sempre mentorado
     type: 'lost_follower',
     title,
     message,
@@ -266,8 +314,10 @@ export async function notifyNewEnrollment({
   return createNotification({
     receiver_id: mentorId,
     receiver_name: mentorName,
+    receiver_role: 'mentor', // Receptor é sempre mentor
     sender_id: studentId,
     sender_name: studentName,
+    sender_role: 'mentorado', // Quem se matricula é sempre mentorado
     type: 'new_enrollment',
     title,
     message,
@@ -296,7 +346,9 @@ export async function notifyCourseUpdate({
   return createNotification({
     receiver_id: studentId,
     receiver_name: studentName,
+    receiver_role: 'mentorado', // Receptor é sempre mentorado
     sender_name: mentorName,
+    sender_role: 'mentor', // Quem atualiza curso é sempre mentor
     type: 'course_updated',
     title,
     message,
@@ -335,4 +387,4 @@ export async function notifyNewAppointment({
     title,
     message,
   });
-} 
+}

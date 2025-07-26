@@ -157,8 +157,10 @@ export interface Notification {
   id: string;
   receiver_id: string;        // Quem recebe a notificação
   receiver_name?: string;     // Nome de quem recebe
+  receiver_role?: string;     // Role de quem recebe (mentor/mentorado)
   sender_id?: string | null;  // Quem envia a notificação (opcional)
   sender_name?: string | null; // Nome de quem envia (opcional)
+  sender_role?: string | null; // Role de quem envia (mentor/mentorado)
   type: string;
   title: string;
   message: string;

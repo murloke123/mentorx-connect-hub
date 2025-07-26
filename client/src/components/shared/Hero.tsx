@@ -35,7 +35,7 @@ const Hero = () => {
                         <span className="text-2xl mb-2">👨‍🏫</span>
                         <span>Configurar perfil como Mentor</span>
                       </Link>
-                      <Link to="/schedule" className="flex flex-col items-center justify-center p-4 border rounded-lg text-center hover:bg-gray-50">
+                      <Link to="/mentors" className="flex flex-col items-center justify-center p-4 border rounded-lg text-center hover:bg-gray-50">
                         <span className="text-2xl mb-2">📅</span>
                         <span>Agendar sessão com Mentor</span>
                       </Link>

@@ -11,9 +11,11 @@ import {
     XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../utils/supabase';
+import { redirectToUserProfile } from '../utils/userUtils';
 import CancelAppointmentModal from './CancelAppointmentModal';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -46,6 +48,7 @@ interface AppointmentsListProps {
 const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTrigger, showAcquiredOnly = false }) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -536,13 +539,8 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                     <Avatar 
                       className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
                       onClick={() => {
-                        if (showAcquiredOnly) {
-                          // Na página do mentorado, clica no mentor -> vai para mentor/publicschedule
-                          window.location.href = `/mentor/publicschedule/${appointment.mentor_id}`;
-                        } else {
-                          // Na página do mentor, clica no mentorado -> vai para mentor/publicschedule do mentor
-                          window.location.href = `/mentor/publicschedule/${appointment.mentor_id}`;
-                        }
+                        const targetUserId = showAcquiredOnly ? appointment.mentor_id : appointment.mentee_id;
+                        redirectToUserProfile(targetUserId, navigate);
                       }}
                     >
                       <AvatarFallback className="bg-blue-100 text-blue-700">
