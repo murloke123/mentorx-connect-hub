@@ -185,17 +185,13 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
 
               {/* Highlight Message */}
               {mentor.highlight_message && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-3 rounded-lg mb-4 border-l-4 border-purple-500">
-                  <p className="text-sm text-gray-700 italic">
-                    "{mentor.highlight_message}"
-                  </p>
-                </div>
+                <p className="text-sm text-gray-700 italic mb-4">
+                  "{mentor.highlight_message}"
+                </p>
               )}
 
               {/* Indicação para virar o card */}
-              <div className="mt-auto pt-4">
-                <p className="text-xs text-gray-500 italic">Passe o mouse para saber mais</p>
-              </div>
+              <p className="text-xs text-gray-600 mt-auto pt-4">Passe o mouse para saber mais</p>
             </div>
           </div>
 

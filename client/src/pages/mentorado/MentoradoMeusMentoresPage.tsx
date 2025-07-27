@@ -357,7 +357,7 @@ const MentoradoMeusMentoresPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center text-center gap-3">
                 <Users className="h-8 w-8 text-blue-600" />
                 <div>
                   <p className="text-2xl font-bold">{stats.total}</p>
@@ -369,7 +369,7 @@ const MentoradoMeusMentoresPage = () => {
           
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center text-center gap-3">
                 <Heart className="h-8 w-8 text-red-500" />
                 <div>
                   <p className="text-2xl font-bold">{stats.following}</p>
@@ -381,7 +381,7 @@ const MentoradoMeusMentoresPage = () => {
           
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center text-center gap-3">
                 <BookOpen className="h-8 w-8 text-green-600" />
                 <div>
                   <p className="text-2xl font-bold">{stats.withCourses}</p>
@@ -393,7 +393,7 @@ const MentoradoMeusMentoresPage = () => {
           
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center justify-center text-center gap-3">
                 <TrendingUp className="h-8 w-8 text-purple-600" />
                 <div>
                   <p className="text-2xl font-bold">{formatPrice(stats.totalSpent)}</p>

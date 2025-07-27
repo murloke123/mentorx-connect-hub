@@ -8,17 +8,17 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
 import { redirectToUserProfile } from "@/utils/userUtils";
 import {
-    BookOpen,
-    ChevronDown,
-    ChevronUp,
-    DollarSign,
-    Frown,
-    Heart,
-    Mail,
-    Search,
-    TrendingUp,
-    User,
-    Users
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  Frown,
+  Heart,
+  Mail,
+  Search,
+  TrendingUp,
+  User,
+  Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

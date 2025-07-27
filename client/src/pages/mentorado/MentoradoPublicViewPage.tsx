@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { supabase } from "@/utils/supabase";
-import { Spinner } from "@/components/ui/spinner";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, User, Mail, Star, Phone, Heart, Sparkles, Target, BookOpen, Trophy, Zap } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { createNotification } from "@/services/notificationService";
+import { supabase } from "@/utils/supabase";
+import { BookOpen, Calendar, Heart, Mail, MessageCircle, Phone, Sparkles, Star, Target, Trophy, User, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 interface MentoradoProfile {
   id: string;
@@ -24,9 +30,13 @@ interface MentoradoProfile {
 
 const MentoradoPublicViewPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState<MentoradoProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   useEffect(() => {
     const fetchMentoradoProfile = async () => {
@@ -92,6 +102,51 @@ const MentoradoPublicViewPage = () => {
 
     fetchMentoradoProfile();
   }, [id]);
+
+  const handleSendMessage = async () => {
+    if (!profileData || !messageText.trim() || !user) return;
+
+    setSendingMessage(true);
+    try {
+      console.log('🔔 Enviando notificação para mentorado:', profileData.full_name);
+      console.log('👤 Dados do usuário (mentor):', {
+        id: user.id,
+        email: user.email,
+        user_metadata: user.user_metadata
+      });
+      console.log('🎯 Mentorado selecionado:', {
+        id: profileData.id,
+        name: profileData.full_name
+      });
+      
+      // Criar notificação no banco de dados
+      const result = await createNotification({
+        receiver_id: profileData.id,
+        receiver_name: profileData.full_name || 'Mentorado',
+        receiver_role: 'mentorado', // Receptor é sempre mentorado
+        sender_id: user.id,
+        sender_name: user.user_metadata?.full_name || user.email || 'Mentor',
+        sender_role: 'mentor', // Quem envia mensagem é sempre mentor
+        type: 'message',
+        title: 'Nova mensagem de mentor',
+        message: messageText.trim()
+      });
+
+      if (result.success) {
+        toast.success(`Notificação enviada para ${profileData.full_name}`);
+        setMessageText("");
+        setIsNotificationModalOpen(false);
+        console.log('✅ Notificação criada com sucesso:', result.data);
+      } else {
+        throw new Error('Falha ao criar notificação');
+      }
+    } catch (error) {
+      console.error("❌ Erro ao enviar notificação:", error);
+      toast.error("Erro ao enviar notificação");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -161,6 +216,13 @@ const MentoradoPublicViewPage = () => {
                   <Badge className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg">
                     <User className="h-4 w-4 mr-2" />
                     Mentorado
+                  </Badge>
+                  <Badge 
+                    className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg cursor-pointer hover:bg-white/80 transition-colors"
+                    onClick={() => setIsNotificationModalOpen(true)}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Enviar Notificação
                   </Badge>
                   {profileData.category && (
                     <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 px-4 py-2 font-semibold shadow-lg">
@@ -414,6 +476,40 @@ const MentoradoPublicViewPage = () => {
 
         </div>
       </div>
+      
+      {/* Modal de Notificação */}
+      <Dialog open={isNotificationModalOpen} onOpenChange={setIsNotificationModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enviar Notificação para {profileData?.full_name}</DialogTitle>
+            <DialogDescription>
+              Envie uma mensagem de notificação para este mentorado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Digite sua mensagem..."
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsNotificationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSendMessage}
+              disabled={!messageText.trim() || sendingMessage}
+            >
+              {sendingMessage ? "Enviando..." : "Enviar Notificação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {/* Add CSS animations */}
       <style>{`
