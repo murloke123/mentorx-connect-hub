@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import { createNotification } from "@/services/notificationService";
 import { supabase } from "@/utils/supabase";
+import { navigateToTop } from "@/utils/utils";
 import {
   BookOpen,
   Calendar,
@@ -484,7 +485,7 @@ const MentoradoMeusMentoresPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/mentor/publicview/${mentor.id}`)}
+                        onClick={() => navigateToTop(navigate, `/mentor/publicview/${mentor.id}`)}
                         className="w-full justify-start text-xs"
                       >
                         <User className="h-3 w-3 mr-2" />

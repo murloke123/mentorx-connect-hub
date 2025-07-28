@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Mentor } from "@/types/database";
+import { navigateToTop } from "@/utils/utils";
 import { motion } from "framer-motion";
 import { BarChart3, Calendar, Code, Crown, Grid3X3, Handshake, MessageCircle, Star, User } from "lucide-react";
 import React, { useState } from "react";
@@ -46,16 +47,34 @@ const getCategoryIcon = (category: string | null) => {
 
 // Função para remover tags HTML e renderizar texto limpo
 const stripHtmlTags = (html: string) => {
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return doc.body.textContent || "";
+  if (!html || html.trim().length === 0) return "";
+  
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const textContent = doc.body.textContent || "";
+    
+    // Remove espaços extras, quebras de linha desnecessárias e caracteres especiais
+    return textContent
+      .replace(/\s+/g, ' ')  // Substitui múltiplos espaços por um único espaço
+      .replace(/\n+/g, ' ')  // Substitui quebras de linha por espaços
+      .trim();               // Remove espaços no início e fim
+  } catch (error) {
+    // Fallback caso o DOMParser falhe
+    return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  }
 };
 
-// Função para truncar texto em aproximadamente 5 linhas (cerca de 300 caracteres)
-const truncateText = (text: string, maxLength: number = 300) => {
-  if (text.length <= maxLength) return text;
+// Função para truncar texto em aproximadamente 350 caracteres
+const truncateText = (text: string, maxLength: number = 350) => {
+  if (!text || text.trim().length === 0) return "";
+  
+  // Remove espaços extras e quebras de linha desnecessárias
+  const cleanText = text.trim().replace(/\s+/g, ' ');
+  
+  if (cleanText.length <= maxLength) return cleanText;
   
   // Encontra o último espaço antes do limite para não cortar palavras
-  const truncated = text.substring(0, maxLength);
+  const truncated = cleanText.substring(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
   
   return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
@@ -66,7 +85,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleViewProfile = () => {
-    navigate(`/mentor/publicview/${mentor.id}`);
+    navigateToTop(navigate, `/mentor/publicview/${mentor.id}`);
   };
 
   const handleContact = () => {
@@ -219,7 +238,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
               <div className="flex-1 mb-4">
                 {mentor.bio ? (
                   <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div className="text-sm text-gray-700 leading-relaxed">
+                    <div className="text-sm text-gray-700 leading-relaxed text-justify">
                       <p className="whitespace-pre-line">{truncateText(stripHtmlTags(mentor.bio))}</p>
                     </div>
                   </div>

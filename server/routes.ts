@@ -2105,6 +2105,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== EMAIL COURSE SALE NOTIFICATION ROUTE ====================
+
+  // Rota para enviar email de notificação de venda de curso para o mentor
+  app.post('/api/email/course-buy', async (req, res) => {
+    try {
+      console.log('💰 [API] Enviando email de venda de curso para mentor...');
+      console.log('📝 [API] Dados recebidos:', JSON.stringify(req.body, null, 2));
+      
+      const { mentorName, mentorEmail, buyerName, courseName, coursePrice, transactionId } = req.body;
+      
+      // Validar campos obrigatórios
+      if (!mentorName || !mentorEmail || !buyerName || !courseName || coursePrice === undefined || !transactionId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios: mentorName, mentorEmail, buyerName, courseName, coursePrice, transactionId'
+        });
+      }
+      
+      // Importar o serviço de email de venda de curso
+       const { enviarEmailVendaCurso } = await import('./services/email/services/mentor/emailSendCourseBuy');
+      
+      const emailData = {
+        mentorName,
+        mentorEmail,
+        buyerName,
+        courseName,
+        coursePrice: Number(coursePrice),
+        transactionId
+      };
+      
+      console.log('📤 [API] Enviando email de venda...');
+      const result = await enviarEmailVendaCurso(emailData);
+      
+      if (result.success) {
+        console.log('✅ [API] Email de venda enviado com sucesso');
+        res.json({
+          success: true,
+          message: 'Email de venda enviado com sucesso para o mentor',
+          messageId: result.messageId
+        });
+      } else {
+        console.error('❌ [API] Falha no envio do email de venda:', result.error);
+        res.status(500).json({
+          success: false,
+          error: result.error || 'Erro ao enviar email de venda'
+        });
+      }
+      
+    } catch (error: any) {
+      console.error('❌ [API] Erro crítico no envio de email de venda:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno do servidor'
+      });
+    }
+  });
+
   // ==================== JITSI MEET ROUTES ====================
 
   // Importar Jitsi Meet Service

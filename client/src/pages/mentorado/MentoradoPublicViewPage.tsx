@@ -1,10 +1,10 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { createNotification } from "@/services/notificationService";
 import { supabase } from "@/utils/supabase";
@@ -213,10 +213,6 @@ const MentoradoPublicViewPage = () => {
                 </h1>
                 
                 <div className="flex justify-center items-center gap-3">
-                  <Badge className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg">
-                    <User className="h-4 w-4 mr-2" />
-                    Mentorado
-                  </Badge>
                   <Badge 
                     className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg cursor-pointer hover:bg-white/80 transition-colors"
                     onClick={() => setIsNotificationModalOpen(true)}
@@ -238,26 +234,28 @@ const MentoradoPublicViewPage = () => {
         
         {/* Profile Avatar */}
         <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
-          <div 
-            className="w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border-4 border-white shadow-xl bg-white"
-            style={{
-              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-              animation: 'float 3s ease-in-out infinite'
-            }}
-          >
-            {profileData.avatar_url ? (
-              <img
-                src={profileData.avatar_url}
-                alt="Profile picture"
-                className="aspect-square h-full w-full object-cover"
-              />
-            ) : (
-              <Avatar className="w-full h-full">
-                <AvatarFallback className="bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white flex items-center justify-center">
-                  <User className="w-12 h-12" />
-                </AvatarFallback>
-              </Avatar>
-            )}
+          <div className="text-center">
+            <div 
+              className="w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border-4 border-white shadow-xl bg-white mx-auto"
+              style={{
+                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                animation: 'float 3s ease-in-out infinite'
+              }}
+            >
+              {profileData.avatar_url ? (
+                <img
+                  src={profileData.avatar_url}
+                  alt="Profile picture"
+                  className="aspect-square h-full w-full object-cover"
+                />
+              ) : (
+                <Avatar className="w-full h-full">
+                  <AvatarFallback className="bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white flex items-center justify-center">
+                    <User className="w-12 h-12" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -269,29 +267,31 @@ const MentoradoPublicViewPage = () => {
             {profileData.highlight_message}
           </p>
         )}
-      </div>
-
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="grid gap-8">
-          
-          {/* Inspirational Quote */}
-          <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 text-white overflow-hidden relative">
+        
+        {/* Banner Jornada de Crescimento próximo ao avatar */}
+        <div className="mt-8 mb-8 max-w-4xl mx-auto px-4">
+          <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 text-white overflow-hidden relative shadow-xl">
             <div className="absolute inset-0 bg-black opacity-10"></div>
             <div className="absolute top-4 right-4">
               <Zap className="h-8 w-8 text-yellow-300 animate-pulse" />
             </div>
-            <CardContent className="p-8 relative">
+            <CardContent className="p-6 relative">
               <div className="text-center">
-                <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-300" />
-                <h3 className="text-2xl font-bold mb-4">🌟 Jornada de Crescimento</h3>
-                <p className="text-lg opacity-90 italic">
+                <Trophy className="h-10 w-10 mx-auto mb-3 text-yellow-300" />
+                <h3 className="text-xl font-bold mb-3">🌟 Jornada de Crescimento</h3>
+                <p className="text-base opacity-90 italic">
                   "Cada grande jornada começa com um único passo. Este mentorado está construindo seu futuro com determinação e foco!"
                 </p>
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
 
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="grid gap-8">
+          
           {/* About Section */}
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
             <CardContent className="p-8">

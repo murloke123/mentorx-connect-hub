@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { checkCoursePaymentStatus, checkUserPaymentIntents, processPendingPayments } from '../../services/stripeCheckoutService';
 import { supabase } from '../../utils/supabase';
+import { navigateToTop } from '../../utils/utils';
 
 interface EnrolledCourse {
   id: string;
@@ -271,7 +272,7 @@ const MentorCursosAdquiridosPage = () => {
 
   // Função para navegar ao perfil público do mentor
   const handleMentorClick = (mentorId: string) => {
-    navigate(`/mentor/publicview/${mentorId}`);
+    navigateToTop(navigate, `/mentor/publicview/${mentorId}`);
   };
 
   return (

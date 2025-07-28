@@ -1,4 +1,5 @@
 import { Course } from "@/types/database";
+import { navigateToTop } from "@/utils/utils";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -45,7 +46,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   // Função para navegar ao perfil público do mentor
   const handleMentorClick = () => {
     if (course.mentor_id) {
-      navigate(`/mentor/publicview/${course.mentor_id}`);
+      navigateToTop(navigate, `/mentor/publicview/${course.mentor_id}`);
     }
   };
 

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { checkCoursePaymentStatus, checkUserPaymentIntents, getUserTransactions, handleCheckoutSuccess, startCourseCheckout } from "@/services/stripeCheckoutService";
 import { supabase } from "@/utils/supabase";
+import { navigateToTop } from "@/utils/utils";
 import { AlertCircle, Play, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -69,7 +70,7 @@ const MentoradoMeusCursosPage = () => {
 
   // Função para navegar ao perfil público do mentor
   const handleMentorClick = (mentorId: string) => {
-    navigate(`/mentor/publicview/${mentorId}`);
+    navigateToTop(navigate, `/mentor/publicview/${mentorId}`);
   };
 
   // Função para buscar role do usuário e redirecionar corretamente

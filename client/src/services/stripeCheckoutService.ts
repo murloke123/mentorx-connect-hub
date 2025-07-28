@@ -48,6 +48,7 @@
  */
 
 import { supabase } from '../utils/supabase';
+import { notifyCoursePurchase } from './notificationService';
 
 // ##########################################################################################
 // ###################### INTERFACES E TIPOS #############################################
@@ -330,6 +331,18 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
       status: transaction.status
     });
 
+    // 🛡️ PREVENÇÃO DE DUPLICAÇÃO: Verificar se a transação já foi processada com sucesso
+    if (transaction.status === 'succeeded' && transaction.payment_completed_at) {
+      console.log('⚠️ [CLIENT-STRIPE] Transação já foi processada anteriormente:', {
+        transactionId: transaction.id,
+        status: transaction.status,
+        paymentCompletedAt: transaction.payment_completed_at
+      });
+      
+      // Retornar sucesso sem reprocessar
+      return { success: true, transaction, error: 'Transação já processada' };
+    }
+
     // 🎯 CORREÇÃO CRÍTICA: Verificar sessão no backend usando conta conectada
     const response = await fetch(`/api/stripe/checkout/session/${transaction.stripe_account_id}/${sessionId}`);
     const result = await response.json();
@@ -387,7 +400,7 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
       .eq('student_id', transaction.buyer_id)
       .single();
 
-    // Buscar nome do estudante para popular o campo studant_name
+    // Buscar dados necessários para a matrícula e notificação
     const { data: studentProfile } = await supabase
       .from('profiles')
       .select('full_name')
@@ -414,39 +427,118 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
 
     const coursePrice = courseData?.price || 0;
 
-    if (existingEnrollment) {
-      // Ativar matrícula existente
-      await supabase
-        .from('matriculas')
-        .update({
-          status: 'active',
-          enrolled_at: new Date().toISOString(),
-          studant_name: studentName,
-          course_owner_id: transaction.mentor_id,
-          course_owner_name: ownerName,
-          price: coursePrice
-        })
-        .eq('course_id', transaction.course_id)
-        .eq('student_id', transaction.buyer_id);
-      
-      console.log('✅ [CLIENT-STRIPE] Matrícula ativada');
+    // 🛡️ PREVENÇÃO DE DUPLICAÇÃO: Verificar se a matrícula já está ativa
+    if (existingEnrollment && existingEnrollment.status === 'active') {
+      console.log('⚠️ [CLIENT-STRIPE] Matrícula já está ativa, pulando criação/ativação:', {
+        enrollmentId: existingEnrollment.id,
+        courseId: transaction.course_id,
+        studentId: transaction.buyer_id,
+        status: existingEnrollment.status
+      });
     } else {
-      // Criar nova matrícula
-      await supabase
-        .from('matriculas')
-        .insert({
-          course_id: transaction.course_id,
-          student_id: transaction.buyer_id,
-          status: 'active',
-          enrolled_at: new Date().toISOString(),
-          progress_percentage: 0,
-          studant_name: studentName,
-          course_owner_id: transaction.mentor_id,
-          course_owner_name: ownerName,
-          price: coursePrice
+      if (existingEnrollment) {
+        // Ativar matrícula existente
+        await supabase
+          .from('matriculas')
+          .update({
+            status: 'active',
+            enrolled_at: new Date().toISOString(),
+            studant_name: studentName,
+            course_owner_id: transaction.mentor_id,
+            course_owner_name: ownerName,
+            price: coursePrice
+          })
+          .eq('course_id', transaction.course_id)
+          .eq('student_id', transaction.buyer_id);
+        
+        console.log('✅ [CLIENT-STRIPE] Matrícula ativada');
+      } else {
+        // Criar nova matrícula
+        await supabase
+          .from('matriculas')
+          .insert({
+            course_id: transaction.course_id,
+            student_id: transaction.buyer_id,
+            status: 'active',
+            enrolled_at: new Date().toISOString(),
+            progress_percentage: 0,
+            studant_name: studentName,
+            course_owner_id: transaction.mentor_id,
+            course_owner_name: ownerName,
+            price: coursePrice
+          });
+        
+        console.log('✅ [CLIENT-STRIPE] Nova matrícula criada');
+      }
+    }
+
+    // Enviar notificação de compra para o mentor
+    try {
+      // Buscar dados do curso
+      const { data: courseData } = await supabase
+        .from('cursos')
+        .select('title')
+        .eq('id', transaction.course_id)
+        .single();
+
+      // Buscar dados do comprador
+      const { data: buyerData } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', transaction.buyer_id)
+        .single();
+
+      // Buscar email do mentor
+      const { data: mentorData } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', transaction.mentor_id)
+        .single();
+
+      if (courseData && buyerData && ownerName) {
+        await notifyCoursePurchase({
+          mentorId: transaction.mentor_id,
+          mentorName: ownerName,
+          buyerId: transaction.buyer_id,
+          buyerName: buyerData.full_name || 'Usuário',
+          courseName: courseData.title,
+          coursePrice: amount, // já está em centavos
         });
-      
-      console.log('✅ [CLIENT-STRIPE] Nova matrícula criada');
+        console.log('✅ [CLIENT-STRIPE] Notificação de compra enviada');
+
+        // Enviar e-mail de venda para o mentor
+        if (mentorData?.email) {
+          try {
+            const emailResponse = await fetch('/api/email/course-buy', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                mentorName: ownerName,
+                mentorEmail: mentorData.email,
+                buyerName: buyerData.full_name || 'Usuário',
+                courseName: courseData.title,
+                coursePrice: amount / 100, // converter de centavos para reais
+                transactionId: transaction.id
+              })
+            });
+
+            const emailResult = await emailResponse.json();
+            
+            if (emailResult.success) {
+              console.log('✅ [CLIENT-STRIPE] E-mail de venda enviado para o mentor');
+            } else {
+              console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar e-mail de venda:', emailResult.error);
+            }
+          } catch (emailError) {
+            console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar e-mail de venda:', emailError);
+          }
+        }
+      }
+    } catch (notificationError) {
+      console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar notificação:', notificationError);
+      // Não falhar o processo por erro de notificação
     }
 
     const finalResult = { success: true, transaction };

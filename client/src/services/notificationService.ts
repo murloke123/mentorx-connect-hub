@@ -39,6 +39,7 @@
  * • schedule - Novo agendamento
  * • new_enrollment - Nova matrícula
  * • course_updated - Curso atualizado
+ * • course_buy - Compra de curso
  * • message - Mensagem de mentorado
  * 
  * 💡 INTERFACE:
@@ -80,7 +81,7 @@ export interface CreateNotificationData {
   sender_id?: string;
   sender_name?: string;
   sender_role?: string;
-  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'schedule' | 'new_enrollment' | 'course_updated' | 'message';
+  type: 'new_follower' | 'lost_follower' | 'appointment_cancelled' | 'cancel_schedule' | 'schedule' | 'new_enrollment' | 'course_updated' | 'message' | 'course_buy';
   title: string;
   message: string;
 }
@@ -384,6 +385,88 @@ export async function notifyNewAppointment({
     sender_id: senderId,
     sender_name: senderName,
     type: 'schedule',
+    title,
+    message,
+  });
+}
+
+/**
+ * Notificar sobre compra de curso
+ */
+export async function notifyCoursePurchase({
+  mentorId,
+  mentorName,
+  buyerId,
+  buyerName,
+  courseName,
+  coursePrice,
+}: {
+  mentorId: string;
+  mentorName: string;
+  buyerId: string;
+  buyerName: string;
+  courseName: string;
+  coursePrice: number;
+}) {
+  console.log('💰 [NOTIFICATION] Criando notificação de compra de curso');
+  console.log('📋 [NOTIFICATION] Parâmetros recebidos:', {
+    mentorId,
+    mentorName,
+    buyerId,
+    buyerName,
+    courseName,
+    coursePrice
+  });
+  
+  // 🛡️ PREVENÇÃO DE DUPLICAÇÃO: Verificar se já existe notificação similar recente
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    
+    const { data: existingNotification } = await supabase
+      .from('notifications')
+      .select('id, created_at')
+      .eq('receiver_id', mentorId)
+      .eq('sender_id', buyerId)
+      .eq('type', 'course_buy')
+      .ilike('message', `%${courseName}%`)
+      .gte('created_at', fiveMinutesAgo)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (existingNotification) {
+      console.log('⚠️ [NOTIFICATION] Notificação de compra duplicada detectada e bloqueada:', {
+        existingId: existingNotification.id,
+        createdAt: existingNotification.created_at,
+        mentorId,
+        buyerId,
+        courseName
+      });
+      return { success: true, data: null, message: 'Notificação duplicada bloqueada' };
+    }
+  } catch (error) {
+    // Se der erro na verificação, continuar com a criação (melhor criar duplicada que não criar)
+    console.log('⚠️ [NOTIFICATION] Erro ao verificar duplicação, continuando:', error);
+  }
+  
+  const title = 'Novo curso vendido!';
+  const priceFormatted = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(coursePrice / 100); // Convertendo de centavos para reais
+  
+  const message = `${buyerName} comprou o curso "${courseName}" por ${priceFormatted}`;
+
+  console.log('📝 [NOTIFICATION] Título e mensagem preparados:', { title, message });
+
+  return createNotification({
+    receiver_id: mentorId,
+    receiver_name: mentorName,
+    receiver_role: 'mentor', // Receptor é sempre mentor
+    sender_id: buyerId,
+    sender_name: buyerName,
+    sender_role: 'mentorado', // Quem compra é sempre mentorado
+    type: 'course_buy',
     title,
     message,
   });
