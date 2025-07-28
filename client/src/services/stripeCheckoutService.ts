@@ -1,4 +1,163 @@
 /**
+ * 🎯 NOVA FUNÇÃO: Enviar email baseado na ativação da matrícula
+ * 
+ * Esta função é chamada APENAS quando uma matrícula fica ativa,
+ * garantindo que apenas 1 email seja enviado por curso comprado.
+ * 
+ * Lógica: 1 matrícula ativa = 1 email enviado
+ * 
+ * 🛡️ PROTEÇÃO ANTI-DUPLICAÇÃO:
+ * - Usa atomic update para marcar email como sendo enviado
+ * - Verifica novamente após marcar para evitar race conditions
+ * - Log detalhado para debug de duplicações
+ */
+async function sendCourseEnrollmentEmail({
+  courseId,
+  studentId,
+  mentorId,
+  transactionId
+}: {
+  courseId: string;
+  studentId: string;
+  mentorId: string;
+  transactionId: string;
+}) {
+  try {
+    console.log('📧 [ENROLLMENT-EMAIL] Iniciando envio de email para matrícula ativa:', {
+      courseId,
+      studentId,
+      mentorId,
+      transactionId,
+      timestamp: new Date().toISOString()
+    });
+
+    // 🛡️ PROTEÇÃO 1: Verificar e MARCAR atomicamente como "being sent" 
+    const { data: enrollmentUpdate, error: updateError } = await supabase
+      .from('matriculas')
+      .update({
+        email_sent: true,
+        email_sent_at: new Date().toISOString()
+      })
+      .eq('course_id', courseId)
+      .eq('student_id', studentId)
+      .eq('status', 'active')
+      .eq('email_sent', false) // Só atualiza se ainda não foi enviado
+      .select('id, email_sent, email_sent_at')
+      .single();
+
+    if (updateError || !enrollmentUpdate) {
+      console.log('✅ [ENROLLMENT-EMAIL] Email já foi enviado por outra instância ou matrícula não encontrada:', {
+        error: updateError?.message,
+        hasUpdate: !!enrollmentUpdate
+      });
+      return;
+    }
+
+    console.log('🔒 [ENROLLMENT-EMAIL] Matrícula marcada para envio de email:', {
+      enrollmentId: enrollmentUpdate.id,
+      email_sent_at: enrollmentUpdate.email_sent_at
+    });
+
+    // 🛡️ PROTEÇÃO 2: Verificar se conseguimos marcar com sucesso (race condition final)
+    if (!enrollmentUpdate.email_sent) {
+      console.log('⚠️ [ENROLLMENT-EMAIL] Falha na marcação atomic, outra instância pode ter processado');
+      return;
+    }
+
+    // Buscar dados necessários
+    const [courseData, studentData, mentorData] = await Promise.all([
+      supabase.from('cursos').select('title, price').eq('id', courseId).single(),
+      supabase.from('profiles').select('full_name').eq('id', studentId).single(),
+      supabase.from('profiles').select('full_name, email').eq('id', mentorId).single()
+    ]);
+
+    if (!courseData.data || !studentData.data || !mentorData.data) {
+      console.error('❌ [ENROLLMENT-EMAIL] Dados incompletos:', {
+        course: !!courseData.data,
+        student: !!studentData.data,
+        mentor: !!mentorData.data
+      });
+      return;
+    }
+
+    // Enviar notificação interna
+    await notifyCoursePurchase({
+      mentorId,
+      mentorName: mentorData.data.full_name,
+      buyerId: studentId,
+      buyerName: studentData.data.full_name || 'Usuário',
+      courseName: courseData.data.title,
+      coursePrice: (courseData.data.price || 0) * 100, // converter para centavos
+    });
+
+    console.log('✅ [ENROLLMENT-EMAIL] Notificação interna enviada');
+
+    // Enviar email para o mentor
+    if (mentorData.data.email) {
+      const emailResponse = await fetch('/api/email/course-buy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mentorName: mentorData.data.full_name,
+          mentorEmail: mentorData.data.email,
+          buyerName: studentData.data.full_name || 'Usuário',
+          courseName: courseData.data.title,
+          coursePrice: courseData.data.price || 0,
+          transactionId
+        })
+      });
+
+      const emailResult = await emailResponse.json();
+      
+      if (emailResult.success) {
+        console.log('✅ [ENROLLMENT-EMAIL] Email enviado para o mentor com sucesso:', {
+          enrollmentId: enrollmentUpdate.id,
+          transactionId,
+          timestamp: new Date().toISOString()
+        });
+          
+      } else {
+        console.error('❌ [ENROLLMENT-EMAIL] Erro ao enviar email:', emailResult.error);
+        
+        // 🛡️ ROLLBACK: Se falhou ao enviar email, desfazer a marcação para tentar novamente depois
+        await supabase
+          .from('matriculas')
+          .update({
+            email_sent: false,
+            email_sent_at: null
+          })
+          .eq('id', enrollmentUpdate.id);
+          
+        console.log('🔄 [ENROLLMENT-EMAIL] Marcação de email desfeita devido à falha no envio');
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ [ENROLLMENT-EMAIL] Erro geral:', error);
+    
+    // 🛡️ ROLLBACK: Em caso de erro geral, tentar desfazer marcação se foi feita
+    try {
+      await supabase
+        .from('matriculas')
+        .update({
+          email_sent: false,
+          email_sent_at: null
+        })
+        .eq('course_id', courseId)
+        .eq('student_id', studentId)
+        .eq('status', 'active')
+        .eq('email_sent', true);
+        
+      console.log('🔄 [ENROLLMENT-EMAIL] Tentativa de rollback devido a erro geral');
+    } catch (rollbackError) {
+      console.error('❌ [ENROLLMENT-EMAIL] Erro no rollback:', rollbackError);
+    }
+  }
+}
+
+/**
  * ===============================================================================
  * 💳 STRIPE CHECKOUT SERVICE - Sistema de Pagamentos (Frontend)
  * ===============================================================================
@@ -312,7 +471,12 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
   await logToNetworkChrome('STRIPE_CHECKOUT', 'HANDLE_SUCCESS_INICIADO', { sessionId, transactionId });
 
   try {
-    console.log('🔄 [CLIENT-STRIPE] Processando sucesso do checkout:', { sessionId, transactionId });
+    console.log('🔄 [CLIENT-STRIPE] Processando sucesso do checkout:', { 
+      sessionId, 
+      transactionId,
+      timestamp: new Date().toISOString(),
+      processId: Math.random().toString(36).substring(2, 11) // ID único para esta execução
+    });
 
     // Primeiro buscar a transação para obter o stripe_account_id
     const { data: transaction, error: fetchError } = await supabase
@@ -436,6 +600,8 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
         status: existingEnrollment.status
       });
     } else {
+      let enrollmentActivated = false;
+      
       if (existingEnrollment) {
         // Ativar matrícula existente
         await supabase
@@ -452,6 +618,7 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
           .eq('student_id', transaction.buyer_id);
         
         console.log('✅ [CLIENT-STRIPE] Matrícula ativada');
+        enrollmentActivated = true;
       } else {
         // Criar nova matrícula
         await supabase
@@ -469,76 +636,18 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
           });
         
         console.log('✅ [CLIENT-STRIPE] Nova matrícula criada');
+        enrollmentActivated = true;
       }
-    }
 
-    // Enviar notificação de compra para o mentor
-    try {
-      // Buscar dados do curso
-      const { data: courseData } = await supabase
-        .from('cursos')
-        .select('title')
-        .eq('id', transaction.course_id)
-        .single();
-
-      // Buscar dados do comprador
-      const { data: buyerData } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', transaction.buyer_id)
-        .single();
-
-      // Buscar email do mentor
-      const { data: mentorData } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('id', transaction.mentor_id)
-        .single();
-
-      if (courseData && buyerData && ownerName) {
-        await notifyCoursePurchase({
+      // 🎯 NOVA LÓGICA: Enviar email apenas quando matrícula é ativada
+      if (enrollmentActivated) {
+        await sendCourseEnrollmentEmail({
+          courseId: transaction.course_id,
+          studentId: transaction.buyer_id,
           mentorId: transaction.mentor_id,
-          mentorName: ownerName,
-          buyerId: transaction.buyer_id,
-          buyerName: buyerData.full_name || 'Usuário',
-          courseName: courseData.title,
-          coursePrice: amount, // já está em centavos
+          transactionId: transaction.id
         });
-        console.log('✅ [CLIENT-STRIPE] Notificação de compra enviada');
-
-        // Enviar e-mail de venda para o mentor
-        if (mentorData?.email) {
-          try {
-            const emailResponse = await fetch('/api/email/course-buy', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                mentorName: ownerName,
-                mentorEmail: mentorData.email,
-                buyerName: buyerData.full_name || 'Usuário',
-                courseName: courseData.title,
-                coursePrice: amount / 100, // converter de centavos para reais
-                transactionId: transaction.id
-              })
-            });
-
-            const emailResult = await emailResponse.json();
-            
-            if (emailResult.success) {
-              console.log('✅ [CLIENT-STRIPE] E-mail de venda enviado para o mentor');
-            } else {
-              console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar e-mail de venda:', emailResult.error);
-            }
-          } catch (emailError) {
-            console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar e-mail de venda:', emailError);
-          }
-        }
       }
-    } catch (notificationError) {
-      console.error('⚠️ [CLIENT-STRIPE] Erro ao enviar notificação:', notificationError);
-      // Não falhar o processo por erro de notificação
     }
 
     const finalResult = { success: true, transaction };

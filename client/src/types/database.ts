@@ -117,6 +117,8 @@ export interface Matricula {
   completed_at: string | null;
   progress_percentage: number | null;
   price: number | null;
+  email_sent: boolean;
+  email_sent_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -129,8 +129,18 @@ const MentoradoMeusCursosPage = () => {
   useEffect(() => {
     if (!user) return;
 
+    let isCheckingPayments = false; // Flag para evitar execuções sobrepostas
+
     const checkPendingPaymentsConditional = async () => {
+      // 🛡️ PROTEÇÃO: Evitar execuções simultâneas
+      if (isCheckingPayments) {
+        console.log('⚠️ [Mentorado] Verificação já em andamento, pulando...');
+        return;
+      }
+
       try {
+        isCheckingPayments = true;
+        
         // Verificar se há matrículas inativas antes de processar pagamentos pendentes
         const { data: inactiveEnrollments } = await supabase
           .from('matriculas')
@@ -147,11 +157,13 @@ const MentoradoMeusCursosPage = () => {
         }
       } catch (error) {
         console.error('Erro na verificação periódica:', error);
+      } finally {
+        isCheckingPayments = false;
       }
     };
 
-    // 🚀 OTIMIZAÇÃO: Configurar verificação periódica apenas se necessário (60 segundos)
-    const interval = setInterval(checkPendingPaymentsConditional, 60000);
+    // 🚀 OTIMIZAÇÃO: Configurar verificação periódica com intervalo maior (90 segundos) para reduzir race conditions
+    const interval = setInterval(checkPendingPaymentsConditional, 90000);
 
     return () => clearInterval(interval);
   }, [user]);
@@ -387,7 +399,7 @@ const MentoradoMeusCursosPage = () => {
                   <p className="text-gray-600 mb-4">
                     Você ainda não está matriculado em nenhum curso.
                   </p>
-                  <Button onClick={() => navigate('/cursos')}>
+                  <Button onClick={() => navigate('/courses')}>
                     Explorar Cursos
                   </Button>
                 </CardContent>
