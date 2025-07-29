@@ -110,13 +110,15 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
         delay: index * 0.1,
         ease: "easeOut"
       }}
-      className="w-full max-w-sm mx-auto"
+      className="w-full max-w-sm mx-auto group"
     >
       {/* Container principal que conecta os dois cards */}
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className="relative bg-background rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 glass-card">
+        {/* Overlay com gradiente dourado no hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
         {/* Card principal com efeito flip */}
         <div 
-          className="relative w-full h-80 [perspective:1000px] cursor-pointer"
+          className="relative w-full h-96 [perspective:1000px] cursor-pointer"
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
           onClick={handleViewProfile}
@@ -127,36 +129,36 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
             transition={{ duration: 0.6, ease: "easeInOut" }}
           >
           {/* Frente do Card */}
-           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-white overflow-hidden">
-             {/* Header com Efeito de Nuvens Roxas */}
+           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-background overflow-hidden relative z-10">
+             {/* Header com Efeito Premium Dourado */}
              <div className="relative overflow-hidden" style={{ height: '110px' }}>
-               {/* Efeito de Nuvens Roxas */}
+               {/* Efeito Premium com Gradiente Dourado */}
                <div className="absolute inset-0 overflow-hidden">
-                 {/* Base Gradient for Sky */}
-                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700"></div>
+                 {/* Base Gradient Premium */}
+                 <div className="absolute inset-0 bg-gradient-to-br from-gold/20 via-gold-light/15 to-background"></div>
 
-                 {/* Cloud 1 - Lighter, larger, more blurred */}
+                 {/* Efeito Shimmer 1 */}
                  <div
-                   className="absolute -top-10 -left-20 w-72 h-72 bg-purple-300/30 rounded-full blur-3xl opacity-80 animate-pulse"
+                   className="absolute -top-10 -left-20 w-72 h-72 bg-gold/10 rounded-full blur-3xl opacity-80 animate-pulse"
                    style={{ animationDuration: '10s' }}
                  ></div>
 
-                 {/* Cloud 2 - Slightly darker, medium size, less blurred */}
+                 {/* Efeito Shimmer 2 */}
                  <div
-                   className="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-400/40 rounded-full blur-2xl opacity-70 animate-pulse"
+                   className="absolute -bottom-10 -right-10 w-60 h-60 bg-gold-light/15 rounded-full blur-2xl opacity-70 animate-pulse"
                    style={{ animationDuration: '12s', animationDelay: '2s' }}
                  ></div>
                  
-                 {/* Cloud 3 - Different shade, smaller, more defined */}
+                 {/* Efeito Shimmer 3 */}
                  <div
-                   className="absolute top-5 left-1/3 w-48 h-48 bg-indigo-300/30 rounded-full blur-xl opacity-90 animate-pulse"
+                   className="absolute top-5 left-1/3 w-48 h-48 bg-gold/8 rounded-full blur-xl opacity-90 animate-pulse"
                    style={{ animationDuration: '11s', animationDelay: '1s' }}
                  ></div>
                </div>
               
-              {/* Tag Mentor Verificado à Esquerda (onde era a categoria) */}
+              {/* Tag Mentor Verificado Premium */}
               <div className="absolute top-4 left-4 z-20">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-100/90 text-purple-700 text-xs font-semibold shadow-lg backdrop-blur-sm border border-purple-200/50">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold/20 text-gold border border-gold/30 text-xs font-semibold shadow-lg backdrop-blur-sm">
                   <Star className="w-3 h-3" />
                   <span>Mentor Verificado</span>
                 </div>
@@ -166,34 +168,33 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
             {/* Avatar */}
             <div className="relative flex justify-center" style={{ marginTop: '-50px' }}>
               <div className="relative">
-                <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+                <Avatar className="w-24 h-24 border-4 border-gold/30 shadow-lg shadow-gold/20">
                   <AvatarImage 
                     src={mentor.avatar_url || undefined} 
                     alt={mentor.full_name || "Mentor"}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white text-xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-gold to-gold-light text-background text-xl font-bold">
                     {mentor.full_name?.charAt(0) || "M"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-background rounded-full"></div>
               </div>
             </div>
 
             {/* Conteúdo da Frente */}
             <div className="p-6 pt-4 text-center">
-              {/* Nome e Tag de Categoria (onde era o mentor verificado) */}
+              {/* Nome e Tag de Categoria */}
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                <h3 className="text-xl font-bold text-foreground mb-2">
                   {mentor.full_name || "Mentor"}
                 </h3>
                 
-                {/* Categoria do Mentor (agora no centro, onde era o mentor verificado) */}
+                {/* Categoria do Mentor Premium */}
                 {mentor.category && categoryInfo && (
                   <div className="mb-2">
                     <div 
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-white text-xs font-semibold shadow-lg backdrop-blur-sm border border-white/20"
-                      style={{ backgroundColor: `${categoryInfo.color}E6` }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-background text-xs font-semibold shadow-lg backdrop-blur-sm border border-gold/30 bg-gradient-to-r from-gold to-gold-light"
                     >
                       {React.createElement(categoryInfo.icon, { className: "w-3 h-3" })}
                       <span>{mentor.category}</span>
@@ -204,72 +205,65 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
 
               {/* Highlight Message */}
               {mentor.highlight_message && (
-                <p className="text-sm text-gray-700 italic mb-4">
+                <p className="text-sm text-muted-foreground italic mb-4">
                   "{mentor.highlight_message}"
                 </p>
               )}
 
               {/* Indicação para virar o card */}
-              <p className="text-xs text-gray-600 mt-auto pt-4">Passe o mouse para saber mais</p>
+              <p className="text-xs text-muted-foreground mt-auto pt-4">Passe o mouse para saber mais</p>
             </div>
           </div>
 
           {/* Verso do Card */}
-           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-white overflow-hidden">
-            <div className="p-6 h-full flex flex-col">
-              {/* Header do verso com foto */}
-              <div className="text-center mb-4">
-                <Avatar className="w-16 h-16 mx-auto mb-3 border-2 border-purple-200">
+           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-background overflow-hidden relative z-10">
+            <div className="p-4 h-full flex flex-col">
+              {/* Header do verso com foto - mais compacto */}
+              <div className="text-center mb-3">
+                <Avatar className="w-12 h-12 mx-auto mb-2 border-2 border-gold/30">
                   <AvatarImage 
                     src={mentor.avatar_url || undefined} 
                     alt={mentor.full_name || "Mentor"}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white text-lg font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-gold to-gold-light text-background text-sm font-bold">
                     {mentor.full_name?.charAt(0) || "M"}
                   </AvatarFallback>
                 </Avatar>
-                <h3 className="text-lg font-bold text-gray-800">
+                <h3 className="text-base font-bold text-foreground">
                   Sobre {mentor.full_name?.split(' ')[0] || "o Mentor"}
                 </h3>
               </div>
 
-              {/* Bio com borda */}
-              <div className="flex-1 mb-4">
+              {/* Bio com borda premium - área flexível */}
+              <div className="flex-1 mb-3 min-h-0">
                 {mentor.bio ? (
-                  <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div className="text-sm text-gray-700 leading-relaxed text-justify">
-                      <p className="whitespace-pre-line">{truncateText(stripHtmlTags(mentor.bio))}</p>
+                  <div className="border-2 border-gold/20 rounded-lg p-3 bg-gold/5 backdrop-blur-sm h-full overflow-y-auto">
+                    <div className="text-xs text-foreground leading-relaxed text-justify">
+                      <p className="whitespace-pre-line">{truncateText(stripHtmlTags(mentor.bio), 250)}</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div className="text-sm text-gray-500 italic text-center">
+                  <div className="border-2 border-gold/20 rounded-lg p-3 bg-gold/5 backdrop-blur-sm h-full flex items-center justify-center">
+                    <div className="text-xs text-muted-foreground italic text-center">
                       Este mentor ainda não adicionou uma biografia.
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Call to action */}
-              <div className="text-center mb-4">
-                <p className="text-xs text-gray-600 mb-2">
-                  Clique no card para ver o perfil completo
-                </p>
-              </div>
-
-              {/* Botões de ação */}
-              <div className="flex gap-2">
+              {/* Botões de ação premium - mais compactos */}
+              <div className="flex gap-1">
                 <Button 
                   onClick={(e) => {
                     e.stopPropagation();
                     handleViewProfile();
                   }}
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                  className="flex-1 bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background shadow-lg hover:shadow-xl transition-all duration-200 text-xs"
                   size="sm"
                 >
-                  <User className="w-4 h-4 mr-2" />
-                  Ver Perfil Completo
+                  <User className="w-3 h-3 mr-1" />
+                  Ver Perfil
                 </Button>
                 <Button 
                   onClick={(e) => {
@@ -278,10 +272,10 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                   }}
                   variant="outline"
                   size="sm"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                  className="border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50 px-2"
                   title="Agendar Conversa"
                 >
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-3 h-3" />
                 </Button>
                 {mentor.phone && (
                   <Button 
@@ -291,9 +285,9 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                     }}
                     variant="outline"
                     size="sm"
-                    className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                    className="border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50 px-2"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageCircle className="w-3 h-3" />
                   </Button>
                 )}
               </div>
@@ -302,16 +296,16 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
         </motion.div>
       </div>
       
-      {/* Rodapé fixo que não vira com o card - integrado ao container */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200 p-3">
+      {/* Rodapé fixo premium que não vira com o card */}
+      <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 border-t border-gold/20 p-3 backdrop-blur-sm">
         <div className="flex justify-center">
-          {/* Botão de agendar centralizado */}
+          {/* Botão de agendar centralizado premium */}
           <Button 
             onClick={(e) => {
               e.stopPropagation();
               handleViewSchedule();
             }}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 w-full"
+            className="bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background shadow-lg hover:shadow-xl transition-all duration-200 w-full btn-gold"
             size="sm"
           >
             <Calendar className="w-4 h-4 mr-2" />

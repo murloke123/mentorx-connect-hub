@@ -1,63 +1,37 @@
-import { Award, Users } from 'lucide-react';
-
-const mentors = [
-  {
-    id: 1,
-    name: "Dr. Ricardo Financas",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Investimentos & Trading",
-    badge: "⭐ TOP MENTOR",
-    badgeClass: "badge-premium",
-    stats: "847 mentorados | 4.9⭐ | R$ 2.3M gerados"
-  },
-  {
-    id: 2,
-    name: "Ana Marketing Digital",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Marketing Digital & Vendas",
-    badge: "🚀 RISING STAR",
-    badgeClass: "badge-premium",
-    stats: "1.2K mentorados | 4.8⭐ | +300% ROI médio"
-  },
-  {
-    id: 3,
-    name: "Prof. Carlos Tech",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Programação & IA",
-    badge: "🤖 TECH GURU",
-    badgeClass: "badge-premium",
-    stats: "956 mentorados | 4.9⭐ | 89% empregabilidade"
-  },
-  {
-    id: 4,
-    name: "Dra. Julia Mindset",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Desenvolvimento Pessoal",
-    badge: "💎 LIFE COACH",
-    badgeClass: "badge-premium",
-    stats: "2.1K mentorados | 5.0⭐ | 94% satisfação"
-  },
-  {
-    id: 5,
-    name: "Bruno Empreendedor",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Empreendedorismo & Negócios",
-    badge: "👑 BUSINESS EXPERT",
-    badgeClass: "badge-premium",
-    stats: "643 mentorados | 4.7⭐ | 156 negócios criados"
-  },
-  {
-    id: 6,
-    name: "Marina Creator",
-    image: "/images/brasoessemfundo.png", // Usando imagem existente como placeholder
-    specialty: "Criação de Conteúdo",
-    badge: "📹 CONTENT QUEEN",
-    badgeClass: "badge-premium",
-    stats: "1.8K mentorados | 4.8⭐ | +50M views geradas"
-  }
-];
+import { Award, Rocket, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getFeaturedMentors } from '../services/mentorService';
+import { Profile } from '../types/database';
+import MentorCard2 from './shared/MentorCard2';
 
 const MentorsSection = () => {
+  const [mentors, setMentors] = useState<Profile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [count, setCount] = useState(2847);
+
+  useEffect(() => {
+    const loadMentors = async () => {
+      try {
+        setIsLoading(true);
+        const featuredMentors = await getFeaturedMentors();
+        setMentors(featuredMentors);
+      } catch (error) {
+        console.error('Erro ao carregar mentores:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMentors();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(prev => prev + Math.floor(Math.random() * 3));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="py-20 relative overflow-hidden bg-background">
       {/* Background Video */}
@@ -88,53 +62,21 @@ const MentorsSection = () => {
 
         {/* Mentors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mentors.map((mentor, index) => (
-            <div
-              key={mentor.id}
-              className="premium-card group hover:scale-105 transform transition-all duration-500 bg-card/80 backdrop-blur-sm"
-            >
-              {/* Badge */}
-              <div className="absolute -top-3 left-6 z-10">
-                <span className={mentor.badgeClass}>
-                  {mentor.badge}
-                </span>
+          {isLoading ? (
+            // Loading placeholders
+            Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="premium-card bg-card/80 backdrop-blur-sm animate-pulse"
+              >
+                <div className="h-96 bg-muted/20 rounded-2xl"></div>
               </div>
-
-              {/* Mentor Image */}
-              <div className="relative mb-6">
-                <div className="w-24 h-24 mx-auto relative">
-                  <img
-                    src={mentor.image}
-                    alt={mentor.name}
-                    className="w-full h-full rounded-full object-cover border-4 border-gold/30 group-hover:border-gold transition-all duration-300"
-                  />
-                  <div className="absolute inset-0 rounded-full border-4 border-gold/50 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ animationDuration: '3s' }}></div>
-                </div>
-              </div>
-
-              {/* Mentor Info */}
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-gold transition-colors duration-300">
-                  {mentor.name}
-                </h3>
-                <p className="text-silver mb-4 font-medium">
-                  {mentor.specialty}
-                </p>
-
-                {/* Stats */}
-                <div className="space-y-2 text-sm text-silver-light">
-                  <div className="flex items-center justify-center space-x-2">
-                    <Users className="w-4 h-4 text-gold" />
-                    <span>{mentor.stats}</span>
-                  </div>
-                </div>
-
-                {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-t from-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-              </div>
-
-            </div>
-          ))}
+            ))
+          ) : (
+            mentors.map((mentor) => (
+              <MentorCard2 key={mentor.id} mentor={mentor} />
+            ))
+          )}
         </div>
 
         {/* Bottom CTA */}
@@ -142,12 +84,27 @@ const MentorsSection = () => {
           <p className="text-xl text-silver-light mb-6">
             Junte-se aos melhores mentores do Brasil
           </p>
-          <div className="glass-card inline-block px-6 py-3">
-            <div className="flex items-center space-x-2">
-              <Award className="w-5 h-5 text-gold" />
-              <span className="text-gold font-semibold">Processo seletivo rigoroso</span>
-              <span className="text-silver">•</span>
-              <span className="text-silver">Apenas 3% são aprovados</span>
+          
+          <div className="flex flex-col items-center space-y-4">
+            {/* Processo Seletivo Card */}
+            <div className="glass-card px-6 py-3">
+              <div className="flex items-center space-x-2">
+                <Award className="w-5 h-5 text-gold" />
+                <span className="text-gold font-semibold">Processo seletivo rigoroso</span>
+                <span className="text-silver">•</span>
+                <span className="text-silver">Apenas 3% são aprovados</span>
+              </div>
+            </div>
+            
+            {/* Counter Card - Abaixo do processo seletivo */}
+            <div className="glass-card px-6 py-3">
+              <div className="flex items-center space-x-2">
+                <Rocket className="w-5 h-5 text-gold animate-pulse" />
+                <span className="text-silver">
+                  Mais de <span className="text-gold font-semibold">{count.toLocaleString()}</span> mentores já transformaram suas vidas
+                </span>
+                <Star className="w-5 h-5 text-gold animate-pulse" />
+              </div>
             </div>
           </div>
         </div>

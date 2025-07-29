@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from '../../utils/supabase';
-import { Spinner } from "@/components/ui/spinner";
 import ProfileForm from "@/components/profile/ProfileForm";
-import type { User } from '@supabase/supabase-js';
+import { Spinner } from "@/components/ui/spinner";
 import { Profile } from '@/types/database';
+import type { User } from '@supabase/supabase-js';
+import { useEffect, useState } from "react";
+import { supabase } from '../../utils/supabase';
 
 interface ProfilePageProps {
   userRole?: "mentor" | "mentorado" | "admin";
@@ -89,7 +89,7 @@ const ProfilePage = ({ userRole }: ProfilePageProps) => {
 
   return (
         <ProfileForm 
-          user={profileData} 
+          user={user} 
           profileData={profileData}
           onProfileUpdate={() => fetchProfileData(user?.id || "")}
         />

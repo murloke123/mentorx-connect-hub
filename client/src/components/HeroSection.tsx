@@ -1,32 +1,8 @@
+import { TypingAnimation } from "@/components/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
-import { Brain, Star, TrendingUp } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Bot, Brain } from 'lucide-react';
 
 const HeroSection = () => {
-  const [count, setCount] = useState(2847);
-  const [displayedText, setDisplayedText] = useState("");
-  const fullText = "TRANSFORME SEU CONHECIMENTO";
-
-  useEffect(() => {
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullText.length) {
-        setDisplayedText(fullText.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 80);
-
-    return () => clearInterval(typingInterval);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount(prev => prev + Math.floor(Math.random() * 3));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
@@ -62,23 +38,32 @@ const HeroSection = () => {
         <div className="mb-8">
           <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
             <span className="gradient-text text-shadow-gold">
-              {displayedText}
-              <span className="animate-pulse">|</span>
+              TRANSFORME SEU CONHECIMENTO
             </span>
             <br />
             <span className="text-foreground">
               EM UM IMPÉRIO DIGITAL
             </span>
             <br />
-            <span className="text-gold animate-glow-pulse">
-              COM IA
-            </span>
+            <div style={{ marginTop: '50px' }}>
+              <span className="text-gold animate-glow-pulse flex items-center justify-center gap-3">
+                <Bot className="h-16 w-16 md:h-20 md:w-20 text-gold animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.6)]" />
+                <span className="text-gold font-black drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] shadow-gold animate-glow-pulse">
+                  COM IA
+                </span>
+              </span>
+            </div>
           </h1>
           
-          <p className="text-xl md:text-2xl text-silver-light mb-8 max-w-4xl mx-auto leading-relaxed">
-            A única plataforma com <span className="text-gold font-semibold">Inteligência Artificial</span> que permite 
-            acompanhar cada passo da jornada dos seus mentorados
-          </p>
+          <TypingAnimation
+            className="text-xl md:text-2xl text-silver-light mb-8 max-w-4xl mx-auto leading-relaxed font-light italic"
+            duration={50}
+            repeat={true}
+            showCursor={true}
+            allowHTML={true}
+          >
+            {'A única plataforma com <span class="text-gold font-semibold">Inteligência Artificial</span> que permite acompanhar cada passo da jornada dos seus mentorados...'}
+          </TypingAnimation>
         </div>
 
         {/* CTA Button */}
@@ -87,17 +72,6 @@ const HeroSection = () => {
             <Brain className="mr-3 h-6 w-6" />
             QUERO MINHA PLATAFORMA EXCLUSIVA
           </Button>
-        </div>
-
-        {/* Counter */}
-        <div className="glass-card inline-block px-8 py-4 animate-bounce-slow">
-          <div className="flex items-center space-x-3">
-            <TrendingUp className="h-6 w-6 text-gold animate-bounce" />
-            <span className="text-lg text-silver-light">
-              Mais de <span className="text-gold font-bold text-2xl">{count.toLocaleString()}</span> mentores já transformaram suas vidas
-            </span>
-            <Star className="h-6 w-6 text-gold animate-pulse" />
-          </div>
         </div>
       </div>
 

@@ -1,19 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, Info, MessageSquare, Phone, Star, User } from "lucide-react";
+import type { User } from '@supabase/supabase-js';
+import { Calendar, Camera, Info, MessageSquare, Phone, Star, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "../../hooks/use-toast";
 import { useCategories } from "../../hooks/useCategories";
-import { Profile, supabase } from "../../utils/supabase";
+import { supabase } from "../../utils/supabase";
+import { uploadImage } from "../../utils/uploadImage";
 import RichTextEditor from "../mentor/content/RichTextEditor";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
-    DialogTitle,
+    DialogTitle
 } from "../ui/dialog";
 import {
     Form,
@@ -24,13 +27,15 @@ import {
     FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "../ui/tooltip";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../ui/select";
+import { Spinner } from "../ui/spinner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface ProfileData {
   id: string;
@@ -38,7 +43,7 @@ interface ProfileData {
   bio?: string | null;
   avatar_url?: string | null;
   email?: string | null;
-  role?: string;
+  role?: string | null;
   highlight_message?: string | null;
   category?: string | null;
   category_id?: string | null;
@@ -58,7 +63,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
-  user: Profile | null;
+  user: User | null;
   profileData: ProfileData | null;
   onProfileUpdate?: () => void;
 }
@@ -68,6 +73,88 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
   const { categories, loading: categoriesLoading } = useCategories();
   const [isLoading, setIsLoading] = useState(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(profileData?.avatar_url || null);
+
+  // Função para lidar com upload de avatar
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    console.log('🔍 Debug - Iniciando upload de avatar:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      userId: user.id,
+      currentAvatarUrl: avatarUrl
+    });
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo inválido",
+        description: "Por favor, selecione apenas arquivos de imagem.",
+      });
+      return;
+    }
+
+    // Validar tamanho do arquivo (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo muito grande",
+        description: "A imagem deve ter no máximo 2MB.",
+      });
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      console.log('🔍 Debug - Chamando uploadImage...');
+      
+      // Upload da nova imagem
+      const uploadResult = await uploadImage(file, 'avatars', avatarUrl || undefined);
+      
+      console.log('🔍 Debug - Upload resultado:', uploadResult);
+
+      // Atualizar no banco de dados
+      console.log('🔍 Debug - Atualizando banco de dados...');
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: uploadResult.url })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('🔍 Debug - Erro no banco de dados:', error);
+        throw error;
+      }
+
+      console.log('🔍 Debug - Upload concluído com sucesso!');
+      setAvatarUrl(uploadResult.url);
+      
+      toast({
+        title: "Avatar atualizado",
+        description: "Sua foto de perfil foi atualizada com sucesso.",
+      });
+
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+    } catch (error) {
+      console.error('🔍 Debug - Erro completo:', error);
+      console.error('🔍 Debug - Erro detalhado:', JSON.stringify(error, null, 2));
+      
+      toast({
+        variant: "destructive",
+        title: "Erro no upload",
+        description: `Erro: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+      });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
   
   // Texto padrão para mentores
   const defaultBioText = `<p class="p1"><span class="s1"></span></p><h2>
@@ -100,12 +187,13 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
     
   const [bioContent, setBioContent] = useState(initialBioContent);
 
-  // Atualizar bioContent quando profileData mudar
+  // Atualizar bioContent e avatarUrl quando profileData mudar
   useEffect(() => {
     const newBioContent = profileData?.role === 'mentor' && (!profileData?.bio || profileData?.bio.trim() === '') 
       ? defaultBioText 
       : (profileData?.bio || "");
     setBioContent(newBioContent);
+    setAvatarUrl(profileData?.avatar_url || null);
   }, [profileData, defaultBioText]);
 
   const form = useForm<ProfileFormValues>({
@@ -178,11 +266,54 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <User className="h-5 w-5 text-blue-600" />
+                  <UserIcon className="h-5 w-5 text-blue-600" />
                   Informações Pessoais
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Upload de Avatar */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage 
+                        src={avatarUrl || undefined} 
+                        alt={profileData?.full_name || "Avatar"} 
+                      />
+                      <AvatarFallback className="text-lg">
+                        {profileData?.full_name?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    {/* Botão de upload sobreposto */}
+                    <label 
+                      htmlFor="avatar-upload" 
+                      className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer transition-colors shadow-lg"
+                    >
+                      {isUploadingAvatar ? (
+                        <Spinner className="h-4 w-4" />
+                      ) : (
+                        <Camera className="h-4 w-4" />
+                      )}
+                    </label>
+                    
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                      disabled={isUploadingAvatar}
+                    />
+                  </div>
+                  
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-gray-700">Foto de Perfil</p>
+                    <p className="text-xs text-gray-500">
+                      Clique no ícone da câmera para alterar (máx. 2MB)
+                    </p>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}

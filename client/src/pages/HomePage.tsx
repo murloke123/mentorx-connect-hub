@@ -7,8 +7,7 @@ import MentorsSection from "@/components/MentorsSection";
 import PricingSection from "@/components/PricingSection";
 import CourseCard from "@/components/shared/CourseCard";
 import Footer from "@/components/shared/Footer";
-import MentorCard from "@/components/shared/MentorCard";
-import Navigation from "@/components/shared/Navigation";
+import MentorCard2 from "@/components/shared/MentorCard2";
 import StatsSection from "@/components/StatsSection";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -64,9 +63,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation Menu */}
-      <Navigation />
-      
       {/* Hero Section do novo layout */}
       <HeroSection />
       
@@ -146,15 +142,16 @@ const HomePage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {!isLoading && featuredMentors.map((mentor) => (
-              <div key={mentor.id} className="transform hover:scale-105 transition-all duration-300">
-                <MentorCard mentor={mentor} />
-              </div>
+              <MentorCard2 
+                key={mentor.id} 
+                mentor={mentor}
+              />
             ))}
             {isLoading && (
               <>
-                <div className="h-48 glass-card animate-pulse" />
-                <div className="h-48 glass-card animate-pulse" />
-                <div className="h-48 glass-card animate-pulse" />
+                <div className="h-96 glass-card animate-pulse" />
+                <div className="h-96 glass-card animate-pulse" />
+                <div className="h-96 glass-card animate-pulse" />
               </>
             )}
           </div>
