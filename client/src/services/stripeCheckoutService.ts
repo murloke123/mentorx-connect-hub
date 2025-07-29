@@ -5,11 +5,6 @@
  * garantindo que apenas 1 email seja enviado por curso comprado.
  * 
  * Lógica: 1 matrícula ativa = 1 email enviado
- * 
- * 🛡️ PROTEÇÃO ANTI-DUPLICAÇÃO:
- * - Usa atomic update para marcar email como sendo enviado
- * - Verifica novamente após marcar para evitar race conditions
- * - Log detalhado para debug de duplicações
  */
 async function sendCourseEnrollmentEmail({
   courseId,
@@ -27,40 +22,26 @@ async function sendCourseEnrollmentEmail({
       courseId,
       studentId,
       mentorId,
-      transactionId,
-      timestamp: new Date().toISOString()
+      transactionId
     });
 
-    // 🛡️ PROTEÇÃO 1: Verificar e MARCAR atomicamente como "being sent" 
-    const { data: enrollmentUpdate, error: updateError } = await supabase
+    // Verificar se já existe uma matrícula ativa para este curso/estudante
+    const { data: activeEnrollment, error: enrollmentError } = await supabase
       .from('matriculas')
-      .update({
-        email_sent: true,
-        email_sent_at: new Date().toISOString()
-      })
+      .select('id, email_sent')
       .eq('course_id', courseId)
       .eq('student_id', studentId)
       .eq('status', 'active')
-      .eq('email_sent', false) // Só atualiza se ainda não foi enviado
-      .select('id, email_sent, email_sent_at')
       .single();
 
-    if (updateError || !enrollmentUpdate) {
-      console.log('✅ [ENROLLMENT-EMAIL] Email já foi enviado por outra instância ou matrícula não encontrada:', {
-        error: updateError?.message,
-        hasUpdate: !!enrollmentUpdate
-      });
+    if (enrollmentError) {
+      console.error('❌ [ENROLLMENT-EMAIL] Erro ao verificar matrícula:', enrollmentError);
       return;
     }
 
-    console.log('🔒 [ENROLLMENT-EMAIL] Matrícula marcada para envio de email:', {
-      enrollmentId: enrollmentUpdate.id,
-      email_sent_at: enrollmentUpdate.email_sent_at
-    });
-
-    // 🛡️ PROTEÇÃO 2: Verificar se conseguimos marcar com sucesso (race condition final)
-    if (!enrollmentUpdate.email_sent) {
-      console.log('⚠️ [ENROLLMENT-EMAIL] Falha na marcação atomic, outra instância pode ter processado');
+    // Se email já foi enviado para esta matrícula, pular
+    if (activeEnrollment?.email_sent) {
+      console.log('✅ [ENROLLMENT-EMAIL] Email já enviado para esta matrícula, pulando...');
       return;
     }
 
@@ -112,48 +93,24 @@ async function sendCourseEnrollmentEmail({
       const emailResult = await emailResponse.json();
       
       if (emailResult.success) {
-        console.log('✅ [ENROLLMENT-EMAIL] Email enviado para o mentor com sucesso:', {
-          enrollmentId: enrollmentUpdate.id,
-          transactionId,
-          timestamp: new Date().toISOString()
-        });
-          
-      } else {
-        console.error('❌ [ENROLLMENT-EMAIL] Erro ao enviar email:', emailResult.error);
+        console.log('✅ [ENROLLMENT-EMAIL] Email enviado para o mentor');
         
-        // 🛡️ ROLLBACK: Se falhou ao enviar email, desfazer a marcação para tentar novamente depois
+        // Marcar email como enviado na matrícula
         await supabase
           .from('matriculas')
           .update({
-            email_sent: false,
-            email_sent_at: null
+            email_sent: true,
+            email_sent_at: new Date().toISOString()
           })
-          .eq('id', enrollmentUpdate.id);
+          .eq('id', activeEnrollment.id);
           
-        console.log('🔄 [ENROLLMENT-EMAIL] Marcação de email desfeita devido à falha no envio');
+      } else {
+        console.error('❌ [ENROLLMENT-EMAIL] Erro ao enviar email:', emailResult.error);
       }
     }
 
   } catch (error) {
     console.error('❌ [ENROLLMENT-EMAIL] Erro geral:', error);
-    
-    // 🛡️ ROLLBACK: Em caso de erro geral, tentar desfazer marcação se foi feita
-    try {
-      await supabase
-        .from('matriculas')
-        .update({
-          email_sent: false,
-          email_sent_at: null
-        })
-        .eq('course_id', courseId)
-        .eq('student_id', studentId)
-        .eq('status', 'active')
-        .eq('email_sent', true);
-        
-      console.log('🔄 [ENROLLMENT-EMAIL] Tentativa de rollback devido a erro geral');
-    } catch (rollbackError) {
-      console.error('❌ [ENROLLMENT-EMAIL] Erro no rollback:', rollbackError);
-    }
   }
 }
 
@@ -471,12 +428,7 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
   await logToNetworkChrome('STRIPE_CHECKOUT', 'HANDLE_SUCCESS_INICIADO', { sessionId, transactionId });
 
   try {
-    console.log('🔄 [CLIENT-STRIPE] Processando sucesso do checkout:', { 
-      sessionId, 
-      transactionId,
-      timestamp: new Date().toISOString(),
-      processId: Math.random().toString(36).substring(2, 11) // ID único para esta execução
-    });
+    console.log('🔄 [CLIENT-STRIPE] Processando sucesso do checkout:', { sessionId, transactionId });
 
     // Primeiro buscar a transação para obter o stripe_account_id
     const { data: transaction, error: fetchError } = await supabase

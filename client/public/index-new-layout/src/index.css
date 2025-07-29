@@ -2,43 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Premium Mentora AI Design System - Luxury Gold & Silver Theme */
+
 @layer base {
   :root {
-    /* Premium Mentora AI Design System - Luxury Gold & Silver Theme */
-    
-    /* Base Colors */
+    /* Background System */
     --background: 220 15% 4%;
-    --background-secondary: 220 15% 8%;
-    --foreground: 210 40% 98%;
+    --background-secondary: 220 15% 6%;
+    --foreground: 45 100% 96%;
 
-    /* Card Colors */
-    --card: 220 15% 8%;
-    --card-foreground: 210 40% 98%;
-    --card-premium: 220 15% 12%;
-
-    --popover: 220 15% 8%;
-    --popover-foreground: 210 40% 98%;
-
-    /* Premium Gold Colors */
+    /* Premium Colors */
     --gold: 45 95% 68%;
     --gold-light: 48 100% 78%;
     --gold-dark: 42 85% 58%;
-
-    /* Premium Silver Colors */
     --silver: 210 15% 75%;
     --silver-light: 210 20% 85%;
     --silver-dark: 210 15% 65%;
 
-    /* Text & Content */
-    --muted: 220 15% 20%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 220 15% 16%;
-    --accent-foreground: 210 40% 98%;
-
-    /* Destructive Colors */
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 210 40% 98%;
+    /* Card System */
+    --card: 220 15% 8%;
+    --card-foreground: 45 100% 96%;
+    --card-premium: 220 15% 10%;
 
     /* Interactive Elements */
     --primary: 45 95% 68%;
@@ -196,10 +180,6 @@
   
   .border-gradient {
     border-image: var(--gradient-gold) 1;
-  }
-
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
   }
 }
 

@@ -1,6 +1,15 @@
+import CoursesSection from "@/components/CoursesSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import FinalCTASection from "@/components/FinalCTASection";
+import HeroSection from "@/components/HeroSection";
+import HighlightsCarousel from "@/components/HighlightsCarousel";
+import MentorsSection from "@/components/MentorsSection";
+import PricingSection from "@/components/PricingSection";
 import CourseCard from "@/components/shared/CourseCard";
-import Hero from "@/components/shared/Hero";
+import Footer from "@/components/shared/Footer";
 import MentorCard from "@/components/shared/MentorCard";
+import Navigation from "@/components/shared/Navigation";
+import StatsSection from "@/components/StatsSection";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicCourses } from "@/services/courseService";
@@ -54,28 +63,61 @@ const HomePage: React.FC = () => {
   }, [toast]);
 
   return (
-    <div>
-      <Hero />
+    <div className="min-h-screen bg-background">
+      {/* Navigation Menu */}
+      <Navigation />
       
-      {/* Live Courses Section */}
-      <section className="py-12 px-4 md:px-8 lg:px-16">
+      {/* Hero Section do novo layout */}
+      <HeroSection />
+      
+      {/* Placeholder para MentorsSection (será implementada depois) */}
+      <MentorsSection />
+      
+      {/* Placeholder para CoursesSection (será implementada depois) */}
+      <CoursesSection />
+      
+      {/* Features Section - Nova seção premium com IA */}
+      <FeaturesSection />
+      
+      {/* Highlights Carousel - Seção de destaques animada */}
+      <HighlightsCarousel />
+      
+      {/* Stats Section - Seção de estatísticas impressionantes */}
+      <StatsSection />
+      
+      {/* Pricing Section - Seção de preços */}
+      <PricingSection />
+      
+      {/* Live Courses Section - Mantendo seção original com styling melhorado */}
+      <section className="py-20 px-4 md:px-8 lg:px-16 bg-background">
         <div className="container mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Cursos em Destaque</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-black mb-6 gradient-text text-shadow-gold">
+              CURSOS EM
+            </h2>
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              DESTAQUE
+            </h3>
+            <p className="text-xl text-silver-light max-w-3xl mx-auto mb-8">
+              Descubra os cursos mais procurados da plataforma
+            </p>
+            <div className="w-32 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mb-8"></div>
             <Link to="/courses">
-              <Button variant="outline">Ver todos os cursos</Button>
+              <Button className="btn-gold">Ver todos os cursos</Button>
             </Link>
           </div>
           
           {/* Grid responsivo: 1 coluna no mobile, 2 no tablet, 4 no desktop */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {!isLoading && liveCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <div key={course.id} className="transform hover:scale-105 transition-all duration-300">
+                <CourseCard course={course} />
+              </div>
             ))}
             {isLoading && (
               <>
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={index} className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                  <div key={index} className="h-48 glass-card animate-pulse" />
                 ))}
               </>
             )}
@@ -83,52 +125,47 @@ const HomePage: React.FC = () => {
         </div>
       </section>
       
-      {/* Featured Mentors Section */}
-      <section className="py-12 px-4 md:px-8 lg:px-16">
+      {/* Featured Mentors Section - Mantendo seção original com styling melhorado */}
+      <section className="py-20 px-4 md:px-8 lg:px-16 bg-background">
         <div className="container mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Mentores em Destaque</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-black mb-6 gradient-text text-shadow-gold">
+              MENTORES EM
+            </h2>
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              DESTAQUE
+            </h3>
+            <p className="text-xl text-silver-light max-w-3xl mx-auto mb-8">
+              Conheça os mentores mais experientes da nossa plataforma
+            </p>
+            <div className="w-32 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mb-8"></div>
             <Link to="/mentors">
-              <Button variant="outline">Conheça nossos mentores</Button>
+              <Button className="btn-gold">Conheça nossos mentores</Button>
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {!isLoading && featuredMentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
+              <div key={mentor.id} className="transform hover:scale-105 transition-all duration-300">
+                <MentorCard mentor={mentor} />
+              </div>
             ))}
             {isLoading && (
               <>
-                <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
-                <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
-                <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="h-48 glass-card animate-pulse" />
+                <div className="h-48 glass-card animate-pulse" />
+                <div className="h-48 glass-card animate-pulse" />
               </>
             )}
           </div>
         </div>
       </section>
       
-      {/* CTA Section */}
-      <section className="py-16 px-4 md:px-8 lg:px-16 bg-primary text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Comece sua jornada hoje</h2>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-            Acesse cursos de alta qualidade e mentorias personalizadas para acelerar sua carreira
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link to="/courses">
-              <Button variant="secondary" size="lg">
-                Explorar cursos
-              </Button>
-            </Link>
-            <Link to="/mentors">
-              <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white hover:text-primary">
-                Encontrar mentor
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Final CTA Section do novo layout */}
+      <FinalCTASection />
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

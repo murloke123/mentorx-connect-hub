@@ -67,33 +67,16 @@ email_sent_at TIMESTAMPTZ NULL
 - ✅ **Auditoria**: Timestamp de quando o e-mail foi enviado
 - ✅ **Proteção**: Múltiplas verificações contra duplicação
 
-## 🔧 Melhorias Implementadas (2025-07-28)
-
-### 🛡️ **Proteção Anti-Race Condition Aprimorada**
-
-1. **Update Atômico**: A função `sendCourseEnrollmentEmail` agora usa update atômico para marcar email como enviado
-2. **Rollback Automático**: Se o envio falhar, a marcação é desfeita automaticamente
-3. **Logs Detalhados**: IDs únicos de processo para rastrear execuções simultâneas
-4. **Intervalo Otimizado**: Verificações periódicas aumentadas de 60s para 90s
-5. **Flag de Execução**: Proteção contra verificações sobrepostas na mesma instância
-
-### 📊 **Melhorias na Lógica de Controle**
-
-```typescript
-// ✅ ANTES: Verificação simples
-if (activeEnrollment?.email_sent) { return; }
-
-// ✅ AGORA: Update atômico com rollback
-const enrollmentUpdate = await supabase
-  .update({ email_sent: true, email_sent_at: now })
-  .eq('email_sent', false) // Só atualiza se ainda não foi enviado
-  .single();
-```
-
 ## 🚀 Como Executar
 
-1. **A migração SQL já foi aplicada** ✅
-2. **As melhorias de código foram implementadas** ✅
+1. **Execute a migração SQL**:
+   ```bash
+   # No Supabase ou PostgreSQL
+   psql -f server/migrations/add_email_sent_to_matriculas.sql
+   ```
+
+2. **Reinicie a aplicação** para aplicar as mudanças
+
 3. **Teste uma compra** para verificar que apenas 1 e-mail é enviado
 
 ## 📊 Monitoramento
