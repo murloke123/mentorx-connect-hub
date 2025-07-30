@@ -1,4 +1,6 @@
-import { BarChart3, Brain, Rocket, Shield, Users, Zap } from 'lucide-react';
+import { NumberTicker } from '@/components/magicui/number-ticker';
+import { BarChart3, Brain, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const features = [
   {
@@ -40,6 +42,15 @@ const features = [
 ];
 
 const FeaturesSection = () => {
+  const [count, setCount] = useState(2851);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(prev => prev + Math.floor(Math.random() * 3));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="py-20 relative bg-background">
       {/* Background */}
@@ -54,6 +65,20 @@ const FeaturesSection = () => {
           <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             MENTORA AI
           </h3>
+          
+          {/* Counter Card - Acima do texto da plataforma */}
+          <div className="mb-6">
+            <div className="glass-card inline-block px-6 py-3">
+              <div className="flex items-center space-x-2">
+                <Rocket className="w-5 h-5 text-gold animate-pulse" />
+                <span className="text-silver">
+                  Mais de <span className="text-gold font-semibold">100</span> novas conexões criadas entre mentores e mentorados
+                </span>
+                <Star className="w-5 h-5 text-gold animate-pulse" />
+              </div>
+            </div>
+          </div>
+          
           <p className="text-xl text-silver-light max-w-3xl mx-auto">
             A plataforma mais avançada do Brasil, potencializada por Inteligência Artificial
           </p>
@@ -72,9 +97,7 @@ const FeaturesSection = () => {
               >
                 {/* Icon */}
                 <div className="mb-6">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} p-4 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-glow`}>
-                    <Icon className="w-full h-full text-white" />
-                  </div>
+                  <Icon className="w-16 h-16 text-gold mx-auto" />
                 </div>
 
                 {/* Content */}
@@ -99,27 +122,37 @@ const FeaturesSection = () => {
           <div className="glass-card max-w-4xl mx-auto p-8 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-gold/10 via-transparent to-silver/10"></div>
             <div className="relative z-10 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full p-5 mx-auto mb-6 glow-pulse">
-                <Brain className="w-full h-full text-white" />
+              <div className="w-28 h-28 mx-auto mb-6 rounded-full bg-white border border-gold/50 p-4 shadow-2xl shadow-gold/40 animate-pulse ring-2 ring-gold/30 ring-offset-2 ring-offset-transparent">
+                <img 
+                  src="/images/robo3.gif" 
+                  alt="Robô IA" 
+                  className="w-full h-full object-contain" 
+                />
               </div>
               <h3 className="text-3xl font-bold gradient-text mb-4">
                 Inteligência Artificial Integrada
               </h3>
               <p className="text-xl text-silver-light max-w-2xl mx-auto mb-6">
                 Nossa IA exclusiva aprende com os dados dos seus mentorados e otimiza automaticamente 
-                a experiência de aprendizado, aumentando em <span className="text-gold font-bold">até 300%</span> a taxa de conclusão dos cursos.
+                a experiência de aprendizado, aumentando em <span className="text-gold font-bold">até 67%</span> a taxa de conclusão dos cursos.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gold mb-2">94.7%</div>
+                  <div className="text-3xl font-bold text-gold mb-2">
+                    <NumberTicker value={94.7} className="text-3xl font-bold text-gold" />%
+                  </div>
                   <div className="text-silver">Taxa de Satisfação</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gold mb-2">300%</div>
+                  <div className="text-3xl font-bold text-gold mb-2">
+                    <NumberTicker value={67} className="text-3xl font-bold text-gold" />%
+                  </div>
                   <div className="text-silver">Aumento no Engajamento</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gold mb-2">85%</div>
+                  <div className="text-3xl font-bold text-gold mb-2">
+                    <NumberTicker value={85} className="text-3xl font-bold text-gold" />%
+                  </div>
                   <div className="text-silver">Conclusão de Cursos</div>
                 </div>
               </div>

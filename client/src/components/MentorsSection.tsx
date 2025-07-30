@@ -1,4 +1,4 @@
-import { Award, Rocket, Star } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getFeaturedMentors } from '../services/mentorService';
 import { Profile } from '../types/database';
@@ -7,7 +7,6 @@ import MentorCard2 from './shared/MentorCard2';
 const MentorsSection = () => {
   const [mentors, setMentors] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [count, setCount] = useState(2847);
 
   useEffect(() => {
     const loadMentors = async () => {
@@ -23,13 +22,6 @@ const MentorsSection = () => {
     };
 
     loadMentors();
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount(prev => prev + Math.floor(Math.random() * 3));
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -85,26 +77,13 @@ const MentorsSection = () => {
             Junte-se aos melhores mentores do Brasil
           </p>
           
-          <div className="flex flex-col items-center space-y-4">
-            {/* Processo Seletivo Card */}
-            <div className="glass-card px-6 py-3">
-              <div className="flex items-center space-x-2">
-                <Award className="w-5 h-5 text-gold" />
-                <span className="text-gold font-semibold">Processo seletivo rigoroso</span>
-                <span className="text-silver">•</span>
-                <span className="text-silver">Apenas 3% são aprovados</span>
-              </div>
-            </div>
-            
-            {/* Counter Card - Abaixo do processo seletivo */}
-            <div className="glass-card px-6 py-3">
-              <div className="flex items-center space-x-2">
-                <Rocket className="w-5 h-5 text-gold animate-pulse" />
-                <span className="text-silver">
-                  Mais de <span className="text-gold font-semibold">{count.toLocaleString()}</span> mentores já transformaram suas vidas
-                </span>
-                <Star className="w-5 h-5 text-gold animate-pulse" />
-              </div>
+          {/* Processo Seletivo Card */}
+          <div className="glass-card inline-block px-6 py-3">
+            <div className="flex items-center space-x-2">
+              <Award className="w-5 h-5 text-gold" />
+              <span className="text-gold font-semibold">Processo seletivo rigoroso</span>
+              <span className="text-silver">•</span>
+              <span className="text-silver">Apenas 3% são aprovados</span>
             </div>
           </div>
         </div>

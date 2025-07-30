@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, CheckCheck, Clock, Plus, Trash2, User, X } from 'lucide-react';
+import { Bell, Calendar, CheckCheck, Clock, Plus, Trash2, User, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Notification } from '../../types/database';
@@ -32,54 +32,54 @@ const getActionIcon = (type: string) => {
     case 'new_follower':
       return (
         <div className="flex items-center space-x-1">
-          <Plus className="w-3 h-3 text-green-600" />
-          <User className="w-3 h-3 text-green-600" />
+          <Plus className="w-3 h-3 text-gold" />
+          <User className="w-3 h-3 text-gold" />
         </div>
       );
     case 'lost_follower':
       return (
         <div className="flex items-center space-x-1">
-          <X className="w-3 h-3 text-red-600" />
-          <User className="w-3 h-3 text-red-600" />
+          <X className="w-3 h-3 text-gold" />
+          <User className="w-3 h-3 text-gold" />
         </div>
       );
     case 'schedule':
       return (
         <div className="flex items-center space-x-1">
-          <Plus className="w-3 h-3 text-blue-600" />
-          <Calendar className="w-3 h-3 text-blue-600" />
+          <Plus className="w-3 h-3 text-gold" />
+          <Calendar className="w-3 h-3 text-gold" />
         </div>
       );
     case 'cancel_schedule':
       return (
         <div className="flex items-center space-x-1">
-          <X className="w-3 h-3 text-red-600" />
-          <Calendar className="w-3 h-3 text-red-600" />
+          <X className="w-3 h-3 text-gold" />
+          <Calendar className="w-3 h-3 text-gold" />
         </div>
       );
     case 'appointment_cancelled':
       return (
         <div className="flex items-center space-x-1">
-          <X className="w-3 h-3 text-red-600" />
-          <Clock className="w-3 h-3 text-red-600" />
+          <X className="w-3 h-3 text-gold" />
+          <Clock className="w-3 h-3 text-gold" />
         </div>
       );
     case 'new_enrollment':
       return (
         <div className="flex items-center space-x-1">
-          <CheckCheck className="w-3 h-3 text-blue-600" />
-          <User className="w-3 h-3 text-blue-600" />
+          <CheckCheck className="w-3 h-3 text-gold" />
+          <User className="w-3 h-3 text-gold" />
         </div>
       );
     case 'course_updated':
       return (
         <div className="flex items-center space-x-1">
-          <Plus className="w-3 h-3 text-purple-600" />
-          <CheckCheck className="w-3 h-3 text-purple-600" />
+          <Plus className="w-3 h-3 text-gold" />
+          <CheckCheck className="w-3 h-3 text-gold" />
         </div>
       );
     default:
-      return <User className="w-3 h-3 text-blue-600" />;
+      return <User className="w-3 h-3 text-gold" />;
   }
 };
 
@@ -139,33 +139,36 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[80vh] p-0">
-        <DialogHeader className="p-6 pb-4">
-          <DialogTitle className="text-lg font-semibold">
+      <DialogContent className="max-w-md max-h-[80vh] p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-slate-700">
+          <DialogTitle className="text-lg font-semibold text-white flex items-center">
+            <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+              <Bell className="h-4 w-4 text-slate-900" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
             Notificações
-            {unreadCount > 0 && (
-              <Badge variant="destructive" className="ml-2">
-                {unreadCount}
-              </Badge>
-            )}
           </DialogTitle>
           <DialogDescription className="sr-only">
             Lista de notificações do usuário
           </DialogDescription>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-3">
             {unreadCount > 0 ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onMarkAllAsRead}
-                className="text-sm"
+                className="text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200"
               >
                 <CheckCheck className="w-4 h-4 mr-1" />
                 Marcar todas como lidas
               </Button>
             ) : notifications.length > 0 && (
-              <div className="flex items-center text-sm text-gray-500">
-                <CheckCheck className="w-4 h-4 mr-1" />
+              <div className="flex items-center text-sm text-gray-400">
+                <CheckCheck className="w-4 h-4 mr-1 text-gold" />
                 Nenhuma nova mensagem
               </div>
             )}
@@ -174,7 +177,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-sm text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200"
               >
                 <Trash2 className="w-4 h-4 mr-1" />
                 Deletar todas
@@ -183,22 +186,20 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           </div>
         </DialogHeader>
 
-        <Separator />
-
-        <ScrollArea className="flex-1 max-h-[400px]">
+        <ScrollArea className="flex-1 max-h-[400px] bg-slate-800/50">
           {loading ? (
             <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Clock className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                <Clock className="w-8 h-8 text-gold" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 Nenhuma notificação
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 Você não tem notificações no momento.
               </p>
             </div>
@@ -207,49 +208,46 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-sm cursor-pointer ${
+                  className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg cursor-pointer backdrop-blur-sm ${
                     notification.is_read
-                      ? 'bg-white border-gray-200'
-                      : getActionColor(notification.type)
+                      ? 'bg-slate-700/50 border-slate-600 hover:bg-slate-700/70'
+                      : 'bg-gradient-to-r from-gold/10 via-gold-light/5 to-gold/10 border-gold/30 hover:border-gold/50 shadow-gold/20'
                   }`}
                   onClick={() => !notification.is_read && onMarkAsRead(notification.id)}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex items-center space-x-2 flex-1">
                       <div 
-                        className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200 hover:shadow-lg"
+                        className="w-10 h-10 bg-gradient-to-br from-gold via-gold-light to-gold-dark rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200 hover:shadow-lg shadow-gold/30"
                         onClick={() => handleUserClick(notification.sender_id || null, notification.sender_role || null)}
                         title={`Ver perfil de ${notification.sender_name || 'usuário'}`}
                       >
-                        <span className="text-white text-xs font-bold">
+                        <span className="text-slate-900 text-sm font-bold">
                           {(notification.sender_name || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-semibold text-gray-900 truncate">
+                            <p className="text-sm font-semibold text-white truncate">
                               {notification.title}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-300 mt-1">
                               {notification.message}
                             </p>
                             {notification.sender_name && (
-                              <p className="text-xs text-gray-400 mt-1">
+                              <p className="text-xs text-gold mt-1 font-medium">
                                 de {notification.sender_name}
                               </p>
                             )}
                           </div>
                           <div className="flex items-center space-x-2">
-                            {!notification.is_read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1 opacity-70">
                               {getActionIcon(notification.type)}
                             </div>
                           </div>
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-gray-400 mt-2">
                           {formatDistanceToNow(new Date(notification.created_at), {
                             addSuffix: true,
                             locale: ptBR,
@@ -266,24 +264,23 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
         {/* Confirmation Dialog for Delete All */}
         {showDeleteConfirm && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-              <h3 className="text-lg font-semibold mb-2">Confirmar exclusão</h3>
-              <p className="text-gray-600 mb-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-6 max-w-sm w-full shadow-2xl">
+              <h3 className="text-lg font-semibold mb-2 text-white">Confirmar exclusão</h3>
+              <p className="text-gray-300 mb-4">
                 Você realmente deseja deletar todas as suas notificações?
               </p>
               <div className="flex space-x-3">
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1"
+                  className="flex-1 bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30"
                 >
                   Não
                 </Button>
                 <Button
-                  variant="destructive"
                   onClick={handleDeleteAll}
-                  className="flex-1"
+                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg"
                 >
                   Sim
                 </Button>

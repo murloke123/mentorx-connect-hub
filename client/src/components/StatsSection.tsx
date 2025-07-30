@@ -114,6 +114,20 @@ const StatsSection = () => {
           <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             IMPRESSIONAM
           </h3>
+          
+          {/* Counter Card - Abaixo do título IMPRESSIONAM */}
+          <div className="mb-6">
+            <div className="glass-card inline-block px-6 py-3">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="w-5 h-5 text-gold animate-pulse" />
+                <span className="text-silver">
+                  Mais de <span className="text-gold font-semibold">37</span> mentores já transformaram suas carreiras
+                </span>
+                <Star className="w-5 h-5 text-gold animate-pulse" />
+              </div>
+            </div>
+          </div>
+          
           <p className="text-xl text-silver-light">
             Dados atualizados em tempo real da nossa plataforma
           </p>

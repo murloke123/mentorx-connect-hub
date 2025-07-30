@@ -34,7 +34,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ userId }) =>
         >
           <Bell 
             className={`w-5 h-5 ${
-              unreadCount > 0 ? 'text-gold animate-pulse' : 'text-gray-300'
+              unreadCount > 0 ? 'text-gold' : 'text-gray-300'
             }`} 
           />
           {unreadCount > 0 && (

@@ -4,6 +4,7 @@ import Navigation from "@/components/shared/Navigation";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ContadorTestPage from "@/pages/ContadorTestPage";
 import DocumentTestPage from "@/pages/DocumentTestPage";
 import { TestDocumentVerificationPage } from "@/pages/TestDocumentVerificationPage";
 
@@ -109,6 +110,7 @@ const AppContent = () => {
           <Route path="/mentors" element={<MentorsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/document-test" element={<DocumentTestPage />} />
+          <Route path="/contador-test" element={<ContadorTestPage />} />
           <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
           <Route path="/appointment-checkout-success" element={<AppointmentCheckoutSuccessPage />} />
