@@ -1,13 +1,13 @@
 
-import React, { useState, useEffect } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { ImageIcon } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
-import { CourseFormData } from "./FormSchema";
-import { uploadCourseImage, removeImage } from "@/utils/uploadImage";
+import { Button } from "@/components/ui/button";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
+import { uploadCourseImage } from "@/utils/uploadImage";
+import { ImageIcon, Upload } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { CourseFormData } from "./FormSchema";
 
 interface ImageFieldProps {
   form: UseFormReturn<CourseFormData>;
@@ -17,6 +17,7 @@ const ImageField = ({ form }: ImageFieldProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   // Extract path from URL
@@ -44,7 +45,7 @@ const ImageField = ({ form }: ImageFieldProps) => {
       setPreviewImage(objectUrl);
       
       // Upload new image, replacing the existing one if there is a path
-      const result = await uploadCourseImage(file, currentImagePath);
+      const result = await uploadCourseImage(file, currentImagePath || undefined);
       
       // Update form value with the new URL
       form.setValue("image", result.url, { shouldValidate: true });
@@ -76,6 +77,16 @@ const ImageField = ({ form }: ImageFieldProps) => {
     }
   };
 
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleImageUpload(e.target.files[0]);
+    }
+  };
+
   return (
     <FormField
       control={form.control}
@@ -85,18 +96,36 @@ const ImageField = ({ form }: ImageFieldProps) => {
           <FormLabel>Imagem do Curso*</FormLabel>
           <FormControl>
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Input
-                id="courseImage"
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                className="cursor-pointer"
+                className="hidden"
                 disabled={isUploading}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleImageUpload(e.target.files[0]);
-                  }
-                }}
+                onChange={handleFileChange}
               />
+              
+              {/* Custom upload button */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleButtonClick}
+                disabled={isUploading}
+                className="w-full h-12 border-2 border-dashed border-gold/30 bg-gradient-to-br from-slate-900/50 via-slate-800/50 to-slate-900/50 hover:border-gold/50 hover:bg-gradient-to-br hover:from-slate-800/60 hover:via-slate-700/60 hover:to-slate-800/60 transition-all duration-300"
+              >
+                {isUploading ? (
+                  <>
+                    <Spinner className="w-4 h-4 mr-2" />
+                    <span className="text-white">Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2 text-gold" />
+                    <span className="text-white">Selecione a imagem do curso</span>
+                  </>
+                )}
+              </Button>
               
               {previewImage ? (
                 <div className="rounded-md border mt-2 overflow-hidden relative">

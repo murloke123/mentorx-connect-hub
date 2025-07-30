@@ -88,7 +88,7 @@ const MeusCursosPage = () => {
       <div className="flex-1 transition-all duration-300 p-6">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Meus Cursos</h1>
+            <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>
             <p className="text-muted-foreground">Gerencie e acompanhe seus cursos criados</p>
           </div>
           <div className="flex gap-3">

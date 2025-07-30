@@ -348,7 +348,7 @@ const MentoradoMeusCursosPage = () => {
       <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Meus Cursos</h1>
+            <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>
             <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
           </div>
         </div>

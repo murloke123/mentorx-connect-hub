@@ -107,20 +107,11 @@ const MentorDashboardPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-white">
-            Dashboard do Mentor
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Gerencie suas mentorias e acompanhe seu progresso
-          </p>
-        </div>
-
-        {/* Card de Conta Verificada - Compacto */}
+      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black relative">
+        {/* Card de Conta Verificada - Posicionado no canto superior direito */}
         {stripeStatus.stripe_onboarding_status && (
-          <div className="mb-6">
-            <div className="bg-gradient-to-r from-slate-900/50 via-slate-800/50 to-slate-900/50 border border-gold/20 rounded-lg px-4 py-2 backdrop-blur-xl shadow-lg shadow-gold/10 h-[45px] flex items-center">
+          <div className="absolute top-6 right-6 z-10">
+            <div className="bg-gradient-to-r from-slate-900/50 via-slate-800/50 to-slate-900/50 border border-gold/20 rounded-lg px-4 py-2 backdrop-blur-xl shadow-lg shadow-gold/10 h-[45px] flex items-center min-w-[300px]">
               <div className="flex items-center gap-2 w-full">
                 {stripeStatus.stripe_onboarding_status === 'completed' ? (
                   <>
@@ -155,6 +146,15 @@ const MentorDashboardPage = () => {
           </div>
         )}
 
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-gold">
+            Dashboard do Mentor
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Gerencie suas mentorias e acompanhe seu progresso
+          </p>
+        </div>
+
         {/* Debug Info - Mostrar status do Stripe */}
         {isLoadingStripeData && (
           <div className="mb-6">
@@ -163,10 +163,10 @@ const MentorDashboardPage = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader-2 w-5 h-5 text-gold animate-spin">
                   <path d="M21 12a9 9 0 11-6.219-8.56"/>
                 </svg>
-                <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border border-green-500/30 backdrop-blur-sm">
+                <Badge className="bg-slate-800/50 text-white border border-gold/30 backdrop-blur-sm">
                   Carregando Dados Financeiros
                 </Badge>
-                <span className="text-sm text-green-400 ml-auto">Conectando com Stripe...</span>
+                <span className="text-sm text-white ml-auto">Conectando com Stripe...</span>
               </div>
             </div>
           </div>

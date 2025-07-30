@@ -861,7 +861,7 @@ const MentorProfilePage = () => {
                 htmlFor="mentor-avatar-upload"
                 className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer hover:bg-primary/90 transition-colors opacity-0 group-hover:opacity-100"
               >
-                <Camera className="h-4 w-4" />
+                <Camera className="h-4 w-4 text-black" />
               </label>
 
               <input

@@ -2,7 +2,7 @@ import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
@@ -273,108 +273,102 @@ const MentorMeusMentoradosPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-black">
       <MentorSidebar />
       <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
         <div className="space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Meus Mentorados</h1>
-            <p className="text-gray-600">Gerencie e acompanhe seus alunos, seguidores e suas métricas de engajamento</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gold via-yellow-400 to-gold bg-clip-text text-transparent">Meus Mentorados</h1>
+            <p className="text-gray-400">Gerencie e acompanhe seus alunos, seguidores e suas métricas de engajamento</p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 text-sm font-medium">Total de Alunos</p>
-                    <p className="text-3xl font-bold">{stats.students}</p>
-                  </div>
-                  <Users className="w-8 h-8 text-blue-200" />
-                </div>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+              <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gold text-center">Total de Alunos</CardTitle>
+                <Users className="h-4 w-4 text-gold ml-2" />
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="text-2xl font-bold text-white">{stats.students}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 text-sm font-medium">Total de Seguidores</p>
-                    <p className="text-3xl font-bold">{stats.followers}</p>
-                  </div>
-                  <Heart className="w-8 h-8 text-purple-200" />
-                </div>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+              <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gold text-center">Total de Seguidores</CardTitle>
+                <Heart className="h-4 w-4 text-gold ml-2" />
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="text-2xl font-bold text-white">{stats.followers}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100 text-sm font-medium">Seguidores sem Curso</p>
-                    <p className="text-3xl font-bold">{stats.followersWithoutCourse}</p>
-                  </div>
-                  <Frown className="w-8 h-8 text-orange-200" />
-                </div>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+              <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gold text-center">Seguidores sem Curso</CardTitle>
+                <Frown className="h-4 w-4 text-gold ml-2" />
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="text-2xl font-bold text-white">{stats.followersWithoutCourse}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 text-sm font-medium">Cursos por Aluno</p>
-                    <p className="text-3xl font-bold">{stats.avgCoursesPerStudent.toFixed(1)}</p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-green-200" />
-                </div>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+              <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gold text-center">Cursos por Aluno</CardTitle>
+                <TrendingUp className="h-4 w-4 text-gold ml-2" />
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="text-2xl font-bold text-white">{stats.avgCoursesPerStudent.toFixed(1)}</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Search and Actions */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder={activeFilter === 'students' 
-                      ? "Buscar alunos por nome ou email..." 
-                      : "Buscar seguidores por nome ou email..."
-                    }
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="px-3 py-1">
-                    {selectedMentorados.length} selecionados
-                  </Badge>
-                  {selectedMentorados.length > 0 && (
-                    <Button variant="outline" size="sm">
-                      <Mail className="w-4 h-4 mr-2" />
-                      Enviar Email
-                    </Button>
-                  )}
-                </div>
+          <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder={activeFilter === 'students' 
+                    ? "Buscar alunos por nome ou email..." 
+                    : "Buscar seguidores por nome ou email..."
+                  }
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
+                />
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="px-3 py-1 bg-gold/20 text-gold border-gold/30">
+                  {selectedMentorados.length} selecionados
+                </Badge>
+                {selectedMentorados.length > 0 && (
+                  <Button variant="outline" size="sm" className="border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Enviar Email
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Table */}
-          <Card>
+          <Card className="premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Button
                     variant={activeFilter === 'students' ? 'default' : 'outline'}
                     onClick={() => setActiveFilter('students')}
-                    className="flex items-center gap-2"
+                    className={`flex items-center gap-2 ${
+                      activeFilter === 'students' 
+                        ? 'bg-gold text-black hover:bg-gold/90' 
+                        : 'border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50'
+                    }`}
                   >
                     <BookOpen className="w-4 h-4" />
                     Alunos Matriculados ({stats.students})
@@ -382,13 +376,17 @@ const MentorMeusMentoradosPage = () => {
                   <Button
                     variant={activeFilter === 'followers' ? 'default' : 'outline'}
                     onClick={() => setActiveFilter('followers')}
-                    className="flex items-center gap-2"
+                    className={`flex items-center gap-2 ${
+                      activeFilter === 'followers' 
+                        ? 'bg-gold text-black hover:bg-gold/90' 
+                        : 'border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50'
+                    }`}
                   >
                     <Heart className="w-4 h-4" />
                     Seguidores sem Curso ({stats.followersWithoutCourse})
                   </Button>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gold/60">
                   {filteredAndSortedMentorados.length} registros
                 </div>
               </div>
@@ -396,66 +394,67 @@ const MentorMeusMentoradosPage = () => {
             <CardContent className="p-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Carregando mentorados...</span>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+                  <span className="ml-3 text-gray-400">Carregando mentorados...</span>
                 </div>
               ) : mentorados.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     {/* Header da Tabela */}
-                    <thead className="bg-gray-50 border-b">
+                    <thead className="bg-slate-800/50 border-b border-gold/20">
                       <tr>
                         <th className="text-left p-4 w-12">
                           <Checkbox 
                             checked={selectedMentorados.length === filteredAndSortedMentorados.length && filteredAndSortedMentorados.length > 0}
                             onCheckedChange={toggleSelectAll}
+                            className="border-gold/30 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
                           />
                         </th>
                         <th 
-                          className="text-left p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="text-left p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('name')}
                         >
-                          <div className="flex items-center gap-2 font-semibold text-gray-900">
+                          <div className="flex items-center gap-2 font-semibold text-gold">
                             <User className="w-4 h-4" />
                             Nome do Mentorado
                             {getSortIcon('name')}
                           </div>
                         </th>
                         <th 
-                          className="text-left p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="text-left p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('email')}
                         >
-                          <div className="flex items-center gap-2 font-semibold text-gray-900">
+                          <div className="flex items-center gap-2 font-semibold text-gold">
                             <Mail className="w-4 h-4" />
                             Email
                             {getSortIcon('email')}
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('courses_acquired')}
                         >
-                          <div className="flex items-center justify-center gap-2 font-semibold text-gray-900">
+                          <div className="flex items-center justify-center gap-2 font-semibold text-gold">
                             <BookOpen className="w-4 h-4" />
                             Cursos Adquiridos
                             {getSortIcon('courses_acquired')}
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('total_spent')}
                         >
-                          <div className="flex items-center justify-center gap-2 font-semibold text-gray-900">
+                          <div className="flex items-center justify-center gap-2 font-semibold text-gold">
                             <DollarSign className="w-4 h-4" />
                             Total Gasto
                             {getSortIcon('total_spent')}
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('is_following')}
                         >
-                          <div className="flex items-center justify-center gap-2 font-semibold text-gray-900">
+                          <div className="flex items-center justify-center gap-2 font-semibold text-gold">
                             <Heart className="w-4 h-4" />
                             Me Segue?
                             {getSortIcon('is_following')}
@@ -469,35 +468,36 @@ const MentorMeusMentoradosPage = () => {
                       {filteredAndSortedMentorados.map((mentorado, index) => (
                         <tr 
                           key={mentorado.id} 
-                          className={`border-b hover:bg-gray-50 transition-colors ${
-                            selectedMentorados.includes(mentorado.id) ? 'bg-blue-50' : ''
+                          className={`border-b border-gold/10 hover:bg-slate-800/30 transition-colors ${
+                            selectedMentorados.includes(mentorado.id) ? 'bg-gold/10' : ''
                           }`}
                         >
                           <td className="p-4">
                             <Checkbox 
                               checked={selectedMentorados.includes(mentorado.id)}
                               onCheckedChange={() => toggleSelectMentorado(mentorado.id)}
+                              className="border-gold/30 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
                             />
                           </td>
                           <td className="p-4">
                             <div className="flex items-center gap-3">
                               <Avatar 
-                                className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+                                className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-gold/50 transition-all"
                                 onClick={() => redirectToUserProfile(mentorado.id, navigate)}
                               >
                                 {mentorado.avatar_url ? (
                                   <AvatarImage src={mentorado.avatar_url} alt={mentorado.full_name || ''} />
                                 ) : (
-                                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                                  <AvatarFallback className="bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black">
                                     {mentorado.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                                   </AvatarFallback>
                                 )}
                               </Avatar>
                               <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="font-medium text-white">
                                   {mentorado.full_name || 'Nome não informado'}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-400">
                                   {mentorado.courses_acquired > 0 
                                     ? `Aluno desde ${new Date(mentorado.first_enrollment_date).toLocaleDateString('pt-BR')}`
                                     : `Segue desde ${new Date(mentorado.first_enrollment_date).toLocaleDateString('pt-BR')}`
@@ -507,26 +507,26 @@ const MentorMeusMentoradosPage = () => {
                             </div>
                           </td>
                           <td className="p-4">
-                            <p className="text-gray-900">{mentorado.email}</p>
+                            <p className="text-white">{mentorado.email}</p>
                           </td>
                           <td className="p-4 text-center">
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                            <Badge variant="secondary" className="bg-gold/20 text-gold border-gold/30">
                               {mentorado.courses_acquired}
                             </Badge>
                           </td>
                           <td className="p-4 text-center">
-                            <span className="font-semibold text-green-600">
+                            <span className="font-semibold text-gold">
                               R$ {mentorado.total_spent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </span>
                           </td>
                           <td className="p-4 text-center">
                             {mentorado.is_following ? (
-                              <Badge className="bg-red-100 text-red-800 border-red-200">
+                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
                                 <Heart className="w-3 h-3 mr-1 fill-current" />
                                 Sim
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="text-gray-600">
+                              <Badge variant="outline" className="text-gray-400 border-gray-600">
                                 Não
                               </Badge>
                             )}
@@ -539,17 +539,17 @@ const MentorMeusMentoradosPage = () => {
               ) : (
                 <div className="text-center py-12">
                   {activeFilter === 'students' ? (
-                    <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <BookOpen className="mx-auto h-12 w-12 text-gold/60 mb-4" />
                   ) : (
-                    <Heart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <Heart className="mx-auto h-12 w-12 text-gold/60 mb-4" />
                   )}
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">
+                  <h3 className="text-xl font-medium text-white mb-2">
                     {activeFilter === 'students' 
                       ? 'Nenhum aluno matriculado encontrado'
                       : 'Nenhum seguidor sem curso encontrado'
                     }
                   </h3>
-                  <p className="text-gray-500">
+                  <p className="text-gray-400">
                     {activeFilter === 'students'
                       ? 'Quando alguém adquirir seus cursos, aparecerá aqui!'
                       : 'Quando alguém te seguir sem ter adquirido cursos, aparecerá aqui!'

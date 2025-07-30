@@ -240,11 +240,11 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       <img 
                         src={course.image_url} 
                         alt={course.title} 
-                        className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                        className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gold shadow-lg shadow-gold/20"
                         onError={() => handleImageError(course.id)}
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground">
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground border-2 border-gold shadow-lg shadow-gold/20">
                         {hasImageLoadingError ? 
                           <AlertTriangle className="h-8 w-8 text-destructive" /> : 
                           <BookOpen className="h-8 w-8" />
@@ -259,16 +259,13 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <Badge 
                           variant="secondary" 
-                          className={course.is_public 
-                            ? "bg-blue-100 text-blue-800 border-blue-200" 
-                            : "bg-orange-100 text-orange-800 border-orange-200"
-                          }
+                          className="bg-transparent text-white border border-white/30 hover:border-white/50"
                         >
                           {course.is_public ? 'Público' : 'Privado'}
                         </Badge>
                         <Badge 
                           variant="secondary"
-                          className="bg-green-100 text-green-800 border-green-200"
+                          className="bg-transparent text-white border border-white/30 hover:border-white/50"
                         >
                           {course.is_paid ? `R$${course.price?.toFixed(2)}` : 'Gratuito'}
                         </Badge>
@@ -297,7 +294,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                     <Button 
                       variant="outline" 
                       onClick={() => handleDeleteClick(course)}
-                      className="h-auto py-2 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-auto py-2 px-2 text-white hover:text-red-300 hover:bg-red-900/20 border-white/30"
                       size="sm"
                       disabled={isDeleting.has(course.id)}
                     >
@@ -308,55 +305,53 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
               </CardHeader>
               <CardContent className="flex-grow">
                 <div 
-                  className="mb-4 cursor-pointer group p-4 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-50 to-slate-100 hover:from-gray-100 hover:to-slate-200 transition-all duration-200 hover:shadow-lg hover:border-gray-400"
+                  className="mb-4 cursor-pointer group p-4 rounded-lg border border-gold/30 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 transition-all duration-200 hover:shadow-lg hover:shadow-gold/10 hover:border-gold/50 backdrop-blur-xl"
                   onClick={() => navigate(`/mentor/meus-cursos/${course.id}/inscricoes`)}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-slate-700" />
-                      <span className="text-sm font-medium text-gray-900">Inscrições</span>
+                      <BookOpen className="w-4 h-4 text-gold" />
+                      <span className="text-sm font-medium text-gold">Inscrições</span>
                     </div>
-                    <div className="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
-                      <span className="text-sm font-semibold text-slate-700">
+                    <div className="bg-slate-800/50 px-3 py-1 rounded-full shadow-sm border border-gold/30">
+                      <span className="text-sm font-semibold text-gold">
                         {course.enrollments_count || 0}
                       </span>
                     </div>
                   </div>
                   <Progress 
                     value={Math.min((course.enrollments_count || 0) * 10, 100)}
-                    className="w-full h-2 mb-3 bg-gray-200 [&>div]:bg-slate-600" 
+                    className="w-full h-2 mb-3 bg-slate-700/50 [&>div]:bg-gold" 
                   />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600 font-medium">
+                    <span className="text-xs text-gold/80 font-medium">
                       {course.enrollments_count || 0} alunos ativos
                     </span>
-                    <span className="text-xs text-slate-700 font-medium">
+                    <span className="text-xs text-gold/80 font-medium">
                       Meta: 10+ alunos
                     </span>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col gap-4">
+              <CardFooter className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id={`publish-${course.id}`}
                     checked={course.is_published}
                     onCheckedChange={(checked) => handlePublishChange(course.id, checked)}
                   />
-                  <Label htmlFor={`publish-${course.id}`}>
+                  <Label htmlFor={`publish-${course.id}`} className="text-sm whitespace-nowrap">
                     {course.is_published ? "Publicado" : "Não Publicado"}
                   </Label>
                 </div>
                 <Button
-                  variant="outline"
-                  className="w-full"
+                  className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-sm"
                   onClick={() => navigate(`/mentor/meus-cursos/${course.id}/modulos`)}
                 >
-                  Gerenciar Módulos e Conteúdos
+                  Gerenciar Módulos
                 </Button>
                 <Button
-                  variant="outline"
-                  className="w-full mt-2"
+                  className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-sm"
                   onClick={() => navigate(`/mentor/meus-cursos/${course.id}/landing-page`)}
                 >
                   Página de Venda

@@ -281,7 +281,7 @@ const MentorCursosAdquiridosPage = () => {
       <div className="flex-1 transition-all duration-300  p-6">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Cursos Adquiridos</h1>
+            <h1 className="text-3xl font-bold text-gold">Cursos Adquiridos</h1>
             <p className="text-muted-foreground">Cursos que adquiri de outros mentores</p>
           </div>
           <Button onClick={() => navigate('/courses')}>
@@ -306,7 +306,7 @@ const MentorCursosAdquiridosPage = () => {
           ) : enrolledCourses.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
-                <Play className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <Play className="mx-auto h-12 w-12 text-gold mb-4" />
                 <p className="text-gray-600 mb-4">
                   Você ainda não adquiriu nenhum curso de outros mentores.
                 </p>
@@ -452,7 +452,7 @@ const MentorCursosAdquiridosPage = () => {
                         className="w-full"
                         onClick={() => navigateToCourse(enrollment.course_id)}
                       >
-                        <Play className="mr-2 h-4 w-4" />
+                        <Play className="mr-2 h-4 w-4 text-gold" />
                         {enrollment.progress_percentage > 0 ? 'Continuar' : 'Começar'}
                       </Button>
                     ) : (
