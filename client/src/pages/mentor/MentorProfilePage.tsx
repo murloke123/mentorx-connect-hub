@@ -1,3 +1,4 @@
+import TagHero from "@/components/magicui/taghero";
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import BadgesSection from "@/components/mentor/profile/BadgesSection";
 import ContactForm from "@/components/mentor/profile/ContactForm";
@@ -714,28 +715,32 @@ const MentorProfilePage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 min-h-screen">
+      <div className="flex-1 transition-all duration-300 min-h-screen bg-black relative">
+        
         {/* Hero Section */}
         <div className="relative w-full">
-          {/* Banner with gradient overlay */}
+          {/* Banner without gradient overlay */}
           <div className="w-full h-[350px] overflow-hidden relative">
-            <img 
-              src="https://images.unsplash.com/photo-1506765515384-028b60a970df?auto=format&fit=crop&w=1500&q=80"
-              alt="Banner profile" 
+            <video 
+              src="https://cdn.pixabay.com/video/2019/10/09/27669-365224683_large.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-blue-600/30"></div>
             
             {/* Floating Stats with 20% transparency */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group relative">
+                  <div key={index} className="premium-card group hover:scale-105 transform transition-all duration-500 bg-card/80 backdrop-blur-sm relative p-4 text-center">
                     <div className="mb-2 flex justify-center">
                       <img 
                         src={stat.icon} 
                         alt={stat.label}
-                        className="w-10 h-10 object-contain"
+                        className="w-10 h-10 object-contain filter brightness-0 saturate-100"
+                        style={{filter: 'brightness(0) saturate(100%) invert(77%) sepia(85%) saturate(2476%) hue-rotate(2deg) brightness(104%) contrast(101%)'}}
                       />
                     </div>
                     {isEditingHeroCards ? (
@@ -759,10 +764,13 @@ const MentorProfilePage = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="text-2xl font-semibold text-gray-800 drop-shadow-lg" style={{textShadow: '0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6)'}}>{stat.value}</div>
-                        <div className="text-sm text-gray-600">{stat.label}</div>
+                        <div className="text-2xl font-semibold text-gold drop-shadow-lg">{stat.value}</div>
+                        <div className="text-sm text-silver">{stat.label}</div>
                       </>
                     )}
+                    
+                    {/* Hover Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
                   </div>
                 ))}
               </div>
@@ -784,7 +792,7 @@ const MentorProfilePage = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => setIsEditingHeroCards(false)}
-                      className="bg-white/90 backdrop-blur-sm"
+                      className="premium-card bg-card/80 backdrop-blur-sm hover:scale-105 transform transition-all duration-500 border-gold/20 text-gold hover:text-gold hover:border-gold/40 h-8 px-3 py-1"
                       disabled={isSaving}
                     >
                       Cancelar
@@ -792,10 +800,11 @@ const MentorProfilePage = () => {
                     <Button
                       size="sm"
                       onClick={handleSaveHeroCards}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="premium-card bg-card/80 backdrop-blur-sm hover:scale-105 transform transition-all duration-500 border-gold/20 text-gold hover:text-gold hover:border-gold/40 h-8 px-3 py-1"
                       disabled={isSaving}
                     >
-                      {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                      {isSaving ? <Spinner className="h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                      Salvar
                     </Button>
                   </div>
                 ) : (
@@ -803,7 +812,7 @@ const MentorProfilePage = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => setIsEditingHeroCards(true)}
-                    className="bg-white/90 backdrop-blur-sm hover:bg-white flex items-center gap-2"
+                    className="premium-card bg-card/80 backdrop-blur-sm hover:scale-105 transform transition-all duration-500 border-gold/20 text-gold hover:text-gold hover:border-gold/40 flex items-center gap-2 h-8 px-3 py-1"
                   >
                     <Edit className="h-4 w-4" />
                     Editar Cards de Sucesso
@@ -869,14 +878,17 @@ const MentorProfilePage = () => {
         
         {/* Name and CTA section */}
         <div className="mt-24 max-w-7xl mx-auto text-center px-6">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gold via-yellow-400 to-gold bg-clip-text text-transparent mb-2">
             {currentUser?.full_name || ""}
           </h1>
-          {currentUser?.highlight_message && (
-            <p className="text-xl text-gray-600 mb-6 max-w-4xl mx-auto">
-              {currentUser.highlight_message}
-            </p>
-          )}
+          
+          {/* TagHero Component - Positioned below mentor name */}
+          <div className="flex justify-center mb-6">
+            <TagHero 
+              isPublicAccount={isPublicAccount}
+              onClick={() => isPublicAccount ? setIsUnpublishModalOpen(true) : setIsPublishModalOpen(true)} 
+            />
+          </div>
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
             <div className="flex gap-3 relative">
@@ -884,43 +896,43 @@ const MentorProfilePage = () => {
                 href={currentUser?.social_media?.instagram || "#"} 
                 target={currentUser?.social_media?.instagram ? "_blank" : "_self"}
                 rel="noopener noreferrer"
-                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                className={`p-3 rounded-full glass-card hover:shadow-xl transition-all hover:scale-110 ${
                   !currentUser?.social_media?.instagram ? 'opacity-50 cursor-default' : ''
                 }`}
                 onClick={(e) => !currentUser?.social_media?.instagram && e.preventDefault()}
               >
-                <Instagram className="h-6 w-6 text-pink-600" />
+                <Instagram className="h-6 w-6 text-gold" />
               </a>
               <a 
                 href={currentUser?.social_media?.facebook || "#"} 
                 target={currentUser?.social_media?.facebook ? "_blank" : "_self"}
                 rel="noopener noreferrer"
-                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                className={`p-3 rounded-full glass-card hover:shadow-xl transition-all hover:scale-110 ${
                   !currentUser?.social_media?.facebook ? 'opacity-50 cursor-default' : ''
                 }`}
                 onClick={(e) => !currentUser?.social_media?.facebook && e.preventDefault()}
               >
-                <Facebook className="h-6 w-6 text-blue-600" />
+                <Facebook className="h-6 w-6 text-gold" />
               </a>
               <a 
                 href={currentUser?.social_media?.youtube || "#"} 
                 target={currentUser?.social_media?.youtube ? "_blank" : "_self"}
                 rel="noopener noreferrer"
-                className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ${
+                className={`p-3 rounded-full glass-card hover:shadow-xl transition-all hover:scale-110 ${
                   !currentUser?.social_media?.youtube ? 'opacity-50 cursor-default' : ''
                 }`}
                 onClick={(e) => !currentUser?.social_media?.youtube && e.preventDefault()}
               >
-                <Youtube className="h-6 w-6 text-red-600" />
+                <Youtube className="h-6 w-6 text-gold" />
               </a>
               
               {/* Botão de edição das redes sociais */}
               <button
                 onClick={() => setIsSocialMediaModalOpen(true)}
-                className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all hover:scale-110 border ml-2 flex items-center justify-center"
+                className="p-3 rounded-full glass-card hover:shadow-xl transition-all hover:scale-110 ml-2 flex items-center justify-center"
                 title="Editar redes sociais"
               >
-                <Edit className="h-6 w-6 text-gray-600" />
+                <Edit className="h-6 w-6 text-gold" />
               </button>
             </div>
           </div>
@@ -963,9 +975,9 @@ const MentorProfilePage = () => {
         </div>
         
         {/* Sticky Navigation */}
-        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="sticky top-0 z-50 glass-card border-t border-b border-gold/20 shadow-sm !rounded-none">
           <div className="max-w-7xl mx-auto px-6">
-            <nav className="flex justify-center space-x-8 py-4">
+            <nav className="flex justify-center space-x-8 py-2">
               {[
                 { id: 'sobre', label: 'Quem Sou Eu', icon: User },
                 { id: 'cursos', label: 'Meus Cursos', icon: GraduationCap },
@@ -978,10 +990,10 @@ const MentorProfilePage = () => {
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-4 py-2 transition-all duration-300 ${
                       activeSection === item.id
-                        ? 'text-gray-700 drop-shadow-[0_0_8px_rgba(75,85,99,0.8)] font-semibold'
-                        : 'text-gray-600 hover:text-gray-700 hover:drop-shadow-[0_0_4px_rgba(75,85,99,0.4)]'
+                        ? 'text-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.8)] font-semibold'
+                        : 'text-silver hover:text-gold hover:drop-shadow-[0_0_4px_rgba(255,215,0,0.4)]'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -998,11 +1010,11 @@ const MentorProfilePage = () => {
           
           {/* Sobre Mim Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
-                  <User className="h-8 w-8 text-black" />
-                  <h2 className="text-3xl font-bold text-black">Meu Perfil</h2>
+                  <User className="h-8 w-8 text-gold" />
+                  <h2 className="text-3xl font-bold text-gold">Meu Perfil</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
@@ -1022,162 +1034,174 @@ const MentorProfilePage = () => {
                     onProfileUpdate={fetchUserData}
                   />
                 </div>
-                
-                {/* Diferenciais em grid de 3 colunas */}
-                <div className="space-y-6">
-                  {/* Título "Por que me seguir?" */}
-                  <div className="flex items-center justify-center gap-3 mb-6">
-                    <UserPlus className="h-8 w-8 text-black" />
-                    <h3 className="text-3xl font-bold text-black">Por que me seguir?</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                      {isEditingDiferenciais ? (
-                        <div className="space-y-3">
-                          <Input
-                            value={diferenciaisData.dif_title_1}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_1: e.target.value}))}
-                            className="font-bold text-lg"
-                            placeholder="Ex: 🎯 Resultados Comprovados"
-                          />
-                          <Textarea
-                            value={diferenciaisData.dif_description_1}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_1: e.target.value}))}
-                            className="text-gray-700"
-                            placeholder="Descrição dos seus resultados comprovados"
-                            rows={3}
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          <h3 className="font-bold text-lg mb-2">
-                            {diferenciaisData.dif_title_1}
-                          </h3>
-                          <p className="text-gray-700 whitespace-pre-wrap">
-                            {diferenciaisData.dif_description_1}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                      {isEditingDiferenciais ? (
-                        <div className="space-y-3">
-                          <Input
-                            value={diferenciaisData.dif_title_2}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_2: e.target.value}))}
-                            className="font-bold text-lg"
-                            placeholder="Ex: 🚀 Metodologia Exclusiva"
-                          />
-                          <Textarea
-                            value={diferenciaisData.dif_description_2}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_2: e.target.value}))}
-                            className="text-gray-700"
-                            placeholder="Descrição da sua metodologia exclusiva"
-                            rows={3}
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          <h3 className="font-bold text-lg mb-2">
-                            {diferenciaisData.dif_title_2}
-                          </h3>
-                          <p className="text-gray-700 whitespace-pre-wrap">
-                            {diferenciaisData.dif_description_2}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="bg-white p-6 rounded-xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                      {isEditingDiferenciais ? (
-                        <div className="space-y-3">
-                          <Input
-                            value={diferenciaisData.dif_title_3}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_3: e.target.value}))}
-                            className="font-bold text-lg"
-                            placeholder="Ex: 💰 ROI Garantido"
-                          />
-                          <Textarea
-                            value={diferenciaisData.dif_description_3}
-                            onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_3: e.target.value}))}
-                            className="text-gray-700"
-                            placeholder="Descrição do ROI ou garantia"
-                            rows={3}
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          <h3 className="font-bold text-lg mb-2">
-                            {diferenciaisData.dif_title_3}
-                          </h3>
-                          <p className="text-gray-700 whitespace-pre-wrap">
-                            {diferenciaisData.dif_description_3}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </section>
 
-                  <div className="border-t pt-4 mt-6">
-                    <div className="flex justify-end gap-2">
-                      {isEditingDiferenciais ? (
-                        <>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setIsEditingDiferenciais(false)}
-                            disabled={isSaving}
-                            className="flex items-center gap-2"
-                          >
-                            <X className="h-4 w-4" />
-                            Cancelar
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            onClick={handleSaveDiferenciais}
-                            disabled={isSaving}
-                            className="flex items-center gap-2"
-                          >
-                            {isSaving ? (
-                              <Spinner className="h-4 w-4" />
-                            ) : (
-                              <Save className="h-4 w-4" />
-                            )}
-                            Salvar
-                          </Button>
-                        </>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => setIsEditingDiferenciais(true)}
-                          className="flex items-center gap-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Editar Diferenciais
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+          {/* Nova Seção: Por que me seguir? (Cópia) */}
+          <section className="scroll-mt-24">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
+              <div className="flex justify-between items-center mb-10">
+                <div className="flex items-center gap-3">
+                  <UserPlus className="h-8 w-8 text-gold" />
+                  <h2 className="text-3xl font-bold text-gold">Por que me seguir?</h2>
                 </div>
+                
+                {/* Checkbox de verificação */}
+                <VerificationSwitch
+                  id="verified-seguir-copy"
+                  checked={verifiedData.por_que_me_seguir}
+                  onChange={(checked) => handleVerifiedChange('por_que_me_seguir', checked)}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-slate-800/50 border border-slate-600 rounded-xl p-6 hover:shadow-xl transition-shadow duration-300 backdrop-blur-sm">
+                  {isEditingDiferenciais ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={diferenciaisData.dif_title_1}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_1: e.target.value}))}
+                        className="font-bold text-lg bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Ex: 🎯 Resultados Comprovados"
+                      />
+                      <Textarea
+                        value={diferenciaisData.dif_description_1}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_1: e.target.value}))}
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Descrição dos seus resultados comprovados"
+                        rows={3}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 className="font-bold text-lg mb-2 text-gold">
+                        {diferenciaisData.dif_title_1}
+                      </h3>
+                      <p className="text-gray-300 whitespace-pre-wrap">
+                        {diferenciaisData.dif_description_1}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="bg-slate-800/50 border border-slate-600 rounded-xl p-6 hover:shadow-xl transition-shadow duration-300 backdrop-blur-sm">
+                  {isEditingDiferenciais ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={diferenciaisData.dif_title_2}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_2: e.target.value}))}
+                        className="font-bold text-lg bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Ex: 🚀 Metodologia Exclusiva"
+                      />
+                      <Textarea
+                        value={diferenciaisData.dif_description_2}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_2: e.target.value}))}
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Descrição da sua metodologia exclusiva"
+                        rows={3}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 className="font-bold text-lg mb-2 text-gold">
+                        {diferenciaisData.dif_title_2}
+                      </h3>
+                      <p className="text-gray-300 whitespace-pre-wrap">
+                        {diferenciaisData.dif_description_2}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="bg-slate-800/50 border border-slate-600 rounded-xl p-6 hover:shadow-xl transition-shadow duration-300 backdrop-blur-sm">
+                  {isEditingDiferenciais ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={diferenciaisData.dif_title_3}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_title_3: e.target.value}))}
+                        className="font-bold text-lg bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Ex: 💰 ROI Garantido"
+                      />
+                      <Textarea
+                        value={diferenciaisData.dif_description_3}
+                        onChange={(e) => setDiferenciaisData(prev => ({...prev, dif_description_3: e.target.value}))}
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                        placeholder="Descrição do ROI ou garantia"
+                        rows={3}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 className="font-bold text-lg mb-2 text-gold">
+                        {diferenciaisData.dif_title_3}
+                      </h3>
+                      <p className="text-gray-300 whitespace-pre-wrap">
+                        {diferenciaisData.dif_description_3}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-                {/* BadgesSection expandida para largura total */}
-                <div className="w-full">
-                  <BadgesSection />
+              <div className="border-t border-slate-600 pt-4 mt-6">
+                <div className="flex justify-end gap-2">
+                  {isEditingDiferenciais ? (
+                    <>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsEditingDiferenciais(false)}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 border-slate-600 text-gray-300 hover:bg-slate-700"
+                      >
+                        <X className="h-4 w-4" />
+                        Cancelar
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        onClick={handleSaveDiferenciais}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 bg-gold hover:bg-gold-light text-slate-900"
+                      >
+                        {isSaving ? (
+                          <Spinner className="h-4 w-4" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                    </>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setIsEditingDiferenciais(true)}
+                      className="flex items-center gap-2 border-slate-600 text-gray-300 hover:bg-slate-700"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Editar Diferenciais
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Nova Seção: Brasões do Mentor (Cópia) */}
+          <section className="scroll-mt-24">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
+              <BadgesSection />
+            </div>
+          </section>
+
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
-                  <BookOpen className="h-8 w-8 text-black" />
-                  <h2 className="text-3xl font-bold text-black">Meus Cursos</h2>
+                  <BookOpen className="h-8 w-8 text-gold" />
+                  <h2 className="text-3xl font-bold text-gold">Meus Cursos</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
@@ -1199,21 +1223,21 @@ const MentorProfilePage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+                <div className="bg-slate-800/50 border border-slate-600 rounded-xl p-12 text-center border-2 border-dashed">
                   <div className="max-w-md mx-auto">
                     <img 
                       src="https://static.vecteezy.com/ti/vetor-gratis/p1/11535870-nenhum-salvo-conceito-ilustracao-design-plano-vector-eps10-elemento-grafico-moderno-para-pagina-de-destino-ui-de-estado-vazio-infografico-icone-vetor.jpg"
                       alt="Nenhum curso disponível"
                       className="w-32 h-32 mx-auto mb-6 opacity-60"
                     />
-                    <h3 className="text-2xl font-bold text-gray-700 mb-4">
+                    <h3 className="text-2xl font-bold text-gray-300 mb-4">
                       Você ainda não criou nenhum curso
                     </h3>
-                    <p className="text-gray-600 leading-relaxed mb-6">
+                    <p className="text-gray-400 leading-relaxed mb-6">
                       Comece a compartilhar seu conhecimento criando seu primeiro curso! 
                       É uma ótima maneira de impactar mais pessoas e gerar renda.
                     </p>
-                    <Button className="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg">
+                    <Button className="bg-gold hover:bg-gold-light text-slate-900 font-bold py-3 px-6 rounded-lg">
                       Criar Meu Primeiro Curso
                     </Button>
                   </div>
@@ -1224,11 +1248,11 @@ const MentorProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
-                  <MessageCircle className="h-8 w-8 text-black" />
-                  <h2 className="text-3xl font-bold text-black">O que dizem meus mentorados ...</h2>
+                  <MessageCircle className="h-8 w-8 text-gold" />
+                  <h2 className="text-3xl font-bold text-gold">O que dizem meus mentorados ...</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
@@ -1241,11 +1265,11 @@ const MentorProfilePage = () => {
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3].map((index) => (
-                  <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-sm border">
+                  <div key={index} className="bg-slate-800/50 border border-slate-600 rounded-xl p-6 shadow-sm backdrop-blur-sm">
                     {isEditingReviews ? (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium mb-2">URL da Foto</label>
+                          <label className="block text-sm font-medium mb-2 text-gray-300">URL da Foto</label>
                           <Input
                             value={reviewsData[`photo_${index}` as keyof typeof reviewsData]}
                             onChange={(e) => setReviewsData(prev => ({
@@ -1253,11 +1277,11 @@ const MentorProfilePage = () => {
                               [`photo_${index}`]: e.target.value
                             }))}
                             placeholder="https://exemplo.com/foto.jpg"
-                            className="text-sm"
+                            className="text-sm bg-slate-700/50 border-slate-600 text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">Nome</label>
+                          <label className="block text-sm font-medium mb-2 text-gray-300">Nome</label>
                           <Input
                             value={reviewsData[`name_${index}` as keyof typeof reviewsData]}
                             onChange={(e) => setReviewsData(prev => ({
@@ -1265,11 +1289,11 @@ const MentorProfilePage = () => {
                               [`name_${index}`]: e.target.value
                             }))}
                             placeholder="Nome da pessoa"
-                            className="text-sm"
+                            className="text-sm bg-slate-700/50 border-slate-600 text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">Profissão</label>
+                          <label className="block text-sm font-medium mb-2 text-gray-300">Profissão</label>
                           <Input
                             value={reviewsData[`profession_${index}` as keyof typeof reviewsData]}
                             onChange={(e) => setReviewsData(prev => ({
@@ -1277,11 +1301,11 @@ const MentorProfilePage = () => {
                               [`profession_${index}`]: e.target.value
                             }))}
                             placeholder="Profissão da pessoa"
-                            className="text-sm"
+                            className="text-sm bg-slate-700/50 border-slate-600 text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">Comentário</label>
+                          <label className="block text-sm font-medium mb-2 text-gray-300">Comentário</label>
                           <Textarea
                             value={reviewsData[`comment_${index}` as keyof typeof reviewsData]}
                             onChange={(e) => setReviewsData(prev => ({
@@ -1289,13 +1313,13 @@ const MentorProfilePage = () => {
                               [`comment_${index}`]: e.target.value
                             }))}
                             placeholder="Comentário do depoimento"
-                            className="text-sm min-h-[100px]"
+                            className="text-sm min-h-[100px] bg-slate-700/50 border-slate-600 text-white"
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="text-center relative">
-                        <Quote className="absolute top-2 left-2 h-6 w-6 text-gray-400" />
+                        <Quote className="absolute top-2 left-2 h-6 w-6 text-gold" />
                         <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
                           <img
                             src={reviewsData[`photo_${index}` as keyof typeof reviewsData]}
@@ -1307,13 +1331,13 @@ const MentorProfilePage = () => {
                             }}
                           />
                         </div>
-                        <h4 className="font-semibold text-gray-800 mb-1">
+                        <h4 className="font-semibold text-gold mb-1">
                           {reviewsData[`name_${index}` as keyof typeof reviewsData]}
                         </h4>
-                        <p className="text-sm text-gray-600 mb-3">
+                        <p className="text-sm text-gray-400 mb-3">
                           {reviewsData[`profession_${index}` as keyof typeof reviewsData]}
                         </p>
-                        <p className="text-gray-700 text-sm leading-relaxed italic">
+                        <p className="text-gray-300 text-sm leading-relaxed italic">
                           "{reviewsData[`comment_${index}` as keyof typeof reviewsData]}"
                         </p>
                       </div>
@@ -1323,7 +1347,7 @@ const MentorProfilePage = () => {
               </div>
               
               {/* Rodapé da seção de depoimentos */}
-              <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+              <div className="mt-8 pt-6 border-t border-slate-600 flex justify-end">
                 {isEditingReviews ? (
                   <div className="flex gap-2">
                     <Button
@@ -1331,6 +1355,7 @@ const MentorProfilePage = () => {
                       variant="outline"
                       onClick={() => setIsEditingReviews(false)}
                       disabled={isSaving}
+                      className="border-slate-600 text-gray-300 hover:bg-slate-700"
                     >
                       <X className="h-4 w-4 mr-2" />
                       Cancelar
@@ -1338,10 +1363,11 @@ const MentorProfilePage = () => {
                     <Button
                       size="sm"
                       onClick={handleSaveReviews}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-gold hover:bg-gold-light text-slate-900"
                       disabled={isSaving}
                     >
                       {isSaving ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                      Salvar
                     </Button>
                   </div>
                 ) : (
@@ -1349,7 +1375,7 @@ const MentorProfilePage = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => setIsEditingReviews(true)}
-                    className="justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:text-accent-foreground h-9 rounded-md px-3 hover:bg-gray-50 flex items-center gap-2"
+                    className="border-slate-600 text-gray-300 hover:bg-slate-700 flex items-center gap-2"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen h-4 w-4">
                       <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1364,11 +1390,11 @@ const MentorProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border relative">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3">
-                  <CalendarDays className="h-8 w-8 text-black" />
-                  <h2 className="text-3xl font-bold text-black">Agenda uma Conversa</h2>
+                  <CalendarDays className="h-8 w-8 text-gold" />
+                  <h2 className="text-3xl font-bold text-gold">Agenda uma Conversa</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
@@ -1406,34 +1432,34 @@ const MentorProfilePage = () => {
 
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
-            <div className="bg-white rounded-2xl shadow-xl p-10 border">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
               <div className="flex items-center justify-center gap-3 mb-10">
-                 <Mail className="h-8 w-8 text-black" />
-                 <h2 className="text-3xl font-bold text-black">Entre em Contato</h2>
+                 <Mail className="h-8 w-8 text-gold" />
+                 <h2 className="text-3xl font-bold text-gold">Entre em Contato</h2>
                </div>
                 <div className="grid lg:grid-cols-2 gap-12 mb-8">
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold">Formas de Contato</h3>
+                    <h3 className="text-xl font-semibold text-gold">Formas de Contato</h3>
                     
                     <div className="space-y-4">
                       {currentUser?.phone && (
-                        <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                          <MessageCircle className="h-6 w-6 text-green-600" />
+                        <div className="flex items-center space-x-4 p-4 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors border border-slate-600">
+                          <MessageCircle className="h-6 w-6 text-gold" />
                           <div>
-                            <p className="font-medium">Telefone/WhatsApp</p>
-                            <p className="text-gray-600 blur-sm select-none">{currentUser.phone}</p>
+                            <p className="font-medium text-gray-300">Telefone/WhatsApp</p>
+                            <p className="text-gray-400 blur-sm select-none">{currentUser.phone}</p>
                           </div>
                         </div>
                       )}
                       
-                      <p className="text-sm text-gray-600 text-left italic">
+                      <p className="text-sm text-gray-400 text-left italic">
                         Em breve você poderá entrar em contato diretamente com o mentor através do WhatsApp e com seus Agentes automatizados para personalizar sua jornada de mentoria.
                       </p>
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-xl font-semibold mb-4">Envie uma Mensagem</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-gold">Envie uma Mensagem</h3>
                     <ContactForm 
                       mentorName={currentUser?.full_name || ''}
                       mentorEmail={currentUser?.email || ''}
@@ -1456,21 +1482,21 @@ const MentorProfilePage = () => {
             </section>
 
           {/* CTA Final */}
-          <section className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-16 text-center text-white">
-            <h2 className="text-4xl font-bold mb-4">Pronto para Transformar sua Vida?</h2>
-            <p className="text-xl mb-8 opacity-90">
+          <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-16 text-center border border-gold/20 relative rounded-xl">
+            <h2 className="text-4xl font-bold mb-4 text-gold">Pronto para Transformar sua Vida?</h2>
+            <p className="text-xl mb-8 text-gray-300">
               Junte-se aos seguidores de {currentUser?.full_name?.split(' ')[0]} e comece sua jornada de transformação
             </p>
             
             <div className="space-y-4 mb-8">
-              <div className="flex justify-center space-x-8 text-lg">
+              <div className="flex justify-center space-x-8 text-lg text-gray-400">
                 <span>✅ Garantia de 30 dias</span>
                 <span>✅ Suporte personalizado</span>
                 <span>✅ Resultados comprovados</span>
               </div>
             </div>
             
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-12 py-6 text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+            <Button className="bg-gradient-to-r from-gold to-yellow-500 hover:from-yellow-500 hover:to-gold text-black px-12 py-6 text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105">
               Transformar Minha Vida Agora
             </Button>
           </section>
@@ -1504,37 +1530,40 @@ const MentorProfilePage = () => {
       {/* Modal de edição das redes sociais */}
       {isSocialMediaModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-4">Editar Redes Sociais</h3>
+          <div className="glass-card p-6 w-full max-w-md mx-4 border border-gold/20">
+            <h3 className="text-lg font-semibold mb-4 text-white">Editar Redes Sociais</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Instagram</label>
+                <label className="block text-sm font-medium mb-2 text-silver">Instagram</label>
                 <Input
                   type="url"
                   placeholder="https://instagram.com/seu_usuario"
                   value={socialMediaData.instagram}
                   onChange={(e) => setSocialMediaData(prev => ({ ...prev, instagram: e.target.value }))}
+                  className="bg-gray-800/50 border-gold/20 text-white placeholder-gray-400"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Facebook</label>
+                <label className="block text-sm font-medium mb-2 text-silver">Facebook</label>
                 <Input
                   type="url"
                   placeholder="https://facebook.com/seu_usuario"
                   value={socialMediaData.facebook}
                   onChange={(e) => setSocialMediaData(prev => ({ ...prev, facebook: e.target.value }))}
+                  className="bg-gray-800/50 border-gold/20 text-white placeholder-gray-400"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">YouTube</label>
+                <label className="block text-sm font-medium mb-2 text-silver">YouTube</label>
                 <Input
                   type="url"
                   placeholder="https://youtube.com/@seu_canal"
                   value={socialMediaData.youtube}
                   onChange={(e) => setSocialMediaData(prev => ({ ...prev, youtube: e.target.value }))}
+                  className="bg-gray-800/50 border-gold/20 text-white placeholder-gray-400"
                 />
               </div>
             </div>
@@ -1543,13 +1572,13 @@ const MentorProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsSocialMediaModalOpen(false)}
-                className="flex-1"
+                className="flex-1 border-gold/20 text-silver hover:bg-gray-800/50"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSaveSocialMedia}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-gold hover:bg-yellow-500 text-black"
               >
                 <Save className="h-4 w-4 mr-2" />
                 Salvar

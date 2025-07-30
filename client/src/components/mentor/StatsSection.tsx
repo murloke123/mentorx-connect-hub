@@ -1,6 +1,6 @@
 import StatsCard from '@/components/shared/StatsCard';
 import { formatCurrency } from '@/utils/formatters';
-import { CircleDollarSign, DollarSign, Library, Users, GraduationCap, Calendar } from 'lucide-react';
+import { CircleDollarSign, Library, Users } from 'lucide-react';
 
 interface StatsSectionProps {
   followersCount: number;

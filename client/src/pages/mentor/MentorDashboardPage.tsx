@@ -9,7 +9,7 @@ import { useStripeFinancialData } from '@/hooks/useStripeFinancialData';
 import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from '@/services/mentorService';
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, Timer } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -107,63 +107,76 @@ const MentorDashboardPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 min-h-screen">
+      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">
-            {profile ? `Bem-vindo(a), ${profile.full_name || 'Mentor(a)'}!` : 'Painel do Mentor'}
+          <h1 className="text-4xl font-bold mb-2 text-white">
+            Dashboard do Mentor
           </h1>
-          <p className="text-gray-600">Gerencie suas métricas e acompanhe seu desempenho.</p>
+          <p className="text-gray-300 text-lg">
+            Gerencie suas mentorias e acompanhe seu progresso
+          </p>
         </div>
 
-        {/* Stripe Status Display */}
+        {/* Card de Conta Verificada - Compacto */}
         {stripeStatus.stripe_onboarding_status && (
-          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="flex items-center gap-3">
-              {stripeStatus.stripe_onboarding_status === 'completed' ? (
-                <>
-                  <CheckCircle className="w-5 h-5 text-black" />
-                  <Badge className="bg-green-100 text-green-700">Conta Verificada</Badge>
-                </>
-              ) : (
-                <>
-                  <Button 
-                    onClick={handleGoToOnboarding}
-                    size="sm"
-                    className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white shadow-lg"
-                  >
-                    Preencher Dados para Começar a Receber
-                  </Button>
-                  <Timer className="w-8 h-8 text-slate-700 animate-pulse ml-4" />
-                  <Badge className="bg-yellow-100 text-yellow-700 animate-pulse">Aguardando preenchimento de dados da conta ...</Badge>
-                </>
-              )}
-              {stripeStatus.lastChecked && (
-                <span className="text-sm text-gray-500 ml-auto">
-                  Última verificação: {stripeStatus.lastChecked.toLocaleTimeString()}
-                </span>
-              )}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-slate-900/50 via-slate-800/50 to-slate-900/50 border border-gold/20 rounded-lg px-4 py-2 backdrop-blur-xl shadow-lg shadow-gold/10 h-[45px] flex items-center">
+              <div className="flex items-center gap-2 w-full">
+                {stripeStatus.stripe_onboarding_status === 'completed' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 text-gold" />
+                    <span className="text-gold text-sm font-medium">Conta Verificada</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-yellow-500" />
+                    <span className="text-yellow-500 text-sm font-medium">
+                      {stripeStatus.stripe_onboarding_status === 'pending' 
+                        ? 'Verificação Pendente' 
+                        : 'Verificação Necessária'
+                      }
+                    </span>
+                    <Button 
+                      size="sm" 
+                      className="ml-2 bg-gold text-slate-900 hover:bg-gold/90"
+                      onClick={handleGoToOnboarding}
+                    >
+                      Completar
+                    </Button>
+                  </>
+                )}
+                {stripeStatus.lastChecked && (
+                  <span className="text-xs text-gray-500 ml-auto">
+                    Última verificação: {stripeStatus.lastChecked.toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Debug Info - Mostrar status do Stripe */}
         {isLoadingStripeData && (
-          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader-2 w-5 h-5 text-black animate-spin">
-                <path d="M21 12a9 9 0 11-6.219-8.56"/>
-              </svg>
-              <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent shadow hover:bg-primary/80 bg-green-100 text-green-700">
-                Carregando Dados Financeiros
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader-2 w-5 h-5 text-gold animate-spin">
+                  <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                </svg>
+                <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border border-green-500/30 backdrop-blur-sm">
+                  Carregando Dados Financeiros
+                </Badge>
+                <span className="text-sm text-green-400 ml-auto">Conectando com Stripe...</span>
               </div>
-              <span className="text-sm text-green-600 ml-auto">Conectando com Stripe...</span>
             </div>
           </div>
         )}
         
         {stripeError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700 text-sm">❌ Erro nos dados do Stripe: {stripeError}</p>
+          <div className="mb-4">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-red-500/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-red-500/20">
+              <p className="text-red-400 text-sm">❌ Erro nos dados do Stripe: {stripeError}</p>
+            </div>
           </div>
         )}
 

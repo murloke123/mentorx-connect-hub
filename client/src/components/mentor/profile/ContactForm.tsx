@@ -117,6 +117,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
         onChange={handleChange}
         required
         disabled={isSubmitting}
+        className="bg-slate-800/50 border-gold/30 text-gold placeholder:text-gold/40 focus:border-gold focus:ring-gold/20"
       />
       <Input
         name="email"
@@ -126,19 +127,21 @@ const ContactForm: React.FC<ContactFormProps> = ({
         onChange={handleChange}
         required
         disabled={isSubmitting}
+        className="bg-slate-800/50 border-gold/30 text-gold placeholder:text-gold/40 focus:border-gold focus:ring-gold/20"
       />
       <Textarea
         name="message"
-        placeholder="Sua mensagem"
+        placeholder="Envie sua mensagem"
         value={formData.message}
         onChange={handleChange}
         rows={4}
         required
         disabled={isSubmitting}
+        className="bg-slate-800/50 border-gold/30 text-gold placeholder:text-gold/40 focus:border-gold focus:ring-gold/20 resize-none"
       />
       <Button 
         type="submit" 
-        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-full h-11 px-8 bg-gold hover:bg-gold-light text-slate-900 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
         disabled={isSubmitting}
       >
         {isSubmitting ? (

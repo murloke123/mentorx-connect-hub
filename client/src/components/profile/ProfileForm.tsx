@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { User } from '@supabase/supabase-js';
-import { Calendar, Camera, Info, MessageSquare, Phone, Star, User as UserIcon } from "lucide-react";
+import { Calendar, Info, MessageSquare, Phone, Star, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -9,7 +9,6 @@ import { useCategories } from "../../hooks/useCategories";
 import { supabase } from "../../utils/supabase";
 import { uploadImage } from "../../utils/uploadImage";
 import RichTextEditor from "../mentor/content/RichTextEditor";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -34,7 +33,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
-import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface ProfileData {
@@ -263,69 +261,26 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
             {/* Informações Pessoais */}
-            <Card className="shadow-sm">
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <UserIcon className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-gold">
+                  <UserIcon className="h-5 w-5 text-gold" />
                   Informações Pessoais
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Upload de Avatar */}
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage 
-                        src={avatarUrl || undefined} 
-                        alt={profileData?.full_name || "Avatar"} 
-                      />
-                      <AvatarFallback className="text-lg">
-                        {profileData?.full_name?.charAt(0)?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    {/* Botão de upload sobreposto */}
-                    <label 
-                      htmlFor="avatar-upload" 
-                      className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer transition-colors shadow-lg"
-                    >
-                      {isUploadingAvatar ? (
-                        <Spinner className="h-4 w-4" />
-                      ) : (
-                        <Camera className="h-4 w-4" />
-                      )}
-                    </label>
-                    
-                    <input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                      disabled={isUploadingAvatar}
-                    />
-                  </div>
-                  
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-700">Foto de Perfil</p>
-                    <p className="text-xs text-gray-500">
-                      Clique no ícone da câmera para alterar (máx. 2MB)
-                    </p>
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="full_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700">Nome Completo</FormLabel>
+                        <FormLabel className="text-sm font-medium text-gray-300">Nome Completo</FormLabel>
                         <FormControl>
                           <Input 
                             {...field} 
                             placeholder="Seu nome completo" 
-                            className="h-11"
+                            className="h-11 bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400"
                           />
                         </FormControl>
                         <FormMessage />
@@ -334,11 +289,11 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                   />
 
                   <div>
-                     <label className="text-sm font-medium text-gray-700 block mb-2">E-mail</label>
+                     <label className="text-sm font-medium text-gray-300 block mb-2">E-mail</label>
                      <Input 
                        value={profileData?.email || ""} 
                        placeholder="Seu e-mail" 
-                       className="h-11 bg-gray-50 cursor-not-allowed"
+                       className="h-11 bg-slate-700/50 border-slate-600 text-gray-400 cursor-not-allowed"
                        disabled
                        readOnly
                      />
@@ -351,8 +306,8 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <Phone className="h-4 w-4 text-green-600" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-300">
+                          <Phone className="h-4 w-4 text-gold" />
                           Telefone
                         </FormLabel>
                         <FormControl>
@@ -360,7 +315,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                             {...field} 
                             placeholder="(11) 99999-9999" 
                             value={field.value || ""}
-                            className="h-11"
+                            className="h-11 bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400"
                           />
                         </FormControl>
                         <FormMessage />
@@ -373,8 +328,8 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                     name="date_of_birth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <Calendar className="h-4 w-4 text-purple-600" />
+                        <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-300">
+                          <Calendar className="h-4 w-4 text-gold" />
                           Data de Nascimento
                         </FormLabel>
                         <FormControl>
@@ -382,7 +337,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                             {...field} 
                             type="date" 
                             value={field.value || ""}
-                            className="h-11"
+                            className="h-11 bg-slate-800/50 border-slate-600 text-white"
                           />
                         </FormControl>
                         <FormMessage />
@@ -392,17 +347,17 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                 </div>
 
                 {/* Mensagem Informativa */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-slate-800/50 border border-gold/30 rounded-lg p-4 backdrop-blur-sm">
                   <div className="space-y-2">
-                    <h4 className="font-medium text-blue-900">Por que essas informações são importantes?</h4>
-                    <div className="space-y-2 text-sm text-blue-800">
+                    <h4 className="font-medium text-gold">Por que essas informações são importantes?</h4>
+                    <div className="space-y-2 text-sm text-gray-300">
                       <div className="flex items-start gap-2">
-                        <Phone className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Telefone:</strong> Permite que mentores entrem em contato quando necessário para agendamentos ou esclarecimentos importantes.</span>
+                        <Phone className="h-4 w-4 text-gold mt-0.5 flex-shrink-0" />
+                        <span><strong className="text-gold">Telefone:</strong> Permite que mentores entrem em contato quando necessário para agendamentos ou esclarecimentos importantes.</span>
                       </div>
                       <div className="flex items-start gap-2">
-                        <Calendar className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Data de Nascimento:</strong> Você pode receber promoções especiais de aniversário e ter acesso antecipado a novas funcionalidades da plataforma.</span>
+                        <Calendar className="h-4 w-4 text-gold mt-0.5 flex-shrink-0" />
+                        <span><strong className="text-gold">Data de Nascimento:</strong> Você pode receber promoções especiais de aniversário e ter acesso antecipado a novas funcionalidades da plataforma.</span>
                       </div>
                     </div>
                   </div>
@@ -412,10 +367,10 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
 
             {/* Informações Importantes - oculto para mentorados */}
             {profileData?.role !== 'mentorado' && (
-              <Card className="shadow-sm">
+              <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Info className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="flex items-center gap-2 text-lg text-gold">
+                    <Info className="h-5 w-5 text-gold" />
                     Informações Importantes
                   </CardTitle>
                 </CardHeader>
@@ -427,20 +382,20 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                       name="category_id"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Categoria do Mentor</FormLabel>
+                          <FormLabel className="text-sm font-medium text-gray-300">Categoria do Mentor</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             value={field.value || ""}
                             disabled={isLoading || categoriesLoading}
                           >
                             <FormControl>
-                              <SelectTrigger className="h-11">
+                              <SelectTrigger className="h-11 bg-slate-800/50 border-slate-600 text-white">
                                 <SelectValue placeholder={categoriesLoading ? "Carregando categorias..." : "Selecione uma categoria"} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-slate-800 border-slate-600">
                               {categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>
+                                <SelectItem key={category.id} value={category.id} className="text-white hover:bg-slate-700">
                                   {category.name}
                                 </SelectItem>
                               ))}
@@ -459,8 +414,8 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                       name="highlight_message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                            <Star className="h-4 w-4 text-yellow-500" />
+                          <FormLabel className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                            <Star className="h-4 w-4 text-gold" />
                             Mensagem de Destaque
                           </FormLabel>
                           <FormControl>
@@ -469,15 +424,15 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                                 {...field} 
                                 value={field.value || ""}
                                 placeholder="Digite uma mensagem que destaque seu diferencial como mentor" 
-                                className="h-11 pr-16"
+                                className="h-11 pr-16 bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400"
                                 maxLength={100}
                               />
-                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
                                 {(field.value || "").length}/100
                               </div>
                             </div>
                           </FormControl>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-400">
                             Máximo de 100 caracteres para destacar seu diferencial como mentor
                           </div>
                           <FormMessage />
@@ -490,10 +445,10 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
             )}
 
             {/* Sobre Mim */}
-            <Card className="shadow-sm">
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <MessageSquare className="h-5 w-5 text-teal-600" />
+                <CardTitle className="flex items-center gap-2 text-lg text-gold">
+                  <MessageSquare className="h-5 w-5 text-gold" />
                   Sobre Mim
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -502,7 +457,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                         onClick={() => setIsBioModalOpen(true)}
                         className="flex items-center"
                       >
-                        <Info className="h-4 w-4 text-blue-500 hover:text-blue-700 cursor-pointer" />
+                        <Info className="h-4 w-4 text-gold hover:text-gold-light cursor-pointer" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -525,7 +480,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
               <Button 
                 type="submit" 
                 disabled={isLoading} 
-                className="h-11 px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                className="h-11 px-8 bg-gold hover:bg-gold-light text-slate-900 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {isLoading ? (
                   "Salvando..."

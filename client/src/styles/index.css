@@ -198,6 +198,29 @@
     border-image: var(--gradient-gold) 1;
   }
 
+  /* Estilos para campos de data - ícone do calendário */
+  input[type="date"] {
+    position: relative;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+  }
+
+  /* Firefox */
+  input[type="date"]::-moz-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+  }
+
+  /* Para campos com background escuro, garantir que o ícone seja branco */
+  input[type="date"].bg-slate-800\/50::-webkit-calendar-picker-indicator,
+  input[type="date"][class*="bg-slate"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.2);
+  }
+
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }

@@ -314,19 +314,19 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
 
   if (loading) {
     return (
-      <div className="bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex items-center justify-center">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 h-[650px] flex items-center justify-center">
         <div className="flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span className="ml-2">Carregando configurações...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-gold" />
+          <span className="ml-2 text-gold">Carregando configurações...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex flex-col">
+    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 h-[650px] flex flex-col">
       <div className="mb-8">
-        <h3 className="text-2xl font-bold text-black">
+        <h3 className="text-2xl font-bold text-gold gradient-text">
           Disponibilidade
         </h3>
       </div>
@@ -334,19 +334,19 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
         <div className="space-y-6">
           {/* Dias da Semana */}
           <div className="space-y-3">
-            <label className="text-sm font-medium flex items-center gap-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gold">
               <Calendar className="h-4 w-4" />
               Dias Disponíveis
             </label>
             <Select>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-slate-800/50 border-gold/30 text-gold hover:border-gold/50">
                 <SelectValue placeholder={getSelectedDaysText()} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-slate-800 border-gold/30">
                 <div className="p-2">
                   {weekDays.map((day) => (
                     <div key={day.key} className="flex items-center justify-between py-2">
-                      <span className="text-sm">{day.label}</span>
+                      <span className="text-sm text-gold">{day.label}</span>
                       <Checkbox
                         checked={settings.workingDays.includes(day.key)}
                         onCheckedChange={(checked) => handleDayToggle(day.key, checked as boolean)}
@@ -356,7 +356,7 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
                 </div>
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gold/60">
               {getSelectedDaysText()}
             </p>
           </div>
@@ -364,17 +364,17 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
           {/* Horários */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="text-sm font-medium flex items-center gap-2 text-gold">
                 <Clock className="h-4 w-4" />
                 Início
               </label>
               <Select value={settings.startTime} onValueChange={(value) => handleTimeChange('startTime', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-slate-800/50 border-gold/30 text-gold hover:border-gold/50">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-slate-800 border-gold/30">
                   {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
+                    <SelectItem key={time} value={time} className="text-gold hover:bg-gold/10">
                       {time}
                     </SelectItem>
                   ))}
@@ -383,17 +383,17 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="text-sm font-medium flex items-center gap-2 text-gold">
                 <Clock className="h-4 w-4" />
                 Fim
               </label>
               <Select value={settings.endTime} onValueChange={(value) => handleTimeChange('endTime', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-slate-800/50 border-gold/30 text-gold hover:border-gold/50">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-slate-800 border-gold/30">
                   {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
+                    <SelectItem key={time} value={time} className="text-gold hover:bg-gold/10">
                       {time}
                     </SelectItem>
                   ))}
@@ -405,30 +405,33 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
           {/* Duração da Sessão e Fuso Horário */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Duração da Sessão (minutos)</label>
+              <label className="text-sm font-medium text-gold">Duração da Sessão (minutos)</label>
               <Select value={settings.sessionDuration.toString()} onValueChange={handleSessionDurationChange}>
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger className="bg-slate-800/50 border-gold/30 text-gold hover:border-gold/50">
+                  <SelectValue placeholder="Selecione a duração" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="30">30 minutos</SelectItem>
-                  <SelectItem value="60">60 minutos</SelectItem>
+                <SelectContent className="bg-slate-800 border-gold/30">
+                  <SelectItem value="30" className="text-gold hover:bg-gold/10">30 minutos</SelectItem>
+                  <SelectItem value="45" className="text-gold hover:bg-gold/10">45 minutos</SelectItem>
+                  <SelectItem value="60" className="text-gold hover:bg-gold/10">1 hora</SelectItem>
+                  <SelectItem value="90" className="text-gold hover:bg-gold/10">1 hora e 30 minutos</SelectItem>
+                  <SelectItem value="120" className="text-gold hover:bg-gold/10">2 horas</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="text-sm font-medium flex items-center gap-2 text-gold">
                 <Globe className="h-4 w-4" />
                 Fuso Horário
               </label>
               <Select value={settings.timezone} onValueChange={handleTimezoneChange}>
-                <SelectTrigger className="w-full" style={{ marginTop: '11px' }}>
+                <SelectTrigger className="w-full bg-slate-800/50 border-gold/30 text-gold hover:border-gold/50" style={{ marginTop: '11px' }}>
                   <SelectValue placeholder="Selecione seu fuso horário" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-slate-800 border-gold/30">
                   {timezones.map((timezone) => (
-                    <SelectItem key={timezone.value} value={timezone.value}>
+                    <SelectItem key={timezone.value} value={timezone.value} className="text-gold hover:bg-gold/10">
                       {timezone.label}
                     </SelectItem>
                   ))}
@@ -436,13 +439,13 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
               </Select>
             </div>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gold/60">
             Detectado automaticamente: {getSelectedTimezoneLabel()}
           </p>
 
           {/* Valor do Agendamento */}
           <div className="space-y-3">
-            <label className="text-sm font-medium flex items-center gap-2">
+            <label className="text-sm font-medium flex items-center gap-2 text-gold">
               <DollarSign className="h-4 w-4" />
               Valor do Agendamento (R$)
             </label>
@@ -453,9 +456,9 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
               placeholder="0.00"
               value={settings.price || ''}
               onChange={(e) => handlePriceChange(e.target.value)}
-              className="w-full"
+              className="w-full bg-slate-800/50 border-gold/30 text-gold placeholder:text-gold/40 hover:border-gold/50 focus:border-gold"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gold/60">
               Defina o valor que será cobrado por cada agendamento (opcional)
             </p>
           </div>
@@ -465,7 +468,7 @@ const MentorCalendarSettings: React.FC<MentorCalendarSettingsProps> = ({ onSetti
         <Button 
           onClick={saveSettings} 
           disabled={saving}
-          className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:via-slate-700 hover:to-slate-800 text-white border-none mt-6"
+          className="w-full h-11 px-8 bg-gold hover:bg-gold-light text-slate-900 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
         >
           {saving ? (
             <>

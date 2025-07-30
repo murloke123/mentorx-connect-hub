@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Gem, Star, Award } from "lucide-react";
+import { Check, Crown, Gem, Star } from "lucide-react";
 
 const PricingSection = () => {
   const plans = [

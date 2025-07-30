@@ -151,18 +151,18 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
   const renderConfirmationDialog = () => (
     <>
       <DialogHeader>
-        <DialogTitle className="text-xl font-semibold text-center">
+        <DialogTitle className="text-xl font-semibold text-center text-white">
           Confirmar Publicação
         </DialogTitle>
-        <DialogDescription className="text-center">
+        <DialogDescription className="text-center text-gray-300">
           Deseja confirmar a publicação da sua conta?
         </DialogDescription>
       </DialogHeader>
 
       <div className="space-y-4">
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
+        <Alert className="bg-green-500/10 border-green-500/30 backdrop-blur-sm">
+          <CheckCircle className="h-4 w-4 text-green-400" />
+          <AlertDescription className="text-green-300">
             Todas as seções foram verificadas com sucesso! Sua conta está pronta para ser publicada.
           </AlertDescription>
         </Alert>
@@ -172,14 +172,14 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         <Button 
           variant="outline" 
           onClick={onClose}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30"
           disabled={isPublishing}
         >
           Cancelar
         </Button>
         <Button 
           onClick={handlePublish}
-          className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white"
+          className="w-full sm:w-auto bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:to-gold text-black font-semibold shadow-lg"
           disabled={isPublishing}
         >
           {isPublishing ? (
@@ -198,10 +198,10 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
   const renderErrorDialog = () => (
     <>
       <DialogHeader>
-        <DialogTitle className="text-xl font-semibold text-center text-red-600">
+        <DialogTitle className="text-xl font-semibold text-center text-red-400">
           Não é possível publicar ainda
         </DialogTitle>
-        <DialogDescription className="text-center">
+        <DialogDescription className="text-center text-gray-300">
           {missingFields.length === 1 
             ? `Você não pode publicar ainda sua conta porque a seção "${missingFields[0]}" não está verificada.`
             : `Você não pode publicar ainda sua conta porque as seções "${missingFields.slice(0, -1).join('", "')}" e "${missingFields[missingFields.length - 1]}" não estão verificadas.`
@@ -210,21 +210,21 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       </DialogHeader>
 
       <div className="space-y-4">
-        <Alert variant="destructive" className="bg-red-50 border-red-200">
-          <X className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert variant="destructive" className="bg-red-500/10 border-red-500/30 backdrop-blur-sm">
+          <X className="h-4 w-4 text-red-400" />
+          <AlertDescription className="text-red-300">
             Complete as verificações necessárias antes de publicar sua conta.
           </AlertDescription>
         </Alert>
 
         {/* Lista de seções não verificadas */}
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <h4 className="font-medium text-gray-900 mb-3">Seções que precisam ser verificadas:</h4>
+        <div className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 backdrop-blur-sm">
+          <h4 className="font-medium text-white mb-3">Seções que precisam ser verificadas:</h4>
           <ul className="space-y-2">
             {missingFields.map((section, index) => (
               <li key={index} className="flex items-center gap-2">
-                <X className="h-4 w-4 text-red-500 shrink-0" />
-                <span className="text-gray-700 font-medium">{section}</span>
+                <X className="h-4 w-4 text-red-400 shrink-0" />
+                <span className="text-gray-300 font-medium">{section}</span>
               </li>
             ))}
           </ul>
@@ -235,7 +235,7 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         <Button 
           variant="outline" 
           onClick={onClose}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30"
         >
           Entendi
         </Button>
@@ -245,11 +245,11 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
         {verifiedStatus === null ? (
           // Loading state
           <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-8 w-8 animate-spin" />
+            <Loader2 className="h-8 w-8 animate-spin text-gold" />
           </div>
         ) : canPublish ? (
           renderConfirmationDialog()

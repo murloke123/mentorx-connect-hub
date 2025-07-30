@@ -87,7 +87,7 @@ const RichTextEditor = ({ initialValue = "", onChange, disabled = false }: RichT
   };
 
   return (
-    <div className={`border rounded-md ${disabled ? 'opacity-70' : ''}`}>
+    <div className={`border ${disabled ? 'opacity-70' : ''}`}>
       <div className="bg-muted p-2 border-b flex flex-wrap gap-1">
         <TooltipProvider>
           <Tooltip>

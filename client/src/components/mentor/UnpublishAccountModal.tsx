@@ -1,12 +1,12 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { updateMentorPublicStatus } from '@/services/mentorService';
@@ -67,20 +67,20 @@ export const UnpublishAccountModal: React.FC<UnpublishAccountModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-center">
+          <DialogTitle className="text-xl font-semibold text-center text-white">
             Despublicar Conta
           </DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogDescription className="text-center text-gray-300">
             Você realmente deseja despublicar sua conta?
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <Alert className="bg-yellow-50 border-yellow-200">
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-800">
+          <Alert className="bg-yellow-500/10 border-yellow-500/30 backdrop-blur-sm">
+            <AlertTriangle className="h-4 w-4 text-yellow-400" />
+            <AlertDescription className="text-yellow-300">
               Sua conta não ficará mais visível para o público e não aparecerá nas páginas de mentores.
             </AlertDescription>
           </Alert>
@@ -90,14 +90,14 @@ export const UnpublishAccountModal: React.FC<UnpublishAccountModalProps> = ({
           <Button 
             variant="outline" 
             onClick={onClose}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30"
             disabled={isUnpublishing}
           >
             Cancelar
           </Button>
           <Button 
             onClick={handleUnpublish}
-            className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white"
+            className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold shadow-lg"
             disabled={isUnpublishing}
           >
             {isUnpublishing ? (

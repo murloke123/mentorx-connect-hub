@@ -1,4 +1,4 @@
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import SchedulesModal from './SchedulesModal';
 
@@ -31,6 +31,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDayModal, setShowDayModal] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0); // 0 = mês atual, 1 = próximo mês
+  const [showLegend, setShowLegend] = useState(false);
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
   
@@ -202,14 +203,14 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     }
     
     if (isCurrentDay) {
-      return `${baseClass} bg-blue-500 text-white hover:bg-blue-600 shadow-lg ring-2 ring-blue-200`;
+      return `${baseClass} bg-gold text-slate-900 hover:bg-gold-light shadow-lg ring-2 ring-gold/50`;
     } else if (isPastDay) {
-      // Dias passados: cinza escuro, não clicável
-      return `${baseClass} bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 hover:scale-100 hover:shadow-none`;
+      // Dias passados: mais claro, não clicável
+      return `${baseClass} bg-slate-600/60 text-slate-300 cursor-not-allowed opacity-70 hover:scale-100 hover:shadow-none border border-slate-500/40`;
     } else if (!isWorking) {
-      return `${baseClass} bg-red-100 text-red-600 cursor-not-allowed hover:scale-100 hover:shadow-none`;
+      return `${baseClass} bg-red-900/30 text-red-400 border border-red-500/30 cursor-not-allowed hover:scale-100 hover:shadow-none`;
     } else {
-      return `${baseClass} bg-white text-gray-800 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-400`;
+      return `${baseClass} bg-slate-800/50 text-gold hover:bg-gold/10 border border-gold/30 hover:border-gold/50`;
     }
   };
 
@@ -217,13 +218,13 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     <>
       <div 
         key={`calendar-${monthOffset}`}
-        className={`bg-white p-8 rounded-2xl border border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 h-[650px] flex flex-col ${className}`}
+        className={`bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/30 shadow-lg shadow-gold/10 hover:shadow-xl hover:shadow-gold/20 transition-all duration-300 h-[650px] flex flex-col ${className}`}
       >
         {/* Cabeçalho com ícone, título e botão de navegação */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-gray-800" />
-            <h3 className="text-2xl font-bold text-gray-800">
+            <Calendar className="h-6 w-6 text-gold" />
+            <h3 className="text-2xl font-bold text-gold">
               {calendarData.currentMonthName} {calendarData.currentYear}
             </h3>
           </div>
@@ -232,7 +233,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {monthOffset === 0 ? (
             <button
               onClick={goToNextMonth}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 hover:text-gray-900 transition-all duration-200 hover:scale-105"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800/50 hover:bg-gold/20 text-gold hover:text-gold border border-gold/30 transition-all duration-200 hover:scale-105"
               title="Avançar para o próximo mês"
             >
               <ChevronRight className="h-5 w-5" />
@@ -240,7 +241,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           ) : (
             <button
               onClick={goToPreviousMonth}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 hover:text-gray-900 transition-all duration-200 hover:scale-105"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800/50 hover:bg-gold/20 text-gold hover:text-gold border border-gold/30 transition-all duration-200 hover:scale-105"
               title="Voltar para o mês anterior"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -253,7 +254,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {weekDays.map((day) => (
             <div 
               key={day} 
-              className="font-bold text-sm text-gray-600 text-center h-8 flex items-center justify-center -ml-2.5"
+              className="font-bold text-sm text-gold/80 text-center h-8 flex items-center justify-center -ml-2.5"
             >
               {day}
             </div>
@@ -299,30 +300,46 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           })}
         </div>
         
-        {/* Legenda melhorada */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-300">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3 text-center">Legenda</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-blue-500 rounded-lg shadow-sm ring-1 ring-blue-200"></div>
-              <span className="text-sm font-medium text-gray-700">Hoje</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-white border-2 border-gray-200 rounded-lg"></div>
-              <span className="text-sm font-medium text-gray-700">
-                Disponível{isClickable ? ' (clicável)' : ''}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-gray-300 rounded-lg opacity-50"></div>
-              <span className="text-sm font-medium text-gray-700">Dia passado (bloqueado)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-red-100 border border-red-200 rounded-lg"></div>
-              <span className="text-sm font-medium text-gray-700">Indisponível</span>
+        {/* Botão para mostrar/ocultar legenda */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setShowLegend(!showLegend)}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-gold/20 text-gold hover:text-gold border border-gold/30 rounded-lg transition-all duration-200 hover:scale-105"
+            title={showLegend ? "Ocultar legenda" : "Mostrar legenda"}
+          >
+            <Info className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {showLegend ? "Ocultar Legenda" : "Mostrar Legenda"}
+            </span>
+          </button>
+        </div>
+
+        {/* Legenda melhorada com padrão premium - condicional */}
+        {showLegend && (
+          <div className="mt-4 p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl border border-gold/30 shadow-lg shadow-gold/10 animate-in slide-in-from-top-2 duration-300">
+            <h4 className="text-sm font-semibold text-gold mb-3 text-center">Legenda</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 bg-gold rounded-lg shadow-sm ring-1 ring-gold/50"></div>
+                <span className="text-sm font-medium text-gold/80">Hoje</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 bg-slate-800/50 border border-gold/30 rounded-lg"></div>
+                <span className="text-sm font-medium text-gold/80">
+                  Disponível{isClickable ? ' (clicável)' : ''}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                 <div className="w-4 h-4 bg-slate-600/60 border border-slate-500/40 rounded-lg opacity-70"></div>
+                 <span className="text-sm font-medium text-gold/80">Dia passado (bloqueado)</span>
+               </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 bg-red-900/30 border border-red-500/30 rounded-lg"></div>
+                <span className="text-sm font-medium text-gold/80">Indisponível</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modal de agendamentos do dia */}
