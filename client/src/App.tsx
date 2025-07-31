@@ -1,3 +1,4 @@
+import ResetPassword from "@/components/auth/ResetPassword";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Footer from "@/components/shared/Footer";
 import Navigation from "@/components/shared/Navigation";
@@ -109,6 +110,7 @@ const AppContent = () => {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/mentors" element={<MentorsPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/document-test" element={<DocumentTestPage />} />
           <Route path="/contador-test" element={<ContadorTestPage />} />
           <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
