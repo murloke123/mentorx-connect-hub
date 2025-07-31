@@ -1,8 +1,8 @@
+import { Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Clock } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 const CheckoutSuccessPage = () => {
   const navigate = useNavigate();

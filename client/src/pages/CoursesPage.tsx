@@ -99,25 +99,25 @@ const CoursesPage = () => {
   }, [selectedCategory, filteredCourses.length]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Hero Banner Section */}
       <div className="relative w-full">
         <div className="w-full h-[600px] overflow-hidden relative">
-          <img 
-            src="https://images.unsplash.com/photo-1506765515384-028b60a970df?auto=format&fit=crop&w=1500&q=80"
-            alt="Cursos Banner" 
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/70 to-blue-600/70"></div>
-          
-          {/* Aurora Boreal Effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="aurora-container">
-              <div className="aurora aurora-1"></div>
-              <div className="aurora aurora-2"></div>
-              <div className="aurora aurora-3"></div>
-            </div>
-      </div>
+            ref={(video) => {
+              if (video) {
+                video.playbackRate = 0.6;
+              }
+            }}
+          >
+            <source src="/images/ensinando.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-gold/20 to-black/60"></div>
 
           {/* Content */}
           <div className="absolute inset-0 flex items-center justify-center">
@@ -132,12 +132,30 @@ const CoursesPage = () => {
                 }}
                 className="relative flex flex-col gap-4 items-center justify-center"
               >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                  Domine novas habilidades com especialistas
-                </h1>
-                <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto italic">
-                  Aprenda com quem realmente entende do assunto
-                </p>
+                <div className="bg-black/40 backdrop-blur-sm w-full py-8 px-4 shadow-2xl mb-12">
+                  <motion.h1 
+                    className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight text-center" 
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                    }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  >
+                    Jornada de cursos específica para você
+                  </motion.h1>
+                  <motion.p 
+                    className="text-lg md:text-xl text-white mb-0 max-w-5xl mx-auto italic text-center whitespace-nowrap" 
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                    }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+                  >
+                    Nossa IA é um reflexo da mente dos nossos mentores e foi treinada para guiar e potencializar o seu aprendizado.
+                  </motion.p>
+                </div>
               </motion.div>
               
               {/* Search and Filter Container */}
@@ -150,15 +168,15 @@ const CoursesPage = () => {
                     placeholder="O que você quer aprender hoje?" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 pr-4 py-6 text-lg rounded-2xl border-0 shadow-xl bg-white transition-all duration-300 focus:outline-none focus:ring-0 focus:shadow-2xl focus:shadow-white/20"
+                    className="pl-12 pr-4 py-6 text-lg text-gray-900 placeholder-gray-500 rounded-2xl border-2 border-gold/40 shadow-xl bg-white transition-all duration-300 focus:outline-none focus:ring-0 focus:border-gold focus:shadow-2xl focus:shadow-gold/30"
                     style={{
-                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                      boxShadow: '0 0 0 2px rgba(255, 215, 0, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)',
                     }}
                     onFocus={(e) => {
-                      e.target.style.boxShadow = '0 0 0 4px rgba(255, 255, 255, 0.3), 0 10px 25px rgba(0, 0, 0, 0.1)';
+                      e.target.style.boxShadow = '0 0 0 4px rgba(255, 215, 0, 0.5), 0 10px 25px rgba(0, 0, 0, 0.1)';
                     }}
                     onBlur={(e) => {
-                      e.target.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(255, 215, 0, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)';
                     }}
           />
         </div>
@@ -174,8 +192,8 @@ const CoursesPage = () => {
                     }}
                     className={`rounded-full px-6 py-6 font-medium transition-all duration-300 focus:outline-none focus:ring-0 flex items-center gap-2 ${
                       filter === "all" 
-                        ? "bg-white text-purple-700 shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-white/20 border-2 border-purple-200" 
-                        : "bg-white/20 text-white border border-white/30 hover:bg-white/30 focus:shadow-lg focus:shadow-white/20"
+                        ? "bg-gradient-to-r from-gold via-gold-light to-gold text-black shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-gold/20 border-2 border-gold/30" 
+                        : "bg-black/30 text-white border border-gold/30 hover:bg-gold/10 focus:shadow-lg focus:shadow-gold/20"
                     }`}
                   >
                     <Book className="h-4 w-4" />
@@ -186,8 +204,8 @@ const CoursesPage = () => {
                     onClick={() => setFilter("free")}
                     className={`rounded-full px-6 py-6 font-medium transition-all duration-300 focus:outline-none focus:ring-0 ${
                       filter === "free" 
-                        ? "bg-white text-purple-700 shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-white/20 border-2 border-purple-200" 
-                        : "bg-white/20 text-white border border-white/30 hover:bg-white/30 focus:shadow-lg focus:shadow-white/20"
+                        ? "bg-gradient-to-r from-gold via-gold-light to-gold text-black shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-gold/20 border-2 border-gold/30" 
+                        : "bg-black/30 text-white border border-gold/30 hover:bg-gold/10 focus:shadow-lg focus:shadow-gold/20"
                     }`}
                   >
                     Gratuitos
@@ -197,8 +215,8 @@ const CoursesPage = () => {
                     onClick={() => setFilter("paid")}
                     className={`rounded-full px-6 py-6 font-medium transition-all duration-300 focus:outline-none focus:ring-0 ${
                       filter === "paid" 
-                        ? "bg-white text-purple-700 shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-white/20 border-2 border-purple-200" 
-                        : "bg-white/20 text-white border border-white/30 hover:bg-white/30 focus:shadow-lg focus:shadow-white/20"
+                        ? "bg-gradient-to-r from-gold via-gold-light to-gold text-black shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-gold/20 border-2 border-gold/30" 
+                        : "bg-black/30 text-white border border-gold/30 hover:bg-gold/10 focus:shadow-lg focus:shadow-gold/20"
                     }`}
                   >
                     Pagos
@@ -220,14 +238,13 @@ const CoursesPage = () => {
                         }`}
                         style={{ animationDelay: `${(index + 1) * 100}ms` }}
                       >
-                        <div className={`w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 mx-auto mb-3 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 ${
-                          selectedCategory === category.id ? 'ring-2 ring-white shadow-xl scale-105' : ''
+                        <div className={`w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 mx-auto mb-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 ${
+                          selectedCategory === category.id ? 'ring-2 ring-gold shadow-xl scale-105' : ''
                         }`}>
                           <div 
-                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                            style={{ backgroundColor: category.color }}
+                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-gold via-gold-light to-gold flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
                           >
-                            <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
+                            <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-black" />
                           </div>
                         </div>
                         <p className={`font-medium text-xs sm:text-sm transition-colors duration-300 text-center px-1 ${
@@ -250,10 +267,10 @@ const CoursesPage = () => {
         {/* Results Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 sm:mb-8 space-y-4 lg:space-y-0">
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gold mb-2">
               {selectedCategory === "all" ? "Todos os Cursos" : categoriesWithAll.find(c => c.id === selectedCategory)?.name}
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base">
+            <p className="text-gray-300 text-sm sm:text-base">
               Segue nossa lista de cursos{searchTerm && ` para "${searchTerm}"`}
             </p>
           </div>
@@ -261,22 +278,22 @@ const CoursesPage = () => {
           {/* Active Filters */}
           {(selectedCategory !== "all" || filter !== "all" || searchTerm) && (
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2">
-              <span className="text-xs sm:text-sm text-gray-600 w-full lg:w-auto text-center lg:text-left mb-2 lg:mb-0">
+              <span className="text-xs sm:text-sm text-gray-300 w-full lg:w-auto text-center lg:text-left mb-2 lg:mb-0">
                 Filtros ativos:
               </span>
               <div className="flex flex-wrap gap-2 justify-center lg:justify-end">
                 {selectedCategory !== "all" && (
-                  <Badge variant="secondary" className="cursor-pointer text-xs hover:bg-gray-300 transition-colors" onClick={() => setSelectedCategory("all")}>
+                  <Badge variant="secondary" className="cursor-pointer text-xs bg-gold/20 text-gold border border-gold/30 hover:bg-gold/30 transition-colors" onClick={() => setSelectedCategory("all")}>
                     {categoriesWithAll.find(c => c.id === selectedCategory)?.name} ×
                   </Badge>
                 )}
                 {filter !== "all" && (
-                  <Badge variant="secondary" className="cursor-pointer text-xs hover:bg-gray-300 transition-colors" onClick={() => setFilter("all")}>
+                  <Badge variant="secondary" className="cursor-pointer text-xs bg-gold/20 text-gold border border-gold/30 hover:bg-gold/30 transition-colors" onClick={() => setFilter("all")}>
                     {filter === "free" ? "Gratuitos" : "Pagos"} ×
                   </Badge>
                 )}
                 {searchTerm && (
-                  <Badge variant="secondary" className="cursor-pointer text-xs hover:bg-gray-300 transition-colors" onClick={() => setSearchTerm("")}>
+                  <Badge variant="secondary" className="cursor-pointer text-xs bg-gold/20 text-gold border border-gold/30 hover:bg-gold/30 transition-colors" onClick={() => setSearchTerm("")}>
                     "{searchTerm}" ×
                   </Badge>
                 )}
@@ -288,25 +305,23 @@ const CoursesPage = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-4 animate-spin">
-              <BookOpen className="h-8 w-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gold via-gold-light to-gold rounded-full mb-4 animate-spin">
+              <BookOpen className="h-8 w-8 text-black" />
             </div>
-            <p className="text-gray-500 text-lg">Carregando cursos incríveis...</p>
+            <p className="text-gray-300 text-lg">Carregando cursos incríveis...</p>
           </div>
         )}
 
         {/* Courses Grid */}
         {!isLoading && filteredCourses.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
             {filteredCourses.map((course, index) => (
               <div
                 key={course.id} 
                 className="animate-fade-in-up w-full flex justify-center"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="w-full max-w-[320px]">
-                  <CourseCard course={course} />
-                </div>
+                <CourseCard course={course} index={index} />
               </div>
             ))}
           </div>
@@ -315,25 +330,25 @@ const CoursesPage = () => {
         {/* Empty State */}
         {!isLoading && filteredCourses.length === 0 && (
           <div className="text-center py-12 sm:py-16 lg:py-20 px-4">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <Search className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-full flex items-center justify-center">
+              <Search className="h-10 w-10 sm:h-12 sm:w-12 text-gold" />
             </div>
             {selectedCategory !== "all" && !searchTerm && filter === "all" ? (
               <>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-3 sm:mb-4">
                   Em breve teremos cursos com esse tópico
                 </h3>
-                <p className="text-gray-600 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
                   Estamos trabalhando para trazer os melhores cursos de {categoriesWithAll.find(c => c.id === selectedCategory)?.name.toLowerCase()}. 
                   Fique atento às novidades!
                 </p>
               </>
             ) : (
               <>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-3 sm:mb-4">
                   Nenhum curso encontrado
                 </h3>
-                <p className="text-gray-600 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
                   Não encontramos cursos que correspondam aos seus critérios de busca. 
                   Tente ajustar os filtros ou buscar por outros termos.
                 </p>
@@ -345,7 +360,7 @@ const CoursesPage = () => {
                 setSelectedCategory("all");
                 setFilter("all");
               }}
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-gold via-gold-light to-gold text-black hover:from-gold-light hover:to-gold px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Limpar Filtros
             </Button>
@@ -353,7 +368,7 @@ const CoursesPage = () => {
         )}
       </div>
 
-      {/* Add CSS animations and Aurora Effect */}
+      {/* Add CSS animations */}
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(20px); }
@@ -373,80 +388,6 @@ const CoursesPage = () => {
         @keyframes fade-in-up {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes aurora {
-          0%, 100% { transform: translateX(-100%) translateY(-50%) rotate(0deg); }
-          50% { transform: translateX(100%) translateY(-50%) rotate(180deg); }
-        }
-        
-        @keyframes aurora2 {
-          0%, 100% { transform: translateX(100%) translateY(-50%) rotate(180deg); }
-          50% { transform: translateX(-100%) translateY(-50%) rotate(0deg); }
-        }
-        
-        @keyframes aurora3 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(90deg); }
-          50% { transform: translateX(-50%) translateY(100%) rotate(270deg); }
-        }
-        
-        .aurora-container {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-          pointer-events: none;
-        }
-        
-        .aurora {
-          position: absolute;
-          width: 200%;
-          height: 100px;
-          background: linear-gradient(90deg, 
-            transparent, 
-            rgba(255, 255, 255, 0.1), 
-            rgba(255, 255, 255, 0.2), 
-            rgba(255, 255, 255, 0.1), 
-            transparent
-          );
-          border-radius: 50px;
-          filter: blur(20px);
-        }
-        
-        .aurora-1 {
-          top: 20%;
-          animation: aurora 15s ease-in-out infinite;
-          animation-delay: 0s;
-        }
-        
-        .aurora-2 {
-          top: 60%;
-          animation: aurora2 20s ease-in-out infinite;
-          animation-delay: 5s;
-          background: linear-gradient(90deg, 
-            transparent, 
-            rgba(255, 255, 255, 0.05), 
-            rgba(255, 255, 255, 0.15), 
-            rgba(255, 255, 255, 0.05), 
-            transparent
-          );
-        }
-        
-        .aurora-3 {
-          left: 50%;
-          width: 100px;
-          height: 200%;
-          animation: aurora3 25s ease-in-out infinite;
-          animation-delay: 10s;
-          background: linear-gradient(0deg, 
-            transparent, 
-            rgba(255, 255, 255, 0.03), 
-            rgba(255, 255, 255, 0.08), 
-            rgba(255, 255, 255, 0.03), 
-            transparent
-          );
         }
         
         .animate-fade-in {

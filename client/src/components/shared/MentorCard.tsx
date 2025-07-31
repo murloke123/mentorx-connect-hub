@@ -118,18 +118,23 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
         <div className="absolute inset-0 bg-gradient-to-t from-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
         {/* Card principal com efeito flip */}
         <div 
-          className="relative w-full h-96 [perspective:1000px] cursor-pointer"
+          className="relative w-full h-96 cursor-pointer"
+          style={{ perspective: '1000px' }}
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
           onClick={handleViewProfile}
         >
           <motion.div
-            className="relative w-full h-full [transform-style:preserve-3d]"
+            className="relative w-full h-full"
+            style={{ transformStyle: 'preserve-3d' }}
             animate={{ rotateY: isFlipped ? 180 : 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
           >
           {/* Frente do Card */}
-           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-background overflow-hidden relative z-10">
+           <div 
+             className="absolute inset-0 w-full h-full bg-background overflow-hidden"
+             style={{ backfaceVisibility: 'hidden' }}
+           >
              {/* Header com Efeito Premium Dourado */}
              <div className="relative overflow-hidden" style={{ height: '110px' }}>
                {/* Efeito Premium com Gradiente Dourado */}
@@ -216,8 +221,14 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
           </div>
 
           {/* Verso do Card */}
-           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] bg-background overflow-hidden relative z-10">
-            <div className="p-4 h-full flex flex-col">
+           <div 
+             className="absolute inset-0 w-full h-full bg-background overflow-hidden"
+             style={{ 
+               backfaceVisibility: 'hidden', 
+               transform: 'rotateY(180deg)' 
+             }}
+           >
+            <div className="p-4 h-full flex flex-col" style={{ minHeight: '384px' }}>
               {/* Header do verso com foto - mais compacto */}
               <div className="text-center mb-3">
                 <Avatar className="w-12 h-12 mx-auto mb-2 border-2 border-gold/30">

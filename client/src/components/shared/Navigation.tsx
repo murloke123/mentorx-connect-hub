@@ -1,5 +1,5 @@
 import { NotificationBell } from "@/components/shared/NotificationBell";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -203,6 +203,13 @@ const Navigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-full h-10 w-10 p-0 bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-200">
                     <Avatar className="h-8 w-8">
+                      {profile?.avatar_url && (
+                        <AvatarImage 
+                          src={profile.avatar_url} 
+                          alt={profile.full_name || 'Avatar do usuário'}
+                          className="object-cover"
+                        />
+                      )}
                       <AvatarFallback className="bg-gradient-to-br from-gold via-gold-light to-gold-dark text-slate-900 text-sm font-semibold">
                         {getUserInitials()}
                       </AvatarFallback>
@@ -213,6 +220,13 @@ const Navigation = () => {
                   <DropdownMenuLabel className="px-4 py-3 border-b border-slate-700">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-10 w-10">
+                        {profile?.avatar_url && (
+                          <AvatarImage 
+                            src={profile.avatar_url} 
+                            alt={profile.full_name || 'Avatar do usuário'}
+                            className="object-cover"
+                          />
+                        )}
                         <AvatarFallback className="bg-gradient-to-br from-gold via-gold-light to-gold-dark text-slate-900 font-semibold">
                           {getUserInitials()}
                         </AvatarFallback>

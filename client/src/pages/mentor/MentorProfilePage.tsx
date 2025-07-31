@@ -152,8 +152,7 @@ const MentorProfilePage = () => {
           image_url, 
           created_at, 
           updated_at, 
-          mentor_id,
-          profiles:mentor_id (full_name, avatar_url)
+          mentor_id
         `)
         .eq("mentor_id", currentUser.id)
         .order("created_at", { ascending: false });
@@ -163,14 +162,13 @@ const MentorProfilePage = () => {
         return [];
       }
       
-      // Format the data to include mentor information
-      const typedData = data as CourseWithProfile[] | null;
-
-      // Format the data to include mentor information
-      const formattedCourses = typedData?.map((course) => ({
+      // Format the data to include mentor information from currentUser (no need to fetch from DB)
+      const formattedCourses = data?.map((course) => ({
         ...course,
-        mentor_name: course.profiles?.[0]?.full_name,
-        mentor_avatar: course.profiles?.[0]?.avatar_url,
+        mentor_info: {
+          full_name: currentUser.full_name || 'Mentor',
+          avatar_url: currentUser.avatar_url || null
+        }
       })) || [];
       
       return formattedCourses;

@@ -1,13 +1,16 @@
 import { Course } from "@/types/database";
 import { navigateToTop } from "@/utils/utils";
+import { motion } from "framer-motion";
+import { Bot, Clock, Play } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CourseCardProps {
   course: Course;
+  index?: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
   const [categoryName, setCategoryName] = useState<string>('Categoria não definida');
   const navigate = useNavigate();
 
@@ -55,304 +58,131 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     navigate(`/curso/${course.id}`);
   };
 
-  const renderPrice = () => {
-    if (!course.is_paid) {
-      return (
-        <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-            <span className="text-2xl font-bold text-green-600">
-              GRATUITO
-            </span>
-            <p className="text-xs text-green-600 font-medium mt-1">
-              Acesso vitalício
-            </p>
-          </div>
-        </div>
-      );
-    }
 
-    if (course.discounted_price && course.price && course.discount && course.discount > 0) {
-      return (
-        <div className="text-center relative">
-          {/* Badge de desconto chamativo */}
-          <div className="absolute -top-3 -right-2 z-10">
-            <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-pulse">
-              -{course.discount}% OFF
-            </div>
-          </div>
-          
-          {/* Container de preços com destaque */}
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-red-200 rounded-xl p-4 relative overflow-hidden">
-            {/* Efeito de brilho */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
-            
-            <div className="relative z-10">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <span className="text-2xl font-bold text-green-600">
-                  R$ {course.discounted_price.toFixed(2)}
-                </span>
-                <span className="text-lg text-gray-500 line-through">
-                  R$ {course.price.toFixed(2)}
-                </span>
-              </div>
-              <p className="text-xs text-red-600 font-semibold">
-                🔥 Oferta por tempo limitado!
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (course.price && course.price > 0) {
-      return (
-        <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-            <span className="text-2xl font-bold text-blue-600">
-              R$ {course.price.toFixed(2)}
-            </span>
-            <p className="text-xs text-blue-600 font-medium mt-1">
-              Acesso vitalício
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    // Fallback para cursos sem preço definido
-    return (
-      <div className="text-center">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-          <span className="text-2xl font-bold text-green-600">
-            GRATUITO
-          </span>
-          <p className="text-xs text-green-600 font-medium mt-1">
-            Acesso vitalício
-          </p>
-        </div>
-      </div>
-    );
-  };
-
-  const mentorName = course.mentor_info?.full_name || 'Mentor'; // Usar nome real do mentor
-  const mentorAvatar = course.mentor_info?.avatar_url ?? undefined; // Usar avatar real do mentor
-
-  const cardStyles = {
-    background: '#ffffff',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-    overflow: 'hidden',
-    transition: 'all 0.3s ease',
-    maxWidth: '500px',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    height: 'auto'
-  };
-
-  const cardHoverStyles = {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-  };
-
-  const imageStyles = {
-    width: '100%',
-    height: '200px',
-    objectFit: 'cover' as const,
-    display: 'block'
-  };
-
-  const contentStyles = {
-    padding: '20px',
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column' as const
-  };
-
-  const mentorSectionStyles = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '16px'
-  };
-
-  const mentorAvatarStyles = {
-    width: '48px',
-    height: '48px',
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white',
-    fontWeight: '600',
-    fontSize: '16px',
-    flexShrink: 0,
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    position: 'relative' as const,
-    overflow: 'hidden'
-  };
-
-  const mentorInfoStyles = {
-    flex: 1
-  };
-
-  const mentorNameStyles = {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#1a202c',
-    margin: '0 0 4px 0',
-    lineHeight: '1.2'
-  };
-
-  const mentorCategoryStyles = {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: '0'
-  };
-
-  const titleStyles = {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#1a202c',
-    margin: '0 0 12px 0',
-    lineHeight: '1.3',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as const,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  };
-
-  const descriptionStyles = {
-    fontSize: '14px',
-    color: '#64748b',
-    lineHeight: '1.5',
-    margin: '0 0 auto 0',
-    display: '-webkit-box',
-    WebkitLineClamp: 3,
-    WebkitBoxOrient: 'vertical' as const,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    height: '63px', // 3 lines * 21px line height
-    flex: '1'
-  };
-
-  const footerStyles = {
-    padding: '0 20px 20px 20px',
-    marginTop: 'auto'
-  };
-
-  const buttonStyles = {
-    width: '100%',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '12px',
-    padding: '10px 20px',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    height: '40px'
-  };
+  const mentorName = course.mentor_info?.full_name || 'Mentor';
+  const mentorAvatar = course.mentor_info?.avatar_url;
 
   return (
-    <div 
-      style={cardStyles}
-      onMouseEnter={(e) => {
-        Object.assign(e.currentTarget.style, cardHoverStyles);
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.1,
+        ease: "easeOut"
       }}
-      onMouseLeave={(e) => {
-        Object.assign(e.currentTarget.style, cardStyles);
-      }}
+      className="w-full group"
     >
-      <img 
-        src={course.image_url} 
-        alt={course.title}
-        style={imageStyles}
-      />
-      
-      <div style={contentStyles}>
-        <div style={mentorSectionStyles}>
-          <div 
-            style={mentorAvatarStyles}
-            onClick={handleMentorClick}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            {mentorAvatar ? (
-              <img 
-                src={mentorAvatar} 
-                alt={mentorName}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  transition: 'all 0.3s ease'
-                }}
-                onError={(e) => {
-                  // Fallback para iniciais se a imagem falhar ao carregar
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    parent.innerHTML = getMentorInitials(mentorName);
-                    parent.style.display = 'flex';
-                    parent.style.alignItems = 'center';
-                    parent.style.justifyContent = 'center';
-                  }
-                }}
-              />
-            ) : (
-              getMentorInitials(mentorName)
-            )}
-          </div>
-          <div style={mentorInfoStyles}>
-            <h4 style={mentorNameStyles}>{mentorName}</h4>
-            <p style={mentorCategoryStyles}>{categoryName}</p>
-          </div>
-        </div>
-
-        <h3 style={titleStyles}>{course.title}</h3>
-        <p style={descriptionStyles}>
-          {course.description || "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."}
-        </p>
+      {/* Container principal premium - Layout horizontal */}
+      <div className="relative bg-background rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 glass-card">
+        {/* Overlay com gradiente dourado no hover */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
         
-        {/* Seção de preço */}
-        <div style={{ marginTop: '16px' }}>
-          {renderPrice()}
-        </div>
-      </div>
+        {/* Layout Vertical */}
+        <div className="flex flex-col h-full">
+          {/* Seção da Imagem - Superior (sem bordas) */}
+          <div className="relative h-48 overflow-hidden rounded-t-2xl">
+            {/* Imagem do curso - encosta nas bordas */}
+            <img 
+              src={course.image_url} 
+              alt={course.title}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Overlay premium */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent"></div>
+            
+            {/* Efeitos Premium com Gradiente Dourado */}
+            <div className="absolute inset-0 overflow-hidden">
+              {/* Efeito Shimmer 1 */}
+              <div
+                className="absolute -top-10 -left-20 w-72 h-72 bg-gold/8 rounded-full blur-3xl opacity-80 animate-pulse"
+                style={{ animationDuration: '10s' }}
+              ></div>
 
-      <div style={footerStyles}>
-        <button 
-          style={buttonStyles}
-          onClick={handleCourseDetailsClick}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          Ver detalhes
-        </button>
+              {/* Efeito Shimmer 2 */}
+              <div
+                className="absolute -bottom-10 -right-10 w-60 h-60 bg-gold-light/10 rounded-full blur-2xl opacity-70 animate-pulse"
+                style={{ animationDuration: '12s', animationDelay: '2s' }}
+              ></div>
+            </div>
+            
+            {/* Tag de preço no canto superior direito */}
+            <div className="absolute top-2 right-2 z-20">
+              <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-gold/90 to-gold-light/90 text-background text-xs font-semibold shadow-lg backdrop-blur-sm border border-gold/20">
+                {course.is_paid ? 
+                  (course.discounted_price ? `R$ ${course.discounted_price.toFixed(0)}` : 
+                   course.price ? `R$ ${course.price.toFixed(0)}` : 'PAGO') 
+                  : 'GRATUITO'
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* Seção do Conteúdo - Abaixo da imagem */}
+          <div className="px-2 py-2 flex flex-col flex-1">
+            {/* Título do Curso com Avatar do Mentor */}
+            <div className="flex items-center gap-2 mb-2">
+              {/* Avatar do mentor */}
+              <div 
+                className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-light border-2 border-white shadow-lg flex items-center justify-center text-background text-xs font-bold cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
+                onClick={handleMentorClick}
+              >
+                {mentorAvatar ? (
+                  <img 
+                    src={mentorAvatar} 
+                    alt={mentorName}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  getMentorInitials(mentorName)
+                )}
+              </div>
+              
+              {/* Título */}
+              <h3 className="text-lg font-bold text-foreground line-clamp-2 leading-tight flex-1">
+                {course.title}
+              </h3>
+            </div>
+
+            {/* Descrição resumida */}
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+              {course.description ? 
+                (course.description.length > 120 ? 
+                  course.description.substring(0, 120) + '...' : 
+                  course.description
+                ) : 
+                "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."
+              }
+            </p>
+
+            {/* Informações do curso */}
+            <div className="flex items-center gap-3 mb-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Play className="w-3 h-3" />
+                <span>Vídeo aulas</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>Acesso vitalício</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Bot className="w-3 h-3" />
+                <span>Com IA</span>
+              </div>
+            </div>
+
+            {/* Botão Ver Detalhes */}
+            <button 
+              onClick={handleCourseDetailsClick}
+              className="w-full bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-xs mt-auto"
+            >
+              Ver Detalhes
+            </button>
+          </div>
         </div>
       </div>
+    </motion.div>
   );
 };
 

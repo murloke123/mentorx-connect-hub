@@ -1,3 +1,4 @@
+import { TypingAnimation } from "@/components/magicui/typing-animation";
 import { MentorCard } from "@/components/shared/MentorCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -105,25 +106,20 @@ const MentorsPage = () => {
   }, [selectedCategory, filteredMentors.length]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Hero Banner Section */}
       <div className="relative w-full">
         <div className="w-full h-[600px] overflow-hidden relative">
-          <img 
-            src="https://images.unsplash.com/photo-1506765515384-028b60a970df?auto=format&fit=crop&w=1500&q=80"
-            alt="Mentores Banner" 
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/70 to-blue-600/70"></div>
-          
-          {/* Aurora Boreal Effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="aurora-container">
-              <div className="aurora aurora-1"></div>
-              <div className="aurora aurora-2"></div>
-              <div className="aurora aurora-3"></div>
-            </div>
-          </div>
+          >
+            <source src="/palestrante.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-gold/20 to-black/60"></div>
 
           {/* Content */}
           <div className="absolute inset-0 flex items-center justify-center">
@@ -138,12 +134,30 @@ const MentorsPage = () => {
                 }}
                 className="relative flex flex-col gap-4 items-center justify-center"
               >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                  Conecte-se com Mentores
-                </h1>
-                <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto italic">
-                  Encontre o mentor ideal para acelerar seu crescimento pessoal e profissional
-                </p>
+                <div className="w-full bg-black/40 backdrop-blur-sm py-8 px-4 shadow-2xl mb-12">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight" style={{
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                  }}>
+                    Conecte-se à mente dos mentores
+                  </h1>
+                  <p className="text-lg md:text-xl text-white mb-4 max-w-4xl mx-auto whitespace-nowrap" style={{
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                  }}>
+                    Tenha acesso 24h a agentes de IA que replicam a experiência e a visão de cada mentor.
+                  </p>
+                  <div className="mt-6 text-center">
+              <TypingAnimation
+                className="text-base font-light text-gray-400 italic max-w-3xl mx-auto"
+                duration={50}
+                startOnView={true}
+                style={{
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                }}
+              >
+                "Uma oportunidade não passa duas vezes, agora é a hora de mudar o destino da sua carreira."
+              </TypingAnimation>
+            </div>
+                </div>
               </motion.div>
               
               {/* Search Container */}
@@ -156,15 +170,15 @@ const MentorsPage = () => {
                     placeholder="Busque por nome, especialidade ou área de atuação..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 pr-4 py-6 text-lg rounded-2xl border-0 shadow-xl bg-white transition-all duration-300 focus:outline-none focus:ring-0 focus:shadow-2xl focus:shadow-white/20"
+                    className="pl-12 pr-4 py-6 text-lg text-gray-900 placeholder-gray-500 rounded-2xl border-2 border-gold/40 shadow-xl bg-white transition-all duration-300 focus:outline-none focus:ring-0 focus:border-gold focus:shadow-2xl focus:shadow-gold/30"
                     style={{
-                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                      boxShadow: '0 0 0 2px rgba(255, 215, 0, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)',
                     }}
                     onFocus={(e) => {
-                      e.target.style.boxShadow = '0 0 0 4px rgba(255, 255, 255, 0.3), 0 10px 25px rgba(0, 0, 0, 0.1)';
+                      e.target.style.boxShadow = '0 0 0 4px rgba(255, 215, 0, 0.5), 0 10px 25px rgba(0, 0, 0, 0.1)';
                     }}
                     onBlur={(e) => {
-                      e.target.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(255, 215, 0, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)';
                     }}
                   />
                 </div>
@@ -179,8 +193,8 @@ const MentorsPage = () => {
                     }}
                     className={`rounded-full px-6 py-6 font-medium transition-all duration-300 focus:outline-none focus:ring-0 flex items-center gap-2 ${
                       selectedCategory === "all" 
-                        ? "bg-white text-purple-700 shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-white/20 border-2 border-purple-200" 
-                        : "bg-white/20 text-white border border-white/30 hover:bg-white/30 focus:shadow-lg focus:shadow-white/20"
+                        ? "bg-gradient-to-r from-gold via-gold-light to-gold text-black shadow-lg hover:shadow-xl focus:shadow-xl focus:shadow-gold/20 border-2 border-gold/30" 
+                        : "bg-black/30 text-white border border-gold/30 hover:bg-gold/20 focus:shadow-lg focus:shadow-gold/20"
                     }`}
                   >
                     <Users className="h-4 w-4" />
@@ -202,14 +216,13 @@ const MentorsPage = () => {
                       }`}
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 ${
-                        selectedCategory === category.id ? 'ring-4 ring-white shadow-2xl scale-105' : ''
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 ${
+                        selectedCategory === category.id ? 'ring-4 ring-gold shadow-2xl scale-105' : ''
                       }`}>
                         <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                          style={{ backgroundColor: category.color }}
+                          className="w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-gradient-to-r from-gold via-gold-light to-gold"
                         >
-                          <IconComponent className="h-6 w-6 text-white" />
+                          <IconComponent className="h-6 w-6 text-black" />
                         </div>
                       </div>
                       <p className={`font-medium text-sm transition-colors duration-300 ${
@@ -231,10 +244,10 @@ const MentorsPage = () => {
         {/* Results Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 sm:mb-8 space-y-4 lg:space-y-0">
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gold mb-2">
               {selectedCategory === "all" ? "Todos os Mentores" : categoriesWithAll.find(c => c.id === selectedCategory)?.name}
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base">
+            <p className="text-gray-300 text-sm sm:text-base">
               Descubra mentores incríveis{searchTerm && ` para "${searchTerm}"`}
             </p>
           </div>
@@ -242,17 +255,17 @@ const MentorsPage = () => {
           {/* Active Filters */}
           {(selectedCategory !== "all" || searchTerm) && (
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2">
-              <span className="text-xs sm:text-sm text-gray-600 w-full lg:w-auto text-center lg:text-left mb-2 lg:mb-0">
+              <span className="text-xs sm:text-sm text-gray-300 w-full lg:w-auto text-center lg:text-left mb-2 lg:mb-0">
                 Filtros ativos:
               </span>
               <div className="flex flex-wrap gap-2 justify-center lg:justify-end">
                 {selectedCategory !== "all" && (
-                  <Badge variant="secondary" className="cursor-pointer text-xs hover:bg-gray-300 transition-colors" onClick={() => setSelectedCategory("all")}>
+                  <Badge variant="secondary" className="cursor-pointer text-xs bg-gold/20 text-gold border border-gold/30 hover:bg-gold/30 transition-colors" onClick={() => setSelectedCategory("all")}>
                     {categoriesWithAll.find(c => c.id === selectedCategory)?.name} ×
                   </Badge>
                 )}
                 {searchTerm && (
-                  <Badge variant="secondary" className="cursor-pointer text-xs hover:bg-gray-300 transition-colors" onClick={() => setSearchTerm("")}>
+                  <Badge variant="secondary" className="cursor-pointer text-xs bg-gold/20 text-gold border border-gold/30 hover:bg-gold/30 transition-colors" onClick={() => setSearchTerm("")}>
                     "{searchTerm}" ×
                   </Badge>
                 )}
@@ -264,10 +277,10 @@ const MentorsPage = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-4 animate-spin">
-              <Users className="h-8 w-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gold via-gold-light to-gold rounded-full mb-4 animate-spin">
+              <Users className="h-8 w-8 text-black" />
             </div>
-            <p className="text-gray-600 text-lg">Carregando mentores incríveis...</p>
+            <p className="text-gray-300 text-lg">Carregando mentores incríveis...</p>
           </div>
         )}
 
@@ -289,25 +302,25 @@ const MentorsPage = () => {
         {/* Empty State */}
         {!isLoading && filteredMentors.length === 0 && (
           <div className="text-center py-12 sm:py-16 lg:py-20 px-4">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <Search className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-full flex items-center justify-center">
+              <Search className="h-10 w-10 sm:h-12 sm:w-12 text-gold" />
             </div>
             {selectedCategory !== "all" && !searchTerm ? (
               <>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-3 sm:mb-4">
                   Em breve teremos mentores nesta categoria
                 </h3>
-                <p className="text-gray-600 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
                   Estamos trabalhando para trazer os melhores mentores de {categoriesWithAll.find(c => c.id === selectedCategory)?.name.toLowerCase()}. 
                   Fique atento às novidades!
                 </p>
               </>
             ) : (
               <>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-3 sm:mb-4">
                   Nenhum mentor encontrado
                 </h3>
-                <p className="text-gray-600 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-6 sm:mb-8 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
                   Não encontramos mentores que correspondam aos seus critérios de busca. 
                   Tente ajustar os filtros ou buscar por outros termos.
                 </p>
@@ -318,7 +331,7 @@ const MentorsPage = () => {
                 setSearchTerm("");
                 setSelectedCategory("all");
               }}
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-gold via-gold-light to-gold text-black hover:from-gold-dark hover:to-gold px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Limpar Filtros
             </Button>
@@ -446,4 +459,4 @@ const MentorsPage = () => {
   );
 };
 
-export default MentorsPage; 
+export default MentorsPage;

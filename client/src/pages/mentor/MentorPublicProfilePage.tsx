@@ -115,11 +115,13 @@ const MentorPublicProfilePage = () => {
       // Format the data to include mentor information
       const typedData = data as CourseWithProfile[] | null;
 
-      // Format the data to include mentor information
+      // Format the data to include mentor information that CourseCard expects
       const formattedCourses = typedData?.map((course) => ({
         ...course,
-        mentor_name: course.profiles?.[0]?.full_name,
-        mentor_avatar: course.profiles?.[0]?.avatar_url,
+        mentor_info: {
+          full_name: course.profiles?.[0]?.full_name || 'Mentor',
+          avatar_url: course.profiles?.[0]?.avatar_url || null
+        }
       })) || [];
       
       return formattedCourses;
