@@ -586,22 +586,22 @@ const AppointmentCheckoutSuccessPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-              <Clock className="w-6 h-6 text-blue-600 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <Card className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+          <CardHeader className="text-center border-b border-slate-700 pb-6">
+            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gold via-gold-light to-gold-dark rounded-full mb-4 shadow-lg">
+              <Clock className="w-6 h-6 text-slate-900 animate-spin" />
             </div>
-            <CardTitle>Processando Pagamento</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white text-xl font-semibold">Processando Pagamento</CardTitle>
+            <CardDescription className="text-gray-300">
               Aguarde enquanto confirmamos seu pagamento...
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="text-center">
               <div className="animate-pulse">
-                <div className="h-2 bg-blue-200 rounded w-full mb-2"></div>
-                <div className="h-2 bg-blue-200 rounded w-3/4 mx-auto"></div>
+                <div className="h-2 bg-gradient-to-r from-gold/30 via-gold-light/30 to-gold/30 rounded w-full mb-2"></div>
+                <div className="h-2 bg-gradient-to-r from-gold/20 via-gold-light/20 to-gold/20 rounded w-3/4 mx-auto"></div>
               </div>
             </div>
           </CardContent>
@@ -612,22 +612,22 @@ const AppointmentCheckoutSuccessPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
-              <AlertCircle className="w-6 h-6 text-red-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <Card className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+          <CardHeader className="text-center border-b border-slate-700 pb-6">
+            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-full mb-4 shadow-lg">
+              <AlertCircle className="w-6 h-6 text-white" />
             </div>
-            <CardTitle className="text-red-900">Erro no Pagamento</CardTitle>
-            <CardDescription className="text-red-700">
+            <CardTitle className="text-red-400 text-xl font-semibold">Erro no Pagamento</CardTitle>
+            <CardDescription className="text-gray-300">
               {error}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-4">
               <Button
                 onClick={() => navigate('/')}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 variant="outline"
               >
                 Voltar ao Início
@@ -641,38 +641,38 @@ const AppointmentCheckoutSuccessPage: React.FC = () => {
 
   if (success && appointment) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <Card className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+          <CardHeader className="text-center border-b border-slate-700 pb-6">
+            <div className="mx-auto flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gold via-gold-light to-gold-dark rounded-full mb-4 shadow-lg">
+              <CheckCircle className="w-6 h-6 text-slate-900" />
             </div>
-            <CardTitle className="text-green-900">Agendamento Confirmado!</CardTitle>
-            <CardDescription className="text-green-700">
+            <CardTitle className="text-white text-xl font-semibold">Agendamento Confirmado!</CardTitle>
+            <CardDescription className="text-gray-300">
               Seu pagamento foi processado com sucesso
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-4">
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-900 mb-2">Detalhes do Agendamento</h3>
-                <div className="space-y-2 text-sm text-green-800">
-                  <p><strong>Mentor:</strong> {appointment.mentor_name}</p>
-                  <p><strong>Data:</strong> {new Date(appointment.scheduled_date + 'T00:00:00').toLocaleDateString('pt-BR', {
+              <div className="bg-gradient-to-r from-gold/10 via-gold-light/5 to-gold/10 p-4 rounded-lg border border-gold/30 shadow-gold/20">
+                <h3 className="font-semibold text-gold mb-2">Detalhes do Agendamento</h3>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <p><strong className="text-white">Mentor:</strong> {appointment.mentor_name}</p>
+                  <p><strong className="text-white">Data:</strong> {new Date(appointment.scheduled_date + 'T00:00:00').toLocaleDateString('pt-BR', {
                     weekday: 'long',
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric'
                   })}</p>
-                  <p><strong>Horário:</strong> {appointment.start_time.substring(0, 5)} - {appointment.end_time.substring(0, 5)}</p>
-                  <p><strong>Valor:</strong> R$ {appointment.price.toFixed(2).replace('.', ',')}</p>
-                  <p><strong>Status:</strong> <span className="text-green-600 font-medium">Confirmado</span></p>
+                  <p><strong className="text-white">Horário:</strong> {appointment.start_time.substring(0, 5)} - {appointment.end_time.substring(0, 5)}</p>
+                  <p><strong className="text-white">Valor:</strong> R$ {appointment.price.toFixed(2).replace('.', ',')}</p>
+                  <p><strong className="text-white">Status:</strong> <span className="text-gold font-medium">Confirmado</span></p>
                 </div>
               </div>
 
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="font-semibold text-blue-900 mb-2">Próximos Passos</h3>
-                <div className="space-y-2 text-sm text-blue-800">
+              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                <h3 className="font-semibold text-white mb-2">Próximos Passos</h3>
+                <div className="space-y-2 text-sm text-gray-300">
                   <p>• Você receberá um e-mail de confirmação</p>
                   <p>• O mentor também foi notificado</p>
                   <p>• O link da reunião será enviado antes do agendamento</p>
@@ -682,7 +682,7 @@ const AppointmentCheckoutSuccessPage: React.FC = () => {
 
               <Button
                 onClick={handleViewAppointments}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Ver Meus Agendamentos
                 <ArrowRight className="w-4 h-4 ml-2" />

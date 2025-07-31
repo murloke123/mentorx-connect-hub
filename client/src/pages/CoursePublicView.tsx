@@ -229,10 +229,10 @@ const CoursePublicView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando curso...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+          <p className="text-gray-300">Carregando curso...</p>
         </div>
       </div>
     );
@@ -240,16 +240,16 @@ const CoursePublicView: React.FC = () => {
 
   if (error || !courseData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Curso não encontrado</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-white mb-2">Curso não encontrado</h2>
+          <p className="text-gray-300 mb-4">
             {error || 'O curso que você está procurando não existe ou não está disponível.'}
           </p>
           <a 
             href="/" 
-            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
           >
             ← Voltar ao início
           </a>
@@ -361,4 +361,4 @@ const CoursePublicView: React.FC = () => {
   );
 };
 
-export default CoursePublicView; 
+export default CoursePublicView;

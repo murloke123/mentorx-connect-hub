@@ -576,17 +576,19 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
+      <DialogContent className="max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+        <DialogHeader className="border-b border-slate-700 pb-4">
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
+              <Plus className="h-4 w-4 text-slate-900" />
+            </div>
             Novo Agendamento
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-700">
+          <div className="bg-gold/10 p-3 rounded-lg border border-gold/30">
+            <p className="text-sm text-gold">
               <strong>Data selecionada:</strong> {selectedDate.toLocaleDateString('pt-BR', {
                 weekday: 'long',
                 day: '2-digit',
@@ -598,28 +600,28 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
           {/* Mostrar informações de preço se for pago */}
           {isPaid && (
-            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-              <p className="text-sm text-green-700">
-                <strong>💰 Valor da mentoria:</strong> R$ {appointmentPrice.toFixed(2).replace('.', ',')}
+            <div className="bg-green-500/10 p-3 rounded-lg border border-green-500/30">
+              <p className="text-sm text-green-400">
+                <strong>Valor da mentoria:</strong> R$ {appointmentPrice.toFixed(2).replace('.', ',')}
               </p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-xs text-green-300 mt-1">
                 Você será redirecionado para o pagamento após confirmar o agendamento
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Horário de Início</label>
+            <label className="text-sm font-medium text-white">Horário de Início</label>
             <Select value={startTime} onValueChange={(value) => {
               setStartTime(value);
               setEndTime('');
             }}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
                 <SelectValue placeholder="Selecione o horário de início" />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent side="bottom" className="bg-slate-800 border-slate-700">
                 {getAvailableStartTimes().map((time) => (
-                  <SelectItem key={time} value={time}>
+                  <SelectItem key={time} value={time} className="text-white hover:bg-slate-700">
                     {time}
                   </SelectItem>
                 ))}
@@ -628,20 +630,20 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Horário de Fim</label>
+            <label className="text-sm font-medium text-white">Horário de Fim</label>
             <Select value={endTime} onValueChange={setEndTime} disabled={!startTime}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
                 <SelectValue placeholder={startTime ? "Selecione o horário de fim" : "Primeiro selecione o horário de início"} />
               </SelectTrigger>
-              <SelectContent side="bottom">
+              <SelectContent side="bottom" className="bg-slate-800 border-slate-700">
                 {getAvailableEndTimes().length > 0 ? (
                   getAvailableEndTimes().map((time) => (
-                    <SelectItem key={time} value={time}>
+                    <SelectItem key={time} value={time} className="text-white hover:bg-slate-700">
                       {time}
                     </SelectItem>
                   ))
                 ) : (
-                  <div className="p-2 text-center text-sm text-gray-500">
+                  <div className="p-2 text-center text-sm text-gray-400">
                     Nenhum horário disponível para este início
                   </div>
                 )}
@@ -650,9 +652,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Observações (opcional)</label>
+            <label className="text-sm font-medium text-white">Observações (opcional)</label>
             <textarea
-              className="w-full p-2 border border-gray-300 rounded-md resize-none"
+              className="w-full p-2 bg-slate-700/50 border border-slate-600 rounded-md resize-none text-white placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-slate-600"
               rows={3}
               placeholder="Adicione observações sobre o agendamento..."
               value={notes}
@@ -661,8 +663,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           </div>
 
           {startTime && endTime && !isTimeSlotAvailable(startTime, endTime) && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-md">
+              <p className="text-sm text-red-400">
                 ⚠️ Este horário conflita com um agendamento existente
               </p>
             </div>
@@ -672,14 +674,14 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30"
               disabled={saving}
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSchedule}
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               disabled={saving || !startTime || !endTime || !isTimeSlotAvailable(startTime, endTime)}
             >
               {saving ? 'Processando...' : (isPaid ? 'Pagar e Agendar' : 'Agendar')}
@@ -691,4 +693,4 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   );
 };
 
-export default CreateScheduleModal; 
+export default CreateScheduleModal;

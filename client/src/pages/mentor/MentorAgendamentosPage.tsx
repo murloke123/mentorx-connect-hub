@@ -50,9 +50,18 @@ const MentorAgendamentosPage = () => {
       <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
         <div className="space-y-8">
           {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-gold">Solicitações de Mentoria</h1>
-            <p className="text-gray-400">Gerencie todas as solicitações de agendamento que você recebeu</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gold">Solicitações de Agendamento</h1>
+              <p className="text-gray-400">Gerencie todas as suas mentorias agendadas e solicitações recebidas</p>
+            </div>
+            <Button 
+              onClick={() => navigate('/mentor/agendamentos-adquiridos')}
+              className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90 transition-all duration-300"
+            >
+              <Calendar className="h-4 w-4" />
+              Ver Agendamentos Adquiridos
+            </Button>
           </div>
 
           {/* Stats Cards */}
@@ -91,35 +100,13 @@ const MentorAgendamentosPage = () => {
             </Card>
           </div>
 
-          {/* Actions */}
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Button 
-                  onClick={() => navigate('/mentor/agendamentos-adquiridos')}
-                  className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90"
-                >
-                  <Calendar className="h-4 w-4" />
-                  Ver Agendamentos Adquiridos
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Lista de agendamentos */}
-          <Card className="premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-gold">Solicitações Recebidas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {user?.id && (
-                <AppointmentsList 
-                  mentorId={user.id} 
-                  refreshTrigger={refreshAppointments}
-                />
-              )}
-            </CardContent>
-          </Card>
+          {/* Minhas Mentorias Agendadas */}
+          {user?.id && (
+            <AppointmentsList 
+              mentorId={user.id} 
+              refreshTrigger={refreshAppointments}
+            />
+          )}
         </div>
       </div>
     </div>

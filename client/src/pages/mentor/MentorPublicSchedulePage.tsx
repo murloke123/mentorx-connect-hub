@@ -1,7 +1,8 @@
 import MentorCalendarComponent from '@/components/MentorCalendarComponent';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/utils/supabase';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Globe, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -106,10 +107,10 @@ const MentorPublicSchedulePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando calendário...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+          <p className="text-gray-400">Carregando calendário...</p>
         </div>
       </div>
     );
@@ -117,18 +118,16 @@ const MentorPublicSchedulePage: React.FC = () => {
 
   if (error || !mentorData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4">
+          <div className="bg-red-900/50 text-red-300 p-4 rounded-lg mb-4 border border-red-500/30">
             <p className="font-semibold">Erro</p>
             <p>{error || 'Mentor não encontrado'}</p>
           </div>
           <Button 
             onClick={() => navigate('/')}
-            variant="outline"
-            className="mt-4"
+            className="mt-4 bg-gold text-black hover:bg-gold/90"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar à Home
           </Button>
         </div>
@@ -154,67 +153,79 @@ const MentorPublicSchedulePage: React.FC = () => {
   const workingDaysPortuguese = translateWorkingDays(mentorSettings.workingDays);
   const allDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+  // Função para gerar iniciais do nome (igual ao MentorCard2)
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between py-6">
+    <div className="min-h-screen bg-black">
+      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button 
-                onClick={() => navigate(-1)}
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-              <div className="flex items-center gap-3">
-                <Calendar className="w-6 h-6 text-purple-600" />
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Agendar com {mentorData.full_name}
-                </h1>
+              {/* Avatar do Mentor - mesmo design do MentorCard2 */}
+              <div className="w-16 h-16 relative group">
+                <Avatar className="w-full h-full border-4 border-gold/30 group-hover:border-gold transition-all duration-300">
+                  <AvatarImage 
+                    src={mentorData.avatar_url || ''} 
+                    alt={mentorData.full_name || 'Mentor'}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-gold/20 to-gold-light/20 text-gold font-bold text-lg">
+                    {getInitials(mentorData.full_name || 'Mentor')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 rounded-full border-4 border-gold/50 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ animationDuration: '3s' }}></div>
+              </div>
+              
+              {/* Título e Subtítulo */}
+              <div>
+                <h1 className="text-3xl font-bold text-gold">Agendar com {mentorData.full_name}</h1>
+                <p className="text-gray-400">Escolha o melhor horário para sua mentoria</p>
               </div>
             </div>
             <Button 
               onClick={() => navigate(`/mentor/publicview/${id}`)}
-              variant="outline"
-              size="sm"
+              className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90 transition-all duration-300"
             >
-              <User className="w-4 h-4 mr-2" />
+              <User className="h-4 w-4" />
               Ver Perfil Completo
             </Button>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-2xl shadow-xl p-10 border">
-          <h2 className="text-3xl font-bold text-gray-800 mb-10 text-center">
-            Agende uma Conversa
-          </h2>
           
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8">
             {/* Painel de Disponibilidade */}
             <div className="md:col-span-1">
-              <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-8 rounded-2xl border border-purple-100 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <h3 className="text-lg font-semibold mb-6 text-gray-800 flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Disponibilidade
-                </h3>
+              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 h-full">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-gold gradient-text flex items-center gap-2">
+                    <Calendar className="h-6 w-6" />
+                    Disponibilidade
+                  </h3>
+                </div>
                 
                 <div className="space-y-6">
                   {/* Dias Disponíveis */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Dias Disponíveis</h4>
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
+                      <Calendar className="h-4 w-4" />
+                      Dias Disponíveis
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {allDays.map((day) => (
                         <span
                           key={day}
-                          className={`px-3 py-2 rounded-md text-sm font-medium border ${
+                          className={`px-3 py-2 rounded-md text-sm font-medium border transition-all ${
                             workingDaysPortuguese.includes(day)
-                              ? 'bg-green-100 text-green-700 border-green-200'
-                              : 'bg-gray-100 text-gray-500 border-gray-200'
+                              ? 'bg-slate-800/50 text-gold border-gold/50 shadow-md'
+                              : 'bg-slate-800/30 text-gray-400 border-gold/20'
                           }`}
                         >
                           {day}
@@ -224,51 +235,60 @@ const MentorPublicSchedulePage: React.FC = () => {
                   </div>
 
                   {/* Horário de Atendimento */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Horário de Atendimento</h4>
-                    <div className="bg-white p-4 rounded-lg border">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
+                      <Clock className="h-4 w-4" />
+                      Horário de Atendimento
+                    </label>
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                        <span>{mentorSettings.startTime} às {mentorSettings.endTime}</span>
+                        <Calendar className="h-4 w-4 text-gold" />
+                        <span className="text-white">{mentorSettings.startTime} às {mentorSettings.endTime}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Duração das Sessões */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Duração das Sessões</h4>
-                    <div className="bg-white p-4 rounded-lg border">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-gold">Duração das Sessões</label>
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                        <span>{mentorSettings.sessionDuration} minutos</span>
+                        <Clock className="h-4 w-4 text-gold" />
+                        <span className="text-white">{mentorSettings.sessionDuration} minutos</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Fuso Horário */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Fuso Horário</h4>
-                    <div className="bg-white p-4 rounded-lg border">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
+                      <Globe className="h-4 w-4" />
+                      Fuso Horário
+                    </label>
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                        <span>{mentorSettings.timezone}</span>
+                        <Globe className="h-4 w-4 text-gold" />
+                        <span className="text-white">{mentorSettings.timezone}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Valor do Agendamento */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Valor do Agendamento</h4>
-                    <div className="bg-white p-4 rounded-lg border">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
+                      <DollarSign className="h-4 w-4" />
+                      Valor do Agendamento
+                    </label>
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
                       {mentorSettings.price && mentorSettings.price > 0 ? (
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="font-semibold text-green-600">
+                          <span className="font-semibold text-gold">
                             R$ {mentorSettings.price.toFixed(2).replace('.', ',')}
                           </span>
                         </div>
                       ) : (
                         <div className="text-sm">
-                          <span className="font-medium text-blue-600">
+                          <span className="font-medium text-gold">
                             🎉 Essa mentoria está gratuita no momento, aproveite!
                           </span>
                         </div>

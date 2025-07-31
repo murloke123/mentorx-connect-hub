@@ -3,7 +3,7 @@ import MentorSidebar from '@/components/mentor/MentorSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/utils/supabase';
-import { CalendarCheck, MessageSquare, Clock, DollarSign, Users } from 'lucide-react';
+import { CalendarCheck, Clock, DollarSign, MessageSquare, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,9 +49,18 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
       <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
         <div className="space-y-8">
           {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-gold">Agendamentos Adquiridos</h1>
-            <p className="text-gray-400">Visualize todos os agendamentos que você adquiriu com outros mentores</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gold">Agendamentos Adquiridos</h1>
+              <p className="text-gray-400">Visualize todos os agendamentos que você adquiriu com outros mentores</p>
+            </div>
+            <Button 
+              onClick={() => navigate('/mentor/agendamentos')}
+              className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90 transition-all duration-300"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Ver Solicitações de Agendamento
+            </Button>
           </div>
 
           {/* Stats Cards */}
@@ -101,41 +110,19 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
             </Card>
           </div>
 
-          {/* Actions */}
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Button 
-                  onClick={() => navigate('/mentor/agendamentos')}
-                  className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Ver Solicitações de Agendamento
-                </Button>
-              </div>
+          {/* Seus Agendamentos */}
+          {mentorId ? (
+            <AppointmentsList 
+              mentorId={mentorId} 
+              showAcquiredOnly={true}
+            />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400">
+                Não foi possível carregar os agendamentos. Tente novamente.
+              </p>
             </div>
-          </div>
-
-          {/* Lista de agendamentos */}
-          <Card className="premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-gold">Seus Agendamentos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {mentorId ? (
-                <AppointmentsList 
-                  mentorId={mentorId} 
-                  showAcquiredOnly={true}
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">
-                    Não foi possível carregar os agendamentos. Tente novamente.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          )}
         </div>
       </div>
     </div>

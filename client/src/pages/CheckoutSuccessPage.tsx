@@ -90,24 +90,24 @@ const CheckoutSuccessPage = () => {
   console.log('🎨 CheckoutSuccessPage: Renderizando página');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-            <Clock className="w-6 h-6 text-blue-600 animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Card className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+        <CardHeader className="text-center border-b border-slate-700 pb-6">
+          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gold via-gold-light to-gold-dark rounded-full mb-4 shadow-lg">
+            <Clock className="w-6 h-6 text-slate-900 animate-spin" />
           </div>
-          <CardTitle>Processando Pagamento</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white text-xl font-semibold">Processando Pagamento</CardTitle>
+          <CardDescription className="text-gray-300">
             Aguarde, estamos processando seu pagamento...
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="text-center">
             <div className="animate-pulse">
-              <div className="h-2 bg-blue-200 rounded w-full mb-2"></div>
-              <div className="h-2 bg-blue-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-2 bg-gradient-to-r from-gold/30 via-gold-light/30 to-gold/30 rounded w-full mb-2"></div>
+              <div className="h-2 bg-gradient-to-r from-gold/20 via-gold-light/20 to-gold/20 rounded w-3/4 mx-auto"></div>
             </div>
-            <p className="text-sm text-gray-600 mt-4">
+            <p className="text-sm text-gray-400 mt-4">
               Você será redirecionado para seus cursos em instantes.
             </p>
           </div>

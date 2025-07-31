@@ -3,10 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bot, PlusCircle } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import ChatModal from "../../components/chat/ChatModal";
 import CoursesList from "../../components/mentor/CoursesList";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
 import { Button } from "../../components/ui/button";
-import ChatModal from "../../components/chat/ChatModal";
 import { getMentorCourses } from '../../services/courseService';
 import { supabase } from '../../utils/supabase';
 

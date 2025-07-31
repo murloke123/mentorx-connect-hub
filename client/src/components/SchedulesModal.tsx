@@ -176,30 +176,32 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl focus:outline-none focus:ring-0 focus:border-slate-700">
+        <DialogHeader className="border-b border-slate-700 pb-4">
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
+              <Calendar className="h-4 w-4 text-slate-900" />
+            </div>
             Agendamento com {mentorName}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Cabeçalho com data do agendamento */}
-          <Card>
+          <Card className="bg-slate-700/50 border-slate-600 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span className="font-medium">Data: {selectedDate.toLocaleDateString('pt-BR')}</span>
+                  <Calendar className="h-4 w-4 text-gold" />
+                  <span className="text-sm text-gray-300">Data: {selectedDate.toLocaleDateString('pt-BR')}</span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-4 text-sm text-gray-300">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-4 w-4 text-gold" />
                     <span>Horário: {settings.startTime} às {settings.endTime}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
+                    <Globe className="h-4 w-4 text-gold" />
                     <span>Fuso: {getMentorTimezoneLabel()}</span>
                   </div>
                 </div>
@@ -210,14 +212,14 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
           {/* Lista de agendamentos */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-lg font-semibold text-white">
                 Agendamentos ({appointments.length})
               </h3>
               {/* Ocultar botão se o usuário atual for o próprio mentor */}
               {user?.id !== mentorId && (
                 <Button 
                   onClick={() => setShowCreateModal(true)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <Plus className="h-4 w-4" />
                   Agendar
@@ -227,16 +229,16 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
 
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-2">Carregando agendamentos...</span>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+                <span className="ml-2 text-gray-300">Carregando agendamentos...</span>
               </div>
             ) : appointments.length === 0 ? (
-              <Card>
+              <Card className="bg-slate-700/50 border-slate-600 shadow-lg">
                 <CardContent className="p-6 text-center">
-                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Nenhum agendamento para este dia</p>
+                  <Calendar className="h-12 w-12 text-gold mx-auto mb-4" />
+                  <p className="text-gray-300">Nenhum agendamento para este dia</p>
                   {user?.id !== mentorId && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                       Clique em "Agendar" para criar um novo agendamento
                     </p>
                   )}
@@ -245,28 +247,28 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
             ) : (
               <div className="space-y-2">
                 {appointments.map((appointment) => (
-                  <Card key={appointment.id}>
+                  <Card key={appointment.id} className="bg-slate-700/50 border-slate-600 shadow-lg hover:bg-slate-700/70 transition-all duration-200">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium">
+                            <Clock className="h-4 w-4 text-gold" />
+                            <span className="font-medium text-white">
                               {formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-600" />
-                            <span>{appointment.mentee_name} - {appointment.mentee_role === 'mentor' ? 'Mentor' : 'Mentorado'}</span>
+                            <User className="h-4 w-4 text-gold" />
+                            <span className="text-gray-300">{appointment.mentee_name} - {appointment.mentee_role === 'mentor' ? 'Mentor' : 'Mentorado'}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 ${
                             appointment.status === 'scheduled' 
-                              ? 'bg-gray-100 text-gray-800 border-gray-200 border'
+                              ? 'bg-gold/20 text-gold border-gold/30 border'
                               : appointment.status === 'completed'
-                              ? 'bg-green-100 text-green-800 border-green-200 border'
-                              : 'bg-red-100 text-red-800 border-red-200 border'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30 border'
+                              : 'bg-red-500/20 text-red-400 border-red-500/30 border'
                           }`}>
                             <div className="flex items-center gap-1">
                               {appointment.status === 'scheduled' && <CheckCircle className="h-4 w-4" />}
@@ -282,7 +284,7 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
                         </div>
                       </div>
                       {appointment.notes && (
-                        <p className="text-sm text-gray-600 mt-2">
+                        <p className="text-sm text-gray-400 mt-2">
                           Observações: {appointment.notes}
                         </p>
                       )}
@@ -314,4 +316,4 @@ const SchedulesModal: React.FC<SchedulesModalProps> = ({
   );
 };
 
-export default SchedulesModal; 
+export default SchedulesModal;
