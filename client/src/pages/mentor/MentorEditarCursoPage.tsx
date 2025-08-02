@@ -7,6 +7,7 @@ import { Course } from "@/types/database";
 import { CourseFormData } from "@/utils/course";
 import { supabase } from "@/utils/supabase";
 import { useQueryClient } from "@tanstack/react-query";
+import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -155,7 +156,10 @@ const EditCoursePage = () => {
     <div className="flex">
       <MentorSidebar />
       <div className="flex-1 transition-all duration-300  p-6">
-        <h1 className="text-2xl font-bold mb-6">Editar Curso</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gold flex items-center gap-2">
+          <Edit className="h-6 w-6 text-gold" />
+          Editar Curso
+        </h1>
         
         {isLoading ? (
           <div className="space-y-4">

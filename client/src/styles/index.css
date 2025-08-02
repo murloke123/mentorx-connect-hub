@@ -267,3 +267,28 @@
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
 }
+
+/* Estilos para texto rico - força cor branca */
+.rich-text-content * {
+  color: #d1d5db !important;
+}
+
+.rich-text-content a {
+  color: #fbbf24 !important;
+}
+
+.rich-text-content strong,
+.rich-text-content b {
+  color: #f3f4f6 !important;
+  font-weight: 600;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3,
+.rich-text-content h4,
+.rich-text-content h5,
+.rich-text-content h6 {
+  color: #f9fafb !important;
+  font-weight: 700;
+}

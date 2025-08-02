@@ -1,6 +1,7 @@
 import ChatModal from '@/components/chat/ChatModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,7 +9,7 @@ import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } 
 import { triggerSuccessConfetti } from '@/utils/confetti';
 import { supabase } from '@/utils/supabase';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Video } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, MessageSquare, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -48,6 +49,7 @@ const ContentRenderer: React.FC<{
   onToggleCurrentContentCompleted
 }) => {
   const { toast } = useToast();
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
 
   const renderContent = () => {
     if (!currentConteudo) {
@@ -147,39 +149,81 @@ const ContentRenderer: React.FC<{
       </div>
 
       {/* Navigation Footer */}
-      <div className="bg-white border-t p-4">
-        <div className="flex justify-between items-center gap-2">
-          <Button 
-            variant="outline" 
-            onClick={onPreviousContent}
-            className="flex-1"
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 p-4">
+        <div className="flex items-center gap-2">
+          {/* Botão Comentários - Esquerda */}
+          <button
+            onClick={() => setShowCommentsModal(true)}
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-10 px-4 py-2 bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700"
           >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Anterior
-          </Button>
+            <MessageSquare className="w-4 h-4" />
+            Comentários
+          </button>
           
-          <div className="flex gap-2 flex-1">
+          {/* Botões de navegação - Centro */}
+          <div className="flex gap-2 flex-1 justify-center">
             <Button 
-              onClick={onNextContent}
-              className="flex-1"
+              variant="outline" 
+              onClick={onPreviousContent}
+              className="bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700"
             >
-              Próximo
-              <ChevronRight className="w-4 h-4 ml-2" />
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Anterior
             </Button>
             
-            <button
-              onClick={onToggleCurrentContentCompleted}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors shadow-sm border border-gray-200"
-              title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Marcar como concluído"}
-            >
-              <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-600' : 'text-gray-400'}`} />
-              <span className="hidden sm:inline">
-                {isCurrentContentCompleted ? "Concluído" : "Marcar como Concluído"}
-              </span>
-            </button>
+            <Button 
+               onClick={onNextContent}
+               className="bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+             >
+               Próximo
+               <ChevronRight className="w-4 h-4 ml-2" />
+             </Button>
           </div>
+          
+          {/* Botão Marcar como Concluído - Direita */}
+          <button
+            onClick={onToggleCurrentContentCompleted}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors shadow-sm border border-slate-600"
+            title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Marcar como concluído"}
+          >
+            <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
+            <span className="hidden sm:inline">
+              {isCurrentContentCompleted ? "Concluído" : "Marcar como Concluído"}
+            </span>
+          </button>
         </div>
       </div>
+
+      {/* Modal de Comentários */}
+      <Dialog open={showCommentsModal} onOpenChange={setShowCommentsModal}>
+        <DialogContent className="max-w-md max-h-[80vh] p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+          <DialogHeader className="p-6 pb-4 border-b border-slate-700">
+            <DialogTitle className="text-lg font-semibold text-white flex items-center">
+              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+                <MessageSquare className="h-4 w-4 text-slate-900" />
+              </div>
+              Comentários
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Modal de comentários do conteúdo
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 p-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-600 rounded-full flex items-center justify-center shadow-lg">
+                <MessageSquare className="w-8 h-8 text-gold" />
+              </div>
+              <h3 className="text-lg font-medium text-white">
+                Em breve esta funcionalidade
+              </h3>
+              <p className="text-sm text-gray-400">
+                Estamos trabalhando para trazer a funcionalidade de comentários em breve.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -222,41 +266,41 @@ const CourseSidebar: React.FC<{
   };
 
   return (
-    <div className="w-80 bg-white border-l flex flex-col">
+    <div className="w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-l border-slate-700 flex flex-col shadow-2xl">
       {/* Progress Header */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b border-slate-700">
         <div className="mb-2">
-          <span className="text-sm font-medium">Progresso do Curso</span>
-          <span className="text-sm text-gray-500 ml-2">{Math.round(progress)}%</span>
+          <span className="text-sm font-medium text-white">Progresso do Curso</span>
+          <span className="text-sm text-gold ml-2">{Math.round(progress)}%</span>
         </div>
-        <Progress value={progress} className="w-full" />
+        <Progress value={progress} className="w-full bg-slate-700" />
       </div>
 
       {/* Modules and Content List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-slate-800/50">
         {modulos.map((modulo) => {
           const isExpanded = expandedModuleId === modulo.id;
           const hasCurrentContent = currentConteudo?.module_id === modulo.id;
           
           return (
-            <div key={modulo.id} className="border-b">
+            <div key={modulo.id} className="border-b border-slate-700">
               <div 
-                className={`p-4 cursor-pointer hover:bg-gray-100 transition-colors ${
-                  hasCurrentContent ? 'bg-gray-50' : 'bg-gray-50'
+                className={`p-4 cursor-pointer hover:bg-slate-700/50 transition-colors ${
+                  hasCurrentContent ? 'bg-gradient-to-r from-gold/10 via-gold-light/5 to-gold/10 border-gold/30' : 'bg-slate-800/30'
                 }`}
                 onClick={() => toggleModule(modulo.id)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className={`font-medium text-sm ${hasCurrentContent ? 'text-blue-700' : ''}`}>
+                    <h3 className={`font-medium text-sm ${hasCurrentContent ? 'text-gold' : 'text-white'}`}>
                       {modulo.title}
                     </h3>
                     {modulo.description && (
-                      <p className="text-xs text-gray-600 mt-1">{modulo.description}</p>
+                      <p className="text-xs text-gray-400 mt-1">{modulo.description}</p>
                     )}
                   </div>
                   <ChevronRight 
-                    className={`w-4 h-4 text-gray-500 transition-transform ${
+                    className={`w-4 h-4 text-gray-400 transition-transform ${
                       isExpanded ? 'rotate-90' : ''
                     }`}
                   />
@@ -265,7 +309,7 @@ const CourseSidebar: React.FC<{
               
               {/* Conteúdos do módulo - só aparecem quando expandido */}
               {isExpanded && (
-                <div className="space-y-1 bg-white">
+                <div className="space-y-1 bg-slate-900/50">
                   {modulo.conteudos.map((conteudo) => {
                     const isActive = currentConteudo?.id === conteudo.id;
                     const isConcluido = conteudosConcluidos.has(conteudo.id);
@@ -273,13 +317,13 @@ const CourseSidebar: React.FC<{
                     return (
                       <div
                         key={conteudo.id}
-                        className={`p-3 ml-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between border-l-2 ${
-                          isActive ? 'bg-blue-50 border-l-blue-500' : 'border-l-gray-200'
+                        className={`p-3 ml-4 cursor-pointer hover:bg-slate-700/30 flex items-center justify-between border-l-2 transition-all duration-200 ${
+                          isActive ? 'bg-gradient-to-r from-gold/20 via-gold-light/10 to-gold/20 border-l-gold shadow-gold/20' : 'border-l-slate-600 hover:border-l-slate-500'
                         }`}
                         onClick={() => onConteudoSelect(conteudo)}
                       >
                         <div className="flex-1">
-                          <p className={`text-sm ${isActive ? 'font-medium text-blue-700' : ''}`}>
+                          <p className={`text-sm ${isActive ? 'font-medium text-gold' : 'text-gray-300'}`}>
                             {conteudo.title}
                           </p>
                           {conteudo.description && (
@@ -299,12 +343,12 @@ const CourseSidebar: React.FC<{
                             e.stopPropagation();
                             onToggleConteudoConcluido(conteudo.id, conteudo.module_id);
                           }}
-                          className="ml-2"
+                          className="ml-2 hover:scale-110 transition-transform duration-200"
                         >
                           {isConcluido ? (
-                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <CheckCircle className="w-5 h-5 text-gold" />
                           ) : (
-                            <Circle className="w-5 h-5 text-gray-300" />
+                            <Circle className="w-5 h-5 text-gray-400 hover:text-gray-300" />
                           )}
                         </button>
                       </div>
@@ -318,7 +362,7 @@ const CourseSidebar: React.FC<{
       </div>
 
       {/* AI Assistant Footer */}
-      <div className="p-4 border-t space-y-2 flex justify-center">
+      <div className="p-4 border-t border-slate-700 space-y-2 flex justify-center bg-slate-900/50">
         <div 
           className="cursor-pointer hover:scale-105 transition-transform duration-200 relative group"
           onClick={() => setIsChatModalOpen(true)}
@@ -328,13 +372,13 @@ const CourseSidebar: React.FC<{
             autoPlay 
             loop 
             muted 
-            className="rounded-lg"
+            className="rounded-lg shadow-lg"
           >
             <source src="/images/robo2.webm" type="video/webm" />
             Seu navegador não suporta o elemento de vídeo.
           </video>
-          <div className="absolute inset-0 bg-cyan-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-            <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
+          <div className="absolute inset-0 bg-gold/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <span className="text-slate-900 text-xs font-medium bg-gold/90 px-2 py-1 rounded shadow-lg">
               Chat IA
             </span>
           </div>
@@ -450,50 +494,74 @@ const CoursePlayerPage = () => {
           return; // Se foi redirecionado, não continuar
         }
         
-        console.log('🔍 CoursePlayerPage: Verificando matrícula do usuário...');
+        console.log('🔍 CoursePlayerPage: Verificando acesso ao curso...');
 
-        // Verificar se o usuário tem matrícula ativa neste curso
-        const { data: enrollment, error: enrollmentError } = await supabase
-          .from('matriculas')
-          .select('status')
-          .eq('course_id', cursoId)
-          .eq('student_id', user.id)
-          .single();
+        // Primeiro, buscar dados do curso para verificar se o usuário é o dono
+        const data = await getCursoCompleto(cursoId);
+        
+        if (!data) {
+          setError("Curso não encontrado.");
+          setLoading(false);
+          return;
+        }
 
-        console.log('📊 CoursePlayerPage: Resultado da matrícula:', {
-          enrollment,
-          enrollmentError
+        // Verificar se o usuário é o dono do curso
+        const isOwner = data.mentor_id === user.id;
+        console.log('👑 CoursePlayerPage: Verificação de propriedade:', {
+          userId: user.id,
+          mentorId: data.mentor_id,
+          isOwner
         });
 
-        if (enrollmentError || !enrollment) {
-          setError("Você não está matriculado neste curso.");
-          setHasAccess(false);
-          setLoading(false);
-          toast({
-            title: "Acesso negado",
-            description: "Você precisa estar matriculado para acessar este curso.",
-            variant: "destructive"
+        if (isOwner) {
+          // Se é o dono do curso, permitir acesso direto
+          console.log('✅ CoursePlayerPage: Usuário é o dono do curso, acesso liberado');
+          setHasAccess(true);
+          setCurso(data);
+        } else {
+          // Se não é o dono, verificar matrícula
+          console.log('🔍 CoursePlayerPage: Verificando matrícula do usuário...');
+
+          const { data: enrollment, error: enrollmentError } = await supabase
+            .from('matriculas')
+            .select('status')
+            .eq('course_id', cursoId)
+            .eq('student_id', user.id)
+            .single();
+
+          console.log('📊 CoursePlayerPage: Resultado da matrícula:', {
+            enrollment,
+            enrollmentError
           });
-          return;
+
+          if (enrollmentError || !enrollment) {
+            setError("Você não está matriculado neste curso.");
+            setHasAccess(false);
+            setLoading(false);
+            toast({
+              title: "Acesso negado",
+              description: "Você precisa estar matriculado para acessar este curso.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          if (enrollment.status !== 'active') {
+            setError("Sua matrícula está pendente. Complete o pagamento para acessar o curso.");
+            setHasAccess(false);
+            setLoading(false);
+            toast({
+              title: "Pagamento pendente",
+              description: "Complete o pagamento para acessar o conteúdo do curso.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          console.log('✅ CoursePlayerPage: Matrícula ativa confirmada, carregando curso...');
+          setHasAccess(true);
+          setCurso(data);
         }
-
-        if (enrollment.status !== 'active') {
-          setError("Sua matrícula está pendente. Complete o pagamento para acessar o curso.");
-          setHasAccess(false);
-          setLoading(false);
-          toast({
-            title: "Pagamento pendente",
-            description: "Complete o pagamento para acessar o conteúdo do curso.",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        console.log('✅ CoursePlayerPage: Matrícula ativa confirmada, carregando curso...');
-        setHasAccess(true);
-
-        // Se tem acesso, buscar dados do curso
-        const data = await getCursoCompleto(cursoId);
         
         if (!data) {
           setError("Curso não encontrado.");
@@ -501,7 +569,6 @@ const CoursePlayerPage = () => {
         }
         
         console.log('📚 CoursePlayerPage: Curso carregado:', data.title);
-        setCurso(data);
         
         // Sistema de progresso removido - sem controle de conteúdos concluídos
         setConteudosConcluidos(new Set());
@@ -906,14 +973,14 @@ const CoursePlayerPage = () => {
     return (
     <div className="flex flex-col h-screen">
       {/* Header com altura fixa de 45px */}
-      <div className="bg-white border-b shadow-sm h-[45px] flex items-center px-6">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm h-[45px] flex items-center px-6">
         <div className="flex items-center space-x-4 w-full">
           {/* Botão voltar */}
           <Button
             variant="ghost"
             size="sm"
             onClick={handleGoBack}
-            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-2 h-8"
+            className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
@@ -921,14 +988,14 @@ const CoursePlayerPage = () => {
           
           {/* Breadcrumb alinhado à esquerda */}
           <div className="flex items-center space-x-2 text-sm flex-1">
-            <span className="text-gray-700 truncate max-w-[200px] font-medium">
+            <span className="text-gray-200 truncate max-w-[200px] font-medium">
               {curso?.title || 'Carregando...'}
             </span>
             
             {currentModule && (
               <>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600 truncate max-w-[150px]">
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-300 truncate max-w-[150px]">
                   {currentModule.title}
                 </span>
               </>
@@ -936,8 +1003,8 @@ const CoursePlayerPage = () => {
             
             {currentConteudo && (
               <>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-900 font-medium truncate max-w-[200px]">
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+                <span className="text-white font-medium truncate max-w-[200px]">
                   {currentConteudo.title}
                 </span>
               </>
@@ -946,23 +1013,23 @@ const CoursePlayerPage = () => {
           
           {/* Badge do tipo de conteúdo */}
           {currentConteudo && (
-            <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg">
+            <div className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded-lg">
               {currentConteudo.content_type === 'video_externo' && (
                 <>
-                  <Video className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">Vídeo</span>
+                  <Video className="w-4 h-4 text-gray-300" />
+                  <span className="text-sm text-gray-200">Vídeo</span>
                 </>
               )}
               {currentConteudo.content_type === 'texto_rico' && (
                 <>
-                  <FileText className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">Texto</span>
+                  <FileText className="w-4 h-4 text-gray-300" />
+                  <span className="text-sm text-gray-200">Texto</span>
                 </>
               )}
               {currentConteudo.content_type === 'pdf' && (
                 <>
-                  <FileText className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">PDF</span>
+                  <FileText className="w-4 h-4 text-gray-300" />
+                  <span className="text-sm text-gray-200">PDF</span>
                 </>
               )}
             </div>

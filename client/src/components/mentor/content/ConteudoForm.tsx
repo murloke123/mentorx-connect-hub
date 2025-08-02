@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useToast } from '../../../hooks/use-toast';
 import { Button } from '../../ui/button';
 import { Form } from '../../ui/form';
 import { ScrollArea } from '../../ui/scroll-area';
-import { Loader2 } from 'lucide-react';
-import { ConteudoFormValues } from './types';
 import BasicContentFields from './BasicContentFields';
-import TextContentField from './TextContentField';
-import VideoContentField from './VideoContentField';
 import PdfContentField from './PdfContentField';
-import { ConteudoFormProps, conteudoSchema } from './types';
-import { useToast } from '../../../hooks/use-toast';
+import TextContentField from './TextContentField';
+import { ConteudoFormProps, ConteudoFormValues, conteudoSchema } from './types';
+import VideoContentField from './VideoContentField';
 
 const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: ConteudoFormProps) => {
   const { toast } = useToast();
@@ -161,16 +160,21 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
           </ScrollArea>
         </div>
 
-        <div className="flex justify-end space-x-2 py-4 px-4 border-t bg-background mt-auto">
+        <div className="flex justify-end space-x-3 py-6 px-6 border-t border-slate-700 bg-slate-800/50 backdrop-blur-sm mt-auto">
           <Button 
             type="button" 
             variant="outline" 
             onClick={onCancel}
             disabled={isSubmitting}
+            className="bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300"
           >
             Cancelar
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+          >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Salvando...' : 'Salvar Conteúdo'}
           </Button>

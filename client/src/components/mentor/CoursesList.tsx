@@ -167,12 +167,12 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
         {/* Filtros e Busca sempre visíveis */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
             <Input
               placeholder="Buscar cursos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
             />
           </div>
           <Tabs defaultValue="all" className="w-full sm:w-auto">
@@ -369,12 +369,12 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
       {/* Filtros e Busca sempre visíveis */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-grow">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
           <Input
             placeholder="Buscar cursos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
           />
         </div>
         <Tabs defaultValue="all" className="w-full sm:w-auto">

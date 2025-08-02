@@ -1,10 +1,10 @@
 
+import { Card, CardContent } from '@/components/ui/card';
 import { FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
 import VideoPlayer from './VideoPlayer';
-import { useState, useEffect } from 'react';
 
 interface VideoContentFieldProps {
   initialUrl?: string;
@@ -47,21 +47,21 @@ const VideoContentField = ({
   return (
     <div className="space-y-4 w-full">
       <div className="space-y-2">
-        <FormLabel>URL do Vídeo</FormLabel>
+        <FormLabel className="text-white font-medium">URL do Vídeo</FormLabel>
         <Input 
           placeholder="Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
           value={videoUrl}
           onChange={handleVideoUrlChange}
           disabled={isSubmitting}
-          className="w-full"
+          className="w-full bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-gold/50 focus:ring-gold/20 transition-all duration-300"
         />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-400">
           Cole o link completo do seu vídeo do YouTube ou Vimeo.
         </p>
       </div>
 
       {videoUrl && (
-        <Card className="w-full">
+        <Card className="w-full bg-slate-800/50 border-slate-600">
           <CardContent className="pt-6">
             <VideoPlayer provider={provider} url={videoUrl} />
           </CardContent>
@@ -69,21 +69,21 @@ const VideoContentField = ({
       )}
 
       <Tabs defaultValue={provider} value={provider} onValueChange={(value) => setProvider(value as 'youtube' | 'vimeo')}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="youtube">YouTube</TabsTrigger>
-          <TabsTrigger value="vimeo">Vimeo</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border-slate-600">
+          <TabsTrigger value="youtube" className="text-white data-[state=active]:bg-gold/20 data-[state=active]:text-gold">YouTube</TabsTrigger>
+          <TabsTrigger value="vimeo" className="text-white data-[state=active]:bg-gold/20 data-[state=active]:text-gold">Vimeo</TabsTrigger>
         </TabsList>
-        <TabsContent value="youtube" className="p-4 border rounded-md mt-2">
-          <h4 className="text-sm font-medium mb-2">Como obter o link do YouTube:</h4>
-          <ol className="text-sm space-y-1 list-decimal list-inside text-muted-foreground">
+        <TabsContent value="youtube" className="p-4 border border-slate-600 rounded-md mt-2 bg-slate-800/30">
+          <h4 className="text-sm font-medium mb-2 text-white">Como obter o link do YouTube:</h4>
+          <ol className="text-sm space-y-1 list-decimal list-inside text-gray-300">
             <li>Vá até o vídeo no YouTube</li>
             <li>Clique em 'Compartilhar' abaixo do vídeo</li>
             <li>Copie o link fornecido</li>
           </ol>
         </TabsContent>
-        <TabsContent value="vimeo" className="p-4 border rounded-md mt-2">
-          <h4 className="text-sm font-medium mb-2">Como obter o link do Vimeo:</h4>
-          <ol className="text-sm space-y-1 list-decimal list-inside text-muted-foreground">
+        <TabsContent value="vimeo" className="p-4 border border-slate-600 rounded-md mt-2 bg-slate-800/30">
+          <h4 className="text-sm font-medium mb-2 text-white">Como obter o link do Vimeo:</h4>
+          <ol className="text-sm space-y-1 list-decimal list-inside text-gray-300">
             <li>Abra o vídeo no Vimeo</li>
             <li>Clique no ícone de 'Compartilhar' (geralmente um avião de papel)</li>
             <li>Copie o link da seção 'Link'</li>

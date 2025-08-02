@@ -18,6 +18,7 @@ import {
     Modulo
 } from '@/services/moduloService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Library } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -183,7 +184,10 @@ const ModulosPage = () => {
           className="mb-6"
         />
 
-        <h1 className="text-3xl font-bold mb-6">Gerenciar Módulos</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <Library className="h-8 w-8 text-gold" />
+          <h1 className="text-3xl font-bold text-gold">Gerenciar Módulos</h1>
+        </div>
 
         {isLoading ? (
           <div className="space-y-4">

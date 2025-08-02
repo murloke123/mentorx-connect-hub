@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { useCategories } from "@/hooks/useCategories";
+import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CourseFormData } from "./FormSchema";
-import { useCategories } from "@/hooks/useCategories";
-import { Spinner } from "@/components/ui/spinner";
 
 interface BasicInfoFieldsProps {
   form: UseFormReturn<CourseFormData>;
@@ -27,9 +27,13 @@ const BasicInfoFields = ({ form }: BasicInfoFieldsProps) => {
         name="name"
         render={({ field }) => (
           <FormItem className="mb-4">
-            <FormLabel>Nome do Curso*</FormLabel>
+            <FormLabel className="text-sm font-medium text-gray-300">Nome do Curso*</FormLabel>
             <FormControl>
-              <Input placeholder="Digite o nome do curso" {...field} />
+              <Input 
+                placeholder="Digite o nome do curso" 
+                {...field} 
+                className="h-11 bg-slate-800/50 text-white placeholder:text-gray-400"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -41,12 +45,13 @@ const BasicInfoFields = ({ form }: BasicInfoFieldsProps) => {
         name="description"
         render={({ field }) => (
           <FormItem className="mb-4">
-            <FormLabel>Descrição*</FormLabel>
+            <FormLabel className="text-sm font-medium text-gray-300">Descrição*</FormLabel>
             <FormControl>
               <Textarea 
                 placeholder="Forneça um resumo do seu curso, destacando o conteúdo e os principais benefícios para o aluno..." 
-                rows={5}
+                rows={8}
                 {...field} 
+                className="bg-slate-800/50 text-white placeholder:text-gray-400"
               />
             </FormControl>
             <FormMessage />
@@ -59,7 +64,7 @@ const BasicInfoFields = ({ form }: BasicInfoFieldsProps) => {
         name="category"
         render={({ field }) => (
           <FormItem className="mb-4">
-            <FormLabel>Categoria*</FormLabel>
+            <FormLabel className="text-sm font-medium text-gray-300">Categoria*</FormLabel>
             <Select 
               onValueChange={(value) => {
                 console.log("Categoria selecionada:", value);
@@ -70,18 +75,18 @@ const BasicInfoFields = ({ form }: BasicInfoFieldsProps) => {
               disabled={loading}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 bg-slate-800/50 text-white">
                   <SelectValue placeholder={loading ? "Carregando categorias..." : "Selecione uma categoria"} />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent className="bg-slate-800 border-slate-600">
                 {loading ? (
                   <div className="flex items-center justify-center p-4">
                     <Spinner className="h-4 w-4" />
                   </div>
                 ) : (
                   categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem key={category.id} value={category.id} className="text-white hover:bg-slate-700">
                       {category.name}
                   </SelectItem>
                   ))

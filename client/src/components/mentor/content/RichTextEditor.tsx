@@ -1,11 +1,17 @@
 
-import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { 
-  Bold, Italic, Underline, AlignLeft, AlignCenter, 
-  AlignRight, List, ListOrdered, Type, Image
-} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+    AlignCenter,
+    AlignLeft,
+    AlignRight,
+    Bold,
+    Image,
+    Italic,
+    List, ListOrdered, Type,
+    Underline
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface RichTextEditorProps {
   initialValue?: string;
@@ -254,7 +260,7 @@ const RichTextEditor = ({ initialValue = "", onChange, disabled = false }: RichT
         ref={editorRef}
         id="rich-text-editor"
         contentEditable={!disabled}
-        className={`p-4 min-h-[300px] max-h-[500px] overflow-y-auto ${!disabled ? 'focus:outline-none' : 'bg-muted-50'}`}
+        className={`rich-text-content p-4 min-h-[300px] max-h-[500px] overflow-y-auto ${!disabled ? 'focus:outline-none' : 'bg-muted-50'}`}
         data-gramm="false" // Desativa correções gramaticais de terceiros
         spellCheck="false" // Desativa verificação ortográfica nativa
         dir="ltr" // Garante a direção do texto da esquerda para a direita

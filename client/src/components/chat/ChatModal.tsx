@@ -383,16 +383,16 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col border border-cyan-500/20">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col border border-gold/30 shadow-gold/20">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-cyan-500/20">
+        <div className="flex items-center justify-between p-6 border-b border-gold/20">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
-              <Bot className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-r from-gold via-gold-light to-gold rounded-full flex items-center justify-center">
+              <Bot className="w-6 h-6 text-slate-900" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">AI Assistant</h3>
-              <p className="text-sm text-cyan-400">Assistente de Conteúdo</p>
+              <p className="text-sm text-gold">Assistente de Conteúdo</p>
             </div>
           </div>
           <Button
@@ -409,7 +409,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-gray-400 mt-20">
-              <Bot className="w-16 h-16 mx-auto mb-4 text-cyan-500" />
+              <Bot className="w-16 h-16 mx-auto mb-4 text-gold" />
               <p className="text-lg">Olá! Sou seu assistente de IA.</p>
               <p className="text-sm">Faça perguntas sobre o conteúdo que você está estudando.</p>
             </div>
@@ -429,7 +429,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
               >
                 <div className="flex items-start space-x-2">
                   {message.sender === 'bot' && (
-                    <Bot className="w-4 h-4 mt-1 text-cyan-400 flex-shrink-0" />
+                    <Bot className="w-4 h-4 mt-1 text-gold flex-shrink-0" />
                   )}
                   {message.sender === 'user' && (
                     <User className="w-4 h-4 mt-1 text-white flex-shrink-0" />
@@ -451,8 +451,8 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
             <div className="flex justify-start">
               <div className="bg-slate-700 rounded-2xl px-4 py-3 border border-slate-600">
                 <div className="flex items-center space-x-2">
-                  <Bot className="w-4 h-4 text-cyan-400" />
-                  <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                  <Bot className="w-4 h-4 text-gold" />
+                  <Loader2 className="w-4 h-4 animate-spin text-gold" />
                   <span className="text-sm text-gray-300">Pensando...</span>
                 </div>
               </div>
@@ -463,7 +463,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
         </div>
 
         {/* Input */}
-        <div className="p-6 border-t border-cyan-500/20">
+        <div className="p-6 border-t border-gold/20">
           <div className="flex space-x-3">
             <div className="flex-1 relative">
               <textarea
@@ -471,22 +471,24 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, contentData }) =
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Digite sua mensagem..."
-                className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+                className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent resize-none"
                 rows={2}
                 disabled={isLoading}
               />
             </div>
-            <Button
-              onClick={sendMessage}
-              disabled={!inputMessage.trim() || isLoading}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </Button>
+            <div className="flex items-center justify-center">
+              <Button
+                onClick={sendMessage}
+                disabled={!inputMessage.trim() || isLoading}
+                className="bg-gradient-to-r from-gold via-gold-light to-gold hover:from-gold-light hover:to-gold text-slate-900 px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

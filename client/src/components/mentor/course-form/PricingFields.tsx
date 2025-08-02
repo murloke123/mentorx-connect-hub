@@ -1,6 +1,5 @@
 
-import React, { useEffect } from "react";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
@@ -42,7 +41,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
           name="price"
           render={({ field }) => (
             <FormItem className="flex-1">
-              <FormLabel>Preço*</FormLabel>
+              <FormLabel className="text-sm font-medium text-gray-300">Preço*</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
@@ -50,6 +49,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                   step="0.01"
                   onChange={(e) => field.onChange(parseFloat(e.target.value))}
                   value={field.value}
+                  className="h-11 bg-slate-800/50 text-white placeholder:text-gray-400"
                 />
               </FormControl>
               <FormMessage />
@@ -62,19 +62,19 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
           name="currency"
           render={({ field }) => (
             <FormItem className="w-full sm:w-[180px]">
-              <FormLabel>Moeda</FormLabel>
+              <FormLabel className="text-sm font-medium text-gray-300">Moeda</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
                 defaultValue={field.value}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11 bg-slate-800/50 text-gold">
                     <SelectValue placeholder="Selecione a moeda" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-slate-800 border-slate-600">
                   {currencies.map((currency) => (
-                    <SelectItem key={currency.value} value={currency.value}>
+                    <SelectItem key={currency.value} value={currency.value} className="text-gold hover:bg-slate-700">
                       {currency.label}
                     </SelectItem>
                   ))}
@@ -91,17 +91,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
         name="discount"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Desconto (%)</FormLabel>
+            <FormLabel className="text-sm font-medium text-gray-300">Desconto (%)</FormLabel>
             <FormControl>
               <Input 
                 type="number" 
                 min="0" 
                 max="100" 
                 onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                value={field.value}
+                   value={field.value}
+                   className="h-11 bg-slate-800/50 text-white placeholder:text-gray-400"
               />
             </FormControl>
-            <FormDescription>
+            <FormDescription className="text-gray-400">
               Deixe em 0 para não aplicar desconto
             </FormDescription>
             <FormMessage />

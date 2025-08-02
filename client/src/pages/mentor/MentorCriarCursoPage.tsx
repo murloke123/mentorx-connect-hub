@@ -7,6 +7,7 @@ import { supabase } from "@/utils/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 
 const CreateCoursePage = () => {
   const navigate = useNavigate();
@@ -109,7 +110,10 @@ const CreateCoursePage = () => {
     <div className="flex">
       <MentorSidebar />
       <div className="flex-1 transition-all duration-300  p-6">
-        <h1 className="text-2xl font-bold mb-6">Criar Novo Curso</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gold flex items-center gap-2">
+          <BookOpen className="h-6 w-6 text-gold" />
+          Criar Novo Curso
+        </h1>
         <CourseForm 
           mode="create"
           initialValues={initialValues}
