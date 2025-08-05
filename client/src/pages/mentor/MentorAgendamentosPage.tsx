@@ -13,6 +13,53 @@ const MentorAgendamentosPage = () => {
   const navigate = useNavigate();
   const [mentorName, setMentorName] = useState<string>('');
   const [refreshAppointments, setRefreshAppointments] = useState<number>(0);
+  const [stats, setStats] = useState({
+    pendingRequests: 0,
+    completedAppointments: 0,
+    totalMentees: 0
+  });
+
+  // Função para carregar estatísticas
+  const loadStats = async () => {
+    if (!user) return;
+
+    try {
+      // Buscar todos os agendamentos do mentor
+      const { data: appointments, error } = await supabase
+        .from('calendar')
+        .select('*')
+        .eq('mentor_id', user.id);
+
+      if (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+        return;
+      }
+
+      if (appointments) {
+        // Solicitações pendentes (não concluídas = scheduled + cancelled)
+        const pendingRequests = appointments.filter(apt => 
+          apt.status === 'scheduled' || apt.status === 'cancelled'
+        ).length;
+
+        // Agendamentos concluídos
+        const completedAppointments = appointments.filter(apt => 
+          apt.status === 'completed'
+        ).length;
+
+        // Total de mentorados únicos que solicitaram agendamentos
+        const uniqueMentees = new Set(appointments.map(apt => apt.mentee_id));
+        const totalMentees = uniqueMentees.size;
+
+        setStats({
+          pendingRequests,
+          completedAppointments,
+          totalMentees
+        });
+      }
+    } catch (err) {
+      console.error('Erro inesperado ao carregar estatísticas:', err);
+    }
+  };
 
   useEffect(() => {
     const loadMentorInfo = async () => {
@@ -36,7 +83,13 @@ const MentorAgendamentosPage = () => {
     };
 
     loadMentorInfo();
+    loadStats();
   }, [user]);
+
+  // Recarregar estatísticas quando refreshAppointments mudar
+  useEffect(() => {
+    loadStats();
+  }, [refreshAppointments]);
 
   // Função para forçar atualização da lista de agendamentos
   const handleAppointmentChange = () => {
@@ -72,19 +125,19 @@ const MentorAgendamentosPage = () => {
                 <MessageSquare className="h-4 w-4 text-gold ml-2" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">-</div>
-                <p className="text-xs text-gray-400">Aguardando resposta</p>
+                <div className="text-2xl font-bold text-white">{stats.pendingRequests}</div>
+                <p className="text-xs text-gray-400">Não concluídas</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gold text-center">Agendamentos Confirmados</CardTitle>
+                <CardTitle className="text-sm font-medium text-gold text-center">Agendamentos Concluídos</CardTitle>
                 <CalendarCheck className="h-4 w-4 text-gold ml-2" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">-</div>
-                <p className="text-xs text-gray-400">Este mês</p>
+                <div className="text-2xl font-bold text-white">{stats.completedAppointments}</div>
+                <p className="text-xs text-gray-400">Finalizados</p>
               </CardContent>
             </Card>
 
@@ -94,8 +147,8 @@ const MentorAgendamentosPage = () => {
                 <Users className="h-4 w-4 text-gold ml-2" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">-</div>
-                <p className="text-xs text-gray-400">Únicos</p>
+                <div className="text-2xl font-bold text-white">{stats.totalMentees}</div>
+                <p className="text-xs text-gray-400">Que solicitaram agendamentos</p>
               </CardContent>
             </Card>
           </div>

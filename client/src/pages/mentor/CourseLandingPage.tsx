@@ -1,29 +1,34 @@
 import {
-    ArrowLeft,
-    Award,
-    BookOpen,
-    CheckCircle,
-    Clock,
-    Download,
-    Edit3,
-    Eye,
-    Play,
-    Save,
-    Shield,
-    Star,
-    Users,
-    Zap
+  ArrowLeft,
+  Award,
+  BookOpen,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Edit3,
+  Eye,
+  FileIcon,
+  FileText,
+  Play,
+  Plus,
+  Rocket,
+  Save,
+  Shield,
+  Star,
+  Trash2,
+  User,
+  X,
+  Zap
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import MentorSidebar from '../../components/mentor/MentorSidebar';
-import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
-import { Separator } from '../../components/ui/separator';
-import { Textarea } from '../../components/ui/textarea';
 import { toast } from '../../hooks/use-toast';
+import { CursoItemLocal, getCursoCompleto } from '../../services/coursePlayerService';
+import '../../styles/landing-page.css';
 import { supabase } from '../../utils/supabase';
 
 interface CourseData {
@@ -42,18 +47,26 @@ interface LandingPageData {
   subheadline: string;
   key_benefits: string[];
   social_proof: string;
+  social_rating?: string;
+  avatar_urls?: string[];
   guarantee: string;
   bonus_offer: string;
   urgency_message: string;
+  course_features?: {
+    content_complete: { title: string; subtitle: string; };
+    lifetime_access: { title: string; subtitle: string; };
+    certificate: { title: string; subtitle: string; };
+  };
 }
 
 const CourseLandingPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [realCourseData, setRealCourseData] = useState<CursoItemLocal | null>(null);
+  const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [landingData, setLandingData] = useState<LandingPageData>({
     headline: "Domine as Habilidades que Vão Transformar Sua Carreira",
     subheadline: "Um curso prático e direto ao ponto para você alcançar resultados reais em tempo recorde",
@@ -64,9 +77,35 @@ const CourseLandingPage: React.FC = () => {
       "Certificado de conclusão"
     ],
     social_proof: "Mais de 1.000 alunos já transformaram suas carreiras",
-    guarantee: "Garantia incondicional de 30 dias",
+    guarantee: "Garantia incondicional de 7 dias",
     bonus_offer: "Bônus exclusivo: Kit de ferramentas profissionais",
-    urgency_message: "Últimas vagas disponíveis"
+    urgency_message: "Contato direto com o mentor",
+    course_features: {
+      content_complete: { title: "Conteúdo Completo", subtitle: "Módulos práticos e teóricos" },
+      lifetime_access: { title: "Acesso Vitalício", subtitle: "Estude no seu ritmo" },
+      certificate: { title: "Certificado", subtitle: "Comprove suas habilidades" }
+    }
+  });
+
+  // Estados para controlar a edição
+  const [isEditingBenefits, setIsEditingBenefits] = useState(false);
+  const [isEditingSocialProof, setIsEditingSocialProof] = useState(false);
+  const [isEditingFeatures, setIsEditingFeatures] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Estados temporários para edição
+  const [tempBenefits, setTempBenefits] = useState<string[]>([]);
+  const [tempSocialProof, setTempSocialProof] = useState("");
+  const [tempSocialRating, setTempSocialRating] = useState("4.9");
+  const [tempAvatarUrls, setTempAvatarUrls] = useState<string[]>([
+    "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
+    "https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png", 
+    "https://primefaces.org/cdn/primereact/images/avatar/onyamalimba.png"
+  ]);
+  const [tempFeatures, setTempFeatures] = useState({
+    content_complete: { title: "", subtitle: "" },
+    lifetime_access: { title: "", subtitle: "" },
+    certificate: { title: "", subtitle: "" }
   });
 
   useEffect(() => {
@@ -74,6 +113,7 @@ const CourseLandingPage: React.FC = () => {
       if (!courseId) return;
       
       try {
+        // Carregar dados básicos do curso
         const { data: course, error: courseError } = await supabase
           .from('cursos')
           .select('*')
@@ -83,6 +123,11 @@ const CourseLandingPage: React.FC = () => {
         if (courseError) throw courseError;
         setCourseData(course);
 
+        // Carregar dados completos do curso com módulos e conteúdos
+        const realCourse = await getCursoCompleto(courseId);
+        setRealCourseData(realCourse);
+
+        // Carregar dados da landing page
         const { data: landingPage } = await supabase
           .from('course_landing_pages')
           .select('layout_body')
@@ -90,7 +135,16 @@ const CourseLandingPage: React.FC = () => {
           .single();
 
         if (landingPage?.layout_body) {
-          setLandingData(prevData => ({ ...prevData, ...landingPage.layout_body }));
+          const loadedData = { ...landingData, ...landingPage.layout_body };
+          setLandingData(loadedData);
+          
+          // Atualizar estados temporários com dados carregados
+          if (loadedData.social_rating) {
+            setTempSocialRating(loadedData.social_rating);
+          }
+          if (loadedData.avatar_urls) {
+            setTempAvatarUrls(loadedData.avatar_urls);
+          }
         }
 
       } catch (error) {
@@ -108,28 +162,192 @@ const CourseLandingPage: React.FC = () => {
     loadData();
   }, [courseId]);
 
-  const handleSave = async () => {
+
+
+  const toggleModule = (moduleIndex: number) => {
+    setExpandedModules(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(moduleIndex)) {
+        newSet.delete(moduleIndex);
+      } else {
+        newSet.add(moduleIndex);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(prev => !prev);
+  };
+
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  // Função para calcular estatísticas de conteúdo
+  const getContentStats = () => {
+    if (!realCourseData) return { videos: 0, texts: 0, pdfs: 0 };
+    
+    let videos = 0;
+    let texts = 0;
+    let pdfs = 0;
+    
+    realCourseData.modulos.forEach(modulo => {
+      modulo.conteudos.forEach(conteudo => {
+        switch (conteudo.content_type) {
+          case 'video_externo':
+            videos++;
+            break;
+          case 'texto_rico':
+            texts++;
+            break;
+          case 'pdf':
+            pdfs++;
+            break;
+        }
+      });
+    });
+    
+    return { videos, texts, pdfs };
+  };
+
+  // Funções para gerenciar a edição dos benefícios
+  const startEditingBenefits = () => {
+    setTempBenefits([...landingData.key_benefits]);
+    setIsEditingBenefits(true);
+  };
+
+  const addBenefit = () => {
+    setTempBenefits([...tempBenefits, ""]);
+  };
+
+  const updateBenefit = (index: number, value: string) => {
+    const newBenefits = [...tempBenefits];
+    newBenefits[index] = value;
+    setTempBenefits(newBenefits);
+  };
+
+  const removeBenefit = (index: number) => {
+    const newBenefits = tempBenefits.filter((_, i) => i !== index);
+    setTempBenefits(newBenefits);
+  };
+
+  const cancelEditingBenefits = () => {
+    setTempBenefits([]);
+    setIsEditingBenefits(false);
+  };
+
+  // Funções para gerenciar a edição do social proof
+  const startEditingSocialProof = () => {
+    setTempSocialProof(landingData.social_proof);
+    setTempSocialRating(landingData.social_rating || "4.9");
+    setTempAvatarUrls(landingData.avatar_urls || [
+      "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
+      "https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png", 
+      "https://primefaces.org/cdn/primereact/images/avatar/onyamalimba.png"
+    ]);
+    setIsEditingSocialProof(true);
+  };
+
+  const cancelEditingSocialProof = () => {
+    setTempSocialProof("");
+    setIsEditingSocialProof(false);
+  };
+
+  // Funções para gerenciar a edição dos recursos
+  const startEditingFeatures = () => {
+    setTempFeatures(landingData.course_features || {
+      content_complete: { title: "Conteúdo Completo", subtitle: "Módulos práticos e teóricos" },
+      lifetime_access: { title: "Acesso Vitalício", subtitle: "Estude no seu ritmo" },
+      certificate: { title: "Certificado", subtitle: "Comprove suas habilidades" }
+    });
+    setIsEditingFeatures(true);
+  };
+
+  const updateFeature = (featureKey: string, field: 'title' | 'subtitle', value: string) => {
+    setTempFeatures(prev => ({
+      ...prev,
+      [featureKey]: {
+        ...prev[featureKey as keyof typeof prev],
+        [field]: value
+      }
+    }));
+  };
+
+  const cancelEditingFeatures = () => {
+    setTempFeatures({
+      content_complete: { title: "", subtitle: "" },
+      lifetime_access: { title: "", subtitle: "" },
+      certificate: { title: "", subtitle: "" }
+    });
+    setIsEditingFeatures(false);
+  };
+
+  // Função para salvar as alterações
+  const saveChanges = async (section: 'benefits' | 'social_proof' | 'features') => {
     if (!courseId) return;
     
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      let updatedData = { ...landingData };
+      
+      if (section === 'benefits') {
+        const filteredBenefits = tempBenefits.filter(benefit => benefit.trim() !== '');
+        updatedData.key_benefits = filteredBenefits;
+        setLandingData(updatedData);
+        setIsEditingBenefits(false);
+      } else if (section === 'social_proof') {
+        updatedData.social_proof = tempSocialProof;
+        updatedData.social_rating = tempSocialRating;
+        updatedData.avatar_urls = tempAvatarUrls;
+        setLandingData(updatedData);
+        setIsEditingSocialProof(false);
+      } else if (section === 'features') {
+        updatedData.course_features = tempFeatures;
+        setLandingData(updatedData);
+        setIsEditingFeatures(false);
+      }
+
+      // Primeiro, verificar se já existe um registro para este course_id
+      const { data: existingRecord } = await supabase
         .from('course_landing_pages')
-        .upsert({
-          course_id: courseId,
-          layout_body: landingData,
-          layout_name: 'simple_checkout',
-          is_active: true
-        });
+        .select('id')
+        .eq('course_id', courseId)
+        .single();
+
+      let error;
+      
+      if (existingRecord) {
+        // Se existe, fazer update
+        const { error: updateError } = await supabase
+          .from('course_landing_pages')
+          .update({
+            layout_body: updatedData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('course_id', courseId);
+        error = updateError;
+      } else {
+        // Se não existe, fazer insert
+        const { error: insertError } = await supabase
+          .from('course_landing_pages')
+          .insert({
+            course_id: courseId,
+            layout_body: updatedData,
+            is_active: true
+          });
+        error = insertError;
+      }
 
       if (error) throw error;
 
       toast({
         title: "Sucesso",
-        description: "Página de vendas salva com sucesso!",
+        description: "Alterações salvas com sucesso!",
         variant: "default"
       });
-      setIsEditing(false);
+
     } catch (error) {
       console.error('Erro ao salvar:', error);
       toast({
@@ -142,590 +360,86 @@ const CourseLandingPage: React.FC = () => {
     }
   };
 
-  const updateLandingData = (field: keyof LandingPageData, value: string | string[]) => {
-    setLandingData(prev => ({ ...prev, [field]: value }));
-  };
 
-  const exportToHTML = async () => {
-    if (!courseData) return;
 
-    try {
-      // Capturar todos os estilos CSS da página
-      const allStyles = Array.from(document.styleSheets)
-        .map(styleSheet => {
-          try {
-            return Array.from(styleSheet.cssRules)
-              .map(rule => rule.cssText)
-              .join('\n');
-          } catch (e) {
-            return '';
-          }
-        })
-        .join('\n');
 
-      // CSS customizado adicional para garantir que tudo funcione standalone
-      const customCSS = `
-        /* Reset e base styles */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          line-height: 1.6;
-          color: #f9fafb;
-          background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
-          min-height: 100vh;
-        }
 
-        /* Variáveis CSS customizadas */
-        :root {
-          --gold: 45 95% 68%;
-          --gold-light: 48 100% 78%;
-          --gold-dark: 42 85% 58%;
-          --background: 220 15% 4%;
-          --foreground: 210 40% 98%;
-          --border: 220 15% 20%;
-          --card: 220 15% 8%;
-          --muted-foreground: 215 20.2% 65.1%;
-        }
 
-        /* Classes utilitárias essenciais */
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: 700; }
-        .font-semibold { font-weight: 600; }
-        .text-xl { font-size: 1.25rem; }
-        .text-2xl { font-size: 1.5rem; }
-        .text-3xl { font-size: 1.875rem; }
-        .text-4xl { font-size: 2.25rem; }
-        .text-sm { font-size: 0.875rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mb-6 { margin-bottom: 1.5rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .p-4 { padding: 1rem; }
-        .p-6 { padding: 1.5rem; }
-        .p-8 { padding: 2rem; }
-        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
-        .space-y-4 > * + * { margin-top: 1rem; }
-        .space-y-6 > * + * { margin-top: 1.5rem; }
-        .space-y-8 > * + * { margin-top: 2rem; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .grid { display: grid; }
-        .gap-12 { gap: 3rem; }
-        .max-w-6xl { max-width: 72rem; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .w-full { width: 100%; }
-        .h-64 { height: 16rem; }
-        .rounded-2xl { border-radius: 1rem; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .rounded-full { border-radius: 9999px; }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .border { border-width: 1px; }
-        .border-2 { border-width: 2px; }
-        .overflow-hidden { overflow: hidden; }
-        .relative { position: relative; }
-        .absolute { position: absolute; }
-        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-        .z-10 { z-index: 10; }
-        .object-cover { object-fit: cover; }
-        .leading-tight { line-height: 1.25; }
-        .opacity-90 { opacity: 0.9; }
-        .transform { transform: translateZ(0); }
-        .transition-all { transition: all 0.3s ease; }
-        .hover\\:scale-105:hover { transform: scale(1.05); }
-
-        /* Grid responsivo */
-        @media (min-width: 1024px) {
-          .lg\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .lg\\:sticky { position: sticky; }
-          .lg\\:top-8 { top: 2rem; }
-        }
-
-        /* Cores e gradientes */
-        .text-gold { color: hsl(45 95% 68%); }
-        .text-white { color: #ffffff; }
-        .text-gray-700 { color: #374151; }
-        .text-emerald-500 { color: #10b981; }
-        .text-red-500 { color: #ef4444; }
-        .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-        .from-gold-dark { --tw-gradient-from: hsl(42 85% 58%); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent); }
-        .via-gold { --tw-gradient-via: hsl(45 95% 68%); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to, transparent); }
-        .to-gold-light { --tw-gradient-to: hsl(48 100% 78%); }
-        .bg-black\\/20 { background-color: rgba(0, 0, 0, 0.2); }
-        .bg-white\\/10 { background-color: rgba(255, 255, 255, 0.1); }
-
-        /* Botão premium */
-        .btn-gold {
-          background: linear-gradient(to right, hsl(42 85% 58%), hsl(45 95% 68%), hsl(48 100% 78%));
-          color: hsl(220 15% 4%);
-          font-weight: 700;
-          padding: 1rem 2rem;
-          border-radius: 0.75rem;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
-          border: none;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          text-decoration: none;
-        }
-        .btn-gold:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 30px hsl(45 95% 68% / 0.3);
-        }
-
-        /* Cards premium */
-        .premium-card {
-          background: hsl(220 15% 12%);
-          border: 1px solid hsl(220 15% 20%);
-          border-radius: 1rem;
-          padding: 2rem;
-          transition: all 0.3s ease;
-        }
-        .premium-card:hover {
-          border-color: hsl(45 95% 68% / 0.5);
-          box-shadow: 0 10px 40px -10px hsl(45 95% 68% / 0.4);
-        }
-
-        /* Animações */
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-        /* Ícones SVG */
-        .icon {
-          width: 1.25rem;
-          height: 1.25rem;
-          display: inline-block;
-          vertical-align: middle;
-        }
-      `;
-
-      // Gerar o HTML da landing page sem a sidebar
-      const landingPageHTML = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${courseData.title} - Página de Vendas</title>
-          <style>
-            ${customCSS}
-            ${allStyles}
-          </style>
-        </head>
-        <body>
-          <div class="min-h-screen bg-gradient-to-br" style="background: linear-gradient(135deg, #0f172a, #1e293b, #334155);">
-            <!-- Background Premium -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;">
-              <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #0f172a, #1e293b, #334155);"></div>
-              <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent, rgba(15, 23, 42, 0.4));"></div>
-            </div>
-
-            <!-- Floating Particles -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;">
-              ${[...Array(15)].map((_, i) => `
-                <div style="
-                  position: absolute;
-                  width: 4px;
-                  height: 4px;
-                  background: hsl(45 95% 68% / 0.2);
-                  border-radius: 50%;
-                  left: ${Math.random() * 100}%;
-                  top: ${Math.random() * 100}%;
-                  animation: float ${4 + Math.random() * 4}s ease-in-out infinite;
-                  animation-delay: ${Math.random() * 6}s;
-                "></div>
-              `).join('')}
-            </div>
-
-            <!-- Checkout Page Content -->
-            <div style="position: relative; z-index: 20; min-height: 100vh;">
-              <div class="max-w-6xl mx-auto px-6 py-12">
-                <div class="grid lg:grid-cols-2 gap-12" style="align-items: start;">
-                  
-                  <!-- Left Column - Course Info -->
-                  <div class="space-y-8">
-                    <!-- Hero Section Premium -->
-                    <div class="premium-card overflow-hidden">
-                      <div style="position: relative; height: 16rem; background: linear-gradient(to right, hsl(42 85% 58%), hsl(45 95% 68%), hsl(48 100% 78%));">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.2);"></div>
-                        <div style="position: relative; z-index: 10; padding: 2rem; height: 100%; display: flex; flex-direction: column; justify-content: center; color: #0f172a;">
-                          <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.25; text-shadow: 0 0 20px hsl(45 95% 68% / 0.5);">
-                            ${landingData.headline}
-                          </h1>
-                          <p style="font-size: 1.25rem; opacity: 0.9; max-width: 42rem;">
-                            ${landingData.subheadline}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Course Image -->
-                    ${courseData.image_url ? `
-                      <div style="position: relative; overflow: hidden; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);">
-                        <img
-                          src="${courseData.image_url}"
-                          alt="${courseData.title}"
-                          style="width: 100%; height: 16rem; object-fit: cover;"
-                        />
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);"></div>
-                        <div style="position: absolute; bottom: 1rem; left: 1rem; color: white;">
-                          <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
-                            <span style="font-weight: 500;">Preview do Curso</span>
-                          </div>
-                        </div>
-                      </div>
-                    ` : ''}
-
-                    <!-- Key Benefits Premium -->
-                    <div class="premium-card">
-                      <div class="mb-6">
-                        <h3 style="display: flex; align-items: center; font-size: 1.25rem; font-weight: 700; color: #f9fafb;">
-                          <svg class="icon" style="margin-right: 0.75rem; color: hsl(45 95% 68%);" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                          </svg>
-                          O que você vai aprender
-                        </h3>
-                      </div>
-                      <ul class="space-y-4">
-                        ${landingData.key_benefits.map(benefit => `
-                          <li style="display: flex; align-items: center; gap: 0.75rem;">
-                            <svg class="icon" style="color: #10b981; flex-shrink: 0;" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span style="color: #d1d5db;">${benefit}</span>
-                          </li>
-                        `).join('')}
-                      </ul>
-                    </div>
-
-                    <!-- Social Proof Premium -->
-                    <div class="premium-card" style="background: linear-gradient(to right, hsl(45 95% 68% / 0.1), hsl(48 100% 78% / 0.1), hsl(45 95% 68% / 0.1)); border-color: hsl(45 95% 68% / 0.2);">
-                      <div style="padding: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                          <div style="display: flex; margin-left: -0.5rem;">
-                            ${[...Array(3)].map((_, i) => `
-                              <div style="
-                                width: 2.5rem;
-                                height: 2.5rem;
-                                border-radius: 50%;
-                                background: linear-gradient(to right, hsl(42 85% 58%), hsl(45 95% 68%), hsl(48 100% 78%));
-                                border: 2px solid #0f172a;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                margin-left: -0.5rem;
-                              ">
-                                <svg class="icon" style="color: #0f172a;" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                                </svg>
-                              </div>
-                            `).join('')}
-                          </div>
-                          <div>
-                            <p style="font-weight: 600; color: #f9fafb;">
-                              ${landingData.social_proof}
-                            </p>
-                            <div style="display: flex; align-items: center;">
-                              ${[...Array(5)].map(() => `
-                                <svg class="icon" style="color: hsl(45 95% 68%); margin-right: 0.125rem;" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                                </svg>
-                              `).join('')}
-                              <span style="margin-left: 0.5rem; font-size: 0.875rem; color: #9ca3af;">4.9/5</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Right Column - Checkout Card Premium -->
-                  <div class="lg:sticky lg:top-8">
-                    <div class="premium-card overflow-hidden" style="box-shadow: 0 0 30px hsl(45 95% 68% / 0.3);">
-                      <div style="background: linear-gradient(to right, hsl(42 85% 58%), hsl(45 95% 68%), hsl(48 100% 78%)); padding: 1.5rem; color: #0f172a;">
-                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 0 20px hsl(45 95% 68% / 0.5);">${courseData.title}</h3>
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                          <div>
-                            <div style="font-size: 1.875rem; font-weight: 700;">
-                              ${courseData.is_paid ? `R$ ${courseData.price}` : 'GRATUITO'}
-                            </div>
-                            ${courseData.is_paid ? `
-                              <div style="font-size: 0.875rem; opacity: 0.9;">
-                                ou 12x de R$ ${(courseData.price / 12).toFixed(2)}
-                              </div>
-                            ` : ''}
-                          </div>
-                          <div style="text-align: right;">
-                            <div style="font-size: 0.875rem; opacity: 0.9;">Acesso</div>
-                            <div style="font-weight: 600;">Vitalício</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style="padding: 1.5rem;" class="space-y-6">
-                        <!-- Course Features Premium -->
-                        <div class="space-y-4">
-                          <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="
-                              width: 2.5rem;
-                              height: 2.5rem;
-                              background: linear-gradient(to right, hsl(45 95% 68% / 0.2), hsl(48 100% 78% / 0.2));
-                              border-radius: 50%;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                              border: 1px solid hsl(45 95% 68% / 0.3);
-                            ">
-                              <svg class="icon" style="color: hsl(45 95% 68%);" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                              </svg>
-                            </div>
-                            <div>
-                              <div style="font-weight: 600; color: #f9fafb;">Conteúdo Completo</div>
-                              <div style="font-size: 0.875rem; color: #9ca3af;">Módulos práticos e teóricos</div>
-                            </div>
-                          </div>
-                          
-                          <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="
-                              width: 2.5rem;
-                              height: 2.5rem;
-                              background: linear-gradient(to right, hsl(45 95% 68% / 0.2), hsl(48 100% 78% / 0.2));
-                              border-radius: 50%;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                              border: 1px solid hsl(45 95% 68% / 0.3);
-                            ">
-                              <svg class="icon" style="color: hsl(45 95% 68%);" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                              </svg>
-                            </div>
-                            <div>
-                              <div style="font-weight: 600; color: #f9fafb;">Acesso Vitalício</div>
-                              <div style="font-size: 0.875rem; color: #9ca3af;">Estude no seu ritmo</div>
-                            </div>
-                          </div>
-                          
-                          <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="
-                              width: 2.5rem;
-                              height: 2.5rem;
-                              background: linear-gradient(to right, hsl(45 95% 68% / 0.2), hsl(48 100% 78% / 0.2));
-                              border-radius: 50%;
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                              border: 1px solid hsl(45 95% 68% / 0.3);
-                            ">
-                              <svg class="icon" style="color: hsl(45 95% 68%);" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                              </svg>
-                            </div>
-                            <div>
-                              <div style="font-weight: 600; color: #f9fafb;">Certificado</div>
-                              <div style="font-size: 0.875rem; color: #9ca3af;">Comprove suas habilidades</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div style="border-top: 1px solid hsl(220 15% 20% / 0.5);"></div>
-
-                        <!-- Bonus Offer Premium -->
-                        <div style="
-                          background: linear-gradient(to right, hsl(45 95% 68% / 0.1), hsl(48 100% 78% / 0.1));
-                          border: 1px solid hsl(45 95% 68% / 0.3);
-                          border-radius: 0.5rem;
-                          padding: 1rem;
-                          backdrop-filter: blur(4px);
-                        ">
-                          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            <svg class="icon" style="color: hsl(45 95% 68%);" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                            <span style="font-weight: 600; color: hsl(45 95% 68%);">Bônus Incluído</span>
-                          </div>
-                          <p style="font-size: 0.875rem; color: #f9fafb;">
-                            ${landingData.bonus_offer}
-                          </p>
-                        </div>
-
-                        <!-- Urgency Message Premium -->
-                        <div style="
-                          background: linear-gradient(to right, hsl(0 85% 60% / 0.1), hsl(0 85% 60% / 0.2));
-                          border: 1px solid hsl(0 85% 60% / 0.3);
-                          border-radius: 0.5rem;
-                          padding: 1rem;
-                          text-align: center;
-                          backdrop-filter: blur(4px);
-                        ">
-                          <p style="color: hsl(0 85% 60%); font-weight: 500;">
-                            ⏰ ${landingData.urgency_message}
-                          </p>
-                        </div>
-
-                        <!-- CTA Button Premium -->
-                        <button class="btn-gold w-full" style="font-size: 1.125rem; padding: 1rem;">
-                          <svg class="icon" style="margin-right: 0.5rem;" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                          </svg>
-                          ${courseData.is_paid ? 'COMPRAR AGORA' : 'COMEÇAR GRATUITAMENTE'}
-                        </button>
-
-                        <!-- Guarantee Premium -->
-                        <div style="text-align: center;">
-                          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.875rem; color: #9ca3af;">
-                            <svg class="icon" style="color: #10b981;" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                            </svg>
-                            <span>${landingData.guarantee}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
-
-      // Criar e baixar o arquivo
-      const blob = new Blob([landingPageHTML], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${courseData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_landing_page.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Sucesso",
-        description: "Página HTML exportada com sucesso!",
-        variant: "default"
-      });
-
-    } catch (error) {
-      console.error('Erro ao exportar HTML:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível exportar a página HTML",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const EditableText = ({ 
-    value, 
-    field, 
-    multiline = false, 
-    className = "",
-    placeholder = ""
-  }: { 
-    value: string;
-    field: keyof LandingPageData;
-    multiline?: boolean;
-    className?: string;
-    placeholder?: string;
-  }) => {
-    if (!isEditing) {
-      return <span className={className}>{value}</span>;
-    }
-
-    if (multiline) {
-      return (
-        <Textarea
-          value={value}
-          onChange={(e) => updateLandingData(field, e.target.value)}
-          className={className}
-          placeholder={placeholder}
-        />
-      );
-    }
-
-    return (
-      <Input
-        value={value}
-        onChange={(e) => updateLandingData(field, e.target.value)}
-        className={className}
-        placeholder={placeholder}
-      />
-    );
-  };
-
-  const EditableBenefits = () => {
-    if (!isEditing) {
-      return (
-        <ul className="space-y-3">
-          {landingData.key_benefits.map((benefit, index) => (
-            <li key={index} className="flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-              <span className="text-gray-700">{benefit}</span>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        {landingData.key_benefits.map((benefit, index) => (
-          <div key={index} className="flex items-center space-x-2">
-            <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-            <Input
-              value={benefit}
-              onChange={(e) => {
-                const newBenefits = [...landingData.key_benefits];
-                newBenefits[index] = e.target.value;
-                updateLandingData('key_benefits', newBenefits);
-              }}
-              className="flex-1"
-            />
-          </div>
-        ))}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => updateLandingData('key_benefits', [...landingData.key_benefits, 'Novo benefício'])}
-        >
-          + Adicionar Benefício
-        </Button>
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
-      <div className="flex">
-        <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
+        {/* Background Premium */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-background-secondary to-background"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40"></div>
+        </div>
+
+        {/* Floating Particles */}
+        <div className="absolute inset-0 z-10">
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-gold/20 rounded-full float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 6}s`,
+                animationDuration: `${4 + Math.random() * 4}s`
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="flex relative z-20">
+          <MentorSidebar />
+          <div className="flex-1 transition-all duration-300 flex items-center justify-center">
+            {/* Loading Premium Dourado */}
+            <div className="flex flex-col items-center space-y-6">
+              {/* Círculo de Loading Dourado */}
+              <div className="relative">
+                {/* Círculo externo com glow */}
+                <div className="w-24 h-24 rounded-full border-4 border-gold/20 animate-pulse"></div>
+                
+                {/* Círculo de loading principal */}
+                <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-transparent border-t-gold border-r-gold animate-spin"></div>
+                
+                {/* Círculo interno com gradiente */}
+                <div className="absolute inset-2 w-20 h-20 rounded-full bg-gradient-to-br from-gold/20 via-gold-light/10 to-transparent animate-pulse"></div>
+                
+                {/* Ponto central */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-gold rounded-full animate-pulse shadow-lg shadow-gold/50"></div>
+                </div>
+                
+                {/* Efeito de brilho */}
+                <div className="absolute -inset-2 w-28 h-28 rounded-full bg-gradient-to-r from-gold/10 via-gold-light/20 to-gold/10 blur-xl animate-pulse"></div>
+              </div>
+              
+              {/* Texto de loading */}
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-bold text-gold animate-pulse">
+                  Carregando Landing Page
+                </h3>
+                <p className="text-sm text-muted-foreground animate-pulse">
+                  Preparando sua página de checkout premium...
+                </p>
+              </div>
+              
+              {/* Pontos de loading */}
+              <div className="flex space-x-2">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-2 h-2 bg-gold rounded-full animate-bounce"
+                    style={{
+                      animationDelay: `${i * 0.2}s`,
+                      animationDuration: '1s'
+                    }}
+                  ></div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -796,158 +510,417 @@ const CourseLandingPage: React.FC = () => {
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
-                onClick={() => window.open(`/course-landing/${courseId}`, '_blank')}
+                onClick={() => window.open(`/curso/${courseId}`, '_blank')}
                 className="border-border/50 hover:border-gold/50 hover:text-gold transition-all group"
               >
                 <Eye className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                 Visualizar
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={exportToHTML}
-                className="border-border/50 hover:border-gold/50 hover:text-gold transition-all group"
-              >
-                <Download className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Exportar HTML
-              </Button>
-              
-              {isEditing ? (
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsEditing(false)}
-                    className="border-border/50 hover:border-destructive/50 hover:text-destructive transition-all"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="btn-gold text-sm disabled:opacity-50"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {isSaving ? 'Salvando...' : 'Salvar'}
-                  </Button>
-                </div>
-              ) : (
-                <Button 
-                  onClick={() => setIsEditing(true)}
-                  className="btn-gold text-sm"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Editar
-                </Button>
-              )}
             </div>
           </div>
 
           {/* Checkout Page Content */}
           <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
-            <div className="max-w-6xl mx-auto px-6 py-12">
-              <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="max-w-7xl mx-auto px-6 py-12 relative">
+              {/* Video Background for Content Area */}
+              <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                <video 
+                  src="https://cdn.pixabay.com/video/2019/10/09/27669-365224683_large.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+                {/* Dark overlay for better readability */}
+                <div className="absolute inset-0 bg-black/60"></div>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-12 items-start relative z-10">
                 
                 {/* Left Column - Course Info */}
                 <div className="space-y-8">
                   {/* Hero Section Premium */}
-                  <div className="premium-card overflow-hidden">
-                    <div className="relative h-64 bg-gradient-to-r from-gold-dark via-gold to-gold-light">
-                      <div className="absolute inset-0 bg-background/20"></div>
-                      <div className="relative z-10 p-8 h-full flex flex-col justify-center text-background">
-                        {isEditing && (
-                          <div className="badge-premium mb-4 w-fit">
-                            Editando: Título Principal
-                          </div>
-                        )}
-                        <h1 className="text-4xl font-bold mb-4 leading-tight text-shadow-gold">
-                          <EditableText
-                            value={landingData.headline}
-                            field="headline"
-                            className="text-4xl font-bold text-background leading-tight"
-                            placeholder="Título principal do curso"
-                          />
+                  <div className={`relative overflow-hidden rounded-3xl backdrop-blur-xl bg-white/5 border border-white/20 shadow-2xl hover:shadow-gold/20 transition-all duration-500 group ${isDescriptionExpanded ? 'h-auto' : 'h-64'}`}>
+                    {/* Subtle Glow Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-gold/5 opacity-50"></div>
+                    {/* Shimmer Effect on Hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                    <div className="relative z-10 p-8 flex flex-col justify-center text-white">
+                        <h1 className="text-2xl md:text-4xl font-black mb-4 leading-tight">
+                          <span className="gradient-text text-shadow-gold">
+                            {courseData.title}
+                          </span>
                         </h1>
-                        <p className="text-xl opacity-90 max-w-2xl">
-                          <EditableText
-                            value={landingData.subheadline}
-                            field="subheadline"
-                            className="text-xl text-background/90"
-                            placeholder="Subtítulo explicativo"
+                        <div className="space-y-4">
+                          <div 
+                            className="text-lg opacity-90 max-w-2xl drop-shadow-md prose prose-invert prose-lg"
+                            dangerouslySetInnerHTML={{
+                              __html: isDescriptionExpanded 
+                                ? courseData.description 
+                                : truncateDescription(courseData.description, 120)
+                            }}
                           />
-                        </p>
+                          <button
+                            onClick={toggleDescription}
+                            className="flex items-center space-x-2 text-gold hover:text-gold-light transition-colors duration-300 group/btn"
+                          >
+                            <span className="text-sm font-medium">
+                              {isDescriptionExpanded ? 'Ver menos' : 'Ver mais'}
+                            </span>
+                            <ChevronDown 
+                              className={`w-4 h-4 transition-transform duration-300 ${
+                                isDescriptionExpanded ? 'rotate-180' : ''
+                              } group-hover/btn:scale-110`}
+                            />
+                          </button>
+                        </div>
                       </div>
-                    </div>
                   </div>
 
                   {/* Course Image */}
                   {courseData.image_url && (
-                    <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+                    <div className="relative overflow-hidden rounded-3xl shadow-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:border-gold/30 transition-all duration-500 group">
+                      {/* Glowing Border Effect */}
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-gold/20 via-transparent to-gold/20 p-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="h-full w-full rounded-3xl bg-black/20"></div>
+                      </div>
+                      
                       <img
                         src={courseData.image_url}
                         alt={courseData.title}
-                        className="w-full h-64 object-cover"
+                        className="w-full h-64 object-cover rounded-3xl"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      
+                      {/* Enhanced Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-3xl"></div>
+                      
+                      {/* Shimmer Effect on Hover */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 rounded-3xl"></div>
+                      
+                      {/* Enhanced Preview Button */}
                       <div className="absolute bottom-4 left-4 text-white">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-white/20 hover:bg-gold/20 hover:border-gold/40 transition-all duration-300">
                           <Play className="w-5 h-5" />
                           <span className="font-medium">Preview do Curso</span>
                         </div>
                       </div>
+                      
+                      {/* Floating Glow Effect */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10"></div>
                     </div>
                   )}
 
                   {/* Key Benefits Premium */}
-                  <div className="premium-card">
+                  <div className="premium-card backdrop-blur-xl bg-white/5 border border-white/20 relative">
+                    {!isEditingBenefits && (
+                      <Button
+                        onClick={startEditingBenefits}
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-3 right-3 z-10 w-8 h-8 p-0 bg-gold/20 border border-gold/30 text-gold hover:bg-gold/30 hover:text-gold-light rounded-full"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </Button>
+                    )}
                     <div className="mb-6">
-                      <h3 className="flex items-center text-xl font-bold text-foreground">
-                        <Zap className="w-6 h-6 mr-3 text-gold" />
+                      <h3 className="flex items-center text-xl font-bold text-white drop-shadow-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-gold to-gold-light rounded-full flex items-center justify-center mr-3 shadow-lg">
+                          <Zap className="w-5 h-5 text-black" />
+                        </div>
                         O que você vai aprender
                       </h3>
                     </div>
                     <div>
-                      {isEditing && (
-                        <div className="badge-premium mb-4">
-                          Editando: Benefícios
+                      {isEditingBenefits ? (
+                        <div className="space-y-4">
+                          {tempBenefits.map((benefit, index) => (
+                            <div key={index} className="flex items-center space-x-3">
+                              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                              <Input
+                                value={benefit}
+                                onChange={(e) => updateBenefit(index, e.target.value)}
+                                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                                placeholder="Digite o benefício..."
+                              />
+                              <Button
+                                onClick={() => removeBenefit(index)}
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          <div className="flex items-center space-x-3">
+                            <Button
+                              onClick={addBenefit}
+                              variant="outline"
+                              size="sm"
+                              className="bg-emerald-500/20 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30"
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              Adicionar Benefício
+                            </Button>
+                          </div>
+                          <div className="flex items-center space-x-3 pt-4 border-t border-white/10">
+                            <Button
+                              onClick={() => saveChanges('benefits')}
+                              disabled={isSaving}
+                              className="bg-gold hover:bg-gold-light text-black font-medium"
+                            >
+                              <Save className="w-4 h-4 mr-2" />
+                              {isSaving ? 'Salvando...' : 'Salvar'}
+                            </Button>
+                            <Button
+                              onClick={cancelEditingBenefits}
+                              variant="outline"
+                              className="border-white/20 text-white hover:bg-white/10"
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Cancelar
+                            </Button>
+                          </div>
                         </div>
+                      ) : (
+                        <ul className="space-y-3">
+                          {landingData.key_benefits.map((benefit, index) => (
+                            <li key={index} className="flex items-center space-x-3">
+                              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                              <span className="text-white">{benefit}</span>
+                            </li>
+                          ))}
+                        </ul>
                       )}
-                      <EditableBenefits />
                     </div>
                   </div>
 
                   {/* Social Proof Premium */}
-                  <div className="premium-card bg-gradient-to-r from-gold/10 via-gold-light/10 to-gold/10 border-gold/20">
-                    <div className="p-6">
-                      {isEditing && (
-                        <div className="badge-premium mb-4">
-                          Editando: Prova Social
+                  <div className="premium-card backdrop-blur-xl bg-white/5 border border-white/20 relative">
+                    {!isEditingSocialProof && (
+                      <Button
+                        onClick={startEditingSocialProof}
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-3 right-3 z-10 w-8 h-8 p-0 bg-gold/20 border border-gold/30 text-gold hover:bg-gold/30 hover:text-gold-light rounded-full"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </Button>
+                    )}
+                    <div className="mb-6">
+                      <h3 className="flex items-center text-xl font-bold text-white drop-shadow-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-gold to-gold-light rounded-full flex items-center justify-center mr-3 shadow-lg">
+                          <User className="w-5 h-5 text-black" />
                         </div>
-                      )}
-                      <div className="flex items-center space-x-3">
-                        <div className="flex -space-x-2">
-                          {[...Array(3)].map((_, i) => (
-                            <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-dark via-gold to-gold-light border-2 border-background flex items-center justify-center">
-                              <Users className="w-5 h-5 text-background" />
-                            </div>
-                          ))}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">
-                            <EditableText
-                              value={landingData.social_proof}
-                              field="social_proof"
-                              className="font-semibold text-foreground"
-                              placeholder="Prova social (ex: +1000 alunos)"
+                        Mais de 1.000 alunos já transformaram suas carreiras
+                      </h3>
+                    </div>
+                    <div>
+                      {isEditingSocialProof ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-lg font-semibold text-white">Editando Social Proof</h4>
+                          </div>
+                          
+                          {/* Campo para editar o texto */}
+                          <div>
+                            <label className="block text-sm font-medium text-white/80 mb-2">
+                              Texto do Social Proof
+                            </label>
+                            <Input
+                              value={tempSocialProof}
+                              onChange={(e) => setTempSocialProof(e.target.value)}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              placeholder="Ex: Mais de 1.000 alunos já transformaram suas carreiras"
                             />
-                          </p>
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 text-gold fill-current" />
-                            ))}
-                            <span className="ml-2 text-sm text-muted-foreground">4.9/5</span>
+                          </div>
+
+                          {/* Campo para editar a nota */}
+                          <div>
+                            <label className="block text-sm font-medium text-white/80 mb-2">
+                              Nota (de 1 a 5)
+                            </label>
+                            <Input
+                              type="number"
+                              min="1"
+                              max="5"
+                              step="0.1"
+                              value={tempSocialRating}
+                              onChange={(e) => setTempSocialRating(e.target.value)}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            />
+                          </div>
+
+                          {/* Campos para editar os links das imagens */}
+                          <div>
+                            <label className="block text-sm font-medium text-white/80 mb-2">
+                              Links das Imagens dos Avatares
+                            </label>
+                            <div className="space-y-2">
+                              {tempAvatarUrls.map((url, index) => (
+                                <div key={index} className="flex items-center space-x-3">
+                                  <div className="w-8 h-8 rounded-full border border-white/20 overflow-hidden flex-shrink-0">
+                                    <img 
+                                      src={url} 
+                                      alt={`Avatar ${index + 1}`}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/32x32/666/fff?text=?";
+                                      }}
+                                    />
+                                  </div>
+                                  <Input
+                                    value={url}
+                                    onChange={(e) => {
+                                      const newUrls = [...tempAvatarUrls];
+                                      newUrls[index] = e.target.value;
+                                      setTempAvatarUrls(newUrls);
+                                    }}
+                                    className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                                    placeholder={`URL da imagem ${index + 1}`}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-3 pt-4 border-t border-white/10">
+                            <Button
+                              onClick={() => saveChanges('social_proof')}
+                              disabled={isSaving}
+                              className="bg-gold hover:bg-gold-light text-black font-medium"
+                            >
+                              <Save className="w-4 h-4 mr-2" />
+                              {isSaving ? 'Salvando...' : 'Salvar'}
+                            </Button>
+                            <Button
+                              onClick={cancelEditingSocialProof}
+                              variant="outline"
+                              className="border-white/20 text-white hover:bg-white/10"
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Cancelar
+                            </Button>
                           </div>
                         </div>
+                      ) : (
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-3">
+                              <div className="flex -space-x-2">
+                                {tempAvatarUrls.map((avatarUrl, i) => (
+                                  <div key={i} className="w-12 h-12 rounded-full border-2 border-white/20 shadow-lg overflow-hidden" style={{zIndex: 3-i}}>
+                                    <img 
+                                      src={avatarUrl} 
+                                      alt={`Avatar ${i + 1}`}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/48x48/666/fff?text=?";
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-white drop-shadow-md">
+                                  {landingData.social_proof}
+                                </p>
+                                <div className="flex items-center">
+                                   {[...Array(5)].map((_, i) => (
+                                     <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(tempSocialRating)) ? 'text-gold fill-current' : 'text-gray-400'} drop-shadow-sm`} />
+                                   ))}
+                                   <span className="ml-2 text-sm text-white/80 font-medium">{tempSocialRating}/5</span>
+                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Course Content Menu */}
+                  <div className="premium-card backdrop-blur-xl bg-white/5 border border-white/20">
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between">
+                        <h3 className="flex items-center text-xl font-bold text-white drop-shadow-lg">
+                          <div className="w-10 h-10 bg-gradient-to-r from-gold to-gold-light rounded-full flex items-center justify-center mr-3 shadow-lg">
+                            <BookOpen className="w-5 h-5 text-black" />
+                          </div>
+                          Conteúdo do Curso
+                        </h3>
+                        
+                        {/* Content Statistics */}
+                        <div className="flex items-center space-x-3">
+                          {(() => {
+                            const stats = getContentStats();
+                            return (
+                              <>
+                                {stats.videos > 0 && (
+                                  <div className="flex items-center space-x-1 bg-white/10 rounded-full px-2 py-1">
+                                    <Play className="w-3 h-3 text-gold" />
+                                    <span className="text-xs text-white font-medium">{stats.videos}</span>
+                                  </div>
+                                )}
+                                {stats.texts > 0 && (
+                                  <div className="flex items-center space-x-1 bg-white/10 rounded-full px-2 py-1">
+                                    <FileText className="w-3 h-3 text-gold" />
+                                    <span className="text-xs text-white font-medium">{stats.texts}</span>
+                                  </div>
+                                )}
+                                {stats.pdfs > 0 && (
+                                  <div className="flex items-center space-x-1 bg-white/10 rounded-full px-2 py-1">
+                                    <FileIcon className="w-3 h-3 text-gold" />
+                                    <span className="text-xs text-white font-medium">{stats.pdfs}</span>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
                       </div>
+                    </div>
+                    <div className="space-y-3">
+                      {realCourseData?.modulos.map((module, moduleIndex) => (
+                        <div key={module.id} className="border border-white/10 rounded-lg overflow-hidden">
+                          <button
+                            onClick={() => toggleModule(moduleIndex)}
+                            className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors duration-200"
+                          >
+                            <span className="font-medium text-white">{module.title}</span>
+                            {expandedModules.has(moduleIndex) ? (
+                              <ChevronDown className="w-5 h-5 text-gold" />
+                            ) : (
+                              <ChevronRight className="w-5 h-5 text-gold" />
+                            )}
+                          </button>
+                          {expandedModules.has(moduleIndex) && (
+                            <div className="px-4 pb-4 space-y-2">
+                              {module.conteudos.map((conteudo, conteudoIndex) => (
+                                <div key={conteudo.id} className="flex items-center space-x-3 py-2">
+                                  <div className="flex items-center space-x-2">
+                                    {conteudo.content_type === 'video_externo' && (
+                                      <Play className="w-3 h-3 text-gold flex-shrink-0" />
+                                    )}
+                                    {conteudo.content_type === 'texto_rico' && (
+                                      <FileText className="w-3 h-3 text-gold flex-shrink-0" />
+                                    )}
+                                    {conteudo.content_type === 'pdf' && (
+                                      <FileIcon className="w-3 h-3 text-gold flex-shrink-0" />
+                                    )}
+                                    <div className="w-2 h-2 bg-gold rounded-full flex-shrink-0"></div>
+                                  </div>
+                                  <span className="text-white/80 text-sm">{conteudo.title}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )) || (
+                        <div className="text-center py-8">
+                          <p className="text-white/60">Nenhum módulo encontrado</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -955,122 +928,256 @@ const CourseLandingPage: React.FC = () => {
                 {/* Right Column - Checkout Card Premium */}
                 <div className="lg:sticky lg:top-8">
                   <div className="premium-card overflow-hidden shadow-glow">
-                    <div className="bg-gradient-to-r from-gold-dark via-gold to-gold-light p-6 text-background">
-                      <h3 className="text-2xl font-bold mb-2 text-shadow-gold">{courseData.title}</h3>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-3xl font-bold">
-                            {courseData.is_paid ? `R$ ${courseData.price}` : 'GRATUITO'}
-                          </div>
-                          {courseData.is_paid && (
-                            <div className="text-sm opacity-90">
-                              ou 12x de R$ {(courseData.price / 12).toFixed(2)}
-                            </div>
-                          )}
+                    {/* Enhanced Course Title Banner */}
+                    <div className="relative overflow-hidden rounded-t-3xl">
+                      {/* Animated Background Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-gold-dark via-gold to-gold-light animate-gradient-x"></div>
+                      
+                      {/* Geometric Pattern Overlay */}
+                      <div className="absolute inset-0 opacity-20">
+                        <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
+                        <div className="absolute bottom-0 right-0 w-24 h-24 bg-white/10 rounded-full translate-x-12 translate-y-12"></div>
+                        <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-white/5 rounded-full -translate-x-8 -translate-y-8"></div>
+                      </div>
+                      
+                      {/* Shimmer Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] animate-shimmer"></div>
+                      
+                      {/* Content */}
+                      <div className="relative p-8 z-50">
+                        <div className="flex items-center mb-4 relative z-50">
+                          <div className="w-3 h-3 bg-white/80 rounded-full mr-2 animate-pulse"></div>
+                          <span className="text-sm font-medium uppercase tracking-wider opacity-90 relative z-50 force-dark-text">Curso Premium</span>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm opacity-90">Acesso</div>
-                          <div className="font-semibold">Vitalício</div>
+                        
+                        <h3 className="text-3xl font-black mb-4 leading-tight text-shadow-lg drop-shadow-2xl relative z-50 force-dark-text">
+                          {courseData.title}
+                        </h3>
+                        
+                        <div className="flex items-center justify-between relative z-50">
+                          <div>
+                            <div className="text-4xl font-black drop-shadow-lg relative z-50 force-dark-text">
+                              {courseData.is_paid ? `R$ ${courseData.price}` : 'GRATUITO'}
+                            </div>
+                            {courseData.is_paid && (
+                              <div className="text-sm opacity-90 font-medium relative z-50 force-dark-text">
+                                ou 12x de R$ {(courseData.price / 12).toFixed(2)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm opacity-90 font-medium relative z-50 force-dark-text">Acesso</div>
+                            <div className="font-black text-lg relative z-50 force-dark-text">Vitalício</div>
+                          </div>
+                        </div>
+                        
+                        {/* Premium Badge */}
+                        <div className="absolute top-4 right-4 z-50">
+                          <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1">
+                            <span className="text-xs font-bold uppercase tracking-wider relative z-50 force-dark-text">Premium</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-6 space-y-6">
+                    <div className="p-6 space-y-6 border border-white/10 rounded-b-3xl">
                       {/* Course Features Premium */}
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
-                            <BookOpen className="w-5 h-5 text-gold" />
+                      <div className="space-y-4 relative">
+                        {!isEditingFeatures && (
+                          <Button
+                            onClick={startEditingFeatures}
+                            variant="ghost"
+                            size="sm"
+                            className="absolute top-0 right-0 z-10 w-8 h-8 p-0 bg-gold/20 border border-gold/30 text-gold hover:bg-gold/30 hover:text-gold-light rounded-full"
+                          >
+                            <Edit3 className="w-3 h-3" />
+                          </Button>
+                        )}
+
+                        {isEditingFeatures ? (
+                          <div className="space-y-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h4 className="text-lg font-semibold text-foreground">Editar Recursos</h4>
+                              <div className="flex space-x-2">
+                                <Button
+                                  onClick={() => saveChanges('features')}
+                                  disabled={isSaving}
+                                  size="sm"
+                                  className="bg-gold hover:bg-gold-light text-black"
+                                >
+                                  {isSaving ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-black mr-2"></div>
+                                      Salvando...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Save className="w-3 h-3 mr-2" />
+                                      Salvar
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  onClick={cancelEditingFeatures}
+                                  variant="outline"
+                                  size="sm"
+                                  className="border-border/50 hover:border-red-500/50 hover:text-red-400"
+                                >
+                                  <X className="w-3 h-3 mr-2" />
+                                  Cancelar
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Edição Conteúdo Completo */}
+                            <div className="space-y-3 p-4 border border-white/10 rounded-lg">
+                              <div className="flex items-center space-x-3 mb-3">
+                                <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                  <BookOpen className="w-5 h-5 text-gold" />
+                                </div>
+                                <span className="text-sm text-muted-foreground">Recurso 1</span>
+                              </div>
+                              <Input
+                                value={tempFeatures.content_complete.title}
+                                onChange={(e) => updateFeature('content_complete', 'title', e.target.value)}
+                                placeholder="Título do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                              <Input
+                                value={tempFeatures.content_complete.subtitle}
+                                onChange={(e) => updateFeature('content_complete', 'subtitle', e.target.value)}
+                                placeholder="Subtítulo do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                            </div>
+
+                            {/* Edição Acesso Vitalício */}
+                            <div className="space-y-3 p-4 border border-white/10 rounded-lg">
+                              <div className="flex items-center space-x-3 mb-3">
+                                <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                  <Clock className="w-5 h-5 text-gold" />
+                                </div>
+                                <span className="text-sm text-muted-foreground">Recurso 2</span>
+                              </div>
+                              <Input
+                                value={tempFeatures.lifetime_access.title}
+                                onChange={(e) => updateFeature('lifetime_access', 'title', e.target.value)}
+                                placeholder="Título do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                              <Input
+                                value={tempFeatures.lifetime_access.subtitle}
+                                onChange={(e) => updateFeature('lifetime_access', 'subtitle', e.target.value)}
+                                placeholder="Subtítulo do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                            </div>
+
+                            {/* Edição Certificado */}
+                            <div className="space-y-3 p-4 border border-white/10 rounded-lg">
+                              <div className="flex items-center space-x-3 mb-3">
+                                <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                  <Award className="w-5 h-5 text-gold" />
+                                </div>
+                                <span className="text-sm text-muted-foreground">Recurso 3</span>
+                              </div>
+                              <Input
+                                value={tempFeatures.certificate.title}
+                                onChange={(e) => updateFeature('certificate', 'title', e.target.value)}
+                                placeholder="Título do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                              <Input
+                                value={tempFeatures.certificate.subtitle}
+                                onChange={(e) => updateFeature('certificate', 'subtitle', e.target.value)}
+                                placeholder="Subtítulo do recurso..."
+                                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-semibold text-foreground">Conteúdo Completo</div>
-                            <div className="text-sm text-muted-foreground">Módulos práticos e teóricos</div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
-                            <Clock className="w-5 h-5 text-gold" />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-foreground">Acesso Vitalício</div>
-                            <div className="text-sm text-muted-foreground">Estude no seu ritmo</div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
-                            <Award className="w-5 h-5 text-gold" />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-foreground">Certificado</div>
-                            <div className="text-sm text-muted-foreground">Comprove suas habilidades</div>
-                          </div>
-                        </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                <BookOpen className="w-5 h-5 text-gold" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-foreground">
+                                  {landingData.course_features?.content_complete.title || "Conteúdo Completo"}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {landingData.course_features?.content_complete.subtitle || "Módulos práticos e teóricos"}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                <Clock className="w-5 h-5 text-gold" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-foreground">
+                                  {landingData.course_features?.lifetime_access.title || "Acesso Vitalício"}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {landingData.course_features?.lifetime_access.subtitle || "Estude no seu ritmo"}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-r from-gold/20 to-gold-light/20 rounded-full flex items-center justify-center border border-gold/30">
+                                <Award className="w-5 h-5 text-gold" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-foreground">
+                                  {landingData.course_features?.certificate.title || "Certificado"}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {landingData.course_features?.certificate.subtitle || "Comprove suas habilidades"}
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       <div className="border-t border-border/50"></div>
 
                       {/* Bonus Offer Premium */}
                       <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 border border-gold/30 rounded-lg p-4 backdrop-blur-sm">
-                        {isEditing && (
-                          <div className="badge-premium mb-2">
-                            Editando: Bônus
-                          </div>
-                        )}
                         <div className="flex items-center space-x-2 mb-2">
                           <Zap className="w-5 h-5 text-gold" />
                           <span className="font-semibold text-gold">Bônus Incluído</span>
                         </div>
                         <p className="text-sm text-foreground">
-                          <EditableText
-                            value={landingData.bonus_offer}
-                            field="bonus_offer"
-                            className="text-sm text-foreground"
-                            placeholder="Descrição do bônus oferecido"
-                          />
+                          {landingData.bonus_offer}
                         </p>
                       </div>
 
-                      {/* Urgency Message Premium */}
-                      <div className="bg-gradient-to-r from-destructive/10 to-destructive/20 border border-destructive/30 rounded-lg p-4 text-center backdrop-blur-sm">
-                        {isEditing && (
-                          <div className="badge-premium mb-2">
-                            Editando: Urgência
-                          </div>
-                        )}
-                        <p className="text-destructive font-medium">
-                          ⏰ <EditableText
-                            value={landingData.urgency_message}
-                            field="urgency_message"
-                            className="text-destructive font-medium"
-                            placeholder="Mensagem de urgência"
-                          />
+                      {/* Contact Message Premium */}
+                      <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 border border-gold/30 rounded-lg p-4 backdrop-blur-sm">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <User className="w-5 h-5 text-gold" />
+                          <span className="font-semibold text-gold">{landingData.urgency_message}</span>
+                        </div>
+                        <p className="text-sm text-foreground">
+                          Tire suas dúvidas diretamente com o mentor e acelere seu aprendizado
                         </p>
                       </div>
 
                       {/* CTA Button Premium */}
-                      <button className="btn-gold w-full text-lg py-4">
-                        <Zap className="w-5 h-5 mr-2" />
-                        {courseData.is_paid ? 'COMPRAR AGORA' : 'COMEÇAR GRATUITAMENTE'}
+                      <button className="btn-gold-static w-full text-lg py-4 flex items-center justify-center gap-2 hover:shadow-glow transition-shadow duration-300">
+                        <Rocket className="w-5 h-5 animate-slow-pulse" />
+                        <span>{courseData.is_paid ? 'Adquirir Agora' : 'Começar Gratuitamente'}</span>
                       </button>
 
                       {/* Guarantee Premium */}
                       <div className="text-center">
-                        {isEditing && (
-                          <div className="badge-premium mb-2">
-                            Editando: Garantia
-                          </div>
-                        )}
                         <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
                           <Shield className="w-4 h-4 text-success" />
                           <span>
-                            <EditableText
-                              value={landingData.guarantee}
-                              field="guarantee"
-                              className="text-sm text-muted-foreground"
-                              placeholder="Texto da garantia"
-                            />
+                            {landingData.guarantee}
                           </span>
                         </div>
                       </div>

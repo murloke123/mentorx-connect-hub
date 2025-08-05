@@ -2,28 +2,26 @@ import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import {
-    AlertTriangle,
-    ArrowLeft,
-    Award,
-    BookOpen,
-    Calendar,
-    CheckCircle,
-    Clock,
-    DollarSign,
-    Mail,
-    MessageSquare,
-    Phone,
-    PlayCircle,
-    Search,
-    TrendingUp,
-    Users
+  AlertTriangle,
+  Award,
+  BookOpen,
+  Calendar,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Mail,
+  MessageSquare,
+  Phone,
+  PlayCircle,
+  Search,
+  TrendingUp,
+  Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -367,145 +365,126 @@ const MentorCursoInscricoesPage = () => {
   return (
     <div className="flex">
       <MentorSidebar />
-      <div className="flex-1 p-6">
+      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black relative">
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/mentor/meus-cursos')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Progresso dos Alunos</h1>
-              <p className="text-muted-foreground">{courseInfo?.title}</p>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-gold">
+            Progresso dos Alunos
+          </h1>
+          <p className="text-gray-300 text-lg">
+            {courseInfo?.title}
+          </p>
+        </div>
+
+        {/* Course Info Card */}
+        {courseInfo && (
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-gold/20 mb-6">
+              <div className="flex items-start gap-4">
+                {courseInfo.image_url ? (
+                  <img 
+                    src={courseInfo.image_url} 
+                    alt={courseInfo.title}
+                    className="w-20 h-20 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-gold/20 to-gold/40 flex items-center justify-center">
+                    <BookOpen className="w-8 h-8 text-gold" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold mb-2 text-white">{courseInfo.title}</h2>
+                  <p className="text-gray-300 mb-3 line-clamp-2">{courseInfo.description}</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <BookOpen className="w-4 h-4" />
+                      {courseInfo.total_modules} módulos
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <PlayCircle className="w-4 h-4" />
+                      {courseInfo.total_contents} conteúdos
+                    </span>
+                    <span className="flex items-center gap-1 text-gold">
+                      <DollarSign className="w-4 h-4" />
+                      R$ {courseInfo.price.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+        )}
 
-          {/* Course Info Card */}
-          {courseInfo && (
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  {courseInfo.image_url ? (
-                    <img 
-                      src={courseInfo.image_url} 
-                      alt={courseInfo.title}
-                      className="w-20 h-20 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-white" />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h2 className="text-xl font-semibold mb-2">{courseInfo.title}</h2>
-                    <p className="text-muted-foreground mb-3 line-clamp-2">{courseInfo.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <BookOpen className="w-4 h-4" />
-                        {courseInfo.total_modules} módulos
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <PlayCircle className="w-4 h-4" />
-                        {courseInfo.total_contents} conteúdos
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        R$ {courseInfo.price.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gold/20 rounded-lg">
+                  <Users className="w-5 h-5 text-gold" />
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Alunos</p>
-                    <p className="text-2xl font-bold">{stats.totalStudents}</p>
-                  </div>
+                <div>
+                  <p className="text-sm text-gray-400">Total de Alunos</p>
+                  <p className="text-2xl font-bold text-white">{stats.totalStudents}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Alunos Ativos</p>
-                    <p className="text-2xl font-bold">{stats.activeStudents}</p>
-                  </div>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Award className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Concluíram</p>
-                    <p className="text-2xl font-bold">{stats.completedStudents}</p>
-                  </div>
+                <div>
+                  <p className="text-sm text-gray-400">Alunos Ativos</p>
+                  <p className="text-2xl font-bold text-white">{stats.activeStudents}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Progresso Médio</p>
-                    <p className="text-2xl font-bold">{stats.averageProgress.toFixed(0)}%</p>
-                  </div>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <Award className="w-5 h-5 text-purple-400" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <DollarSign className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Receita Total</p>
-                    <p className="text-2xl font-bold">R$ {stats.totalRevenue.toFixed(2)}</p>
-                  </div>
+                <div>
+                  <p className="text-sm text-gray-400">Concluíram</p>
+                  <p className="text-2xl font-bold text-white">{stats.completedStudents}</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
 
-          {/* Filters and Search */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-orange-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Progresso Médio</p>
+                  <p className="text-2xl font-bold text-white">{stats.averageProgress.toFixed(0)}%</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-4 backdrop-blur-xl shadow-2xl shadow-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gold/20 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-gold" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Receita Total</p>
+                  <p className="text-2xl font-bold text-gold">R$ {stats.totalRevenue.toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Buscar por nome ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-slate-800/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
               />
             </div>
             <div className="flex gap-2">
@@ -513,6 +492,7 @@ const MentorCursoInscricoesPage = () => {
                 variant={sortBy === 'progress' ? 'default' : 'outline'}
                 onClick={() => setSortBy('progress')}
                 size="sm"
+                className={sortBy === 'progress' ? 'bg-gold text-slate-900 hover:bg-gold/90' : 'border-gold/30 text-gray-300 hover:bg-gold/10 hover:text-gold'}
               >
                 Progresso
               </Button>
@@ -520,6 +500,7 @@ const MentorCursoInscricoesPage = () => {
                 variant={sortBy === 'name' ? 'default' : 'outline'}
                 onClick={() => setSortBy('name')}
                 size="sm"
+                className={sortBy === 'name' ? 'bg-gold text-slate-900 hover:bg-gold/90' : 'border-gold/30 text-gray-300 hover:bg-gold/10 hover:text-gold'}
               >
                 Nome
               </Button>
@@ -527,6 +508,7 @@ const MentorCursoInscricoesPage = () => {
                 variant={sortBy === 'enrolled_date' ? 'default' : 'outline'}
                 onClick={() => setSortBy('enrolled_date')}
                 size="sm"
+                className={sortBy === 'enrolled_date' ? 'bg-gold text-slate-900 hover:bg-gold/90' : 'border-gold/30 text-gray-300 hover:bg-gold/10 hover:text-gold'}
               >
                 Data de Inscrição
               </Button>
@@ -534,24 +516,22 @@ const MentorCursoInscricoesPage = () => {
                 variant={sortBy === 'last_access' ? 'default' : 'outline'}
                 onClick={() => setSortBy('last_access')}
                 size="sm"
+                className={sortBy === 'last_access' ? 'bg-gold text-slate-900 hover:bg-gold/90' : 'border-gold/30 text-gray-300 hover:bg-gold/10 hover:text-gold'}
               >
                 Último Acesso
               </Button>
             </div>
-          </div>
         </div>
 
         {/* Students Progress List */}
         {sortedStudents.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Nenhum aluno encontrado</h3>
-              <p className="text-muted-foreground">
-                {searchTerm ? 'Nenhum aluno encontrado com os critérios de busca.' : 'Este curso ainda não possui alunos inscritos.'}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-8 backdrop-blur-xl shadow-2xl shadow-gold/20 text-center">
+            <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2 text-white">Nenhum aluno encontrado</h3>
+            <p className="text-gray-300">
+              {searchTerm ? 'Nenhum aluno encontrado com os critérios de busca.' : 'Este curso ainda não possui alunos inscritos.'}
+            </p>
+          </div>
         ) : (
           <div className="space-y-4">
             {sortedStudents.map((student) => {
@@ -560,8 +540,7 @@ const MentorCursoInscricoesPage = () => {
               );
 
               return (
-                <Card key={student.student_id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
+                <div key={student.student_id} className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-gold/20 hover:shadow-gold/30 transition-all duration-300">
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
                       <Avatar className="w-16 h-16">
@@ -575,10 +554,10 @@ const MentorCursoInscricoesPage = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <h3 className="text-lg font-semibold">
+                            <h3 className="text-lg font-semibold text-white">
                               {student.student_name || 'Nome não informado'}
                             </h3>
-                            <p className="text-muted-foreground">{student.student_email}</p>
+                            <p className="text-gray-300">{student.student_email}</p>
                           </div>
                           {getStatusBadge(student)}
                         </div>
@@ -586,10 +565,10 @@ const MentorCursoInscricoesPage = () => {
                         {/* Progress Bar - Destaque Principal */}
                         <div className="mb-4">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-lg font-bold text-primary">
+                            <span className="text-lg font-bold text-gold">
                               Progresso: {student.progress_percentage}%
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-gray-400">
                               {student.completed_contents}/{student.total_contents} conteúdos
                             </span>
                           </div>
@@ -602,26 +581,26 @@ const MentorCursoInscricoesPage = () => {
                         {/* Details */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
                           <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <Calendar className="w-4 h-4 text-gray-400" />
                             <div>
-                              <p className="text-muted-foreground">Inscrito em</p>
-                              <p className="font-medium">{formatDate(student.enrolled_at)}</p>
+                              <p className="text-gray-400">Inscrito em</p>
+                              <p className="font-medium text-white">{formatDate(student.enrolled_at)}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <Clock className="w-4 h-4 text-gray-400" />
                             <div>
-                              <p className="text-muted-foreground">Tempo no curso</p>
-                              <p className="font-medium">{daysSinceEnrollment} dias</p>
+                              <p className="text-gray-400">Tempo no curso</p>
+                              <p className="font-medium text-white">{daysSinceEnrollment} dias</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                            <TrendingUp className="w-4 h-4 text-gray-400" />
                             <div>
-                              <p className="text-muted-foreground">Status</p>
-                              <p className="font-medium">{student.status}</p>
+                              <p className="text-gray-400">Status</p>
+                              <p className="font-medium text-white">{student.status}</p>
                             </div>
                           </div>
                         </div>
@@ -678,8 +657,7 @@ const MentorCursoInscricoesPage = () => {
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               );
             })}
           </div>

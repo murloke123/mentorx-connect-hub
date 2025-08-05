@@ -336,6 +336,49 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
     loadAppointments(); // Recarregar agendamentos
   };
 
+  const handleCompleteClick = async (appointment: Appointment) => {
+    try {
+      console.log('🚀 [CompleteAppointment] Iniciando conclusão:', {
+        appointmentId: appointment.id,
+        mentorId: appointment.mentor_id,
+        menteeId: appointment.mentee_id
+      });
+
+      // Atualizar status para 'completed'
+      const { error } = await supabase
+        .from('calendar')
+        .update({ status: 'completed' })
+        .eq('id', appointment.id);
+
+      if (error) {
+        console.error('❌ [CompleteAppointment] Erro ao concluir:', error);
+        toast({
+          title: "Erro ao concluir agendamento",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ [CompleteAppointment] Agendamento concluído com sucesso');
+      toast({
+        title: "Agendamento concluído",
+        description: "O agendamento foi marcado como concluído com sucesso.",
+        variant: "default"
+      });
+
+      // Recarregar agendamentos
+      loadAppointments();
+    } catch (err) {
+      console.error('💥 [CompleteAppointment] Erro inesperado:', err);
+      toast({
+        title: "Erro inesperado",
+        description: "Não foi possível concluir o agendamento",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Card className="w-full premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
       <CardContent className="space-y-4 pt-6">
@@ -537,8 +580,8 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                             : `${appointment.mentee_name} - ${appointment.mentee_role === 'mentor' ? 'Mentor' : 'Mentorado'}`
                           }
                         </h4>
-                          {/* Tag Temporal */}
-                          <Badge className={`${getTemporalColor(getTemporalCategory(appointment))} border`}>
+                          {/* Tag Temporal - Oculta */}
+                          <Badge className={`${getTemporalColor(getTemporalCategory(appointment))} border hidden`}>
                             <div className="flex items-center gap-1">
                               {getTemporalIcon(getTemporalCategory(appointment))}
                               {getTemporalText(getTemporalCategory(appointment))}
@@ -577,17 +620,22 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                     {/* Ações */}
                     <div className="flex items-center gap-2">
                       {appointment.status === 'scheduled' && (
-                        <div 
-                          className={`flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all hover:opacity-80 ${
-                            !showAcquiredOnly 
-                              ? 'bg-red-500/20 text-red-400' 
-                              : 'bg-red-100 text-red-700'
-                          }`}
-                          onClick={() => handleCancelClick(appointment)}
-                        >
-                          <XCircle className="h-4 w-4" />
-                          <span className="text-sm font-medium">Cancelar</span>
-                        </div>
+                        <>
+                          <div 
+                            className="flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all hover:opacity-80 bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                            onClick={() => handleCompleteClick(appointment)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            <span className="text-sm font-medium">Concluir</span>
+                          </div>
+                          <div 
+                            className="flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all hover:opacity-80 bg-red-500/20 text-red-400 hover:bg-red-500/30 hover:shadow-red-500/50 hover:shadow-lg border border-red-500/30 hover:border-red-500/60"
+                            onClick={() => handleCancelClick(appointment)}
+                          >
+                            <XCircle className="h-4 w-4" />
+                            <span className="text-sm font-medium">Cancelar</span>
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>

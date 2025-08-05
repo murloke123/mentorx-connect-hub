@@ -67,7 +67,7 @@ const CourseLandingPublicPage: React.FC = () => {
     ],
     testimonial_text: "Este curso mudou completamente minha perspectiva profissional. Em apenas 3 meses consegui resultados que não imaginava serem possíveis!",
     testimonial_author: "Maria Silva, Estudante",
-    guarantee_text: "Garantia de 30 dias - Se não ficar satisfeito, devolvemos 100% do seu dinheiro",
+    guarantee_text: "Garantia de 7 dias - Se não ficar satisfeito, devolvemos 100% do seu dinheiro",
     urgency_text: "⚡ Oferta por tempo limitado! Apenas 48 horas restantes",
     bonus_title: "Bônus Exclusivos",
     bonus_description: "Além do curso completo, você também receberá materiais extras que vão acelerar seus resultados"
@@ -443,4 +443,4 @@ const CourseLandingPublicPage: React.FC = () => {
   );
 };
 
-export default CourseLandingPublicPage; 
+export default CourseLandingPublicPage;

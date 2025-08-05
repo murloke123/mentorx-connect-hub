@@ -153,6 +153,10 @@
     @apply bg-gradient-to-r from-gold-dark via-gold to-gold-light text-primary-foreground font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-glow transform hover:scale-105 transition-all duration-300 hover:from-gold via-gold-light to-gold-light;
   }
 
+  .btn-gold-static {
+    @apply bg-gradient-to-r from-gold-dark via-gold to-gold-light text-primary-foreground font-bold py-4 px-8 rounded-xl shadow-lg;
+  }
+
   .btn-silver {
     @apply bg-gradient-to-r from-silver-dark via-silver to-silver-light text-secondary-foreground font-semibold py-3 px-6 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300;
   }
@@ -224,6 +228,10 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+
+  .hover\:shadow-glow:hover {
+    box-shadow: 0 0 30px hsl(45 95% 68% / 0.7), 0 0 60px hsl(45 95% 68% / 0.3);
+  }
 }
 
 @keyframes float {
@@ -291,4 +299,20 @@
 .rich-text-content h6 {
   color: #f9fafb !important;
   font-weight: 700;
+}
+
+/* Animação personalizada para o ícone do raio */
+@keyframes slow-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.animate-slow-pulse {
+  animation: slow-pulse 2s ease-in-out infinite;
 }

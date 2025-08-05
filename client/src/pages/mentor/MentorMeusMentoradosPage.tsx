@@ -382,7 +382,7 @@ const MentorMeusMentoradosPage = () => {
                         : 'border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50'
                     }`}
                   >
-                    <Heart className="w-4 h-4" />
+                    <Frown className="w-4 h-4" />
                     Seguidores sem Curso ({stats.followersWithoutCourse})
                   </Button>
                 </div>
@@ -541,7 +541,7 @@ const MentorMeusMentoradosPage = () => {
                   {activeFilter === 'students' ? (
                     <BookOpen className="mx-auto h-12 w-12 text-gold/60 mb-4" />
                   ) : (
-                    <Heart className="mx-auto h-12 w-12 text-gold/60 mb-4" />
+                    <Frown className="mx-auto h-12 w-12 text-gold/60 mb-4" />
                   )}
                   <h3 className="text-xl font-medium text-white mb-2">
                     {activeFilter === 'students' 

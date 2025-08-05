@@ -1052,7 +1052,7 @@ const MentorPublicProfilePage = () => {
               
               <div className="space-y-4 mb-8">
                 <div className="flex justify-center space-x-8 text-lg">
-                  <span>✅ Garantia de 30 dias</span>
+                  <span>✅ Garantia de 7 dias</span>
                   <span>✅ Suporte personalizado</span>
                   <span>✅ Resultados comprovados</span>
                 </div>

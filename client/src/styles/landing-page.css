@@ -1,0 +1,13 @@
+/* Landing Page Specific Styles */
+
+/* Force dark text for landing page card - específico da landing page */
+.force-dark-text {
+  color: #1B1D24 !important;
+}
+
+/* Estilos específicos da landing page que não são compartilhados */
+.landing-page-container {
+  /* Container específico da landing page se necessário */
+}
+
+/* Outros estilos específicos da landing page podem ser adicionados aqui */

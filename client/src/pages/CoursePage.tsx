@@ -409,7 +409,7 @@ const CoursePage = () => {
                 {course.is_paid && (
                   <div className="mt-6 pt-6 border-t text-center">
                     <p className="text-sm text-gray-600">
-                      🛡️ Garantia de 30 dias
+                      🛡️ Garantia de 7 dias
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
                       Devolução do dinheiro se não ficar satisfeito
@@ -446,4 +446,4 @@ const CoursePage = () => {
   );
 };
 
-export default CoursePage; 
+export default CoursePage;

@@ -29,7 +29,7 @@ import {
     AdminMentoresPage,
     AdminProfilePage,
     AppointmentCheckoutSuccessPage,
-    CourseLandingPage, CourseLandingPublicPage,
+    CourseLandingPage,
     // Páginas públicas
     CoursePlayerPage,
     CoursePublicView,
@@ -116,9 +116,6 @@ const AppContent = () => {
           <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
           <Route path="/appointment-checkout-success" element={<AppointmentCheckoutSuccessPage />} />
-          <Route path="/course/:courseId" element={<CoursePublicView />} />
-          <Route path="/course-page/:courseId" element={<CourseLandingPublicPage />} />
-          <Route path="/course-landing/:courseId" element={<CourseLandingPublicPage />} />
           <Route path="/curso/:courseId" element={<CoursePublicView />} />
           
           {/* Rotas de Mentor - Protegidas */}
