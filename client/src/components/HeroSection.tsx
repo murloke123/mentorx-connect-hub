@@ -3,6 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Bot, Brain } from 'lucide-react';
 
 const HeroSection = () => {
+  const scrollToPricing = () => {
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth' });
+      // Aguardar o scroll e então selecionar o plano PLATINUM
+      setTimeout(() => {
+        const event = new CustomEvent('selectPlatinum');
+        window.dispatchEvent(event);
+      }, 1000);
+    }
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
@@ -68,7 +79,10 @@ const HeroSection = () => {
 
         {/* CTA Button */}
         <div className="mb-12">
-          <Button className="btn-gold text-xl py-6 px-12 rounded-2xl shadow-glow hover:shadow-gold transform hover:scale-105 transition-all duration-300">
+          <Button 
+            onClick={scrollToPricing}
+            className="btn-gold text-xl py-6 px-12 rounded-2xl shadow-glow hover:shadow-gold transform hover:scale-105 transition-all duration-300"
+          >
             <Brain className="mr-3 h-6 w-6" />
             QUERO MINHA PLATAFORMA EXCLUSIVA
           </Button>

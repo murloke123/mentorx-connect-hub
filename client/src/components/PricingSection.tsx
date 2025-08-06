@@ -1,8 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Gem, Star } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const PricingSection = () => {
+interface PricingSectionProps {
+  initialSelectedPlan?: string;
+}
+
+const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>("GOLD");
+
+  useEffect(() => {
+    if (initialSelectedPlan) {
+      setSelectedPlan(initialSelectedPlan);
+    }
+  }, [initialSelectedPlan]);
+
+  useEffect(() => {
+    const handleSelectPlatinum = () => {
+      setSelectedPlan("PLATINUM");
+    };
+
+    window.addEventListener('selectPlatinum', handleSelectPlatinum);
+    
+    return () => {
+      window.removeEventListener('selectPlatinum', handleSelectPlatinum);
+    };
+  }, []);
+
   const plans = [
     {
       name: "SILVER",
@@ -12,10 +37,13 @@ const PricingSection = () => {
       icon: <Gem className="w-8 h-8" />,
       popular: false,
       features: [
-        "Acesso a 5 cursos básicos",
-        "Suporte por email",
-        "Certificado de conclusão",
-        "Acesso por 6 meses",
+        "Painel de Análise",
+        "Criação de Conteúdo Digital",
+        "Plataforma Multi-Mentor",
+        "Módulo de Agendamento",
+        "Módulo de Progresso",
+        "Módulo de Pagamentos",
+        "Suporte em horário comercial – Nível 3",
         "Material complementar"
       ],
       buttonText: "COMEÇAR AGORA",
@@ -27,16 +55,15 @@ const PricingSection = () => {
       price: "R$ 197",
       originalPrice: "R$ 397",
       icon: <Star className="w-8 h-8" />,
-      popular: true,
+      popular: false,
       features: [
-        "Acesso a TODOS os cursos",
-        "Mentoria em grupo semanal",
-        "Suporte prioritário",
-        "Certificado premium",
-        "Acesso por 1 ano",
-        "Material exclusivo",
-        "Comunidade VIP",
-        "Workshops ao vivo"
+        "Tudo do plano Silver, mais:",
+        "Orientações em grupo semanais",
+        "Auxílio na criação de conteúdo",
+        "Suporte prioritário – Nível 2",
+        "Agente de IA para criação de conteúdos",
+        "Agente de IA para suporte aos mentorados",
+        "Material exclusivo"
       ],
       buttonText: "ESCOLHER GOLD",
       gradient: "from-yellow-400 to-yellow-600"
@@ -49,14 +76,14 @@ const PricingSection = () => {
       icon: <Crown className="w-8 h-8" />,
       popular: false,
       features: [
-        "TUDO do plano Gold",
-        "Mentoria individual 1:1",
-        "Acesso vitalício",
-        "Consultoria personalizada",
-        "Networking exclusivo",
-        "Eventos presenciais VIP",
-        "Suporte 24/7",
-        "Garantia de resultados"
+        "Tudo dos planos Silver e Gold, mais:",
+        "Plataforma exclusiva só sua",
+        "Criação da sua marca e domínio",
+        "Performance garantida",
+        "Agentes de IA altamente treinados",
+        "Suporte nível máximo 24/7",
+        "Engajamento da sua marca",
+        "Parcerias e descontos para novos projetos"
       ],
       buttonText: "ESCOLHER PLATINUM",
       gradient: "from-gray-300 to-gray-500"
@@ -64,7 +91,7 @@ const PricingSection = () => {
   ];
 
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section id="pricing" className="py-24 px-4 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background-secondary to-background opacity-90" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
@@ -93,30 +120,31 @@ const PricingSection = () => {
             </div>
           </div>
           
-          <p className="text-xl text-silver-light">
-            Cada diamante representa um nível de excelência único
+          <p className="text-xl text-silver-light italic">
+            <em>"Cada mentorado é um diamante em potencial. Escolha o plano que vai lapidar seu talento e acelerar sua jornada."</em>
           </p>
           <div className="w-32 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mt-6"></div>
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 max-w-7xl mx-auto px-4">
           {plans.map((plan, index) => (
             <Card 
               key={plan.name}
-              className={`relative overflow-hidden transition-all duration-500 hover:scale-105 ${
-                plan.popular 
-                  ? 'border-gold shadow-2xl shadow-gold/30 ring-4 ring-gold/40 bg-gradient-to-b from-gold/5 to-transparent' 
-                  : 'border-border hover:border-gold/30'
-              } ${plan.popular ? 'md:scale-110 transform' : ''}`}
+              onClick={() => setSelectedPlan(plan.name)}
+              className={`relative overflow-hidden transition-all duration-500 cursor-pointer transform-gpu ${
+                selectedPlan === plan.name
+                  ? 'border-gold shadow-2xl shadow-gold/30 ring-1 ring-gold/40 bg-gradient-to-b from-gold/5 to-transparent scale-105' 
+                  : 'border-border hover:border-gold/30 hover:scale-102'
+              } hover:shadow-xl`}
             >
-              {plan.popular && (
+              {selectedPlan === plan.name && (
                 <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-gold via-yellow-400 to-gold text-black text-center py-3 text-sm font-bold tracking-wider">
-                  MAIS POPULAR
+                  SELECIONADO
                 </div>
               )}
               
-              <CardHeader className={`text-center ${plan.popular ? 'pt-16' : 'pt-8'}`}>
+              <CardHeader className={`text-center pb-4 ${selectedPlan === plan.name ? 'pt-16' : 'pt-8'}`}>
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center text-white`}>
                   {plan.icon}
                 </div>
@@ -152,7 +180,7 @@ const PricingSection = () => {
 
                 <Button 
                   className={`w-full py-6 text-lg font-bold transition-all duration-300 ${
-                    plan.popular 
+                    selectedPlan === plan.name
                       ? 'btn-gold hover:shadow-glow' 
                       : 'bg-gradient-to-r from-border to-muted hover:from-gold/20 hover:to-gold-light/20 hover:text-gold'
                   }`}
@@ -160,7 +188,7 @@ const PricingSection = () => {
                   {plan.buttonText}
                 </Button>
 
-                {plan.popular && (
+                {selectedPlan === plan.name && (
                   <div className="text-center">
                     <p className="text-xs text-gold font-semibold">
                       🔥 Oferta por tempo limitado!
