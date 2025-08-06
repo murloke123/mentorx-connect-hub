@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { clientConfig } from "@/config/environment";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import { ArrowLeft, Mail } from "lucide-react";
@@ -53,7 +54,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBackToLogin })
 
       // Enviar email de reset de senha
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${clientConfig.APP_URL}/reset-password`,
       });
 
       if (error) {

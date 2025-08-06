@@ -84,7 +84,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
           <div className="relative h-48 overflow-hidden rounded-t-2xl">
             {/* Imagem do curso - encosta nas bordas */}
             <img 
-              src={course.image_url} 
+              src={course.image_url || '/placeholder.svg'} 
               alt={course.title}
               className="w-full h-full object-cover"
             />
@@ -107,12 +107,22 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
               ></div>
             </div>
             
+            {/* Tag de desconto no canto superior esquerdo */}
+            {course.discount && course.discount > 0 && (
+              <div className="absolute top-2 left-2 z-20">
+                <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-gold/90 to-gold-light/90 text-background text-xs font-semibold shadow-lg backdrop-blur-sm border border-gold/20">
+                  -{course.discount}%
+                </div>
+              </div>
+            )}
+
             {/* Tag de preço no canto superior direito */}
             <div className="absolute top-2 right-2 z-20">
               <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-gold/90 to-gold-light/90 text-background text-xs font-semibold shadow-lg backdrop-blur-sm border border-gold/20">
                 {course.is_paid ? 
-                  (course.discounted_price ? `R$ ${course.discounted_price.toFixed(0)}` : 
-                   course.price ? `R$ ${course.price.toFixed(0)}` : 'PAGO') 
+                  (course.discount && course.discount > 0 && course.discounted_price ? 
+                    `R$ ${course.discounted_price.toFixed(0)}` : 
+                    course.price ? `R$ ${course.price.toFixed(0)}` : 'PAGO') 
                   : 'GRATUITO'
                 }
               </div>
@@ -140,20 +150,21 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
               </div>
               
               {/* Título */}
-              <h3 className="text-lg font-bold text-foreground line-clamp-2 leading-tight flex-1">
+              <h3 className="text-lg font-bold text-foreground truncate leading-tight flex-1" title={course.title || ''}>
                 {course.title}
               </h3>
             </div>
 
             {/* Descrição resumida */}
-            <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
-              {course.description ? 
-                (course.description.length > 120 ? 
-                  course.description.substring(0, 120) + '...' : 
-                  course.description
-                ) : 
-                "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."
-              }
+            <p className="text-xs text-muted-foreground mb-4 leading-relaxed overflow-hidden" 
+               style={{
+                 display: '-webkit-box',
+                 WebkitLineClamp: 2,
+                 WebkitBoxOrient: 'vertical',
+                 wordBreak: 'break-word',
+                 hyphens: 'auto'
+               }}>
+              {course.description || "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."}
             </p>
 
             {/* Informações do curso */}

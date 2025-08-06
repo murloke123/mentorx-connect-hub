@@ -72,6 +72,7 @@ export interface CreateCheckoutSessionData {
   mentorId: string;
   successUrl: string;
   cancelUrl: string;
+  customAmount?: number; // Valor customizado em centavos (para desconto)
 }
 
 export interface CheckoutSessionResult {
@@ -165,22 +166,56 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
     });
     
     // Preparar parâmetros para criar sessão de checkout
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      line_items: [{
-        price: data.priceId,
-        quantity: 1
-      }],
-      mode: 'payment',
-      success_url: data.successUrl,
-      cancel_url: data.cancelUrl,
-      customer_email: data.buyerEmail,
-      metadata: {
-        course_id: data.courseId,
-        buyer_id: data.buyerId,
-        mentor_id: data.mentorId
-      },
-      locale: 'pt-BR' as const
-    };
+    let sessionParams: Stripe.Checkout.SessionCreateParams;
+    
+    if (data.customAmount) {
+      // Usar valor customizado (com desconto)
+      console.log('💰 [SERVER-STRIPE] Usando valor customizado (com desconto):', data.customAmount);
+      sessionParams = {
+        line_items: [{
+          price_data: {
+            currency: 'brl',
+            unit_amount: data.customAmount, // Valor em centavos
+            product_data: {
+              name: 'Curso com Desconto',
+              description: `Curso ID: ${data.courseId}`
+            }
+          },
+          quantity: 1
+        }],
+        mode: 'payment',
+        success_url: data.successUrl,
+        cancel_url: data.cancelUrl,
+        customer_email: data.buyerEmail,
+        metadata: {
+          course_id: data.courseId,
+          buyer_id: data.buyerId,
+          mentor_id: data.mentorId,
+          has_discount: 'true',
+          original_price_id: data.priceId
+        },
+        locale: 'pt-BR' as const
+      };
+    } else {
+      // Usar priceId normal (sem desconto)
+      console.log('💰 [SERVER-STRIPE] Usando priceId normal (sem desconto):', data.priceId);
+      sessionParams = {
+        line_items: [{
+          price: data.priceId,
+          quantity: 1
+        }],
+        mode: 'payment',
+        success_url: data.successUrl,
+        cancel_url: data.cancelUrl,
+        customer_email: data.buyerEmail,
+        metadata: {
+          course_id: data.courseId,
+          buyer_id: data.buyerId,
+          mentor_id: data.mentorId
+        },
+        locale: 'pt-BR' as const
+      };
+    }
 
     // 🎯 CORREÇÃO CRÍTICA: Criar sessão na conta conectada específica
     const session = await stripe.checkout.sessions.create(sessionParams, {

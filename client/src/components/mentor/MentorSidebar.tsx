@@ -52,7 +52,7 @@ const MentorSidebar = () => {
 
   const menuItems = [
     {
-      label: "Dashboard",
+      label: "Meu Painel",
       href: "/mentor/dashboard",
       icon: (
         <LayoutDashboard className="h-5 w-5 shrink-0 text-gray-300" />

@@ -43,20 +43,31 @@ const BasicInfoFields = ({ form }: BasicInfoFieldsProps) => {
       <FormField
         control={form.control}
         name="description"
-        render={({ field }) => (
-          <FormItem className="mb-4">
-            <FormLabel className="text-sm font-medium text-gray-300">Descrição*</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Forneça um resumo do seu curso, destacando o conteúdo e os principais benefícios para o aluno..." 
-                rows={8}
-                {...field} 
-                className="bg-slate-800/50 text-white placeholder:text-gray-400"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+        render={({ field }) => {
+          const currentLength = field.value?.length || 0;
+          const minLength = 100;
+          const isValid = currentLength >= minLength;
+          
+          return (
+            <FormItem className="mb-4">
+              <FormLabel className="text-sm font-medium text-gray-300">Descrição*</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Forneça um resumo do seu curso, destacando o conteúdo e os principais benefícios para o aluno..." 
+                  rows={8}
+                  {...field} 
+                  className="bg-slate-800/50 text-white placeholder:text-gray-400"
+                />
+              </FormControl>
+              <div className="flex justify-between items-center mt-1">
+                <FormMessage />
+                <span className={`text-xs ${isValid ? 'text-green-400' : 'text-gray-400'}`}>
+                  {currentLength}/{minLength} caracteres mínimos
+                </span>
+              </div>
+            </FormItem>
+          );
+        }}
       />
 
       <FormField

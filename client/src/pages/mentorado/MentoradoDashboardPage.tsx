@@ -1,6 +1,7 @@
 import EnrolledCoursesList from '@/components/mentorado/EnrolledCoursesList';
 import MentoradoSidebar from '@/components/mentorado/MentoradoSidebar';
 import StatsSection from '@/components/mentorado/StatsSection';
+import LoadingComponent from '@/components/shared/LoadingComponent';
 import { useAuth } from '@/hooks/useAuth';
 import { getMenteeCourses, getMenteeFollowingCount, getMenteeProfile } from '@/services/menteeService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -57,14 +58,7 @@ const MentoradoDashboardPage = () => {
   
   // Se não há usuário logado, não renderiza o dashboard
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Carregando...</h2>
-          <p className="text-gray-600">Verificando autenticação...</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent message="Verificando autenticação" variant="full-screen" />;
   }
   
   // Convert courses to the expected type
@@ -86,10 +80,12 @@ const MentoradoDashboardPage = () => {
       <MentoradoSidebar />
       <div className="flex-1 transition-all duration-300  p-6 overflow-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">
-            {profile ? `Bem-vindo, ${profile.full_name || 'Mentorado'}!` : 'Dashboard'}
+          <h1 className="text-4xl font-bold mb-2 text-gold">
+            {profile ? `Bem-vindo, ${profile.full_name || 'Mentorado'}!` : 'Dashboard do Mentorado'}
           </h1>
-          <p className="text-gray-600">Acompanhe seus cursos e seu progresso</p>
+          <p className="text-gray-300 text-lg">
+            Acompanhe seus cursos e seu progresso
+          </p>
         </div>
 
         {/* Stats Section */}

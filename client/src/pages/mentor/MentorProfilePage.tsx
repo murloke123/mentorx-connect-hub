@@ -8,6 +8,7 @@ import MentorCalendarComponent from "@/components/MentorCalendarComponent";
 import MentorCalendarSettings from "@/components/MentorCalendarSettings";
 import ProfileForm from "@/components/profile/ProfileForm";
 import CourseCard from "@/components/shared/CourseCard";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ const MentorProfilePage = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [currentAvatarPath, setCurrentAvatarPath] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
+  const [authUser, setAuthUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('sobre');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -144,15 +146,21 @@ const MentorProfilePage = () => {
           id, 
           title, 
           description, 
+          mentor_id,
+          category_id,
           is_public, 
           is_paid, 
           price, 
           discount,
           discounted_price,
           image_url, 
+          is_published,
+          stripe_product_id,
+          stripe_price_id,
           created_at, 
-          updated_at, 
-          mentor_id
+          updated_at,
+          category,
+          landing_page_id
         `)
         .eq("mentor_id", currentUser.id)
         .order("created_at", { ascending: false });
@@ -176,6 +184,29 @@ const MentorProfilePage = () => {
     enabled: !!currentUser?.id
   });
 
+  // Função para lidar com o clique no botão WhatsApp
+  const handleWhatsAppClick = () => {
+    if (!currentUser?.phone) {
+      toast({
+        variant: "destructive",
+        title: "Número não disponível",
+        description: "Este mentor não possui número de telefone preenchido na plataforma."
+      });
+      return;
+    }
+
+    // Obter código do país (sem o +) e número de telefone limpo
+    const countryCode = (currentUser as any).country ? (currentUser as any).country.replace('+', '') : '55';
+    const cleanPhone = currentUser.phone.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+    
+    // Combinar código do país com o número de telefone
+    const fullPhoneNumber = `${countryCode}${cleanPhone}`;
+    
+    // Abrir WhatsApp Web em nova guia
+    const whatsappUrl = `https://wa.me/${fullPhoneNumber}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   // Extract path from URL
   const extractPathFromUrl = (url: string | null): string | null => {
     if (!url) return null;
@@ -188,6 +219,8 @@ const MentorProfilePage = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      setAuthUser(user);
 
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -299,7 +332,7 @@ const MentorProfilePage = () => {
       const objectUrl = URL.createObjectURL(file);
       setMentorAvatarUrl(objectUrl);
 
-      const result = await uploadImage(file, 'avatars', currentAvatarPath);
+      const result = await uploadImage(file, 'avatars', currentAvatarPath || undefined);
       setMentorAvatarUrl(result.url);
       setCurrentAvatarPath(result.path);
 
@@ -352,7 +385,7 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar currentUser com os novos dados
-      setCurrentUser(prev => ({ ...prev, ...editData }));
+      setCurrentUser(prev => prev ? { ...prev, ...editData } : null);
       setIsEditModalOpen(false);
 
       toast({
@@ -386,10 +419,10 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar o estado local
-      setCurrentUser(prev => ({
+      setCurrentUser(prev => prev ? {
         ...prev,
         hero_cards: heroCardsData
-      }));
+      } : null);
 
       toast({
         title: "Hero cards atualizados",
@@ -423,10 +456,10 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar o estado local
-      setCurrentUser(prev => ({
+      setCurrentUser(prev => prev ? {
         ...prev,
         social_media: socialMediaData
-      }));
+      } : null);
 
       toast({
         title: "Redes sociais atualizadas",
@@ -460,10 +493,10 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar o estado local
-      setCurrentUser(prev => ({
+      setCurrentUser(prev => prev ? {
         ...prev,
         cx_diferenciais: diferenciaisData
-      }));
+      } : null);
 
       toast({
         title: "Diferenciais atualizados",
@@ -497,10 +530,10 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar o estado local
-      setCurrentUser(prev => ({
+      setCurrentUser(prev => prev ? {
         ...prev,
         review_comments: reviewsData
-      }));
+      } : null);
 
       toast({
         title: "Depoimentos atualizados",
@@ -535,10 +568,19 @@ const MentorProfilePage = () => {
       if (error) throw error;
 
       // Atualizar o estado local
-      setCurrentUser(prev => ({
-        ...prev,
-        verified: dataForSaving
-      }));
+      setCurrentUser(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          verified: {
+            cards_sucesso_verificado: dataForSaving.cards_sucesso,
+            por_que_me_seguir_verificado: dataForSaving.por_que_me_seguir,
+            meus_cursos_verificado: dataForSaving.meus_cursos,
+            elogios_verificado: dataForSaving.elogios,
+            calendario_verificado: dataForSaving.calendario
+          }
+        };
+      });
 
       toast({
         title: "Status de verificação atualizado",
@@ -695,8 +737,8 @@ const MentorProfilePage = () => {
     return (
       <div className="flex">
         <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 flex items-center justify-center min-h-screen">
-          <Spinner className="h-8 w-8" />
+        <div className="flex-1 transition-all duration-300">
+          <LoadingComponent message="Carregando Dados" />
         </div>
       </div>
     );
@@ -1027,7 +1069,7 @@ const MentorProfilePage = () => {
                 {/* ProfileForm expandido para largura total */}
                 <div className="w-full">
                   <ProfileForm 
-                    user={currentUser} 
+                    user={authUser}
                     profileData={currentUser}
                     onProfileUpdate={fetchUserData}
                   />
@@ -1217,7 +1259,10 @@ const MentorProfilePage = () => {
               ) : mentorCourses.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {mentorCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard 
+                      key={course.id} 
+                      course={course} 
+                    />
                   ))}
                 </div>
               ) : (
@@ -1471,7 +1516,10 @@ const MentorProfilePage = () => {
                 {/* Rodapé com os botões */}
                 <div className="border-t pt-6 mt-8">
                   <div className="grid lg:grid-cols-1 gap-4">
-                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <Button 
+                      onClick={handleWhatsAppClick}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    >
                       Chamar no WhatsApp
                     </Button>
                   </div>
@@ -1479,25 +1527,7 @@ const MentorProfilePage = () => {
               </div>
             </section>
 
-          {/* CTA Final */}
-          <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-16 text-center border border-gold/20 relative rounded-xl">
-            <h2 className="text-4xl font-bold mb-4 text-gold">Pronto para Transformar sua Vida?</h2>
-            <p className="text-xl mb-8 text-gray-300">
-              Junte-se aos seguidores de {currentUser?.full_name?.split(' ')[0]} e comece sua jornada de transformação
-            </p>
-            
-            <div className="space-y-4 mb-8">
-              <div className="flex justify-center space-x-8 text-lg text-gray-400">
-                <span>✅ Garantia de 30 dias</span>
-                <span>✅ Suporte personalizado</span>
-                <span>✅ Resultados comprovados</span>
-              </div>
-            </div>
-            
-            <Button className="bg-gradient-to-r from-gold to-yellow-500 hover:from-yellow-500 hover:to-gold text-black px-12 py-6 text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105">
-              Transformar Minha Vida Agora
-            </Button>
-          </section>
+
         </div>
 
         {/* Add CSS animations */}

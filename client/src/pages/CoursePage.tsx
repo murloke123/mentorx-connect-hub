@@ -131,7 +131,7 @@ const CoursePage = () => {
       
       // Redirecionar para o Stripe Checkout
       console.log('🔄 Redirecionando para:', result.sessionUrl);
-      window.location.href = result.sessionUrl;
+      window.open(result.sessionUrl, '_blank');
     } catch (error: any) {
       console.error('❌ Erro ao processar pagamento:', error);
       toast.error(error.message || 'Erro ao processar pagamento');

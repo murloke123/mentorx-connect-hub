@@ -291,17 +291,53 @@ const MentorCursosAdquiridosPage = () => {
 
         <div>
           {loadingEnrolled ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <div className="aspect-video bg-gray-200 rounded-t-lg"></div>
-                  <CardContent className="p-4">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="min-h-[60vh] flex items-center justify-center">
+              {/* Loading Premium Dourado */}
+              <div className="flex flex-col items-center space-y-6">
+                {/* Círculo de Loading Dourado */}
+                <div className="relative">
+                  {/* Círculo externo com glow */}
+                  <div className="w-24 h-24 rounded-full border-4 border-gold/20 animate-pulse"></div>
+                  
+                  {/* Círculo de loading principal */}
+                  <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-transparent border-t-gold border-r-gold animate-spin"></div>
+                  
+                  {/* Círculo interno com gradiente */}
+                  <div className="absolute inset-2 w-20 h-20 rounded-full bg-gradient-to-br from-gold/20 via-gold-light/10 to-transparent animate-pulse"></div>
+                  
+                  {/* Ponto central */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-3 h-3 bg-gold rounded-full animate-pulse shadow-lg shadow-gold/50"></div>
+                  </div>
+                  
+                  {/* Efeito de brilho */}
+                  <div className="absolute -inset-2 w-28 h-28 rounded-full bg-gradient-to-r from-gold/10 via-gold-light/20 to-gold/10 blur-xl animate-pulse"></div>
+                </div>
+                
+                {/* Texto de loading */}
+                <div className="text-center space-y-2">
+                  <h3 className="text-xl font-bold text-gold animate-pulse">
+                    Carregando Cursos
+                  </h3>
+                  <p className="text-sm text-muted-foreground animate-pulse">
+                    Buscando seus cursos adquiridos...
+                  </p>
+                </div>
+                
+                {/* Pontos de loading */}
+                <div className="flex space-x-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 bg-gold rounded-full animate-bounce"
+                      style={{
+                        animationDelay: `${i * 0.2}s`,
+                        animationDuration: '1s'
+                      }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : enrolledCourses.length === 0 ? (
             <Card>
@@ -329,6 +365,19 @@ const MentorCursosAdquiridosPage = () => {
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg"></div>
                     )}
+                    
+                    {/* Tag de status no canto superior direito */}
+                    <div className="absolute top-2 right-2 z-20">
+                      <Badge variant={
+                        enrollment.status === 'active' ? 'default' : 
+                        enrollment.status === 'inactive' ? 'destructive' : 'secondary'
+                      } className="shadow-lg">
+                        {enrollment.status === 'active' ? 'Ativo' : 
+                         enrollment.status === 'inactive' ? 'Pagamento Pendente' : 
+                         'Suspenso'}
+                      </Badge>
+                    </div>
+                    
                     {enrollment.progress_percentage > 0 && (
                       <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-2">
                         <div className="w-full bg-gray-700 rounded-full h-2">
@@ -403,43 +452,30 @@ const MentorCursosAdquiridosPage = () => {
                         <h4 style={{
                           fontSize: '16px',
                           fontWeight: '600',
-                          color: '#1a202c',
+                          color: 'white',
                           margin: '0 0 4px 0',
                           lineHeight: '1.2'
                         }}>
                           {enrollment.course.mentor.full_name}
                         </h4>
-                        <p style={{
-                          fontSize: '14px',
-                          color: '#64748b',
-                          margin: '0'
-                        }}>
+                        <p className="text-xs text-muted-foreground">
                           {enrollment.course.category || 'Categoria não definida'}
                         </p>
                       </div>
                     </div>
 
-                    <h3 className="font-semibold mb-2 line-clamp-2">
+                    <h3 className="font-semibold mb-2 truncate" title={enrollment.course.title}>
                       {enrollment.course.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {enrollment.course.description}
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+                      {enrollment.course.description ? 
+                        (enrollment.course.description.length > 120 ? 
+                          enrollment.course.description.substring(0, 120) + '...' : 
+                          enrollment.course.description
+                        ) : 
+                        "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."
+                      }
                     </p>
-                    <div className="flex items-center justify-between mb-4">
-                      <Badge variant={
-                        enrollment.status === 'active' ? 'default' : 
-                        enrollment.status === 'inactive' ? 'destructive' : 'secondary'
-                      }>
-                        {enrollment.status === 'active' ? 'Ativo' : 
-                         enrollment.status === 'inactive' ? 'Pagamento Pendente' : 
-                         'Suspenso'}
-                      </Badge>
-                      {enrollment.course.is_paid && (
-                        <span className="text-sm font-medium text-green-600">
-                          {formatPrice(enrollment.course.price)}
-                        </span>
-                      )}
-                    </div>
                     {enrollment.progress_percentage > 0 && (
                       <div className="mb-4">
                         <span className="text-sm text-gray-600">
@@ -448,13 +484,13 @@ const MentorCursosAdquiridosPage = () => {
                       </div>
                     )}
                     {enrollment.status === 'active' ? (
-                      <Button 
-                        className="w-full"
+                      <button 
                         onClick={() => navigateToCourse(enrollment.course_id)}
+                        className="w-full bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-xs mt-auto flex items-center justify-center gap-2"
                       >
-                        <Play className="mr-2 h-4 w-4 text-gold" />
+                        <Play className="h-4 w-4" />
                         {enrollment.progress_percentage > 0 ? 'Continuar' : 'Começar'}
-                      </Button>
+                      </button>
                     ) : (
                       <Button 
                         className="w-full bg-orange-600 hover:bg-orange-700"

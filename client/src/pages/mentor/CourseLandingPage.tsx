@@ -49,6 +49,7 @@ interface LandingPageData {
   social_proof: string;
   social_rating?: string;
   avatar_urls?: string[];
+  comment?: string;
   guarantee: string;
   bonus_offer: string;
   urgency_message: string;
@@ -77,6 +78,7 @@ const CourseLandingPage: React.FC = () => {
       "Certificado de conclusão"
     ],
     social_proof: "Mais de 1.000 alunos já transformaram suas carreiras",
+    comment: "Este curso mudou completamente minha carreira. Recomendo!",
     guarantee: "Garantia incondicional de 7 dias",
     bonus_offer: "Bônus exclusivo: Kit de ferramentas profissionais",
     urgency_message: "Contato direto com o mentor",
@@ -97,6 +99,7 @@ const CourseLandingPage: React.FC = () => {
   const [tempBenefits, setTempBenefits] = useState<string[]>([]);
   const [tempSocialProof, setTempSocialProof] = useState("");
   const [tempSocialRating, setTempSocialRating] = useState("4.9");
+  const [tempComment, setTempComment] = useState("");
   const [tempAvatarUrls, setTempAvatarUrls] = useState<string[]>([
     "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
     "https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png", 
@@ -242,6 +245,7 @@ const CourseLandingPage: React.FC = () => {
   const startEditingSocialProof = () => {
     setTempSocialProof(landingData.social_proof);
     setTempSocialRating(landingData.social_rating || "4.9");
+    setTempComment(landingData.comment || "Este curso mudou completamente minha carreira. Recomendo!");
     setTempAvatarUrls(landingData.avatar_urls || [
       "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
       "https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png", 
@@ -300,6 +304,7 @@ const CourseLandingPage: React.FC = () => {
       } else if (section === 'social_proof') {
         updatedData.social_proof = tempSocialProof;
         updatedData.social_rating = tempSocialRating;
+        updatedData.comment = tempComment;
         updatedData.avatar_urls = tempAvatarUrls;
         setLandingData(updatedData);
         setIsEditingSocialProof(false);
@@ -622,7 +627,7 @@ const CourseLandingPage: React.FC = () => {
                         <Edit3 className="w-3 h-3" />
                       </Button>
                     )}
-                    <div className="mb-6">
+                    <div className="mb-6 px-2">
                       <h3 className="flex items-center text-xl font-bold text-white drop-shadow-lg">
                         <div className="w-10 h-10 bg-gradient-to-r from-gold to-gold-light rounded-full flex items-center justify-center mr-3 shadow-lg">
                           <Zap className="w-5 h-5 text-black" />
@@ -630,7 +635,7 @@ const CourseLandingPage: React.FC = () => {
                         O que você vai aprender
                       </h3>
                     </div>
-                    <div>
+                    <div className="px-2">
                       {isEditingBenefits ? (
                         <div className="space-y-4">
                           {tempBenefits.map((benefit, index) => (
@@ -712,7 +717,7 @@ const CourseLandingPage: React.FC = () => {
                         <div className="w-10 h-10 bg-gradient-to-r from-gold to-gold-light rounded-full flex items-center justify-center mr-3 shadow-lg">
                           <User className="w-5 h-5 text-black" />
                         </div>
-                        Mais de 1.000 alunos já transformaram suas carreiras
+                        {landingData.social_proof}
                       </h3>
                     </div>
                     <div>
@@ -748,6 +753,19 @@ const CourseLandingPage: React.FC = () => {
                               value={tempSocialRating}
                               onChange={(e) => setTempSocialRating(e.target.value)}
                               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            />
+                          </div>
+
+                          {/* Campo para editar o comentário */}
+                          <div>
+                            <label className="block text-sm font-medium text-white/80 mb-2">
+                              Comentário
+                            </label>
+                            <Input
+                              value={tempComment}
+                              onChange={(e) => setTempComment(e.target.value)}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                              placeholder="Ex: Este curso mudou completamente minha carreira. Recomendo!"
                             />
                           </div>
 
@@ -822,15 +840,17 @@ const CourseLandingPage: React.FC = () => {
                                 ))}
                               </div>
                               <div>
-                                <p className="font-semibold text-white drop-shadow-md">
-                                  {landingData.social_proof}
-                                </p>
                                 <div className="flex items-center">
                                    {[...Array(5)].map((_, i) => (
                                      <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(tempSocialRating)) ? 'text-gold fill-current' : 'text-gray-400'} drop-shadow-sm`} />
                                    ))}
                                    <span className="ml-2 text-sm text-white/80 font-medium">{tempSocialRating}/5</span>
                                  </div>
+                                 {landingData.comment && (
+                                   <p className="text-sm text-white/70 italic mt-2">
+                                     "{landingData.comment}"
+                                   </p>
+                                 )}
                               </div>
                             </div>
                           </div>
@@ -1167,8 +1187,11 @@ const CourseLandingPage: React.FC = () => {
                       </div>
 
                       {/* CTA Button Premium */}
-                      <button className="btn-gold-static w-full text-lg py-4 flex items-center justify-center gap-2 hover:shadow-glow transition-shadow duration-300">
-                        <Rocket className="w-5 h-5 animate-slow-pulse" />
+                      <button 
+                        disabled 
+                        className="btn-gold-static w-full text-lg py-4 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed transition-opacity duration-300"
+                      >
+                        <Rocket className="w-5 h-5" />
                         <span>{courseData.is_paid ? 'Adquirir Agora' : 'Começar Gratuitamente'}</span>
                       </button>
 

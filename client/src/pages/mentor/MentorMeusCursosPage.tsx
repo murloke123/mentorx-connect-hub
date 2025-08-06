@@ -1,11 +1,20 @@
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bot, PlusCircle } from "lucide-react";
+import { AlertTriangle, Bot, PlusCircle } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import ChatModal from "../../components/chat/ChatModal";
 import CoursesList from "../../components/mentor/CoursesList";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
 import { Button } from "../../components/ui/button";
 import { getMentorCourses } from '../../services/courseService';
 import { supabase } from '../../utils/supabase';
@@ -14,6 +23,7 @@ const MeusCursosPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [isUnpublishedCoursesAlertOpen, setIsUnpublishedCoursesAlertOpen] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -62,6 +72,16 @@ const MeusCursosPage = () => {
       console.error("Error fetching mentor courses:", error);
     }
   }, [isError, error]);
+
+  // Verificar se há cursos não publicados e mostrar modal de alerta
+  useEffect(() => {
+    if (coursesData && coursesData.length > 0) {
+      const hasUnpublishedCourses = coursesData.some(course => !course.is_published);
+      if (hasUnpublishedCourses) {
+        setIsUnpublishedCoursesAlertOpen(true);
+      }
+    }
+  }, [coursesData]);
 
   const totalEnrollments = coursesData.reduce((sum, courseItem) => {
     const enrollmentCount = courseItem.enrollments_count || 0;
@@ -127,6 +147,33 @@ const MeusCursosPage = () => {
           texto: "Você está criando um novo curso. Descreva o tema, público-alvo, objetivos de aprendizagem e estrutura desejada para o seu curso. A IA irá ajudá-lo a desenvolver o conteúdo e organizar as informações de forma pedagógica."
         }}
       />
+
+      {/* Modal de alerta para cursos não publicados */}
+      <AlertDialog open={isUnpublishedCoursesAlertOpen} onOpenChange={setIsUnpublishedCoursesAlertOpen}>
+        <AlertDialogContent className="max-w-md p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+          <AlertDialogHeader className="p-6 pb-4 border-b border-slate-700">
+            <AlertDialogTitle className="text-lg font-semibold text-white flex items-center">
+              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+                <AlertTriangle className="h-4 w-4 text-slate-900" />
+              </div>
+              Atenção: Cursos Não Publicados
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm leading-relaxed text-gray-300 mt-3">
+              Você possui cursos que ainda não estão publicados e não aparecem na plataforma para os outros usuários. 
+              <br /><br />
+              Analise as informações do curso se estão corretas, crie módulos e conteúdos para o mesmo e também revise a página de vendas. Só depois disso publique o seu curso.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="p-6 pt-4">
+            <AlertDialogAction 
+              onClick={() => setIsUnpublishedCoursesAlertOpen(false)}
+              className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Entendi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

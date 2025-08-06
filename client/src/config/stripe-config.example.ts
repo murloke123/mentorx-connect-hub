@@ -7,6 +7,8 @@
  * - O arquivo 'stripe-config.ts' está no .gitignore e nunca será commitado.
  */
 
+import { clientConfig } from './environment';
+
 export const stripeConfig = {
   // Apenas chave pública (seguro para frontend)
   publishableKey: 'pk_test_sua_chave_publica_aqui',
@@ -15,9 +17,9 @@ export const stripeConfig = {
   country: 'BR' as const,
   currency: 'brl' as const,
   
-  // URLs de callback
-  successUrl: 'http://localhost:8080/stripe/success',
-  cancelUrl: 'http://localhost:8080/stripe/cancel',
+  // URLs de callback - usando configuração de ambiente
+  successUrl: `${clientConfig.APP_URL}/stripe/success`,
+  cancelUrl: `${clientConfig.APP_URL}/stripe/cancel`,
   
   // Taxa da plataforma (em centavos)
   platformFeePercent: 10, // 10% da transação

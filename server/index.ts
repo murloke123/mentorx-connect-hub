@@ -13,6 +13,8 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:5000', 
     'http://localhost:5173',
+    'https://mentoraai.com.br',
+    'https://www.mentoraai.com.br',
     /\.replit\.dev$/,
     /\.replit\.app$/
   ],

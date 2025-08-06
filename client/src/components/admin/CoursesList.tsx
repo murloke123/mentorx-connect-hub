@@ -1,28 +1,28 @@
-import { useState } from 'react';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Users, AlertCircle } from "lucide-react";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { deleteCourse, CourseWithDetails } from "@/services/adminService";
+import { CourseWithDetails, deleteCourse } from "@/services/adminService";
+import { AlertCircle, User, Users } from "lucide-react";
+import { useState } from 'react';
 
 
 
@@ -125,7 +125,7 @@ const CoursesList = ({ courses, isLoading, onDelete }: CoursesListProps) => {
         {courses.map((course) => (
           <Card key={course.id}>
             <CardHeader>
-              <CardTitle className="text-lg line-clamp-1">{course.title}</CardTitle>
+              <CardTitle className="text-lg truncate" title={course.title}>{course.title}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <User className="h-3 w-3" /> {course.mentor_name || 'Mentor desconhecido'}
               </CardDescription>

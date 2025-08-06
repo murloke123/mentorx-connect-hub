@@ -1,4 +1,5 @@
 import MentoradoSidebar from "@/components/mentorado/MentoradoSidebar";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,15 +12,15 @@ import { createNotification } from "@/services/notificationService";
 import { supabase } from "@/utils/supabase";
 import { navigateToTop } from "@/utils/utils";
 import {
-  BookOpen,
-  Calendar,
-  Heart,
-  HeartOff,
-  MessageCircle,
-  Search,
-  TrendingUp,
-  User,
-  Users
+    BookOpen,
+    Calendar,
+    Heart,
+    HeartOff,
+    MessageCircle,
+    Search,
+    TrendingUp,
+    User,
+    Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -327,78 +328,71 @@ const MentoradoMeusMentoresPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-black">
         <MentoradoSidebar />
         <div className="flex-1 transition-all duration-300 p-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-64 mb-8"></div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
-              ))}
-            </div>
-          </div>
+          <LoadingComponent message="Carregando Dados" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-black">
       <MentoradoSidebar />
       <div className="flex-1 transition-all duration-300 p-6">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Meus Mentores</h1>
-            <p className="text-muted-foreground">Mentores que sigo ou dos quais adquiri cursos</p>
+            <h1 className="text-4xl font-bold text-gold mb-2">Meus Mentores</h1>
+            <p className="text-muted-foreground">Mentores que estou seguindo e seus cursos disponíveis</p>
           </div>
         </div>
 
         {/* Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardContent className="p-4">
               <div className="flex flex-col items-center justify-center text-center gap-3">
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                  <p className="text-sm text-gray-600">Total de Mentores</p>
+                  <p className="text-2xl font-bold text-white">{stats.total}</p>
+                  <p className="text-sm text-gold">Total de Mentores</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardContent className="p-4">
               <div className="flex flex-col items-center justify-center text-center gap-3">
-                <Heart className="h-8 w-8 text-red-500" />
+                <Heart className="h-8 w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.following}</p>
-                  <p className="text-sm text-gray-600">Seguindo</p>
+                  <p className="text-2xl font-bold text-white">{stats.following}</p>
+                  <p className="text-sm text-gold">Seguindo</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardContent className="p-4">
               <div className="flex flex-col items-center justify-center text-center gap-3">
-                <BookOpen className="h-8 w-8 text-green-600" />
+                <BookOpen className="h-8 w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.withCourses}</p>
-                  <p className="text-sm text-gray-600">Com Cursos</p>
+                  <p className="text-2xl font-bold text-white">{stats.withCourses}</p>
+                  <p className="text-sm text-gold">Com Cursos</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardContent className="p-4">
               <div className="flex flex-col items-center justify-center text-center gap-3">
-                <TrendingUp className="h-8 w-8 text-purple-600" />
+                <TrendingUp className="h-8 w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold">{formatPrice(stats.totalSpent)}</p>
-                  <p className="text-sm text-gray-600">Total Investido</p>
+                  <p className="text-2xl font-bold text-white">{formatPrice(stats.totalSpent)}</p>
+                  <p className="text-sm text-gold">Total Investido</p>
                 </div>
               </div>
             </CardContent>
@@ -408,25 +402,28 @@ const MentoradoMeusMentoresPage = () => {
         {/* Barra de busca */}
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 h-4 w-4" />
             <Input
               placeholder="Buscar mentores por nome, email ou categoria..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
             />
           </div>
         </div>
 
         {/* Lista de mentores */}
         {filteredMentores.length === 0 ? (
-          <Card>
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg">
             <CardContent className="p-8 text-center">
-              <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-4">
+              <Users className="mx-auto h-12 w-12 text-gold/60 mb-4" />
+              <p className="text-gray-400 mb-4">
                 {searchTerm ? "Nenhum mentor encontrado com esse termo de busca." : "Você ainda não segue nenhum mentor e não possui cursos adquiridos."}
               </p>
-              <Button onClick={() => navigate('/mentores')}>
+              <Button 
+                onClick={() => navigate('/mentores')}
+                className="bg-gold text-black hover:bg-gold/90"
+              >
                 Explorar Mentores
               </Button>
             </CardContent>
@@ -434,26 +431,26 @@ const MentoradoMeusMentoresPage = () => {
         ) : (
           <div className="space-y-4">
             {filteredMentores.map((mentor) => (
-              <Card key={mentor.id} className="hover:shadow-md transition-shadow">
+              <Card key={mentor.id} className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-4 gap-4 items-stretch">
                     {/* Coluna 1: Avatar + Nome do mentor */}
-                    <div className="flex items-center gap-4 h-24 bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-4 h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300">
                       <Avatar className="h-16 w-16 flex-shrink-0">
                         <AvatarImage src={mentor.avatar_url || ""} alt={mentor.full_name || ""} />
-                        <AvatarFallback className="bg-blue-100 text-blue-700">
+                        <AvatarFallback className="bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black">
                           {mentor.full_name ? getMentorInitials(mentor.full_name) : "M"}
                         </AvatarFallback>
                       </Avatar>
-                      <h3 className="font-semibold text-lg text-gray-900 truncate">{mentor.full_name || "Nome não informado"}</h3>
+                      <h3 className="font-semibold text-lg text-white truncate">{mentor.full_name || "Nome não informado"}</h3>
                     </div>
 
                     {/* Coluna 2: Cursos do mentor */}
-                    <div className="h-24 bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow overflow-hidden">
+                    <div className="h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300 overflow-hidden">
                       {/* Título com ícone */}
                       <div className="flex items-center gap-2 mb-2">
-                        <BookOpen className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span className="text-sm font-medium text-gray-700">Cursos:</span>
+                        <BookOpen className="h-4 w-4 text-gold flex-shrink-0" />
+                        <span className="text-sm font-medium text-gold">Cursos:</span>
                       </div>
                       
                       {/* Tags dos cursos */}
@@ -463,17 +460,17 @@ const MentoradoMeusMentoresPage = () => {
                             <Badge
                               key={course.id}
                               variant="secondary"
-                              className="cursor-pointer hover:bg-green-100 hover:text-green-800 transition-colors text-xs"
+                              className="cursor-pointer bg-gold/20 text-gold border-gold/30 hover:bg-gold/30 hover:text-gold transition-colors text-xs"
                               onClick={() => navigate(`/curso/${course.id}`)}
                             >
                               {course.title.length > 15 ? `${course.title.substring(0, 15)}...` : course.title}
                             </Badge>
                           ))
                         ) : (
-                          <span className="text-xs text-gray-500">Nenhum curso</span>
+                          <span className="text-xs text-gray-400">Nenhum curso</span>
                         )}
                         {mentor.courses_created.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs border-gold/30 text-gold">
                             +{mentor.courses_created.length - 3}
                           </Badge>
                         )}
@@ -481,12 +478,12 @@ const MentoradoMeusMentoresPage = () => {
                     </div>
 
                     {/* Coluna 3: Botões de ação 1 */}
-                    <div className="h-24 bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow flex flex-col justify-center gap-2">
+                    <div className="h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300 flex flex-col justify-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => navigateToTop(navigate, `/mentor/publicview/${mentor.id}`)}
-                        className="w-full justify-start text-xs"
+                        className="w-full justify-start text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
                       >
                         <User className="h-3 w-3 mr-2" />
                         Ver Perfil
@@ -496,7 +493,7 @@ const MentoradoMeusMentoresPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => navigate(`/mentor/publicschedule/${mentor.id}`)}
-                        className="w-full justify-start text-xs"
+                        className="w-full justify-start text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
                       >
                         <Calendar className="h-3 w-3 mr-2" />
                         Agendar
@@ -504,7 +501,7 @@ const MentoradoMeusMentoresPage = () => {
                     </div>
 
                     {/* Coluna 4: Botões de ação 2 */}
-                    <div className="h-24 bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow flex flex-col justify-center gap-2">
+                    <div className="h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300 flex flex-col justify-center gap-2">
                       <Dialog 
                         open={openDialogs[mentor.id] || false} 
                         onOpenChange={(open) => setOpenDialogs(prev => ({ ...prev, [mentor.id]: open }))}
@@ -517,16 +514,16 @@ const MentoradoMeusMentoresPage = () => {
                               setSelectedMentor(mentor);
                               setOpenDialogs(prev => ({ ...prev, [mentor.id]: true }));
                             }}
-                            className="w-full justify-start text-xs"
+                            className="w-full justify-start text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
                           >
                             <MessageCircle className="h-3 w-3 mr-2" />
                             Notificar
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-slate-900 border-gold/30">
                           <DialogHeader>
-                            <DialogTitle>Enviar Notificação para {selectedMentor?.full_name || mentor.full_name}</DialogTitle>
-                            <DialogDescription>
+                            <DialogTitle className="text-white">Enviar Notificação para {selectedMentor?.full_name || mentor.full_name}</DialogTitle>
+                            <DialogDescription className="text-gray-400">
                               Envie uma mensagem de notificação para este mentor.
                             </DialogDescription>
                           </DialogHeader>
@@ -536,12 +533,14 @@ const MentoradoMeusMentoresPage = () => {
                               value={messageText}
                               onChange={(e) => setMessageText(e.target.value)}
                               rows={4}
+                              className="bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
                             />
                           </div>
                           <DialogFooter>
                             <Button
                               onClick={handleSendMessage}
                               disabled={!messageText.trim() || sendingMessage}
+                              className="bg-gold text-black hover:bg-gold/90"
                             >
                               {sendingMessage ? "Enviando..." : "Enviar Notificação"}
                             </Button>
@@ -550,10 +549,14 @@ const MentoradoMeusMentoresPage = () => {
                       </Dialog>
                       
                       <Button
-                        variant={mentor.is_following ? "destructive" : "default"}
+                        variant={mentor.is_following ? "outline" : "default"}
                         size="sm"
                         onClick={() => handleToggleFollow(mentor.id, mentor.is_following)}
-                        className="w-full justify-start text-xs"
+                        className={`w-full justify-start text-xs ${
+                          mentor.is_following 
+                            ? 'border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500/70' 
+                            : 'bg-gold text-black hover:bg-gold/90'
+                        }`}
                       >
                         {mentor.is_following ? (
                           <>

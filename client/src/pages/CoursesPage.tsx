@@ -1,4 +1,5 @@
 import CourseCard from "@/components/shared/CourseCard";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Course } from '@/types/database';
 import { categoryIconMap, getCategoryIcon } from "@/utils/categoryIcons";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Book, BookOpen, Search } from "lucide-react";
+import { Book, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 const CoursesPage = () => {
@@ -304,12 +305,7 @@ const CoursesPage = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gold via-gold-light to-gold rounded-full mb-4 animate-spin">
-              <BookOpen className="h-8 w-8 text-black" />
-            </div>
-            <p className="text-gray-300 text-lg">Carregando cursos incríveis...</p>
-          </div>
+          <LoadingComponent message="Carregando cursos incríveis" />
         )}
 
         {/* Courses Grid */}

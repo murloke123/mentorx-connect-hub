@@ -1,4 +1,5 @@
 import MentoradoSidebar from "@/components/mentorado/MentoradoSidebar";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { checkCoursePaymentStatus, checkUserPaymentIntents, getUserTransactions, handleCheckoutSuccess, startCourseCheckout } from "@/services/stripeCheckoutService";
 import { supabase } from "@/utils/supabase";
 import { navigateToTop } from "@/utils/utils";
-import { AlertCircle, Play, RefreshCw } from "lucide-react";
+import { AlertCircle, Play, PlusCircle, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -317,7 +318,7 @@ const MentoradoMeusCursosPage = () => {
       // ✅ DELAY REMOVIDO: Redirect imediato para melhor performance
       
       console.log('🔄 Redirecionando para checkout:', result.sessionUrl);
-      window.location.href = result.sessionUrl;
+      window.open(result.sessionUrl, '_blank');
     } catch (error: any) {
       console.error('❌ Erro ao processar pagamento:', error);
       toast.error(error.message || 'Erro ao processar pagamento');
@@ -327,30 +328,37 @@ const MentoradoMeusCursosPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex">
         <MentoradoSidebar />
-        <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
+        <div className="flex-1 transition-all duration-300  p-6">
+          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
+              <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
             </div>
+            <Button onClick={() => navigate('/courses')}>
+              <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+            </Button>
           </div>
+
+          <LoadingComponent message="Carregando Cursos" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex">
       <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+      <div className="flex-1 transition-all duration-300  p-6">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>
+            <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
             <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
           </div>
+          <Button onClick={() => navigate('/courses')}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+          </Button>
         </div>
           
           {/* Alerta de transações pendentes/falhadas */}
@@ -379,205 +387,204 @@ const MentoradoMeusCursosPage = () => {
             );
           })()}
 
-          {/* Cursos Matriculados */}
-          <div>
-            {enrolledCourses.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <p className="text-gray-600 mb-4">
-                    Você ainda não está matriculado em nenhum curso.
-                  </p>
-                  <Button onClick={() => navigate('/courses')}>
-                    Explorar Cursos
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {enrolledCourses.map((enrollment) => (
-                  <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
-                    <div className="aspect-video relative">
-                                                {enrollment.course.image_url ? (
-                            <img 
-                              src={enrollment.course.image_url} 
-                              alt={enrollment.course.title}
-                              className="w-full h-full object-cover rounded-t-lg"
-                            />
-                          ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg"></div>
-                      )}
-                      {enrollment.progress_percentage > 0 && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-2">
-                          <div className="w-full bg-gray-700 rounded-full h-2">
-                            <div 
-                              className="bg-blue-500 h-2 rounded-full"
-                              style={{ width: `${enrollment.progress_percentage}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      )}
+        <div>
+          {enrolledCourses.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Play className="mx-auto h-12 w-12 text-gold mb-4" />
+                <p className="text-gray-600 mb-4">
+                  Você ainda não está matriculado em nenhum curso.
+                </p>
+                <Button onClick={() => navigate('/courses')}>
+                  Explorar Cursos
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {enrolledCourses.map((enrollment) => (
+                <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
+                  <div className="aspect-video relative">
+                    {enrollment.course.image_url ? (
+                      <img 
+                        src={enrollment.course.image_url} 
+                        alt={enrollment.course.title}
+                        className="w-full h-full object-cover rounded-t-lg"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg"></div>
+                    )}
+                    
+                    {/* Tag de status no canto superior direito */}
+                    <div className="absolute top-2 right-2 z-20">
+                      <Badge variant={
+                        enrollment.status === 'active' ? 'default' : 
+                        enrollment.status === 'inactive' ? 'destructive' : 'secondary'
+                      } className="shadow-lg">
+                        {enrollment.status === 'active' ? 'Ativo' : 
+                         enrollment.status === 'inactive' ? 'Pagamento Pendente' : 
+                         'Suspenso'}
+                      </Badge>
                     </div>
-                    <CardContent className="p-4">
-                      {/* Seção do mentor - mesmo padrão do CourseCard */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                        <div 
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontWeight: '600',
-                            fontSize: '16px',
-                            flexShrink: 0,
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                          onClick={() => handleMentorClick(enrollment.course.mentor.id)}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.1)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.boxShadow = 'none';
-                          }}
-                        >
-                          {enrollment.course.mentor.avatar_url ? (
-                            <img 
-                              src={enrollment.course.mentor.avatar_url} 
-                              alt={enrollment.course.mentor.full_name}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                transition: 'all 0.3s ease'
-                              }}
-                              onError={(e) => {
-                                // Fallback para iniciais se a imagem falhar ao carregar
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  parent.innerHTML = getMentorInitials(enrollment.course.mentor.full_name);
-                                  parent.style.display = 'flex';
-                                  parent.style.alignItems = 'center';
-                                  parent.style.justifyContent = 'center';
-                                }
-                              }}
-                            />
-                          ) : (
-                            getMentorInitials(enrollment.course.mentor.full_name)
-                          )}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            color: '#1a202c',
-                            margin: '0 0 4px 0',
-                            lineHeight: '1.2'
-                          }}>
-                            {enrollment.course.mentor.full_name}
-                          </h4>
-                          <p style={{
-                            fontSize: '14px',
-                            color: '#64748b',
-                            margin: '0'
-                          }}>
-                            {enrollment.course.category || 'Categoria não definida'}
-                          </p>
+                    
+                    {enrollment.progress_percentage > 0 && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-2">
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-blue-500 h-2 rounded-full"
+                            style={{ width: `${enrollment.progress_percentage}%` }}
+                          ></div>
                         </div>
                       </div>
-
-                      <h3 className="font-semibold mb-2 line-clamp-2">
-                        {enrollment.course.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                        {enrollment.course.description}
-                      </p>
-                      <div className="flex items-center justify-between mb-4">
-                        <Badge variant={
-                          enrollment.status === 'active' ? 'default' : 
-                          enrollment.status === 'inactive' ? 'destructive' : 'secondary'
-                        }>
-                          {enrollment.status === 'active' ? 'Ativo' : 
-                           enrollment.status === 'inactive' ? 'Pagamento Pendente' : 
-                           'Suspenso'}
-                        </Badge>
-                        {enrollment.progress_percentage > 0 && (
-                          <span className="text-sm text-gray-600">
-                            {Math.round(enrollment.progress_percentage)}% concluído
-                          </span>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    {/* Seção do mentor - mesmo padrão do CourseCard */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <div 
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: '600',
+                          fontSize: '16px',
+                          flexShrink: 0,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onClick={() => handleMentorClick(enrollment.course.mentor.id)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        {enrollment.course.mentor.avatar_url ? (
+                          <img 
+                            src={enrollment.course.mentor.avatar_url} 
+                            alt={enrollment.course.mentor.full_name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onError={(e) => {
+                              // Fallback para iniciais se a imagem falhar ao carregar
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = getMentorInitials(enrollment.course.mentor.full_name);
+                                parent.style.display = 'flex';
+                                parent.style.alignItems = 'center';
+                                parent.style.justifyContent = 'center';
+                              }
+                            }}
+                          />
+                        ) : (
+                          getMentorInitials(enrollment.course.mentor.full_name)
                         )}
                       </div>
-                      {enrollment.status === 'active' ? (
-                        <Button 
-                          className="w-full"
-                          onClick={() => navigateToCourse(enrollment.course_id)}
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          {enrollment.progress_percentage > 0 ? 'Continuar' : 'Começar'}
-                        </Button>
-                      ) : (
-                        (() => {
-                          // Definir existingTransaction no escopo correto
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          color: 'white',
+                          margin: '0 0 4px 0',
+                          lineHeight: '1.2'
+                        }}>
+                          {enrollment.course.mentor.full_name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {enrollment.course.category || 'Categoria não definida'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <h3 className="font-semibold mb-2 truncate" title={enrollment.course.title}>
+                      {enrollment.course.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+                      {enrollment.course.description ? 
+                        (enrollment.course.description.length > 120 ? 
+                          enrollment.course.description.substring(0, 120) + '...' : 
+                          enrollment.course.description
+                        ) : 
+                        "Aprenda com um dos melhores mentores da plataforma e transforme sua carreira profissional."
+                      }
+                    </p>
+                    {enrollment.progress_percentage > 0 && (
+                      <div className="mb-4">
+                        <span className="text-sm text-gray-600">
+                          {Math.round(enrollment.progress_percentage)}% concluído
+                        </span>
+                      </div>
+                    )}
+                    {enrollment.status === 'active' ? (
+                      <button 
+                        onClick={() => navigateToCourse(enrollment.course_id)}
+                        className="w-full bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-xs mt-auto flex items-center justify-center gap-2"
+                      >
+                        <Play className="h-4 w-4" />
+                        {enrollment.progress_percentage > 0 ? 'Continuar' : 'Começar'}
+                      </button>
+                    ) : (
+                      <Button 
+                        className="w-full bg-orange-600 hover:bg-orange-700"
+                        onClick={async () => {
                           const existingTransaction = failedTransactions.find(t => t.course_id === enrollment.course_id);
-                          const isAccessingStripe = accessingStripe === enrollment.course_id || 
-                                                   (existingTransaction && accessingStripe === existingTransaction.id);
-                          
-                          return (
-                            <Button 
-                              className="w-full bg-orange-600 hover:bg-orange-700"
-                              onClick={async () => {
-                                if (existingTransaction) {
-                                  // Reutilizar transação existente
-                                  console.log('♻️ Reutilizando transação pendente existente:', existingTransaction.id);
-                                  await handleRetryPayment(existingTransaction.id);
-                                } else {
-                                  // Apenas criar nova se não existir transação pendente
-                                  try {
-                                    setAccessingStripe(enrollment.course_id);
-                                    console.log('🆕 Criando nova sessão de checkout para curso:', enrollment.course_id);
-                                    const result = await startCourseCheckout(enrollment.course_id, user!.id);
-                                    if (result.sessionUrl) {
-                                      // ✅ DELAY REMOVIDO: Redirect imediato para Stripe
-                                      window.location.href = result.sessionUrl;
-                                    }
-                                  } catch (error: any) {
-                                    console.error('❌ Erro ao criar nova sessão:', error);
-                                    toast.error(error.message || 'Erro ao processar pagamento');
-                                    setAccessingStripe(null); // Limpar em caso de erro
-                                  }
-                                  // Nota: Não limpar no finally porque o usuário será redirecionado
-                                }
-                              }}
-                              disabled={isAccessingStripe}
-                            >
-                              {isAccessingStripe ? (
-                                <>
-                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                  Acessando Stripe...
-                                </>
-                              ) : (
-                                <>
-                                  <RefreshCw className="mr-2 h-4 w-4" />
-                                  Tentar Pagamento
-                                </>
-                              )}
-                            </Button>
-                          );
-                        })()
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                          if (existingTransaction) {
+                            // Reutilizar transação existente
+                            console.log('♻️ Reutilizando transação pendente existente:', existingTransaction.id);
+                            await handleRetryPayment(existingTransaction.id);
+                          } else {
+                            // Apenas criar nova se não existir transação pendente
+                            try {
+                              setAccessingStripe(enrollment.course_id);
+                              console.log('🆕 Criando nova sessão de checkout para curso:', enrollment.course_id);
+                              const result = await startCourseCheckout(enrollment.course_id, user!.id);
+                              if (result.sessionUrl) {
+                                // ✅ DELAY REMOVIDO: Redirect imediato para Stripe
+                                window.open(result.sessionUrl, '_blank');
+                              }
+                            } catch (error: any) {
+                              console.error('❌ Erro ao criar nova sessão:', error);
+                              toast.error(error.message || 'Erro ao processar pagamento');
+                              setAccessingStripe(null); // Limpar em caso de erro
+                            }
+                            // Nota: Não limpar no finally porque o usuário será redirecionado
+                          }
+                        }}
+                        disabled={accessingStripe === enrollment.course_id}
+                      >
+                        {accessingStripe === enrollment.course_id ? (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                            Acessando Stripe...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Tentar Pagamento
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
               </div>
             )}
           </div>

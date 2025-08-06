@@ -36,7 +36,7 @@ const MentoradoSidebar = () => {
 
   const menuItems = [
     {
-      label: "Dashboard",
+      label: "Meu Painel",
       href: "/mentorado/dashboard",
       icon: (
         <LayoutDashboard className="h-5 w-5 shrink-0 text-gray-300" />

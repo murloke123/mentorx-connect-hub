@@ -163,6 +163,7 @@ async function sendCourseEnrollmentEmail({
  * ===============================================================================
  */
 
+import { clientConfig } from '../config/environment';
 import { supabase } from '../utils/supabase';
 import { notifyCoursePurchase } from './notificationService';
 
@@ -177,6 +178,7 @@ interface CreateCheckoutSessionParams {
   buyerEmail: string;
   mentorId: string; // UUID do mentor
   mentorStripeAccountId: string; // Stripe account ID
+  finalPrice?: number; // Preço final (com desconto se aplicável)
 }
 
 export interface CheckoutSessionResult {
@@ -255,7 +257,8 @@ export async function createCheckoutSession({
   buyerId,
   buyerEmail,
   mentorId,
-  mentorStripeAccountId
+  mentorStripeAccountId,
+  finalPrice
 }: CreateCheckoutSessionParams): Promise<CheckoutSessionResult & { transactionId?: string }> {
   await logToNetworkChrome('STRIPE_CHECKOUT', 'CREATE_SESSION_INICIADO', {
     priceId, courseId, buyerId, mentorId, mentorStripeAccountId
@@ -267,14 +270,21 @@ export async function createCheckoutSession({
       priceId, courseId, buyerId
     });
 
-    // Para obter o preço, precisamos primeiro buscar do curso
-    const { data: course } = await supabase
-      .from('cursos')
-      .select('price')
-      .eq('id', courseId)
-      .single();
+    // Usar o preço final (com desconto se aplicável) ou buscar do curso
+    let totalAmount = finalPrice || 0;
+    
+    if (totalAmount === 0) {
+      const { data: course } = await supabase
+        .from('cursos')
+        .select('price, discount, discounted_price')
+        .eq('id', courseId)
+        .single();
+      
+      totalAmount = (course?.discount && course?.discount > 0 && course?.discounted_price) 
+        ? course.discounted_price 
+        : (course?.price || 0);
+    }
 
-    const totalAmount = course?.price || 0;
     const platformFee = 0; // Sem taxa da plataforma
     const mentorAmount = totalAmount;
 
@@ -318,19 +328,31 @@ export async function createCheckoutSession({
     const baseUrl = userRole === 'mentor' ? '/mentor/cursos-adquiridos' : '/mentorado/cursos';
 
     // 🎯 CORREÇÃO CRÍTICA: Chamar backend em vez de Stripe diretamente
+    const requestBody: any = {
+      accountId: mentorStripeAccountId,
+      priceId,
+      courseId,
+      buyerId,
+      buyerEmail,
+      mentorId,
+      successUrl: `${clientConfig.APP_URL}/checkout-success`,
+      cancelUrl: `${clientConfig.APP_URL}${baseUrl}?checkout=canceled`
+    };
+
+    // Se há desconto aplicado, enviar valor customizado em centavos
+    if (finalPrice) {
+      requestBody.customAmount = Math.round(finalPrice * 100); // Converter para centavos
+      console.log('💰 [CLIENT-STRIPE] Enviando valor customizado para backend:', {
+        finalPrice,
+        customAmountCentavos: requestBody.customAmount,
+        totalAmount
+      });
+    }
+
     const response = await fetch('/api/stripe/checkout/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        accountId: mentorStripeAccountId,
-        priceId,
-        courseId,
-        buyerId,
-        buyerEmail,
-        mentorId,
-        successUrl: `${window.location.origin}/checkout-success`,
-        cancelUrl: `${window.location.origin}${baseUrl}?checkout=canceled`
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const result = await response.json();
@@ -663,6 +685,20 @@ export async function startCourseCheckout(courseId: string, buyerId: string): Pr
       throw new Error('Curso não possui preço configurado no Stripe');
     }
 
+    // Verificar se há desconto e calcular o preço final
+    const hasDiscount = course.discount && course.discount > 0 && course.discounted_price;
+    const finalPrice = hasDiscount ? course.discounted_price : course.price;
+
+    console.log('💰 [CLIENT-STRIPE] Análise de preço detalhada:', {
+      courseId: courseId,
+      precoOriginal: course.price,
+      desconto: course.discount,
+      precoComDesconto: course.discounted_price,
+      temDesconto: hasDiscount,
+      precoFinal: finalPrice,
+      valorEconomizado: hasDiscount ? (course.price - course.discounted_price) : 0
+    });
+
     // Buscar informações do mentor
     const { data: mentor, error: mentorError } = await supabase
       .from('profiles')
@@ -719,7 +755,8 @@ export async function startCourseCheckout(courseId: string, buyerId: string): Pr
       buyerId: buyerId,
       buyerEmail: buyerEmail,
       mentorId: course.mentor_id,
-      mentorStripeAccountId: mentor.stripe_account_id
+      mentorStripeAccountId: mentor.stripe_account_id,
+      finalPrice: finalPrice
     });
 
     await logToNetworkChrome('STRIPE_CHECKOUT', 'START_COURSE_CHECKOUT_SUCESSO', result);

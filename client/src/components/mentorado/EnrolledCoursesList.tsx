@@ -1,9 +1,9 @@
 
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Course {
@@ -27,20 +27,7 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
     return (
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Meus Cursos Adquiridos</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardHeader className="pb-3">
-                <Skeleton className="h-5 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 mb-4" />
-                <Skeleton className="h-10 w-full mb-2" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <LoadingComponent message="Carregando seus cursos" />
       </div>
     );
   }
@@ -83,7 +70,9 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
           return (
             <Card key={course.id}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">{course.title}</CardTitle>
+                <CardTitle className="text-lg truncate" title={course.title}>
+                  {course.title}
+                </CardTitle>
                 <CardDescription>Por {course.mentor_name || "Mentor"}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -92,13 +81,20 @@ const EnrolledCoursesList = ({ courses, isLoading }: EnrolledCoursesListProps) =
                     <span>Progresso</span>
                     <span>{progressPercent}%</span>
                   </div>
-                  <Progress value={progressPercent} className="h-2" />
+                  <Progress 
+                    value={progressPercent} 
+                    className="h-2 bg-slate-700/50 [&>div]:bg-gold" 
+                  />
                   <div className="text-xs text-muted-foreground mt-1">
                     {course.completed_lessons || 0} de {course.total_lessons || 0} aulas concluídas
                   </div>
                 </div>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link to={`/mentorado/cursoplayer/${course.id}`}>
+                <Button 
+                  className="w-full bg-gold hover:bg-gold/90 text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm" 
+                  asChild
+                >
+                  <Link to={`/mentorado/cursoplayer/${course.id}`} className="flex items-center gap-2">
+                    <Play className="w-4 h-4" />
                     {progressPercent === 0 ? "Iniciar Curso" : "Continuar Curso"}
                   </Link>
                 </Button>

@@ -1,9 +1,10 @@
 import ProfileForm from "@/components/profile/ProfileForm";
-import { Spinner } from "@/components/ui/spinner";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { Profile } from '@/types/database';
 import type { User } from '@supabase/supabase-js';
 import { useEffect, useState } from "react";
 import { supabase } from '../../utils/supabase';
+import MentoradoHeroBanner from "./MentoradoHeroBanner";
 
 interface ProfilePageProps {
   userRole?: "mentor" | "mentorado" | "admin";
@@ -71,11 +72,7 @@ const ProfilePage = ({ userRole }: ProfilePageProps) => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Spinner />
-      </div>
-    );
+    return <LoadingComponent message="Carregando Dados" />;
   }
 
   if (error) {
@@ -88,11 +85,21 @@ const ProfilePage = ({ userRole }: ProfilePageProps) => {
   }
 
   return (
+    <div className="min-h-screen bg-slate-900">
+      {userRole === "mentorado" && (
+        <MentoradoHeroBanner 
+          profileData={profileData} 
+          onProfileUpdate={() => fetchProfileData(user?.id || "")}
+        />
+      )}
+      <div className="container mx-auto px-4 py-8">
         <ProfileForm 
           user={user} 
           profileData={profileData}
           onProfileUpdate={() => fetchProfileData(user?.id || "")}
         />
+      </div>
+    </div>
   );
 };
 

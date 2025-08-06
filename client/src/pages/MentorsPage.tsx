@@ -1,4 +1,5 @@
 import { TypingAnimation } from "@/components/magicui/typing-animation";
+import LoadingComponent from "@/components/shared/LoadingComponent";
 import { MentorCard } from "@/components/shared/MentorCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -276,12 +277,7 @@ const MentorsPage = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gold via-gold-light to-gold rounded-full mb-4 animate-spin">
-              <Users className="h-8 w-8 text-black" />
-            </div>
-            <p className="text-gray-300 text-lg">Carregando mentores incríveis...</p>
-          </div>
+          <LoadingComponent message="Carregando mentores incríveis" />
         )}
 
         {/* Mentors Grid */}

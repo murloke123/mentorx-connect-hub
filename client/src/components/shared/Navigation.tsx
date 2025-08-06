@@ -189,7 +189,7 @@ const Navigation = () => {
                 onClick={handleDashboardAccess}
               >
                 <LayoutDashboard className="h-4 w-4" />
-                Meu Dashboard
+                Meu Painel
               </Button>
             )}
             
@@ -251,7 +251,7 @@ const Navigation = () => {
                   </Link>
                     <DropdownMenuItem className="cursor-pointer px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200" onClick={handleDashboardAccess}>
                       <LayoutDashboard className="h-4 w-4 mr-3 text-gray-400" />
-                    Meu Dashboard
+                    Meu Painel
                   </DropdownMenuItem>
                     <Link to={configRoute}>
                       <DropdownMenuItem className="cursor-pointer px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200">

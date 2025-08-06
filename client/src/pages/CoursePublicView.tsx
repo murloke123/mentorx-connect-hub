@@ -33,6 +33,8 @@ interface CourseData {
   image_url: string;
   mentor_id: string;
   created_at: string;
+  discount?: number | null;
+  discounted_price?: number | null;
 }
 
 interface LandingPageData {
@@ -182,7 +184,7 @@ const CoursePublicView: React.FC = () => {
         throw new Error('URL da sessão não retornada');
       }
       
-      window.location.href = result.sessionUrl;
+      window.open(result.sessionUrl, '_blank');
     } catch (error: any) {
       console.error('❌ Erro ao processar pagamento:', error);
       toast({
@@ -309,7 +311,7 @@ const CoursePublicView: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex relative z-20">
+        <div className="flex relative z-20 min-h-screen">
           <div className="flex-1 transition-all duration-300 flex items-center justify-center">
             {/* Loading Premium Dourado */}
             <div className="flex flex-col items-center space-y-6">
@@ -613,7 +615,7 @@ const CoursePublicView: React.FC = () => {
                           <span className="text-muted-foreground text-sm">(1.247 avaliações)</span>
                         </div>
                         <p className="text-muted-foreground text-sm">
-                          "Este curso mudou completamente minha carreira. Recomendo!"
+                          "{landingData.comment || "Este curso mudou completamente minha carreira. Recomendo!"}"
                         </p>
                       </div>
                     </div>
@@ -692,7 +694,7 @@ const CoursePublicView: React.FC = () => {
                       <div className="text-muted-foreground leading-relaxed">
                         {isDescriptionExpanded ? (
                           <div>
-                            <p className="whitespace-pre-wrap">{courseData.description}</p>
+                            <p className="whitespace-pre-wrap break-words overflow-wrap-anywhere">{courseData.description}</p>
                             <button
                               onClick={toggleDescription}
                               className="text-gold hover:text-gold-light transition-colors mt-2 text-sm font-medium"
@@ -702,7 +704,7 @@ const CoursePublicView: React.FC = () => {
                           </div>
                         ) : (
                           <div>
-                            <p className="whitespace-pre-wrap">{truncateDescription(courseData.description)}</p>
+                            <p className="whitespace-pre-wrap break-words overflow-wrap-anywhere">{truncateDescription(courseData.description)}</p>
                             {courseData.description.length > 150 && (
                               <button
                                 onClick={toggleDescription}
@@ -732,10 +734,45 @@ const CoursePublicView: React.FC = () => {
 
                     {/* Preço */}
                     <div className="text-center mb-6">
-                      <div className="text-4xl font-bold text-foreground mb-2">
-                        {courseData.is_paid ? `R$ ${courseData.price.toFixed(2)}` : 'GRATUITO'}
-                      </div>
-                      <p className="text-muted-foreground text-sm">
+                      {courseData.is_paid ? (
+                        <div>
+                          {/* Tag de desconto */}
+                          {courseData.discount && courseData.discount > 0 && (
+                            <div className="inline-block bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-bold mb-3 shadow-lg">
+                              -{courseData.discount}% OFF
+                            </div>
+                          )}
+                          
+                          <div className="space-y-1">
+                            {/* Preço original (riscado se houver desconto) */}
+                            {courseData.discount && courseData.discount > 0 && courseData.discounted_price ? (
+                              <div className="text-lg text-muted-foreground line-through">
+                                De R$ {courseData.price.toFixed(2)}
+                              </div>
+                            ) : null}
+                            
+                            {/* Preço final */}
+                            <div className="text-4xl font-bold text-foreground">
+                              R$ {(courseData.discount && courseData.discount > 0 && courseData.discounted_price 
+                                ? courseData.discounted_price 
+                                : courseData.price).toFixed(2)}
+                            </div>
+                            
+                            {/* Economia */}
+                            {courseData.discount && courseData.discount > 0 && courseData.discounted_price && (
+                              <div className="text-green-600 font-semibold text-sm">
+                                Você economiza R$ {(courseData.price - courseData.discounted_price).toFixed(2)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-4xl font-bold text-foreground mb-2">
+                          GRATUITO
+                        </div>
+                      )}
+                      
+                      <p className="text-muted-foreground text-sm mt-2">
                         {courseData.is_paid ? 'Pagamento único' : 'Acesso completo'}
                       </p>
                     </div>

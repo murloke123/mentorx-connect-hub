@@ -60,6 +60,16 @@ export interface Profile {
         dif_title_3?: string;
         dif_description_3?: string;
     } | null;
+    hero_cards?: {
+        hero_card_1?: string;
+        hero_card_desc_1?: string;
+        hero_card_2?: string;
+        hero_card_desc_2?: string;
+        hero_card_3?: string;
+        hero_card_desc_3?: string;
+        hero_card_4?: string;
+        hero_card_desc_4?: string;
+    } | null;
     review_comments?: {
         photo_1?: string;
         name_1?: string;

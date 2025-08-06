@@ -6,32 +6,33 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "../../hooks/use-toast";
 import { useCategories } from "../../hooks/useCategories";
+import { detectUserCountry } from "../../utils/countryDetection";
 import { supabase } from "../../utils/supabase";
-import { uploadImage } from "../../utils/uploadImage";
 import RichTextEditor from "../mentor/content/RichTextEditor";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CountryCodeSelect } from "../ui/CountryCodeSelect";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
 } from "../ui/dialog";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "../ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
@@ -46,6 +47,7 @@ interface ProfileData {
   category?: string | null;
   category_id?: string | null;
   phone?: string | null;
+  country?: string | null;
   date_of_birth?: string | null;
 }
 
@@ -55,6 +57,7 @@ const profileSchema = z.object({
   category_id: z.string().optional().nullable(),
   highlight_message: z.string().max(100, "Mensagem de destaque deve ter no máximo 100 caracteres").optional().nullable(),
   phone: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
   date_of_birth: z.string().optional().nullable(),
 });
 
@@ -70,90 +73,27 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
   const { toast } = useToast();
   const { categories, loading: categoriesLoading } = useCategories();
   const [isLoading, setIsLoading] = useState(false);
+  const [detectedCountry, setDetectedCountry] = useState<string>("+55");
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(profileData?.avatar_url || null);
-
-  // Função para lidar com upload de avatar
-  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user?.id) return;
-
-    console.log('🔍 Debug - Iniciando upload de avatar:', {
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      userId: user.id,
-      currentAvatarUrl: avatarUrl
-    });
-
-    // Validar tipo de arquivo
-    if (!file.type.startsWith('image/')) {
-      toast({
-        variant: "destructive",
-        title: "Arquivo inválido",
-        description: "Por favor, selecione apenas arquivos de imagem.",
-      });
-      return;
-    }
-
-    // Validar tamanho do arquivo (2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: "Arquivo muito grande",
-        description: "A imagem deve ter no máximo 2MB.",
-      });
-      return;
-    }
-
-    setIsUploadingAvatar(true);
-
-    try {
-      console.log('🔍 Debug - Chamando uploadImage...');
-      
-      // Upload da nova imagem
-      const uploadResult = await uploadImage(file, 'avatars', avatarUrl || undefined);
-      
-      console.log('🔍 Debug - Upload resultado:', uploadResult);
-
-      // Atualizar no banco de dados
-      console.log('🔍 Debug - Atualizando banco de dados...');
-      const { error } = await supabase
-        .from('profiles')
-        .update({ avatar_url: uploadResult.url })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('🔍 Debug - Erro no banco de dados:', error);
-        throw error;
-      }
-
-      console.log('🔍 Debug - Upload concluído com sucesso!');
-      setAvatarUrl(uploadResult.url);
-      
-      toast({
-        title: "Avatar atualizado",
-        description: "Sua foto de perfil foi atualizada com sucesso.",
-      });
-
-      if (onProfileUpdate) {
-        onProfileUpdate();
-      }
-    } catch (error) {
-      console.error('🔍 Debug - Erro completo:', error);
-      console.error('🔍 Debug - Erro detalhado:', JSON.stringify(error, null, 2));
-      
-      toast({
-        variant: "destructive",
-        title: "Erro no upload",
-        description: `Erro: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
-      });
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
   
+  // Detecta o país automaticamente quando o componente carrega
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const country = await detectUserCountry();
+        setDetectedCountry(country);
+      } catch (error) {
+        console.warn('Erro ao detectar país:', error);
+        setDetectedCountry("+55"); // Fallback para Brasil
+      }
+    };
+
+    // Só detecta se o usuário não tem país definido
+    if (!profileData?.country) {
+      detectCountry();
+    }
+  }, [profileData?.country]);
+
   // Texto padrão para mentores
   const defaultBioText = `<p class="p1"><span class="s1"></span></p><h2>
 
@@ -185,13 +125,12 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
     
   const [bioContent, setBioContent] = useState(initialBioContent);
 
-  // Atualizar bioContent e avatarUrl quando profileData mudar
+  // Atualizar bioContent quando profileData mudar
   useEffect(() => {
     const newBioContent = profileData?.role === 'mentor' && (!profileData?.bio || profileData?.bio.trim() === '') 
       ? defaultBioText 
       : (profileData?.bio || "");
     setBioContent(newBioContent);
-    setAvatarUrl(profileData?.avatar_url || null);
   }, [profileData, defaultBioText]);
 
   const form = useForm<ProfileFormValues>({
@@ -202,6 +141,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
       category_id: profileData?.category_id || null, // Usar null em vez de string vazia
       highlight_message: profileData?.highlight_message || null,
       phone: profileData?.phone || null, // Usar null em vez de string vazia
+      country: profileData?.country || detectedCountry, // Usa país detectado automaticamente
       date_of_birth: profileData?.date_of_birth || null, // Usar null em vez de string vazia
     },
   });
@@ -228,6 +168,7 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
           category_id: data.category_id || null, // Garantir que seja null se vazio
           highlight_message: data.highlight_message || null,
           phone: data.phone || null, // Garantir que seja null se vazio
+          country: data.country || null, // Garantir que seja null se vazio
           date_of_birth: data.date_of_birth || null, // Garantir que seja null se vazio
         })
         .eq("id", user.id);
@@ -301,27 +242,48 @@ const ProfileForm = ({ user, profileData, onProfileUpdate }: ProfileFormProps) =
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                          <Phone className="h-4 w-4 text-gold" />
-                          Telefone
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="(11) 99999-9999" 
-                            value={field.value || ""}
-                            className="h-11 bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="space-y-4">
+                    <FormLabel className="flex items-center gap-2 text-sm font-medium text-gray-300">
+                      <Phone className="h-4 w-4 text-gold" />
+                      Telefone
+                    </FormLabel>
+                    <div className="grid grid-cols-2 gap-2">
+                      <FormField
+                        control={form.control}
+                        name="country"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <CountryCodeSelect
+                                value={field.value || detectedCountry}
+                                onChange={field.onChange}
+                                disabled={isLoading}
+                                className="h-11"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="99999-9999" 
+                                value={field.value || ""}
+                                className="h-11 bg-slate-800/50 border-slate-600 text-white placeholder:text-gray-400"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
                   <FormField
                     control={form.control}

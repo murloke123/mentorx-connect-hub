@@ -5,16 +5,19 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from "../../hooks/use-toast";
 import { useAuth } from "../../hooks/useAuth";
+import { getConteudosByModuloId } from "../../services/conteudoService";
 import { deleteCourse, updateCoursePublicationStatus } from "../../services/courseService";
+import { getModulosByCursoId } from "../../services/moduloService";
+import { supabase } from "../../utils/supabase";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
 import { Button } from '../ui/button';
@@ -39,6 +42,8 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
   const [isDeleting, setIsDeleting] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+  const [publishValidationDialogOpen, setPublishValidationDialogOpen] = useState(false);
+  const [validationErrorMessage, setValidationErrorMessage] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -46,7 +51,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
   // Filtrar cursos com base na busca e filtro de visibilidade
   const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (course.title || '').toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesFilter = visibilityFilter === null || 
                         (visibilityFilter === 'public' && course.is_public) ||
@@ -81,6 +86,75 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
     console.warn(`Failed to load image for course ${courseId}. It might be an invalid or inaccessible blob URL.`);
   };
 
+  // Validar se o curso pode ser publicado
+  const validateCourseForPublication = async (courseId: string): Promise<{ canPublish: boolean; errorMessage?: string }> => {
+    try {
+      // 1. Verificar se tem módulos
+      const modulos = await getModulosByCursoId(courseId);
+      if (modulos.length === 0) {
+        return {
+          canPublish: false,
+          errorMessage: "Para publicar o curso você precisa ter módulos e conteúdos criados, além do que, você precisa ajustar as informações da página de venda, por exemplo, você não pode deixar o campo de comentário de avaliação igual a \"Este curso mudou completamente minha carreira. Recomendo!\" você tem que editar esse texto para condizer com comentários reais de seus mentorados, assim como as fotos de quem te avaliou, você pode simplesmente pegar o link das fotos de algum aluno seu do facebook ou instagram por exemplo e colocar o link dessa foto nas pessoas que te avaliaram por exemplo."
+        };
+      }
+
+      // 2. Verificar se tem conteúdos nos módulos
+      let hasContent = false;
+      for (const modulo of modulos) {
+        const conteudos = await getConteudosByModuloId(modulo.id);
+        if (conteudos.length > 0) {
+          hasContent = true;
+          break;
+        }
+      }
+
+      if (!hasContent) {
+        return {
+          canPublish: false,
+          errorMessage: "Para publicar o curso você precisa ter módulos e conteúdos criados, além do que, você precisa ajustar as informações da página de venda, por exemplo, você não pode deixar o campo de comentário de avaliação igual a \"Este curso mudou completamente minha carreira. Recomendo!\" você tem que editar esse texto para condizer com comentários reais de seus mentorados, assim como as fotos de quem te avaliou, você pode simplesmente pegar o link das fotos de algum aluno seu do facebook ou instagram por exemplo e colocar o link dessa foto nas pessoas que te avaliaram por exemplo."
+        };
+      }
+
+      // 3. Verificar a página de venda
+      const { data: landingPageData, error } = await supabase
+        .from('course_landing_pages')
+        .select('layout_body')
+        .eq('course_id', courseId)
+        .single();
+
+      if (error || !landingPageData) {
+        return {
+          canPublish: false,
+          errorMessage: "Para publicar o curso você precisa ter módulos e conteúdos criados, além do que, você precisa ajustar as informações da página de venda, por exemplo, você não pode deixar o campo de comentário de avaliação igual a \"Este curso mudou completamente minha carreira. Recomendo!\" você tem que editar esse texto para condizer com comentários reais de seus mentorados, assim como as fotos de quem te avaliou, você pode simplesmente pegar o link das fotos de algum aluno seu do facebook ou instagram por exemplo e colocar o link dessa foto nas pessoas que te avaliaram por exemplo."
+        };
+      }
+
+      // 4. Verificar se o comentário não é o padrão
+      const layoutBody = landingPageData.layout_body;
+      if (layoutBody && typeof layoutBody === 'object') {
+        const layoutData = layoutBody as any;
+        
+        // Procurar por comentários com o texto específico
+        const hasDefaultComment = JSON.stringify(layoutData).includes("Este curso mudou completamente minha carreira. Recomendo!");
+        
+        if (hasDefaultComment) {
+          return {
+            canPublish: false,
+            errorMessage: "Para publicar o curso você precisa ter módulos e conteúdos criados, além do que, você precisa ajustar as informações da página de venda, por exemplo, você não pode deixar o campo de comentário de avaliação igual a \"Este curso mudou completamente minha carreira. Recomendo!\" você tem que editar esse texto para condizer com comentários reais de seus mentorados, assim como as fotos de quem te avaliou, você pode simplesmente pegar o link das fotos de algum aluno seu do facebook ou instagram por exemplo e colocar o link dessa foto nas pessoas que te avaliaram por exemplo."
+          };
+        }
+      }
+
+      return { canPublish: true };
+    } catch (error) {
+      console.error('Erro ao validar curso para publicação:', error);
+      return {
+        canPublish: false,
+        errorMessage: "Erro ao validar o curso. Tente novamente."
+      };
+    }
+  };
+
   // Navegar para a página de visualização do curso (CoursePlayerPage)
   const handleViewCourse = (courseId: string) => {
     navigate(`/mentor/meus-cursos/view/${courseId}`);
@@ -89,6 +163,17 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
   const handlePublishChange = async (courseId: string, newStatus: boolean) => {
     try {
       setIsUpdating(prev => new Set([...prev, courseId]));
+
+      // Se está tentando publicar, validar primeiro
+      if (newStatus) {
+        const validation = await validateCourseForPublication(courseId);
+        if (!validation.canPublish) {
+          setValidationErrorMessage(validation.errorMessage || 'Erro na validação');
+          setPublishValidationDialogOpen(true);
+          return;
+        }
+      }
+
       await updateCoursePublicationStatus(courseId, newStatus);
       
       toast({
@@ -238,8 +323,8 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                   <div className="flex items-start gap-4 min-w-0">
                     {canDisplayImage ? (
                       <img 
-                        src={course.image_url} 
-                        alt={course.title} 
+                        src={course.image_url || ''} 
+                        alt={course.title || ''} 
                         className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gold shadow-lg shadow-gold/20"
                         onError={() => handleImageError(course.id)}
                       />
@@ -252,7 +337,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-lg truncate">{course.title}</CardTitle>
+                      <CardTitle className="text-lg truncate">{course.title || 'Curso sem título'}</CardTitle>
                       {hasImageLoadingError && (
                         <p className="text-xs text-destructive mt-1">Erro ao carregar imagem.</p>
                       )}
@@ -267,8 +352,20 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                           variant="secondary"
                           className="bg-transparent text-white border border-white/30 hover:border-white/50"
                         >
-                          {course.is_paid ? `R$${course.price?.toFixed(2)}` : 'Gratuito'}
+                          {course.is_paid ? 
+                            `R$${(course.discount && course.discount > 0 && course.discounted_price ? 
+                              course.discounted_price : course.price)?.toFixed(2)}` : 
+                            'Gratuito'
+                          }
                         </Badge>
+                        {course.discount && course.discount > 0 && (
+                          <Badge 
+                            variant="secondary"
+                            className="bg-green-600/20 text-green-400 border border-green-500/30 hover:border-green-500/50"
+                          >
+                            -{course.discount}%
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -335,13 +432,20 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
               </CardContent>
               <CardFooter className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
-                  <Switch
-                    id={`publish-${course.id}`}
-                    checked={course.is_published}
-                    onCheckedChange={(checked) => handlePublishChange(course.id, checked)}
-                  />
+                  <div className="relative">
+                    <Switch
+                      id={`publish-${course.id}`}
+                      checked={course.is_published}
+                      onCheckedChange={(checked) => handlePublishChange(course.id, checked)}
+                      disabled={isUpdating.has(course.id)}
+                      className="relative z-10"
+                    />
+                    {course.is_published && (
+                      <div className="absolute -inset-1 bg-gradient-to-r from-green-400/30 to-emerald-400/30 rounded-full opacity-50 blur-sm animate-pulse"></div>
+                    )}
+                  </div>
                   <Label htmlFor={`publish-${course.id}`} className="text-sm whitespace-nowrap">
-                    {course.is_published ? "Publicado" : "Não Publicado"}
+                    {isUpdating.has(course.id) ? "Atualizando..." : (course.is_published ? "Publicado" : "Não Publicado")}
                   </Label>
                 </div>
                 <Button
@@ -390,6 +494,44 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
       {/* Conteúdo dinâmico */}
       {renderContent()}
+
+      {/* Modal de erro de validação de publicação */}
+      <AlertDialog open={publishValidationDialogOpen} onOpenChange={setPublishValidationDialogOpen}>
+        <AlertDialogContent className="max-w-lg bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-gold/30 shadow-2xl shadow-gold/20 backdrop-blur-xl">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-gold/20 border border-gold/30">
+                <AlertTriangle className="h-5 w-5 text-gold" />
+              </div>
+              <AlertDialogTitle className="text-white text-lg font-semibold">
+                Não é possível publicar o curso
+              </AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-white/80 text-sm leading-relaxed space-y-3">
+              <p>
+                Para publicar o curso você precisa ter <span className="text-gold font-medium">módulos e conteúdos criados</span>, além do que, você precisa ajustar as informações da página de venda.
+              </p>
+              <p>
+                Por exemplo, você não pode deixar o campo de comentário de avaliação igual a <span className="text-gold/80 italic">"Este curso mudou completamente minha carreira. Recomendo!"</span>
+              </p>
+              <p>
+                Você tem que <span className="text-gold font-medium">editar esse texto para condizer com comentários reais</span> de seus mentorados, assim como as fotos de quem te avaliou.
+              </p>
+              <p>
+                Você pode simplesmente pegar o link das fotos de algum aluno seu do Facebook ou Instagram e colocar o link dessa foto nas pessoas que te avaliaram.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="pt-6">
+            <AlertDialogAction 
+              onClick={() => setPublishValidationDialogOpen(false)}
+              className="bg-gold/90 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl transition-all duration-200 px-6"
+            >
+              Entendi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Modal de confirmação de exclusão */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { clientConfig } from '@/config/environment';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { enviarEmailBoasVindas } from '@/services/emailService';
 import { createOrUpdateStripeConnectedAccount } from '@/services/stripeClientService';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
@@ -244,8 +245,8 @@ const LoginPage = () => {
               userName: fullName,
               userEmail: email,
               userRole: role,
-              loginUrl: window.location.origin + '/login',
-              supportUrl: window.location.origin + '/suporte'
+              loginUrl: clientConfig.APP_URL + '/login',
+              supportUrl: clientConfig.APP_URL + '/suporte'
             });
 
             if (emailResult.success) {

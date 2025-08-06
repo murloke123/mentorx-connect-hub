@@ -53,7 +53,7 @@ const MentoradoConfiguracoesPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-black">
         <MentoradoSidebar />
         <div className="flex-1 transition-all duration-300  flex items-center justify-center">
           <Spinner />
@@ -63,13 +63,13 @@ const MentoradoConfiguracoesPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-black">
       <MentoradoSidebar />
       <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
-            <p className="text-gray-600">Gerencie suas preferências e configurações da conta</p>
+            <h1 className="text-4xl font-bold text-gold mb-2">Configurações</h1>
+            <p className="text-muted-foreground">Gerencie suas preferências e configurações da conta</p>
           </div>
 
           {/* Configurações de Interface */}

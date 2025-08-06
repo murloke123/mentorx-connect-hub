@@ -160,7 +160,7 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
     // Redirecionar para o checkout
     if (checkoutResult.sessionUrl) {
-      window.location.href = checkoutResult.sessionUrl;
+      window.open(checkoutResult.sessionUrl, '_blank');
       return true; // Pagamento processado
     }
 

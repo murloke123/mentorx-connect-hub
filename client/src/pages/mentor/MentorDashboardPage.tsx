@@ -1,7 +1,7 @@
 import AnalyticsSection from '@/components/mentor/AnalyticsSection';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
 import StatsSection from '@/components/mentor/StatsSection';
-import { Badge } from '@/components/ui/badge';
+import LoadingComponent from '@/components/shared/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeAccountStatus } from '@/hooks/useStripeAccountStatus';
@@ -80,14 +80,7 @@ const MentorDashboardPage = () => {
 
   // Se não há usuário logado, não renderiza o dashboard
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Carregando...</h2>
-          <p className="text-gray-600">Verificando autenticação...</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent message="Verificando autenticação" variant="full-screen" />;
   }
 
   // Stats calculations
@@ -158,17 +151,7 @@ const MentorDashboardPage = () => {
         {/* Debug Info - Mostrar status do Stripe */}
         {isLoadingStripeData && (
           <div className="mb-6">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-gold/20">
-              <div className="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-loader-2 w-5 h-5 text-gold animate-spin">
-                  <path d="M21 12a9 9 0 11-6.219-8.56"/>
-                </svg>
-                <Badge className="bg-slate-800/50 text-white border border-gold/30 backdrop-blur-sm">
-                  Carregando Dados Financeiros
-                </Badge>
-                <span className="text-sm text-white ml-auto">Conectando com Stripe...</span>
-              </div>
-            </div>
+            <LoadingComponent message="Carregando dados financeiros" variant="minimal" />
           </div>
         )}
         

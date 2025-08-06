@@ -2,7 +2,7 @@ import * as z from "zod";
 
 export const formSchema = z.object({
   name: z.string().min(5, "O título deve conter pelo menos 5 caracteres"),
-  description: z.string().min(20, "A descrição deve conter pelo menos 20 caracteres"),
+  description: z.string().min(100, "A descrição deve conter pelo menos 100 caracteres"),
   category: z.string().min(1, "Selecione uma categoria"),
   image: z.string().min(1, "Selecione uma imagem para o curso"),
   type: z.enum(["free", "paid"]),

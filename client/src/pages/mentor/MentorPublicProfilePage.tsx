@@ -46,6 +46,29 @@ const MentorPublicProfilePage = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Função para lidar com o clique no botão WhatsApp
+  const handleWhatsAppClick = () => {
+    if (!mentorData?.phone) {
+      toast({
+        variant: "destructive",
+        title: "Número não disponível",
+        description: "Este mentor não possui número de telefone preenchido na plataforma."
+      });
+      return;
+    }
+
+    // Obter código do país (sem o +) e número de telefone limpo
+    const countryCode = (mentorData as any).country ? (mentorData as any).country.replace('+', '') : '55';
+    const cleanPhone = mentorData.phone.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+    
+    // Combinar código do país com o número de telefone
+    const fullPhoneNumber = `${countryCode}${cleanPhone}`;
+    
+    // Abrir WhatsApp Web em nova guia
+    const whatsappUrl = `https://wa.me/${fullPhoneNumber}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   // Monitor changes to mentor settings
   useEffect(() => {
     console.log('📋 [MENTOR-SETTINGS] Estado atualizado:', mentorSettings);
@@ -846,8 +869,8 @@ const MentorPublicProfilePage = () => {
                     <div className="text-center">
                       <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden">
                         <img
-                          src={mentorData.review_comments?.[`photo_${index}`] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                          alt={mentorData.review_comments?.[`name_${index}`] || 'Pessoa'}
+                          src={(mentorData.review_comments as any)?.[`photo_${index}`] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                          alt={(mentorData.review_comments as any)?.[`name_${index}`] || 'Pessoa'}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -856,13 +879,13 @@ const MentorPublicProfilePage = () => {
                         />
                       </div>
                       <h4 className="font-semibold text-gray-800 mb-1">
-                        {mentorData.review_comments?.[`name_${index}`] || 'Nome da Pessoa'}
+                        {(mentorData.review_comments as any)?.[`name_${index}`] || 'Nome da Pessoa'}
                       </h4>
                       <p className="text-sm text-gray-600 mb-3">
-                        {mentorData.review_comments?.[`profession_${index}`] || 'Profissão'}
+                        {(mentorData.review_comments as any)?.[`profession_${index}`] || 'Profissão'}
                       </p>
                       <p className="text-gray-700 text-sm leading-relaxed italic">
-                        "{mentorData.review_comments?.[`comment_${index}`] || 'Comentário do depoimento'}"
+                        "{(mentorData.review_comments as any)?.[`comment_${index}`] || 'Comentário do depoimento'}"
                       </p>
                     </div>
                   </div>
@@ -1035,7 +1058,10 @@ const MentorPublicProfilePage = () => {
                 {/* Rodapé com os botões */}
                 <div className="border-t pt-6 mt-8">
                   <div className="grid lg:grid-cols-1 gap-4">
-                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <Button 
+                      onClick={handleWhatsAppClick}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    >
                       Chamar no WhatsApp
                     </Button>
                   </div>

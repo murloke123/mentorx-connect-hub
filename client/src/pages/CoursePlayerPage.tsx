@@ -1,4 +1,5 @@
 import ChatModal from '@/components/chat/ChatModal';
+import LoadingComponent from '@/components/shared/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -937,7 +938,7 @@ const CoursePlayerPage = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><p>Carregando curso...</p></div>;
+  if (loading) return <LoadingComponent message="Carregando curso" variant="full-screen" />;
   
   if (error) {
     return (

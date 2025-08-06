@@ -21,6 +21,7 @@
  * - Aqui só fazemos fetch() para nossos próprios endpoints
  */
 
+import { clientConfig } from '@/config/environment';
 import { supabase } from '@/utils/supabase';
 
 // ##########################################################################################
@@ -382,8 +383,8 @@ export async function startAppointmentCheckout(
 
     // URLs de checkout para agendamentos
     // 🎯 CORREÇÃO CRÍTICA: Adicionar {CHECKOUT_SESSION_ID} para que o Stripe inclua automaticamente o session_id
-    const successUrl = `${window.location.origin}/appointment-checkout-success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${window.location.origin}/`;
+    const successUrl = `${clientConfig.APP_URL}/appointment-checkout-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${clientConfig.APP_URL}/`;
 
     // Criar sessão de checkout
     const response = await fetch('/api/stripe/appointments/checkout', {

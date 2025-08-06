@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Modulo } from '@/services/moduloService';
-import { ChevronRight, Edit, FileText, PlusCircle, Trash2 } from 'lucide-react';
+import { ChevronRight, Edit, FileText, Library, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -51,8 +51,8 @@ const ModuloList = ({ modulos, cursoId, onAddModulo, onEditModulo, onDeleteModul
 
       {modulos.length === 0 ? (
         <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-lg">
-          <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-xl font-medium text-gray-900">
+          <Library className="mx-auto h-12 w-12 text-gold" />
+          <h3 className="mt-2 text-xl font-medium text-white">
             Nenhum módulo criado
           </h3>
           <p className="mt-1 text-sm text-gray-500">

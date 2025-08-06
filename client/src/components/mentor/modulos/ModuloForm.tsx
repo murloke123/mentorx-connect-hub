@@ -1,13 +1,11 @@
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
-import { DialogClose } from '@/components/ui/dialog';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const moduloSchema = z.object({
   title: z.string().min(3, { message: 'O nome do módulo deve ter pelo menos 3 caracteres' }),
@@ -49,7 +47,12 @@ const ModuloForm = ({ onSubmit, initialData, isLoading = false, submitText = 'Sa
             <FormItem>
               <FormLabel>Nome do Módulo</FormLabel>
               <FormControl>
-                <Input placeholder="Digite o nome do módulo..." {...field} disabled={isLoading} />
+                <Input 
+                  placeholder="Digite o nome do módulo..." 
+                  {...field} 
+                  disabled={isLoading}
+                  className="bg-background"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

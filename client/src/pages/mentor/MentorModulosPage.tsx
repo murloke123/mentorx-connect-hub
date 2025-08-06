@@ -208,29 +208,43 @@ const ModulosPage = () => {
 
         {/* Modal de Adicionar Módulo */}
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Adicionar Novo Módulo</DialogTitle>
+          <DialogContent className="max-w-md p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+            <DialogHeader className="p-6 pb-4 border-b border-slate-700">
+              <DialogTitle className="text-lg font-semibold text-white flex items-center">
+                <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+                  <Library className="h-4 w-4 text-slate-900" />
+                </div>
+                Adicionar Novo Módulo
+              </DialogTitle>
             </DialogHeader>
-            <ModuloForm
-              onSubmit={handleSubmitAddModulo}
-              isLoading={isSubmitting}
-            />
+            <div className="p-6 pt-4">
+              <ModuloForm
+                onSubmit={handleSubmitAddModulo}
+                isLoading={isSubmitting}
+              />
+            </div>
           </DialogContent>
         </Dialog>
 
         {/* Modal de Editar Módulo */}
         {editingModulo && (
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Editar Módulo: {editingModulo.title}</DialogTitle>
+            <DialogContent className="max-w-md p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+              <DialogHeader className="p-6 pb-4 border-b border-slate-700">
+                <DialogTitle className="text-lg font-semibold text-white flex items-center">
+                  <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+                    <Library className="h-4 w-4 text-slate-900" />
+                  </div>
+                  Editar Módulo: {editingModulo.title}
+                </DialogTitle>
               </DialogHeader>
-              <ModuloForm
-                onSubmit={handleSubmitEditModulo}
-                isLoading={isSubmitting}
-                initialData={editingModulo}
-              />
+              <div className="p-6 pt-4">
+                <ModuloForm
+                  onSubmit={handleSubmitEditModulo}
+                  isLoading={isSubmitting}
+                  initialData={editingModulo}
+                />
+              </div>
             </DialogContent>
           </Dialog>
         )}

@@ -15,7 +15,7 @@ const FinalCTASection = () => {
     },
     {
       icon: <Shield className="w-5 h-5" />,
-      text: "Garantia de 30 dias"
+      text: "Garantia de 7 dias"
     }
   ];
 
@@ -93,7 +93,7 @@ const FinalCTASection = () => {
             🚀 GARANTIR ACESSO VITALÍCIO AGORA
           </Button>
           <p className="text-sm text-muted-foreground">
-            ✅ Acesso imediato • ✅ Sem mensalidades • ✅ Garantia de 30 dias
+            ✅ Acesso imediato • ✅ Sem mensalidades • ✅ Garantia de 7 dias
           </p>
         </div>
 

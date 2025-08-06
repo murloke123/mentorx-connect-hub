@@ -62,7 +62,6 @@ import {
     MentorRotasPage,
     MentorsPage,
     MentorStripeOnboardingPage,
-    MentorTemplatesEmailPage,
     NotFound,
     // Helpers
     preloadCriticalComponents
@@ -222,11 +221,7 @@ const AppContent = () => {
               <MentorStripeOnboardingPage />
             </ProtectedRoute>
           } />
-          <Route path="/mentor/templates-email" element={
-            <ProtectedRoute allowedRoles={['mentor']}>
-              <MentorTemplatesEmailPage />
-            </ProtectedRoute>
-          } />
+
           
           {/* Rotas de Mentorado - Protegidas */}
           <Route path="/mentorado/dashboard" element={

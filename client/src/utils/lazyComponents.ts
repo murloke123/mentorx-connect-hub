@@ -35,6 +35,7 @@ export const AdminCalendarioPage = lazy(() => import('@/pages/admin/AdminCalenda
 export const AdminConfiguracoesPage = lazy(() => import('@/pages/admin/AdminConfiguracoesPage'));
 
 // ===== MENTOR PAGES - Chunk separado =====
+// NOTA: MentorTemplatesEmailPage foi removido - não adicionar novamente
 export const MentorDashboardPage = lazy(() => import('@/pages/mentor/MentorDashboardPage'));
 export const MentorProfilePage = lazy(() => import('@/pages/mentor/MentorProfilePage'));
 export const MentorPublicProfilePage = lazy(() => import('@/pages/mentor/MentorPublicProfilePage'));
@@ -54,7 +55,7 @@ export const MentorConfiguracoesPage = lazy(() => import('@/pages/mentor/MentorC
 export const MentorRotasPage = lazy(() => import('@/pages/mentor/MentorRotasPage'));
 export const MentorMapeamentoDBPage = lazy(() => import('@/pages/mentor/MentorMapeamentoDBPage'));
 export const MentorStripeOnboardingPage = lazy(() => import('@/pages/mentor/MentorStripeOnboardingPage'));
-export const MentorTemplatesEmailPage = lazy(() => import('@/pages/mentor/TemplatesEmail'));
+
 
 // ===== MENTORADO PAGES - Chunk separado =====
 export const MentoradoDashboardPage = lazy(() => import('@/pages/mentorado/MentoradoDashboardPage'));
