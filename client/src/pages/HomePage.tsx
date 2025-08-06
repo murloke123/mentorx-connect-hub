@@ -5,7 +5,6 @@ import HeroSection from "@/components/HeroSection";
 import HighlightsCarousel from "@/components/HighlightsCarousel";
 import MentorsSection from "@/components/MentorsSection";
 import PricingSection from "@/components/PricingSection";
-import Footer from "@/components/shared/Footer";
 import StatsSection from "@/components/StatsSection";
 import React from "react";
 
@@ -35,9 +34,6 @@ const HomePage: React.FC = () => {
       
       {/* Final CTA Section do novo layout */}
       <FinalCTASection />
-      
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

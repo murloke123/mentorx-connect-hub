@@ -10,6 +10,7 @@ import {
   Eye,
   FileIcon,
   FileText,
+  Library,
   Play,
   Plus,
   Rocket,
@@ -551,14 +552,20 @@ const CourseLandingPage: React.FC = () => {
                     {/* Shimmer Effect on Hover */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
                     <div className="relative z-10 p-8 flex flex-col justify-center text-white">
-                        <h1 className="text-2xl md:text-4xl font-black mb-4 leading-tight">
-                          <span className="gradient-text text-shadow-gold">
+                        <h1 className="text-2xl md:text-4xl font-black mb-4 leading-tight break-words hyphens-auto">
+                          <span className="gradient-text text-shadow-gold break-words">
                             {courseData.title}
                           </span>
                         </h1>
                         <div className="space-y-4">
                           <div 
-                            className="text-lg opacity-90 max-w-2xl drop-shadow-md prose prose-invert prose-lg"
+                            className="text-lg opacity-90 max-w-full break-words hyphens-auto drop-shadow-md prose prose-invert prose-lg"
+                            style={{
+                              wordWrap: 'break-word',
+                              overflowWrap: 'break-word',
+                              wordBreak: 'break-word',
+                              hyphens: 'auto'
+                            }}
                             dangerouslySetInnerHTML={{
                               __html: isDescriptionExpanded 
                                 ? courseData.description 
@@ -692,7 +699,7 @@ const CourseLandingPage: React.FC = () => {
                           {landingData.key_benefits.map((benefit, index) => (
                             <li key={index} className="flex items-center space-x-3">
                               <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                              <span className="text-white">{benefit}</span>
+                              <span className="text-white break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>{benefit}</span>
                             </li>
                           ))}
                         </ul>
@@ -847,7 +854,7 @@ const CourseLandingPage: React.FC = () => {
                                    <span className="ml-2 text-sm text-white/80 font-medium">{tempSocialRating}/5</span>
                                  </div>
                                  {landingData.comment && (
-                                   <p className="text-sm text-white/70 italic mt-2">
+                                   <p className="text-sm text-white/70 italic mt-2 break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                      "{landingData.comment}"
                                    </p>
                                  )}
@@ -901,44 +908,56 @@ const CourseLandingPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      {realCourseData?.modulos.map((module, moduleIndex) => (
-                        <div key={module.id} className="border border-white/10 rounded-lg overflow-hidden">
-                          <button
-                            onClick={() => toggleModule(moduleIndex)}
-                            className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors duration-200"
-                          >
-                            <span className="font-medium text-white">{module.title}</span>
-                            {expandedModules.has(moduleIndex) ? (
-                              <ChevronDown className="w-5 h-5 text-gold" />
-                            ) : (
-                              <ChevronRight className="w-5 h-5 text-gold" />
-                            )}
-                          </button>
-                          {expandedModules.has(moduleIndex) && (
-                            <div className="px-4 pb-4 space-y-2">
-                              {module.conteudos.map((conteudo, conteudoIndex) => (
-                                <div key={conteudo.id} className="flex items-center space-x-3 py-2">
-                                  <div className="flex items-center space-x-2">
-                                    {conteudo.content_type === 'video_externo' && (
-                                      <Play className="w-3 h-3 text-gold flex-shrink-0" />
-                                    )}
-                                    {conteudo.content_type === 'texto_rico' && (
-                                      <FileText className="w-3 h-3 text-gold flex-shrink-0" />
-                                    )}
-                                    {conteudo.content_type === 'pdf' && (
-                                      <FileIcon className="w-3 h-3 text-gold flex-shrink-0" />
-                                    )}
-                                    <div className="w-2 h-2 bg-gold rounded-full flex-shrink-0"></div>
+                      {realCourseData?.modulos && realCourseData.modulos.length > 0 ? (
+                        realCourseData.modulos.map((module, moduleIndex) => (
+                          <div key={module.id} className="border border-white/10 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() => toggleModule(moduleIndex)}
+                              className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors duration-200"
+                            >
+                              <span className="font-medium text-white break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>{module.title}</span>
+                              {expandedModules.has(moduleIndex) ? (
+                                <ChevronDown className="w-5 h-5 text-gold" />
+                              ) : (
+                                <ChevronRight className="w-5 h-5 text-gold" />
+                              )}
+                            </button>
+                            {expandedModules.has(moduleIndex) && (
+                              <div className="px-4 pb-4 space-y-2">
+                                {module.conteudos.map((conteudo, conteudoIndex) => (
+                                  <div key={conteudo.id} className="flex items-center space-x-3 py-2">
+                                    <div className="flex items-center space-x-2">
+                                      {conteudo.content_type === 'video_externo' && (
+                                        <Play className="w-3 h-3 text-gold flex-shrink-0" />
+                                      )}
+                                      {conteudo.content_type === 'texto_rico' && (
+                                        <FileText className="w-3 h-3 text-gold flex-shrink-0" />
+                                      )}
+                                      {conteudo.content_type === 'pdf' && (
+                                        <FileIcon className="w-3 h-3 text-gold flex-shrink-0" />
+                                      )}
+                                      <div className="w-2 h-2 bg-gold rounded-full flex-shrink-0"></div>
+                                    </div>
+                                    <span className="text-white/80 text-sm break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>{conteudo.title}</span>
                                   </div>
-                                  <span className="text-white/80 text-sm">{conteudo.title}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )) || (
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
                         <div className="text-center py-8">
-                          <p className="text-white/60">Nenhum módulo encontrado</p>
+                          <div className="mb-4">
+                            <Library className="w-8 h-8 text-gold mx-auto mb-3" />
+                            <p className="text-white/60 mb-4">Nenhum módulo encontrado</p>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/mentor/meus-cursos/${courseId}/modulos`)}
+                            className="inline-flex items-center px-6 py-3 bg-transparent border border-gold text-gold hover:bg-gold hover:text-black transition-all duration-300 rounded-lg font-medium"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Criar Módulos
+                          </button>
                         </div>
                       )}
                     </div>
@@ -970,7 +989,7 @@ const CourseLandingPage: React.FC = () => {
                           <span className="text-sm font-medium uppercase tracking-wider opacity-90 relative z-50 force-dark-text">Curso Premium</span>
                         </div>
                         
-                        <h3 className="text-3xl font-black mb-4 leading-tight text-shadow-lg drop-shadow-2xl relative z-50 force-dark-text">
+                        <h3 className="text-3xl font-black mb-4 leading-tight text-shadow-lg drop-shadow-2xl relative z-50 force-dark-text break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                           {courseData.title}
                         </h3>
                         
@@ -1122,10 +1141,10 @@ const CourseLandingPage: React.FC = () => {
                                 <BookOpen className="w-5 h-5 text-gold" />
                               </div>
                               <div>
-                                <div className="font-semibold text-foreground">
+                                <div className="font-semibold text-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.content_complete.title || "Conteúdo Completo"}
                                 </div>
-                                <div className="text-sm text-muted-foreground">
+                                <div className="text-sm text-muted-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.content_complete.subtitle || "Módulos práticos e teóricos"}
                                 </div>
                               </div>
@@ -1136,10 +1155,10 @@ const CourseLandingPage: React.FC = () => {
                                 <Clock className="w-5 h-5 text-gold" />
                               </div>
                               <div>
-                                <div className="font-semibold text-foreground">
+                                <div className="font-semibold text-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.lifetime_access.title || "Acesso Vitalício"}
                                 </div>
-                                <div className="text-sm text-muted-foreground">
+                                <div className="text-sm text-muted-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.lifetime_access.subtitle || "Estude no seu ritmo"}
                                 </div>
                               </div>
@@ -1150,10 +1169,10 @@ const CourseLandingPage: React.FC = () => {
                                 <Award className="w-5 h-5 text-gold" />
                               </div>
                               <div>
-                                <div className="font-semibold text-foreground">
+                                <div className="font-semibold text-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.certificate.title || "Certificado"}
                                 </div>
-                                <div className="text-sm text-muted-foreground">
+                                <div className="text-sm text-muted-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                                   {landingData.course_features?.certificate.subtitle || "Comprove suas habilidades"}
                                 </div>
                               </div>
@@ -1170,7 +1189,7 @@ const CourseLandingPage: React.FC = () => {
                           <Zap className="w-5 h-5 text-gold" />
                           <span className="font-semibold text-gold">Bônus Incluído</span>
                         </div>
-                        <p className="text-sm text-foreground">
+                        <p className="text-sm text-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                           {landingData.bonus_offer}
                         </p>
                       </div>
@@ -1181,7 +1200,7 @@ const CourseLandingPage: React.FC = () => {
                           <User className="w-5 h-5 text-gold" />
                           <span className="font-semibold text-gold">{landingData.urgency_message}</span>
                         </div>
-                        <p className="text-sm text-foreground">
+                        <p className="text-sm text-foreground break-words hyphens-auto" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                           Tire suas dúvidas diretamente com o mentor e acelere seu aprendizado
                         </p>
                       </div>
