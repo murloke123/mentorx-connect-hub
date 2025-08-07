@@ -7,13 +7,13 @@ import ChatModal from "../../components/chat/ChatModal";
 import CoursesList from "../../components/mentor/CoursesList";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
 import { Button } from "../../components/ui/button";
 import { getMentorCourses } from '../../services/courseService';
@@ -156,7 +156,7 @@ const MeusCursosPage = () => {
               <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
                 <AlertTriangle className="h-4 w-4 text-slate-900" />
               </div>
-              Atenção: Cursos Não Publicados
+              Atenção: Cursos não publicados ...
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm leading-relaxed text-gray-300 mt-3">
               Você possui cursos que ainda não estão publicados e não aparecem na plataforma para os outros usuários. 

@@ -9,6 +9,15 @@ import MentorCalendarSettings from "@/components/MentorCalendarSettings";
 import ProfileForm from "@/components/profile/ProfileForm";
 import CourseCard from "@/components/shared/CourseCard";
 import LoadingComponent from "@/components/shared/LoadingComponent";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +30,7 @@ import { supabase } from "@/utils/supabase";
 import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Calendar, CalendarDays, Camera, Check, Edit, Facebook, GraduationCap, Instagram, Mail, MessageCircle, Quote, Save, Star, User, UserPlus, X, Youtube } from "lucide-react";
+import { AlertTriangle, BookOpen, Calendar, CalendarDays, Camera, Check, Edit, Facebook, GraduationCap, Instagram, Mail, MessageCircle, Quote, Save, Star, User, UserPlus, X, Youtube } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CourseWithProfile extends Course {
@@ -55,6 +64,8 @@ const MentorProfilePage = () => {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isUnpublishModalOpen, setIsUnpublishModalOpen] = useState(false);
   const [isPublicAccount, setIsPublicAccount] = useState(false);
+  const [isUnpublishedProfileAlertOpen, setIsUnpublishedProfileAlertOpen] = useState(false);
+  const [hasShownUnpublishedAlert, setHasShownUnpublishedAlert] = useState(false);
   
   // Estados para edição dos hero cards
   const [isEditingHeroCards, setIsEditingHeroCards] = useState(false);
@@ -128,6 +139,7 @@ const MentorProfilePage = () => {
   // Estados para os checkboxes de verificação
   const [verifiedData, setVerifiedData] = useState({
     cards_sucesso: false,
+    meu_perfil: false,
     por_que_me_seguir: false,
     meus_cursos: false,
     elogios: false,
@@ -304,6 +316,7 @@ const MentorProfilePage = () => {
       if (profile.verified) {
         setVerifiedData({
           cards_sucesso: profile.verified.cards_sucesso || false,
+          meu_perfil: profile.verified.meu_perfil || false,
           por_que_me_seguir: profile.verified.por_que_me_seguir || false,
           meus_cursos: profile.verified.meus_cursos || false,
           elogios: profile.verified.elogios || false,
@@ -321,6 +334,16 @@ const MentorProfilePage = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  // Verificar se o perfil está publicado e mostrar modal de alerta (apenas uma vez por sessão)
+  useEffect(() => {
+    if (currentUser && !isLoading && !hasShownUnpublishedAlert) {
+      if (!currentUser.is_public) {
+        setIsUnpublishedProfileAlertOpen(true);
+        setHasShownUnpublishedAlert(true);
+      }
+    }
+  }, [currentUser, isLoading, hasShownUnpublishedAlert]);
 
   const handleMentorImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1059,9 +1082,9 @@ const MentorProfilePage = () => {
                 
                 {/* Checkbox de verificação */}
                 <VerificationSwitch
-                  id="verified-seguir"
-                  checked={verifiedData.por_que_me_seguir}
-                  onChange={(checked) => handleVerifiedChange('por_que_me_seguir', checked)}
+                  id="verified-perfil"
+                  checked={verifiedData.meu_perfil}
+                  onChange={(checked) => handleVerifiedChange('meu_perfil', checked)}
                 />
               </div>
               
@@ -1629,6 +1652,35 @@ const MentorProfilePage = () => {
         onClose={() => setIsUnpublishModalOpen(false)}
         onUnpublishSuccess={handleUnpublishSuccess}
       />
+
+      {/* Modal de alerta para perfil não publicado */}
+      <AlertDialog open={isUnpublishedProfileAlertOpen} onOpenChange={setIsUnpublishedProfileAlertOpen}>
+        <AlertDialogContent className="glass-card border-gold/20">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-yellow-500" />
+              <AlertDialogTitle className="text-gold">
+                Atenção: Perfil não publicado ...
+              </AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-silver text-left">
+              Seu perfil não está publicado, isso significa que outros usuários da plataforma não poderão visualizá-lo.
+              <br /><br />
+              Insira uma foto sua, revise as informações do seu perfil e verifique se estão corretas. Confira também as seções: "Cards de Sucesso", "Meu Perfil", "Por que me seguir", "Meus Cursos", "O que dizem meus mentorados" e "Agende uma Conversa".
+              <br /><br />
+              Após isso, tente publicar sua conta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setIsUnpublishedProfileAlertOpen(false)}
+              className="bg-gold hover:bg-yellow-500 text-black"
+            >
+              Entendi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -47,6 +47,7 @@ interface LandingPageData {
   guarantee: string;
   bonus_offer: string;
   urgency_message: string;
+  comment?: string;
   course_features?: {
     content_complete: { title: string; subtitle: string };
     lifetime_access: { title: string; subtitle: string };
@@ -61,6 +62,14 @@ interface UserProfile {
   role?: string;
 }
 
+interface MentorProfile {
+  id: string;
+  full_name?: string;
+  avatar_url?: string;
+  bio?: string;
+  highlight_message?: string;
+}
+
 const CoursePublicView: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
@@ -70,6 +79,7 @@ const CoursePublicView: React.FC = () => {
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [mentorData, setMentorData] = useState<MentorProfile | null>(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [processingEnrollment, setProcessingEnrollment] = useState(false);
@@ -124,6 +134,19 @@ const CoursePublicView: React.FC = () => {
 
         if (courseError) throw courseError;
         setCourseData(course);
+
+        // Carregar dados do mentor
+        if (course.mentor_id) {
+          const { data: mentor, error: mentorError } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, bio, highlight_message')
+            .eq('id', course.mentor_id)
+            .single();
+
+          if (!mentorError && mentor) {
+            setMentorData(mentor);
+          }
+        }
 
         // Carregar dados completos do curso com módulos e conteúdos
         const realCourse = await getCursoCompleto(courseId);
@@ -538,6 +561,46 @@ const CoursePublicView: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Coluna Principal - Cards de Conteúdo */}
                 <div className="lg:col-span-2 space-y-8">
+                  
+                  {/* Card: Sobre o Mentor */}
+                  {mentorData && (
+                    <div 
+                      className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:border-gold/30"
+                      onClick={() => navigate(`/mentor/publicview/${mentorData.id}`)}
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* Avatar do Mentor */}
+                        <div className="relative">
+                          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gold/30">
+                            {mentorData.avatar_url ? (
+                              <img 
+                                src={mentorData.avatar_url} 
+                                alt={mentorData.full_name || "Mentor"}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-gold/20 to-gold/40 flex items-center justify-center">
+                                <User className="w-8 h-8 text-gold" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-background rounded-full"></div>
+                        </div>
+
+                        {/* Informações do Mentor */}
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-foreground mb-1">
+                            {mentorData.full_name || "Mentor"}
+                          </h3>
+                          
+                          {/* Frase de destaque */}
+                          <p className="text-gold text-sm font-medium mb-2 italic">
+                            "{mentorData.highlight_message || "Estou aqui para compartilhar meu conhecimento e te ajudar a alcançar seus objetivos!"}"
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Card: O que você vai aprender */}
                   <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">

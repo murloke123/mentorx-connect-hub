@@ -204,7 +204,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
       {/* Label - Ocultar asterisco obrigatório se conta verificada */}
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-foreground">
           {label}
           {required && !shouldHideUploadElements && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -213,10 +213,10 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         )}
       </div>
 
-      <Card className={`transition-all duration-200 ${
-        dragActive ? 'border-blue-500 bg-blue-50' : 
+      <Card className={`transition-all duration-200 bg-card/50 backdrop-blur-sm ${
+        dragActive ? 'border-blue-500 bg-blue-50/20' : 
         hasError ? 'border-red-300' : 
-        isUploaded ? 'border-green-300' : 'border-gray-200'
+        isUploaded ? 'border-green-300' : 'border-border/50'
       }`}>
         <CardContent className="p-4">
           {isUploaded && currentPreviewUrl ? (
@@ -258,11 +258,11 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="absolute top-2 right-2 shadow-md bg-white/90 hover:bg-red-50 hover:border-red-300"
+                className="absolute top-2 right-2 shadow-lg bg-slate-800/95 hover:bg-slate-700 hover:border-slate-600 border-slate-600 backdrop-blur-sm"
                 onClick={handleRemove}
                 title="Substituir documento"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 text-gray-200 hover:text-white" />
               </Button>
             </div>
           ) : uploadState.isUploading ? (
@@ -289,18 +289,18 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             // Área de upload (mostrada quando não há upload em andamento E não há documento válido E conta não está verificada)
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                dragActive ? 'border-blue-500 bg-blue-50/20' : 'border-border/50 hover:border-border'
               }`}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={openFileDialog}
             >
-              <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-sm text-gray-600 mb-2">
+              <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-sm text-foreground mb-2">
                 Clique para selecionar ou arraste o arquivo aqui
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 JPG, PNG ou PDF até 5MB
               </p>
             </div>

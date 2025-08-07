@@ -217,6 +217,7 @@ export interface Database {
           bio: string | null;
           role: string;
           updated_at: string | null;
+          created_at: string | null;
           category: string | null;
           category_id: string | null;
           highlight_message: string | null;

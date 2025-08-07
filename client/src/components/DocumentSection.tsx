@@ -130,14 +130,14 @@ export const DocumentSection: React.FC<DocumentSectionProps> = ({
   };
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 backdrop-blur-xl border border-border/50 min-h-[600px]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          <FileText className="h-5 w-5 text-gold" />
           Documentos de Identificação
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pb-8">
         {/* Mostrar Alert informativo apenas se NÃO estiver completo E não estiver verificado */}
         {!isComplete && !isVerified && (
           <Alert>
@@ -213,12 +213,12 @@ export const DocumentSection: React.FC<DocumentSectionProps> = ({
                         <RadioGroupItem value={doc.value} id={doc.value} />
                         <Label 
                           htmlFor={doc.value} 
-                          className="flex items-center gap-3 cursor-pointer flex-1 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 cursor-pointer flex-1 p-3 border border-border rounded-lg hover:bg-card/50 transition-colors bg-card/30"
                         >
-                          <Icon className="h-5 w-5 text-gray-600" />
+                          <Icon className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <div className="font-medium">{doc.label}</div>
-                            <div className="text-sm text-gray-500">{doc.description}</div>
+                            <div className="font-medium text-foreground">{doc.label}</div>
+                            <div className="text-sm text-muted-foreground">{doc.description}</div>
                           </div>
                         </Label>
                       </div>
@@ -259,9 +259,9 @@ export const DocumentSection: React.FC<DocumentSectionProps> = ({
 
                 {/* Status de completude - Mostrar apenas se NÃO estiver completo E não estiver verificado */}
                 {!isComplete && !isVerified && (
-                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                    <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                    <span className="text-sm font-medium">
+                  <div className="flex items-center gap-2 p-3 bg-card/50 border border-border/50 rounded-lg backdrop-blur-sm">
+                    <div className="h-3 w-3 rounded-full bg-gold" />
+                    <span className="text-sm font-medium text-foreground">
                       Aguardando upload dos documentos...
                     </span>
                   </div>

@@ -1,10 +1,16 @@
+// 🔒 SISTEMA DE LOCK DISTRIBUÍDO PARA CONTROLE DE EMAILS
+const emailLocks = new Map<string, Promise<void>>();
+
 /**
- * 🎯 NOVA FUNÇÃO: Enviar email baseado na ativação da matrícula
+ * 🎯 FUNÇÃO ROBUSTA: Enviar email com controle atômico anti-duplicação
  * 
- * Esta função é chamada APENAS quando uma matrícula fica ativa,
- * garantindo que apenas 1 email seja enviado por curso comprado.
+ * MECANISMOS DE PROTEÇÃO:
+ * 1. Lock distribuído por matrícula (evita race conditions)
+ * 2. Verificação atômica com UPDATE condicional
+ * 3. Timeout de segurança para locks órfãos
+ * 4. Logs detalhados para debug
  * 
- * Lógica: 1 matrícula ativa = 1 email enviado
+ * Lógica: 1 matrícula ativa = 1 email enviado (GARANTIDO)
  */
 async function sendCourseEnrollmentEmail({
   courseId,
@@ -17,100 +23,189 @@ async function sendCourseEnrollmentEmail({
   mentorId: string;
   transactionId: string;
 }) {
-  try {
-    console.log('📧 [ENROLLMENT-EMAIL] Iniciando envio de email para matrícula ativa:', {
-      courseId,
-      studentId,
-      mentorId,
-      transactionId
-    });
+  const lockKey = `email_${courseId}_${studentId}`;
+  const startTime = Date.now();
+  
+  console.log('🔒 [EMAIL-LOCK] Tentando adquirir lock:', {
+    lockKey,
+    courseId,
+    studentId,
+    mentorId,
+    transactionId,
+    timestamp: new Date().toISOString()
+  });
 
-    // Verificar se já existe uma matrícula ativa para este curso/estudante
-    const { data: activeEnrollment, error: enrollmentError } = await supabase
-      .from('matriculas')
-      .select('id, email_sent')
-      .eq('course_id', courseId)
-      .eq('student_id', studentId)
-      .eq('status', 'active')
-      .single();
-
-    if (enrollmentError) {
-      console.error('❌ [ENROLLMENT-EMAIL] Erro ao verificar matrícula:', enrollmentError);
-      return;
-    }
-
-    // Se email já foi enviado para esta matrícula, pular
-    if (activeEnrollment?.email_sent) {
-      console.log('✅ [ENROLLMENT-EMAIL] Email já enviado para esta matrícula, pulando...');
-      return;
-    }
-
-    // Buscar dados necessários
-    const [courseData, studentData, mentorData] = await Promise.all([
-      supabase.from('cursos').select('title, price').eq('id', courseId).single(),
-      supabase.from('profiles').select('full_name').eq('id', studentId).single(),
-      supabase.from('profiles').select('full_name, email').eq('id', mentorId).single()
-    ]);
-
-    if (!courseData.data || !studentData.data || !mentorData.data) {
-      console.error('❌ [ENROLLMENT-EMAIL] Dados incompletos:', {
-        course: !!courseData.data,
-        student: !!studentData.data,
-        mentor: !!mentorData.data
-      });
-      return;
-    }
-
-    // Enviar notificação interna
-    await notifyCoursePurchase({
-      mentorId,
-      mentorName: mentorData.data.full_name,
-      buyerId: studentId,
-      buyerName: studentData.data.full_name || 'Usuário',
-      courseName: courseData.data.title,
-      coursePrice: (courseData.data.price || 0) * 100, // converter para centavos
-    });
-
-    console.log('✅ [ENROLLMENT-EMAIL] Notificação interna enviada');
-
-    // Enviar email para o mentor
-    if (mentorData.data.email) {
-      const emailResponse = await fetch('/api/email/course-buy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mentorName: mentorData.data.full_name,
-          mentorEmail: mentorData.data.email,
-          buyerName: studentData.data.full_name || 'Usuário',
-          courseName: courseData.data.title,
-          coursePrice: courseData.data.price || 0,
-          transactionId
-        })
-      });
-
-      const emailResult = await emailResponse.json();
+  // 🔒 STEP 1: Verificar se já existe um lock ativo
+  if (emailLocks.has(lockKey)) {
+    console.log('⏳ [EMAIL-LOCK] Lock já existe, aguardando liberação...');
+    try {
+      await emailLocks.get(lockKey);
+      console.log('✅ [EMAIL-LOCK] Lock anterior liberado, verificando se email já foi enviado...');
       
-      if (emailResult.success) {
-        console.log('✅ [ENROLLMENT-EMAIL] Email enviado para o mentor');
+      // Verificar se o email já foi enviado enquanto aguardava
+      const { data: checkEnrollment } = await supabase
+        .from('matriculas')
+        .select('email_sent')
+        .eq('course_id', courseId)
+        .eq('student_id', studentId)
+        .eq('status', 'active')
+        .single();
         
-        // Marcar email como enviado na matrícula
+      if (checkEnrollment?.email_sent) {
+        console.log('✅ [EMAIL-LOCK] Email já foi enviado por processo anterior, abortando...');
+        return;
+      }
+    } catch (error) {
+      console.log('⚠️ [EMAIL-LOCK] Erro ao aguardar lock anterior, continuando...');
+    }
+  }
+
+  // 🔒 STEP 2: Criar novo lock com timeout de segurança
+  const lockPromise = (async () => {
+    try {
+      console.log('🚀 [EMAIL-ATOMIC] Iniciando processo atômico de envio de email');
+
+      // 🔍 STEP 3: Verificação atômica com UPDATE condicional
+      // Esta operação é atômica no PostgreSQL - evita race conditions
+      const { data: updateResult, error: updateError } = await supabase
+        .from('matriculas')
+        .update({
+          email_sent: true,
+          email_sent_at: new Date().toISOString()
+        })
+        .eq('course_id', courseId)
+        .eq('student_id', studentId)
+        .eq('status', 'active')
+        .eq('email_sent', false) // 🎯 CRÍTICO: Só atualiza se ainda não foi enviado
+        .select('id, email_sent, email_sent_at')
+        .single();
+
+      if (updateError || !updateResult) {
+        console.log('🛑 [EMAIL-ATOMIC] Email já foi enviado ou matrícula não encontrada:', {
+          error: updateError?.message,
+          hasResult: !!updateResult
+        });
+        return; // Email já foi enviado por outro processo
+      }
+
+      console.log('✅ [EMAIL-ATOMIC] Lock atômico adquirido com sucesso:', {
+        matriculaId: updateResult.id,
+        emailSentAt: updateResult.email_sent_at
+      });
+
+      // 🔍 STEP 4: Buscar dados necessários
+      const [courseData, studentData, mentorData] = await Promise.all([
+        supabase.from('cursos').select('title, price, discounted_price').eq('id', courseId).single(),
+        supabase.from('profiles').select('full_name').eq('id', studentId).single(),
+        supabase.from('profiles').select('full_name, email').eq('id', mentorId).single()
+      ]);
+
+      if (!courseData.data || !studentData.data || !mentorData.data) {
+        console.error('❌ [EMAIL-ATOMIC] Dados incompletos, revertendo flag:', {
+          course: !!courseData.data,
+          student: !!studentData.data,
+          mentor: !!mentorData.data
+        });
+        
+        // Reverter flag se dados incompletos
         await supabase
           .from('matriculas')
-          .update({
-            email_sent: true,
-            email_sent_at: new Date().toISOString()
-          })
-          .eq('id', activeEnrollment.id);
-          
-      } else {
-        console.error('❌ [ENROLLMENT-EMAIL] Erro ao enviar email:', emailResult.error);
+          .update({ email_sent: false, email_sent_at: null })
+          .eq('id', updateResult.id);
+        return;
       }
-    }
 
-  } catch (error) {
-    console.error('❌ [ENROLLMENT-EMAIL] Erro geral:', error);
+      // 🔍 STEP 5: Enviar notificação interna
+      try {
+        await notifyCoursePurchase({
+          mentorId,
+          mentorName: mentorData.data.full_name,
+          buyerId: studentId,
+          buyerName: studentData.data.full_name || 'Usuário',
+          courseName: courseData.data.title,
+          coursePrice: (courseData.data.discounted_price || courseData.data.price || 0) * 100,
+        });
+        console.log('✅ [EMAIL-ATOMIC] Notificação interna enviada');
+      } catch (notifyError) {
+        console.error('⚠️ [EMAIL-ATOMIC] Erro na notificação interna (continuando):', notifyError);
+      }
+
+      // 🔍 STEP 6: Enviar email para o mentor (ÚNICA CHAMADA GARANTIDA)
+      if (mentorData.data.email) {
+        console.log('📧 [EMAIL-ATOMIC] Enviando email ÚNICO para mentor:', {
+          mentorEmail: mentorData.data.email,
+          courseName: courseData.data.title,
+          transactionId
+        });
+
+        const emailResponse = await fetch('/api/email/course-buy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            mentorName: mentorData.data.full_name,
+            mentorEmail: mentorData.data.email,
+            buyerName: studentData.data.full_name || 'Usuário',
+            courseName: courseData.data.title,
+            coursePrice: courseData.data.discounted_price || courseData.data.price || 0,
+            transactionId
+          })
+        });
+
+        const emailResult = await emailResponse.json();
+        
+        if (emailResult.success) {
+          console.log('✅ [EMAIL-ATOMIC] Email enviado com sucesso para o mentor!', {
+            mentorEmail: mentorData.data.email,
+            messageId: emailResult.messageId,
+            duration: Date.now() - startTime
+          });
+        } else {
+          console.error('❌ [EMAIL-ATOMIC] Erro ao enviar email:', emailResult.error);
+          
+          // Reverter flag se email falhou
+          await supabase
+            .from('matriculas')
+            .update({ email_sent: false, email_sent_at: null })
+            .eq('id', updateResult.id);
+        }
+      } else {
+        console.error('❌ [EMAIL-ATOMIC] Mentor sem email, revertendo flag');
+        await supabase
+          .from('matriculas')
+          .update({ email_sent: false, email_sent_at: null })
+          .eq('id', updateResult.id);
+      }
+
+    } catch (error) {
+      console.error('❌ [EMAIL-ATOMIC] Erro crítico no processo atômico:', error);
+    } finally {
+      console.log('🔓 [EMAIL-LOCK] Liberando lock:', {
+        lockKey,
+        duration: Date.now() - startTime
+      });
+    }
+  })();
+
+  // 🔒 STEP 7: Registrar lock com timeout de segurança
+  emailLocks.set(lockKey, lockPromise);
+  
+  // Timeout de segurança para limpar locks órfãos
+  setTimeout(() => {
+    if (emailLocks.get(lockKey) === lockPromise) {
+      emailLocks.delete(lockKey);
+      console.log('🧹 [EMAIL-LOCK] Lock removido por timeout de segurança:', lockKey);
+    }
+  }, 30000); // 30 segundos
+
+  try {
+    await lockPromise;
+  } finally {
+    // Limpar lock após conclusão
+    if (emailLocks.get(lockKey) === lockPromise) {
+      emailLocks.delete(lockKey);
+    }
   }
 }
 
@@ -576,6 +671,15 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
     } else {
       let enrollmentActivated = false;
       
+      // Buscar dados do curso para obter o discounted_price
+      const { data: courseData, error: courseError } = await supabase
+        .from('cursos')
+        .select('discounted_price')
+        .eq('id', transaction.course_id)
+        .single();
+
+      const discountedPrice = courseData?.discounted_price || null;
+
       if (existingEnrollment) {
         // Ativar matrícula existente
         await supabase
@@ -586,12 +690,13 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
             studant_name: studentName,
             course_owner_id: transaction.mentor_id,
             course_owner_name: ownerName,
-            price: coursePrice
+            price: coursePrice,
+            discounted_price: discountedPrice
           })
           .eq('course_id', transaction.course_id)
           .eq('student_id', transaction.buyer_id);
         
-        console.log('✅ [CLIENT-STRIPE] Matrícula ativada');
+        console.log('✅ [CLIENT-STRIPE] Matrícula ativada com discounted_price:', discountedPrice);
         enrollmentActivated = true;
       } else {
         // Criar nova matrícula
@@ -606,10 +711,11 @@ export async function handleCheckoutSuccess(sessionId: string, transactionId: st
             studant_name: studentName,
             course_owner_id: transaction.mentor_id,
             course_owner_name: ownerName,
-            price: coursePrice
+            price: coursePrice,
+            discounted_price: discountedPrice
           });
         
-        console.log('✅ [CLIENT-STRIPE] Nova matrícula criada');
+        console.log('✅ [CLIENT-STRIPE] Nova matrícula criada com discounted_price:', discountedPrice);
         enrollmentActivated = true;
       }
 

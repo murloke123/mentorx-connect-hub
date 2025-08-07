@@ -1,12 +1,12 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { updateMentorPublicStatus } from '@/services/mentorService';
@@ -21,11 +21,12 @@ interface PublishAccountModalProps {
 }
 
 interface VerifiedStatus {
+  cards_sucesso: boolean;
+  meu_perfil: boolean;
+  por_que_me_seguir: boolean;
+  meus_cursos: boolean;
   elogios: boolean;
   calendario: boolean;
-  meus_cursos: boolean;
-  cards_sucesso: boolean;
-  por_que_me_seguir: boolean;
 }
 
 export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
@@ -37,15 +38,17 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
   const [verifiedStatus, setVerifiedStatus] = useState<VerifiedStatus | null>(null);
   const [canPublish, setCanPublish] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [hasAvatar, setHasAvatar] = useState(false);
   const { toast } = useToast();
 
-  // Mapear campos para nomes de seções
+  // Mapeamento dos campos do banco para nomes das seções
   const fieldToSectionMap: Record<string, string> = {
-    elogios: 'O que dizem meus mentorados ...',
-    calendario: 'Agende uma Conversa',
-    meus_cursos: 'Meus Cursos',
     cards_sucesso: 'Cards de Sucesso',
-    por_que_me_seguir: 'Por que me seguir'
+    meu_perfil: 'Meu Perfil',
+    por_que_me_seguir: 'Por que me seguir?',
+    meus_cursos: 'Meus Cursos',
+    elogios: 'O que dizem meus mentorados ...',
+    calendario: 'Agenda uma Conversa'
   };
 
   useEffect(() => {
@@ -62,10 +65,10 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         throw new Error('Usuário não autenticado');
       }
 
-      // Buscar o campo verified do perfil
+      // Buscar o campo verified e avatar_url do perfil
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('verified')
+        .select('verified, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -74,26 +77,38 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       }
 
       const verified = profile?.verified || {};
+      const avatarUrl = profile?.avatar_url;
+      
+      // Verificar se tem avatar
+      const hasValidAvatar = avatarUrl && avatarUrl.trim() !== '';
+      setHasAvatar(hasValidAvatar);
       
       // Mapear os campos do banco para o formato esperado
       const status: VerifiedStatus = {
-        elogios: verified.elogios || false,
-        calendario: verified.calendario || false,
-        meus_cursos: verified.meus_cursos || false,
         cards_sucesso: verified.cards_sucesso || false,
-        por_que_me_seguir: verified.por_que_me_seguir || false
+        meu_perfil: verified.meu_perfil || false,
+        por_que_me_seguir: verified.por_que_me_seguir || false,
+        meus_cursos: verified.meus_cursos || false,
+        elogios: verified.elogios || false,
+        calendario: verified.calendario || false
       };
 
       setVerifiedStatus(status);
 
-      // Verificar se todos os campos estão como true
+      // Verificar se todos os campos estão como true E se tem avatar
       const allVerified = Object.values(status).every(value => value === true);
-      setCanPublish(allVerified);
+      const canPublishAccount = allVerified && hasValidAvatar;
+      setCanPublish(canPublishAccount);
 
       // Identificar campos faltantes
       const missing = Object.entries(status)
         .filter(([_, value]) => !value)
         .map(([key, _]) => fieldToSectionMap[key]);
+      
+      // Adicionar avatar se não tiver
+      if (!hasValidAvatar) {
+        missing.push('Foto de Avatar');
+      }
       
       setMissingFields(missing);
 
@@ -163,7 +178,7 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         <Alert className="bg-green-500/10 border-green-500/30 backdrop-blur-sm">
           <CheckCircle className="h-4 w-4 text-green-400" />
           <AlertDescription className="text-green-300">
-            Todas as seções foram verificadas com sucesso! Sua conta está pronta para ser publicada.
+            Todas as seções foram verificadas e sua foto de avatar foi adicionada com sucesso! Sua conta está pronta para ser publicada.
           </AlertDescription>
         </Alert>
       </div>
@@ -202,10 +217,7 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
           Não é possível publicar ainda
         </DialogTitle>
         <DialogDescription className="text-center text-gray-300">
-          {missingFields.length === 1 
-            ? `Você não pode publicar ainda sua conta porque a seção "${missingFields[0]}" não está verificada.`
-            : `Você não pode publicar ainda sua conta porque as seções "${missingFields.slice(0, -1).join('", "')}" e "${missingFields[missingFields.length - 1]}" não estão verificadas.`
-          }
+          Você não pode publicar ainda sua conta porque alguns requisitos não foram atendidos.
         </DialogDescription>
       </DialogHeader>
 
@@ -213,7 +225,19 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         <Alert variant="destructive" className="bg-red-500/10 border-red-500/30 backdrop-blur-sm">
           <X className="h-4 w-4 text-red-400" />
           <AlertDescription className="text-red-300">
-            Complete as verificações necessárias antes de publicar sua conta.
+            {(() => {
+              const sectionsToVerify = missingFields.filter(field => field !== 'Foto de Avatar');
+              const needsAvatar = missingFields.includes('Foto de Avatar');
+              
+              if (sectionsToVerify.length > 0 && needsAvatar) {
+                return 'Complete as verificações necessárias e adicione uma foto de avatar antes de publicar sua conta.';
+              } else if (sectionsToVerify.length > 0) {
+                return 'Complete as verificações necessárias antes de publicar sua conta.';
+              } else if (needsAvatar) {
+                return 'Adicione uma foto de avatar antes de publicar sua conta.';
+              }
+              return 'Complete os requisitos necessários antes de publicar sua conta.';
+            })()}
           </AlertDescription>
         </Alert>
 

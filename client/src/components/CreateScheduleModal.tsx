@@ -64,6 +64,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [notes, setNotes] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestName, setGuestName] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Função para formatar data local sem problemas de fuso horário
@@ -169,37 +171,69 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
   // Função para criar agendamento gratuito
   const createFreeAppointment = async () => {
-    if (!user) {
-      toast({
-        title: "Erro de autenticação",
-        description: "Você precisa estar logado para agendar",
-        variant: "destructive"
-      });
-      return;
+    // Verificar se é usuário logado ou convidado
+    const isGuest = !user;
+    
+    if (isGuest) {
+      // Validar campos obrigatórios para convidados
+      if (!guestEmail || !guestName) {
+        toast({
+          title: "Campos obrigatórios",
+          description: "Nome e email são obrigatórios para agendamento",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Validar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(guestEmail)) {
+        toast({
+          title: "Email inválido",
+          description: "Por favor, insira um email válido",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     const formattedDate = formatDateForDatabase(selectedDate);
     
-    console.log('💾 [createFreeAppointment] Criando agendamento gratuito:', {
-      mentee_id: user.id,
+    console.log('💾 [createFreeAppointment] Criando agendamento:', {
+      isGuest,
+      mentee_id: user?.id || null,
       mentor_id: mentorId,
       date: formattedDate,
       selectedDate: selectedDate,
       startTime,
       endTime,
-      price: settings.price || 0
+      price: settings.price || 0,
+      guestEmail: isGuest ? guestEmail : null,
+      guestName: isGuest ? guestName : null
     });
 
     try {
-      // Buscar informações do usuário
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, email')
-        .eq('id', user.id)
-        .single();
+      let profile;
+      
+      if (isGuest) {
+        // Para convidados, usar os dados fornecidos
+        profile = {
+          full_name: guestName,
+          email: guestEmail
+        };
+      } else {
+        // Para usuários logados, buscar informações do perfil
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', user.id)
+          .single();
 
-      if (profileError) {
-        throw new Error('Erro ao buscar informações do usuário');
+        if (profileError) {
+          throw new Error('Erro ao buscar informações do usuário');
+        }
+        
+        profile = profileData;
       }
 
       console.log('👤 [createFreeAppointment] Profile do usuário:', JSON.stringify(profile, null, 2));
@@ -253,7 +287,7 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       }
 
       const appointmentData = {
-        mentee_id: user.id,
+        mentee_id: user?.id || null,
         mentee_name: profile.full_name || 'Usuário',
         mentor_id: mentorId,
         mentor_name: mentorName,
@@ -264,7 +298,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         notes: notes.trim() || null,
         meet_link: meetLink,
         price: settings.price || 0,
-        payment_status: 'free' // Agendamento gratuito
+        payment_status: 'free', // Agendamento gratuito
+        guest_email: isGuest ? guestEmail : null,
+        guest_name: isGuest ? guestName : null
       };
 
       console.log('📊 [createFreeAppointment] Dados do agendamento:', appointmentData);
@@ -282,27 +318,31 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
       console.log('✅ [createFreeAppointment] Agendamento criado:', data);
       
-      // Criar notificação para o mentor sobre o novo agendamento
-      console.log('🔔 [createFreeAppointment] Criando notificação para o mentor...');
-      try {
-        await notifyNewAppointment({
-          receiverId: mentorId,
-          receiverName: mentorName,
-          senderId: user.id,
-          senderName: profile.full_name || 'Usuário',
-          appointmentDate: formatDate(formattedDate),
-          appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
-        });
-        console.log('✅ [createFreeAppointment] Notificação criada com sucesso');
-      } catch (notificationError) {
-        console.error('⚠️ [createFreeAppointment] Erro ao criar notificação:', notificationError);
+      // Criar notificação para o mentor sobre o novo agendamento (apenas para usuários logados)
+      if (!isGuest) {
+        console.log('🔔 [createFreeAppointment] Criando notificação para o mentor...');
+        try {
+          await notifyNewAppointment({
+            receiverId: mentorId,
+            receiverName: mentorName,
+            senderId: user!.id,
+            senderName: profile.full_name || 'Usuário',
+            appointmentDate: formatDate(formattedDate),
+            appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
+          });
+          console.log('✅ [createFreeAppointment] Notificação criada com sucesso');
+        } catch (notificationError) {
+          console.error('⚠️ [createFreeAppointment] Erro ao criar notificação:', notificationError);
+        }
       }
 
       // Enviar e-mails de confirmação
       await sendAppointmentEmails(profile, formattedDate, meetLink);
 
-      // Redirecionar para a página de agendamentos
-      await redirectToMyAppointments();
+      // Redirecionar para a página de agendamentos (apenas para usuários logados)
+      if (!isGuest) {
+        await redirectToMyAppointments();
+      }
       
       onSuccess();
     } catch (error) {
@@ -313,6 +353,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
   // Função para enviar e-mails de confirmação
   const sendAppointmentEmails = async (profile: any, formattedDate: string, meetLink: string) => {
+    const isGuest = !user;
+    
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');
       return date.toLocaleDateString('pt-BR', {
@@ -327,13 +369,17 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       return timeString.substring(0, 5);
     };
 
+    // Determinar nome e email do mentorado (usuário logado ou convidado)
+    const menteeName = isGuest ? guestName : (profile.full_name || 'Usuário');
+    const menteeEmail = isGuest ? guestEmail : (profile.email || user?.email);
+
     // Enviar e-mail para o mentor
     try {
       console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentor...');
       const emailData = {
         mentorId: mentorId,
         mentorName: mentorName,
-        menteeName: profile.full_name || 'Usuário',
+        menteeName: menteeName,
         appointmentDate: formatDate(formattedDate),
         appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
         timezone: 'America/Sao_Paulo (UTC-3)',
@@ -364,8 +410,8 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
       console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentorado...');
       const menteeEmailData = {
         mentorName: mentorName,
-        menteeName: profile.full_name || 'Usuário',
-        menteeEmail: profile.email || user?.email,
+        menteeName: menteeName,
+        menteeEmail: menteeEmail,
         appointmentDate: formatDate(formattedDate),
         appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
         timezone: 'America/Sao_Paulo (UTC-3)',
@@ -480,15 +526,9 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   };
 
   const handleSchedule = async () => {
-    if (!user) {
-      toast({
-        title: "Erro de autenticação",
-        description: "Você precisa estar logado para agendar",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    const isGuest = !user;
+    
+    // Validações básicas
     if (!startTime || !endTime) {
       toast({
         title: "Campos obrigatórios",
@@ -496,6 +536,28 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
         variant: "destructive"
       });
       return;
+    }
+    
+    // Validações específicas para convidados
+    if (isGuest) {
+      if (!guestEmail || !guestName) {
+        toast({
+          title: "Campos obrigatórios",
+          description: "Nome e email são obrigatórios para agendamento",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(guestEmail)) {
+        toast({
+          title: "Email inválido",
+          description: "Por favor, insira um email válido",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     if (startTime >= endTime) {
@@ -527,6 +589,16 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
       // ✅ VALIDAÇÃO CRÍTICA: Verificar se o mentor pode receber pagamentos
       if (appointmentPrice > 0) {
+        // Convidados não podem fazer agendamentos pagos
+        if (isGuest) {
+          toast({
+            title: "Agendamento pago indisponível",
+            description: "Para agendamentos pagos, é necessário fazer login ou criar uma conta",
+            variant: "destructive"
+          });
+          return;
+        }
+        
         const { canPay, reason } = await canProcessAppointmentPayment(mentorId, appointmentPrice);
         
         if (!canPay) {
@@ -651,6 +723,36 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
             </Select>
           </div>
 
+          {/* Campos para usuários não logados */}
+          {!user && (
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">Seu nome *</label>
+                <input
+                  type="text"
+                  className="w-full p-2 bg-slate-700/50 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-slate-600"
+                  placeholder="Digite seu nome completo"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">Seu email *</label>
+                <input
+                  type="email"
+                  className="w-full p-2 bg-slate-700/50 border border-slate-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-slate-600"
+                  placeholder="Digite seu email"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                />
+                <p className="text-xs text-gray-400">
+                  Você receberá as informações do agendamento neste email
+                </p>
+              </div>
+            </>
+          )}
+
           <div className="space-y-2">
             <label className="text-sm font-medium text-white">Observações (opcional)</label>
             <textarea
@@ -682,7 +784,13 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
             <Button
               onClick={handleSchedule}
               className="flex-1 bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-              disabled={saving || !startTime || !endTime || !isTimeSlotAvailable(startTime, endTime)}
+              disabled={
+                saving || 
+                !startTime || 
+                !endTime || 
+                !isTimeSlotAvailable(startTime, endTime) ||
+                (!user && (!guestName || !guestEmail))
+              }
             >
               {saving ? 'Processando...' : (isPaid ? 'Pagar e Agendar' : 'Agendar')}
             </Button>

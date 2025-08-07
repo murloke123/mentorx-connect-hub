@@ -150,7 +150,7 @@ const MentoradoPublicViewPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="min-h-screen bg-slate-900 flex justify-center items-center">
         <Spinner />
       </div>
     );
@@ -158,16 +158,16 @@ const MentoradoPublicViewPage = () => {
 
   if (error || !profileData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-slate-900 flex justify-center items-center">
+        <Card className="w-full max-w-md glass-card border border-gold/20">
           <CardContent className="p-6 text-center">
-            <div className="text-red-500 mb-2">
+            <div className="text-gold mb-2">
               <User className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-white mb-2">
               Mentorado não encontrado
             </h3>
-            <p className="text-gray-600">
+            <p className="text-silver">
               {error || "O perfil solicitado não está disponível."}
             </p>
           </CardContent>
@@ -177,13 +177,13 @@ const MentoradoPublicViewPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-slate-900">
       {/* Floating Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-200 rounded-full opacity-20 animate-bounce"></div>
-        <div className="absolute bottom-40 left-20 w-12 h-12 bg-pink-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-24 h-24 bg-yellow-200 rounded-full opacity-20 animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gold/10 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-gold/10 rounded-full opacity-20 animate-bounce"></div>
+        <div className="absolute bottom-40 left-20 w-12 h-12 bg-gold/10 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-24 h-24 bg-gold/10 rounded-full opacity-20 animate-bounce"></div>
       </div>
 
       {/* Hero Section */}
@@ -195,33 +195,33 @@ const MentoradoPublicViewPage = () => {
             alt="Banner profile" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-blue-600/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 to-slate-800/70"></div>
           
           {/* Floating Elements (bolinhas) */}
           <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white opacity-10 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-24 h-24 bg-white opacity-10 rounded-full animate-bounce"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-white opacity-5 rounded-full"></div>
+            <div className="absolute top-10 left-10 w-32 h-32 bg-gold/10 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-24 h-24 bg-gold/10 rounded-full animate-bounce"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-gold/5 rounded-full"></div>
           </div>
           
           {/* Nome e Tag sobreposto ao banner */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="text-center mb-8">
-              <div className="bg-black/30 backdrop-blur-md rounded-2xl px-8 py-6 border border-white/20 shadow-2xl">
+              <div className="bg-slate-800/80 backdrop-blur-md rounded-2xl px-8 py-6 border border-gold/20 shadow-2xl">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
                   {profileData.full_name || "Nome não informado"}
                 </h1>
                 
                 <div className="flex justify-center items-center gap-3">
                   <Badge 
-                    className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg cursor-pointer hover:bg-white/80 transition-colors"
+                    className="bg-gold/90 text-black border-0 backdrop-blur-sm px-4 py-2 font-semibold shadow-lg cursor-pointer hover:bg-gold/80 transition-colors"
                     onClick={() => setIsNotificationModalOpen(true)}
                   >
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Enviar Notificação
                   </Badge>
                   {profileData.category && (
-                    <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 px-4 py-2 font-semibold shadow-lg">
+                    <Badge className="bg-gradient-to-r from-slate-700 to-slate-800 text-gold border border-gold/30 px-4 py-2 font-semibold shadow-lg">
                       <Star className="w-4 h-4 mr-2" />
                       {profileData.category}
                     </Badge>
@@ -236,9 +236,9 @@ const MentoradoPublicViewPage = () => {
         <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
           <div className="text-center">
             <div 
-              className="w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border-4 border-white shadow-xl bg-white mx-auto"
+              className="w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border-4 border-gold shadow-xl bg-slate-800 mx-auto"
               style={{
-                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
                 animation: 'float 3s ease-in-out infinite'
               }}
             >
@@ -250,7 +250,7 @@ const MentoradoPublicViewPage = () => {
                 />
               ) : (
                 <Avatar className="w-full h-full">
-                  <AvatarFallback className="bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 text-white flex items-center justify-center">
+                  <AvatarFallback className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-gold flex items-center justify-center">
                     <User className="w-12 h-12" />
                   </AvatarFallback>
                 </Avatar>
@@ -263,23 +263,23 @@ const MentoradoPublicViewPage = () => {
       {/* CTA section */}
       <div className="mt-24 max-w-5xl mx-auto text-center px-4">        
         {profileData.highlight_message && (
-          <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">
+          <p className="text-xl text-silver mb-6 max-w-3xl mx-auto">
             {profileData.highlight_message}
           </p>
         )}
         
         {/* Banner Jornada de Crescimento próximo ao avatar */}
         <div className="mt-8 mb-8 max-w-4xl mx-auto px-4">
-          <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 text-white overflow-hidden relative shadow-xl">
-            <div className="absolute inset-0 bg-black opacity-10"></div>
+          <Card className="bg-gradient-to-r from-slate-800 to-slate-700 border border-gold/20 text-white overflow-hidden relative shadow-xl">
+            <div className="absolute inset-0 bg-black/10"></div>
             <div className="absolute top-4 right-4">
-              <Zap className="h-8 w-8 text-yellow-300 animate-pulse" />
+              <Zap className="h-8 w-8 text-gold animate-pulse" />
             </div>
             <CardContent className="p-6 relative">
               <div className="text-center">
-                <Trophy className="h-10 w-10 mx-auto mb-3 text-yellow-300" />
-                <h3 className="text-xl font-bold mb-3">🌟 Jornada de Crescimento</h3>
-                <p className="text-base opacity-90 italic">
+                <Trophy className="h-10 w-10 mx-auto mb-3 text-gold" />
+                <h3 className="text-xl font-bold mb-3 text-gold">🌟 Jornada de Crescimento</h3>
+                <p className="text-base text-silver italic">
                   "Cada grande jornada começa com um único passo. Este mentorado está construindo seu futuro com determinação e foco!"
                 </p>
               </div>
@@ -293,25 +293,25 @@ const MentoradoPublicViewPage = () => {
         <div className="grid gap-8">
           
           {/* About Section */}
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="glass-card border border-gold/20">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg">
-                  <User className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <div className="bg-gradient-to-r from-gold to-yellow-500 p-2 rounded-lg">
+                  <User className="h-6 w-6 text-black" />
                 </div>
                 Sobre o Mentorado
               </h2>
               {profileData.bio ? (
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                   <div 
-                    className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
+                    className="prose prose-lg max-w-none text-silver leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: profileData.bio }}
                   />
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <BookOpen className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-lg italic">
+                  <BookOpen className="h-16 w-16 mx-auto text-gold/50 mb-4" />
+                  <p className="text-silver text-lg italic">
                     Este mentorado está preparando uma apresentação incrível sobre si mesmo. 
                     Em breve você conhecerá mais sobre sua jornada! 📚✨
                   </p>
@@ -321,25 +321,25 @@ const MentoradoPublicViewPage = () => {
           </Card>
 
           {/* Contact Information */}
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="glass-card border border-gold/20">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <div className="bg-gradient-to-r from-green-500 to-blue-500 p-2 rounded-lg">
-                  <Mail className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <div className="bg-gradient-to-r from-gold to-yellow-500 p-2 rounded-lg">
+                  <Mail className="h-6 w-6 text-black" />
                 </div>
                 Informações de Contato
               </h2>
               
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Email */}
-                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                   <div className="flex items-center gap-4">
-                    <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 rounded-full">
-                      <Mail className="h-6 w-6 text-white" />
+                    <div className="bg-gradient-to-r from-gold to-yellow-500 p-3 rounded-full">
+                      <Mail className="h-6 w-6 text-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900 mb-1">E-mail</p>
-                      <p className="text-gray-700 font-medium">
+                      <p className="text-sm font-semibold text-gold mb-1">E-mail</p>
+                      <p className="text-silver font-medium">
                         {profileData.email || "Não informado"}
                       </p>
                     </div>
@@ -347,14 +347,14 @@ const MentoradoPublicViewPage = () => {
                 </div>
 
                 {/* Phone */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                   <div className="flex items-center gap-4">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-3 rounded-full">
-                      <Phone className="h-6 w-6 text-white" />
+                    <div className="bg-gradient-to-r from-gold to-yellow-500 p-3 rounded-full">
+                      <Phone className="h-6 w-6 text-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900 mb-1">Telefone</p>
-                      <p className="text-gray-700 font-medium">
+                      <p className="text-sm font-semibold text-gold mb-1">Telefone</p>
+                      <p className="text-silver font-medium">
                         {profileData.phone || "Não informado"}
                       </p>
                     </div>
@@ -362,14 +362,14 @@ const MentoradoPublicViewPage = () => {
                 </div>
 
                 {/* Birth Date */}
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                   <div className="flex items-center gap-4">
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full">
-                      <Calendar className="h-6 w-6 text-white" />
+                    <div className="bg-gradient-to-r from-gold to-yellow-500 p-3 rounded-full">
+                      <Calendar className="h-6 w-6 text-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900 mb-1">Data de Nascimento</p>
-                      <p className="text-gray-700 font-medium">
+                      <p className="text-sm font-semibold text-gold mb-1">Data de Nascimento</p>
+                      <p className="text-silver font-medium">
                         {profileData.date_of_birth 
                           ? new Date(profileData.date_of_birth).toLocaleDateString('pt-BR')
                           : "Não informado"
@@ -381,28 +381,28 @@ const MentoradoPublicViewPage = () => {
 
                 {/* Category */}
                 {profileData.category && (
-                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                     <div className="flex items-center gap-4">
-                      <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-3 rounded-full">
-                        <Target className="h-6 w-6 text-white" />
+                      <div className="bg-gradient-to-r from-gold to-yellow-500 p-3 rounded-full">
+                        <Target className="h-6 w-6 text-black" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 mb-1">Área de Interesse</p>
-                        <p className="text-gray-700 font-medium">{profileData.category}</p>
+                        <p className="text-sm font-semibold text-gold mb-1">Área de Interesse</p>
+                        <p className="text-silver font-medium">{profileData.category}</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Member Since */}
-                <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-200">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-gold/20">
                   <div className="flex items-center gap-4">
-                    <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-3 rounded-full">
-                      <Calendar className="h-6 w-6 text-white" />
+                    <div className="bg-gradient-to-r from-gold to-yellow-500 p-3 rounded-full">
+                      <Calendar className="h-6 w-6 text-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900 mb-1">Membro desde</p>
-                      <p className="text-gray-700 font-medium">
+                      <p className="text-sm font-semibold text-gold mb-1">Membro desde</p>
+                      <p className="text-silver font-medium">
                         {new Date(profileData.created_at).toLocaleDateString('pt-BR', {
                           year: 'numeric',
                           month: 'long',
@@ -417,30 +417,30 @@ const MentoradoPublicViewPage = () => {
           </Card>
 
           {/* Motivational Section */}
-          <Card className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 border-0 text-white overflow-hidden relative">
-            <div className="absolute inset-0 bg-black opacity-10"></div>
+          <Card className="bg-gradient-to-r from-slate-800 to-slate-700 border border-gold/20 text-white overflow-hidden relative">
+            <div className="absolute inset-0 bg-black/10"></div>
             <div className="absolute top-4 left-4">
-              <Sparkles className="h-8 w-8 text-yellow-300 animate-spin" />
+              <Sparkles className="h-8 w-8 text-gold animate-spin" />
             </div>
             <div className="absolute bottom-4 right-4">
-              <Heart className="h-8 w-8 text-pink-300 animate-pulse" />
+              <Heart className="h-8 w-8 text-gold animate-pulse" />
             </div>
             <CardContent className="p-8 relative">
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4">🚀 Potencial Ilimitado</h3>
-                <p className="text-lg opacity-90 mb-6">
+                <h3 className="text-2xl font-bold mb-4 text-gold">🚀 Potencial Ilimitado</h3>
+                <p className="text-lg text-silver mb-6">
                   Este mentorado representa o futuro brilhante que estamos construindo juntos. 
                   Cada interação é uma oportunidade de crescimento mútuo e transformação positiva.
                 </p>
                 <div className="flex justify-center gap-4">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span className="text-sm font-medium">✨ Dedicação</span>
+                  <div className="bg-gold/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-gold/30">
+                    <span className="text-sm font-medium text-gold">✨ Dedicação</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span className="text-sm font-medium">🎯 Foco</span>
+                  <div className="bg-gold/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-gold/30">
+                    <span className="text-sm font-medium text-gold">🎯 Foco</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span className="text-sm font-medium">🌟 Crescimento</span>
+                  <div className="bg-gold/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-gold/30">
+                    <span className="text-sm font-medium text-gold">🌟 Crescimento</span>
                   </div>
                 </div>
               </div>
@@ -449,27 +449,27 @@ const MentoradoPublicViewPage = () => {
 
           {/* Fun Facts Section */}
           <div className="grid md:grid-cols-3 gap-6">
-            <Card className="bg-gradient-to-br from-blue-500 to-cyan-500 border-0 text-white">
+            <Card className="bg-gradient-to-br from-slate-800 to-slate-700 border border-gold/20 text-white">
               <CardContent className="p-6 text-center">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 text-blue-100" />
-                <h4 className="font-bold text-lg mb-2">Aprendizado</h4>
-                <p className="text-sm opacity-90">Sempre em busca de novos conhecimentos</p>
+                <BookOpen className="h-12 w-12 mx-auto mb-4 text-gold" />
+                <h4 className="font-bold text-lg mb-2 text-gold">Aprendizado</h4>
+                <p className="text-sm text-silver">Sempre em busca de novos conhecimentos</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-500 to-pink-500 border-0 text-white">
+            <Card className="bg-gradient-to-br from-slate-800 to-slate-700 border border-gold/20 text-white">
               <CardContent className="p-6 text-center">
-                <Target className="h-12 w-12 mx-auto mb-4 text-purple-100" />
-                <h4 className="font-bold text-lg mb-2">Objetivos</h4>
-                <p className="text-sm opacity-90">Focado em alcançar suas metas</p>
+                <Target className="h-12 w-12 mx-auto mb-4 text-gold" />
+                <h4 className="font-bold text-lg mb-2 text-gold">Objetivos</h4>
+                <p className="text-sm text-silver">Focado em alcançar suas metas</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-500 to-emerald-500 border-0 text-white">
+            <Card className="bg-gradient-to-br from-slate-800 to-slate-700 border border-gold/20 text-white">
               <CardContent className="p-6 text-center">
-                <Zap className="h-12 w-12 mx-auto mb-4 text-green-100" />
-                <h4 className="font-bold text-lg mb-2">Energia</h4>
-                <p className="text-sm opacity-90">Motivado para fazer a diferença</p>
+                <Zap className="h-12 w-12 mx-auto mb-4 text-gold" />
+                <h4 className="font-bold text-lg mb-2 text-gold">Energia</h4>
+                <p className="text-sm text-silver">Motivado para fazer a diferença</p>
               </CardContent>
             </Card>
           </div>
@@ -479,10 +479,10 @@ const MentoradoPublicViewPage = () => {
       
       {/* Modal de Notificação */}
       <Dialog open={isNotificationModalOpen} onOpenChange={setIsNotificationModalOpen}>
-        <DialogContent>
+        <DialogContent className="glass-card border border-gold/20">
           <DialogHeader>
-            <DialogTitle>Enviar Notificação para {profileData?.full_name}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Enviar Notificação para {profileData?.full_name}</DialogTitle>
+            <DialogDescription className="text-silver">
               Envie uma mensagem de notificação para este mentorado.
             </DialogDescription>
           </DialogHeader>
@@ -492,18 +492,21 @@ const MentoradoPublicViewPage = () => {
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               rows={4}
+              className="bg-slate-800/50 border-gold/20 text-white placeholder:text-silver"
             />
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsNotificationModalOpen(false)}
+              className="border-gold/30 text-gold hover:bg-gold/10"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleSendMessage}
               disabled={!messageText.trim() || sendingMessage}
+              className="bg-gold hover:bg-yellow-500 text-black"
             >
               {sendingMessage ? "Enviando..." : "Enviar Notificação"}
             </Button>

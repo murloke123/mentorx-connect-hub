@@ -1,17 +1,20 @@
 
-import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import RecentMentorsTab from './RecentMentorsTab';
-import RecentMentoradosTab from './RecentMentoradosTab';
 import RecentCoursesTab from './RecentCoursesTab';
+import RecentMentoradosTab from './RecentMentoradosTab';
+import RecentMentorsTab from './RecentMentorsTab';
 
 interface Mentor {
   id: string;
   full_name: string;
   avatar_url: string | null;
   bio: string | null;
-  courses_count: number;
-  followers_count: number;
+  is_public?: boolean | null;
+  courses: Array<{
+    id: string;
+    title: string;
+    is_published: boolean;
+  }>;
 }
 
 interface Mentorado {

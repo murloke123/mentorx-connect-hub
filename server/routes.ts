@@ -1101,8 +1101,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ###################### ENDPOINTS E-MAIL - BREVO ####################################
   // ##########################################################################################
 
+  // 🔒 CACHE DE PROTEÇÃO CONTRA E-MAILS DE BOAS-VINDAS DUPLICADOS
+  const processedWelcomeEmails = new Map<string, { timestamp: number; messageId?: string }>();
+  
+  // Limpar cache de boas-vindas a cada 2 horas para evitar acúmulo de memória
+  setInterval(() => {
+    const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+    const keysToDelete: string[] = [];
+    
+    processedWelcomeEmails.forEach((value, key) => {
+      if (value.timestamp < twoHoursAgo) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => processedWelcomeEmails.delete(key));
+    console.log('🧹 [WELCOME-EMAIL-CACHE] Cache de e-mails de boas-vindas limpo, entradas restantes:', processedWelcomeEmails.size);
+  }, 2 * 60 * 60 * 1000); // 2 horas
+
   // ENDPOINT 21: Enviar e-mail de boas-vindas
   app.post('/api/email/boas-vindas', async (req, res) => {
+    const startTime = Date.now();
+    
     try {
       const { userName, userEmail, userRole, loginUrl, supportUrl } = req.body;
       
@@ -1130,6 +1150,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'userRole deve ser "mentor" ou "mentorado"'
         });
       }
+
+      // 🔒 PROTEÇÃO BACKEND: Verificar se e-mail de boas-vindas já foi processado para este usuário
+      const cacheKey = `${userEmail}_${userRole}`;
+      const existingProcess = processedWelcomeEmails.get(cacheKey);
+      
+      if (existingProcess) {
+        const timeDiff = Date.now() - existingProcess.timestamp;
+        console.log('🛑 [WELCOME-EMAIL] E-mail de boas-vindas já processado para este usuário:', {
+          userEmail,
+          userRole,
+          processedAt: new Date(existingProcess.timestamp).toISOString(),
+          timeDiffMs: timeDiff,
+          messageId: existingProcess.messageId
+        });
+        
+        return res.json({
+          success: true,
+          message: 'E-mail de boas-vindas já foi enviado para este usuário',
+          messageId: existingProcess.messageId,
+          cached: true,
+          processedAt: new Date(existingProcess.timestamp).toISOString()
+        });
+      }
+
+      // 🔒 MARCAR COMO PROCESSANDO IMEDIATAMENTE (evita race conditions)
+      processedWelcomeEmails.set(cacheKey, { 
+        timestamp: Date.now(),
+        messageId: undefined 
+      });
+      
+      console.log('🔒 [WELCOME-EMAIL] Usuário marcado como processando:', {
+        cacheKey,
+        timestamp: new Date().toISOString()
+      });
       
       // Importar dinamicamente o serviço de e-mail
       const { enviarEmailBoasVindas } = await import('./services/email/emailService');
@@ -1142,14 +1196,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         supportUrl: supportUrl || 'https://app.mentoraai.com.br/suporte'
       };
       
+      console.log('📤 [WELCOME-EMAIL] Enviando e-mail ÚNICO de boas-vindas para Brevo...');
       const result = await enviarEmailBoasVindas(emailData);
       
-      if (!result.success) {
-        return res.status(500).json(result);
+      if (result.success) {
+        // 🔒 ATUALIZAR CACHE COM MESSAGE ID
+        processedWelcomeEmails.set(cacheKey, { 
+          timestamp: Date.now(),
+          messageId: result.messageId 
+        });
+        
+        console.log('✅ [WELCOME-EMAIL] E-mail de boas-vindas enviado com sucesso!', {
+          messageId: result.messageId,
+          duration: Date.now() - startTime,
+          userEmail,
+          userRole
+        });
+        
+        res.json({
+          success: true,
+          message: 'E-mail de boas-vindas enviado com sucesso',
+          messageId: result.messageId,
+          duration: Date.now() - startTime
+        });
+      } else {
+        // 🔒 REMOVER DO CACHE SE FALHOU (permitir retry)
+        processedWelcomeEmails.delete(cacheKey);
+        
+        console.error('❌ [WELCOME-EMAIL] Falha no envio do e-mail de boas-vindas:', result.error);
+        res.status(500).json({
+          success: false,
+          error: result.error || 'Erro ao enviar e-mail de boas-vindas'
+        });
       }
       
-      res.json(result);
     } catch (error) {
+      // 🔒 REMOVER DO CACHE SE ERRO CRÍTICO (permitir retry)
+      const { userEmail, userRole } = req.body;
+      if (userEmail && userRole) {
+        const cacheKey = `${userEmail}_${userRole}`;
+        processedWelcomeEmails.delete(cacheKey);
+      }
+      
       console.error('❌ ROUTES.TS: Erro em /api/email/boas-vindas:', error);
       res.status(500).json({ 
         success: false, 
@@ -2107,11 +2195,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== EMAIL COURSE SALE NOTIFICATION ROUTE ====================
 
+  // 🔒 CACHE DE PROTEÇÃO CONTRA EMAILS DUPLICADOS NO BACKEND
+  const processedEmails = new Map<string, { timestamp: number; messageId?: string }>();
+  
+  // Limpar cache a cada 1 hora para evitar acúmulo de memória
+  setInterval(() => {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    const keysToDelete: string[] = [];
+    
+    processedEmails.forEach((value, key) => {
+      if (value.timestamp < oneHourAgo) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => processedEmails.delete(key));
+    console.log('🧹 [EMAIL-CACHE] Cache de emails limpo, entradas restantes:', processedEmails.size);
+  }, 60 * 60 * 1000); // 1 hora
+
   // Rota para enviar email de notificação de venda de curso para o mentor
   app.post('/api/email/course-buy', async (req, res) => {
+    const startTime = Date.now();
+    
     try {
-      console.log('💰 [API] Enviando email de venda de curso para mentor...');
-      console.log('📝 [API] Dados recebidos:', JSON.stringify(req.body, null, 2));
+      console.log('💰 [API-EMAIL] Iniciando processo de envio de email de venda...');
+      console.log('📝 [API-EMAIL] Dados recebidos:', JSON.stringify(req.body, null, 2));
       
       const { mentorName, mentorEmail, buyerName, courseName, coursePrice, transactionId } = req.body;
       
@@ -2122,9 +2230,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'Campos obrigatórios: mentorName, mentorEmail, buyerName, courseName, coursePrice, transactionId'
         });
       }
+
+      // 🔒 PROTEÇÃO BACKEND: Verificar se email já foi processado para esta transação
+      const cacheKey = `${transactionId}_${mentorEmail}`;
+      const existingProcess = processedEmails.get(cacheKey);
+      
+      if (existingProcess) {
+        const timeDiff = Date.now() - existingProcess.timestamp;
+        console.log('🛑 [API-EMAIL] Email já processado para esta transação:', {
+          transactionId,
+          mentorEmail,
+          processedAt: new Date(existingProcess.timestamp).toISOString(),
+          timeDiffMs: timeDiff,
+          messageId: existingProcess.messageId
+        });
+        
+        return res.json({
+          success: true,
+          message: 'Email já foi enviado para esta transação',
+          messageId: existingProcess.messageId,
+          cached: true,
+          processedAt: new Date(existingProcess.timestamp).toISOString()
+        });
+      }
+
+      // 🔒 MARCAR COMO PROCESSANDO IMEDIATAMENTE (evita race conditions)
+      processedEmails.set(cacheKey, { 
+        timestamp: Date.now(),
+        messageId: undefined 
+      });
+      
+      console.log('🔒 [API-EMAIL] Transação marcada como processando:', {
+        cacheKey,
+        timestamp: new Date().toISOString()
+      });
       
       // Importar o serviço de email de venda de curso
-       const { enviarEmailVendaCurso } = await import('./services/email/services/mentor/emailSendCourseBuy');
+      const { enviarEmailVendaCurso } = await import('./services/email/services/mentor/emailSendCourseBuy');
       
       const emailData = {
         mentorName,
@@ -2135,18 +2277,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transactionId
       };
       
-      console.log('📤 [API] Enviando email de venda...');
+      console.log('📤 [API-EMAIL] Enviando email ÚNICO para Brevo...');
       const result = await enviarEmailVendaCurso(emailData);
       
       if (result.success) {
-        console.log('✅ [API] Email de venda enviado com sucesso');
+        // 🔒 ATUALIZAR CACHE COM MESSAGE ID
+        processedEmails.set(cacheKey, { 
+          timestamp: Date.now(),
+          messageId: result.messageId 
+        });
+        
+        console.log('✅ [API-EMAIL] Email enviado com sucesso!', {
+          messageId: result.messageId,
+          duration: Date.now() - startTime,
+          transactionId,
+          mentorEmail
+        });
+        
         res.json({
           success: true,
           message: 'Email de venda enviado com sucesso para o mentor',
-          messageId: result.messageId
+          messageId: result.messageId,
+          duration: Date.now() - startTime
         });
       } else {
-        console.error('❌ [API] Falha no envio do email de venda:', result.error);
+        // 🔒 REMOVER DO CACHE SE FALHOU (permitir retry)
+        processedEmails.delete(cacheKey);
+        
+        console.error('❌ [API-EMAIL] Falha no envio do email:', result.error);
         res.status(500).json({
           success: false,
           error: result.error || 'Erro ao enviar email de venda'
@@ -2154,7 +2312,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
     } catch (error: any) {
-      console.error('❌ [API] Erro crítico no envio de email de venda:', error);
+      // 🔒 REMOVER DO CACHE SE ERRO CRÍTICO (permitir retry)
+      const { transactionId, mentorEmail } = req.body;
+      if (transactionId && mentorEmail) {
+        const cacheKey = `${transactionId}_${mentorEmail}`;
+        processedEmails.delete(cacheKey);
+      }
+      
+      console.error('❌ [API-EMAIL] Erro crítico no envio de email:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Erro interno do servidor'
@@ -2246,14 +2411,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🎯 [API] Gerando múltiplos links Jitsi...');
       const { quantidade = 3 } = req.body;
       
-      const links = meetService.criarMultiplosLinks(quantidade);
+      const result = await meetService.criarMultiplosLinks(quantidade);
       
       res.json({
         success: true,
         message: `${quantidade} links gerados com sucesso`,
         data: {
-          links: links,
-          quantidade: links.length,
+          links: result.links,
+          quantidade: result.quantidade,
           provider: 'Jitsi Meet',
           criadoEm: new Date().toISOString()
         }

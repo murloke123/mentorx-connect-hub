@@ -10,14 +10,14 @@ import { deleteCourse, updateCoursePublicationStatus } from "../../services/cour
 import { getModulosByCursoId } from "../../services/moduloService";
 import { supabase } from "../../utils/supabase";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
 import { Button } from '../ui/button';
@@ -286,8 +286,8 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
       // Nenhum curso criado ainda
       return (
         <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-lg">
-          <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-xl font-medium text-gray-900">Nenhum curso criado ainda</h3>
+          <BookOpen className="mx-auto h-12 w-12 text-gold" />
+          <h3 className="mt-2 text-xl font-medium text-white">Nenhum curso criado ainda</h3>
           <p className="mt-1 text-sm text-gray-500">Comece a compartilhar seu conhecimento!</p>
           <div className="mt-6">
             <Button onClick={handleCreateCourse}>

@@ -67,22 +67,89 @@ export async function getAdminProfile() {
 export type MentorWithStats = Profile & {
   courses_count: number;
   followers_count: number;
+  published_courses_count: number;
+  unpublished_courses_count: number;
+  created_at: string;
 };
 
 export async function getAllMentors({ signal }: { queryKey: QueryKey, signal?: AbortSignal }): Promise<MentorWithStats[]> {
   try {
-    // Fixed SQL query to avoid parsing errors
+    // Get mentors with detailed course information
     const { data, error } = await supabase
       .from("profiles")
-      .select('*, courses:cursos(count), followers:followers(count)')
+      .select(`
+        *,
+        created_at,
+        courses:cursos(count),
+        published_courses:cursos!inner(count),
+        unpublished_courses:cursos!inner(count),
+        followers:mentor_followers(count)
+      `)
       .eq("role", "mentor")
-      .order("full_name", { ascending: true });
+      .eq("published_courses.is_published", true)
+      .eq("unpublished_courses.is_published", false)
+      .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      // Fallback query if the complex query fails
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("profiles")
+        .select(`
+          *,
+          created_at
+        `)
+        .eq("role", "mentor")
+        .order("created_at", { ascending: false });
+
+      if (fallbackError) throw fallbackError;
+
+      // Get course counts separately for each mentor
+      const mentorsWithStats = await Promise.all(
+        fallbackData.map(async (mentor) => {
+          // Get total courses count
+          const { count: totalCourses } = await supabase
+            .from("cursos")
+            .select("*", { count: "exact", head: true })
+            .eq("mentor_id", mentor.id);
+
+          // Get published courses count
+          const { count: publishedCourses } = await supabase
+            .from("cursos")
+            .select("*", { count: "exact", head: true })
+            .eq("mentor_id", mentor.id)
+            .eq("is_published", true);
+
+          // Get unpublished courses count
+          const { count: unpublishedCourses } = await supabase
+            .from("cursos")
+            .select("*", { count: "exact", head: true })
+            .eq("mentor_id", mentor.id)
+            .eq("is_published", false);
+
+          // Get followers count
+          const { count: followersCount } = await supabase
+            .from("mentor_followers")
+            .select("*", { count: "exact", head: true })
+            .eq("mentor_id", mentor.id);
+
+          return {
+            ...mentor,
+            courses_count: totalCourses || 0,
+            published_courses_count: publishedCourses || 0,
+            unpublished_courses_count: unpublishedCourses || 0,
+            followers_count: followersCount || 0,
+          };
+        })
+      );
+
+      return mentorsWithStats;
+    }
     
     return data.map(mentor => ({
       ...mentor,
       courses_count: Array.isArray(mentor.courses) ? mentor.courses[0]?.count || 0 : 0,
+      published_courses_count: Array.isArray(mentor.published_courses) ? mentor.published_courses[0]?.count || 0 : 0,
+      unpublished_courses_count: Array.isArray(mentor.unpublished_courses) ? mentor.unpublished_courses[0]?.count || 0 : 0,
       followers_count: Array.isArray(mentor.followers) ? mentor.followers[0]?.count || 0 : 0,
     }));
   } catch (error) {
@@ -279,6 +346,40 @@ export async function getAdminActions(limit = 10) {
     return data;
   } catch (error) {
     console.error("Error fetching admin actions:", error);
+    return [];
+  }
+}
+
+// Get mentors with detailed course information for dashboard
+export type MentorWithCourses = Profile & {
+  courses: Array<{
+    id: string;
+    title: string;
+    is_published: boolean;
+  }>;
+};
+
+export async function getMentorsWithCourses({ signal }: { queryKey: QueryKey, signal?: AbortSignal }): Promise<MentorWithCourses[]> {
+  try {
+    // Get mentors with their courses
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(`
+        *,
+        cursos:cursos(id, title, is_published)
+      `)
+      .eq("role", "mentor")
+      .order("created_at", { ascending: false })
+      .limit(10); // Limit to recent mentors for dashboard
+
+    if (error) throw error;
+    
+    return data.map(mentor => ({
+      ...mentor,
+      courses: mentor.cursos || [],
+    }));
+  } catch (error) {
+    console.error("Error fetching mentors with courses:", error);
     return [];
   }
 }

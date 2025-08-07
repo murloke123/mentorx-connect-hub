@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import { User, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Mentorado {
   id: string;
@@ -62,7 +62,6 @@ const RecentMentoradosTab = ({ mentorados, isLoading }: RecentMentoradosTabProps
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">{mentorado.full_name}</p>
-                  <p className="text-sm text-gray-500">{mentorado.bio || "Sem bio"}</p>
                   <Badge variant="outline" className="mt-1 text-gray-500">
                     {mentorado.enrollments_count} cursos
                   </Badge>

@@ -1,28 +1,28 @@
-import { useState } from 'react';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Users, BookOpen, AlertCircle } from "lucide-react";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { deleteUser, MentorWithStats } from "@/services/adminService";
+import { AlertCircle, BookOpen, Calendar, CheckCircle, Eye, EyeOff, User, XCircle } from "lucide-react";
+import { useState } from 'react';
 
 
 
@@ -111,7 +111,7 @@ const MentorsList = ({ mentors, isLoading, onDelete }: MentorsListProps) => {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                   {mentor.avatar_url ? (
-                    <img src={mentor.avatar_url} alt={mentor.full_name} className="w-10 h-10 rounded-full object-cover" />
+                    <img src={mentor.avatar_url} alt={mentor.full_name || 'Mentor'} className="w-10 h-10 rounded-full object-cover" />
                   ) : (
                     <User className="h-5 w-5 text-gray-500" />
                   )}
@@ -122,14 +122,63 @@ const MentorsList = ({ mentors, isLoading, onDelete }: MentorsListProps) => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500 line-clamp-3 h-12 mb-3">
-                {mentor.bio || 'Este mentor não possui biografia.'}
-              </p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center text-sm text-gray-500 gap-1">
-                  <BookOpen className="h-3 w-3" /> 
-                  <span>{mentor.courses_count} cursos</span>
+            <CardContent className="space-y-3">
+              {/* Status de Publicação do Perfil */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Status do Perfil:</span>
+                <Badge variant={mentor.is_public ? "default" : "secondary"} className="flex items-center gap-1">
+                  {mentor.is_public ? (
+                    <>
+                      <Eye className="h-3 w-3" />
+                      Público
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3 w-3" />
+                      Privado
+                    </>
+                  )}
+                </Badge>
+              </div>
+
+              {/* Número de Cursos */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Total de Cursos:</span>
+                <div className="flex items-center gap-1 text-sm">
+                  <BookOpen className="h-3 w-3" />
+                  <span>{mentor.courses_count}</span>
+                </div>
+              </div>
+
+              {/* Status dos Cursos */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Cursos Publicados:</span>
+                  <div className="flex items-center gap-1 text-sm text-green-600">
+                    <CheckCircle className="h-3 w-3" />
+                    <span>{mentor.published_courses_count}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Cursos Não Publicados:</span>
+                  <div className="flex items-center gap-1 text-sm text-orange-600">
+                    <XCircle className="h-3 w-3" />
+                    <span>{mentor.unpublished_courses_count}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data de Cadastro */}
+              <div className="flex items-center justify-between pt-2 border-t">
+                <span className="text-sm font-medium">Cadastrado em:</span>
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                  <Calendar className="h-3 w-3" />
+                  <span>
+                    {mentor.created_at 
+                      ? new Date(mentor.created_at).toLocaleDateString('pt-BR')
+                      : 'Data não disponível'
+                    }
+                  </span>
                 </div>
               </div>
             </CardContent>

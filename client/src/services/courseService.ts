@@ -249,12 +249,18 @@ export async function createCourseWithStripe(
         return { course };
       }
 
-      // Determina o preço (0 para cursos gratuitos)
-      const priceInCents = course.is_paid && course.price ? Math.round(course.price * 100) : 0;
+      // Determina o preço final (com desconto se aplicável, 0 para cursos gratuitos)
+      const finalPrice = course.discount && course.discount > 0 && course.discounted_price 
+        ? course.discounted_price 
+        : course.price;
+      const priceInCents = course.is_paid && finalPrice ? Math.round(finalPrice * 100) : 0;
       
       console.log('💰 Criando produto no Stripe com preço:', {
         is_paid: course.is_paid,
         price: course.price,
+        discounted_price: course.discounted_price,
+        discount: course.discount,
+        finalPrice,
         priceInCents
       });
 
@@ -367,15 +373,24 @@ export async function updateCourseWithStripe(
         console.log('✅ Produto Stripe atualizado');
 
         // Verifica se o preço mudou OU se mudou de pago para gratuito (ou vice-versa)
-        const oldPrice = currentCourse.is_paid ? (currentCourse.price || 0) : 0;
-        const newPrice = course.is_paid ? (course.price || 0) : 0;
-        const priceChanged = oldPrice !== newPrice;
+        // Considera o preço com desconto se aplicável
+        const oldFinalPrice = currentCourse.is_paid ? (
+          currentCourse.discount && currentCourse.discount > 0 && currentCourse.discounted_price
+            ? currentCourse.discounted_price
+            : (currentCourse.price || 0)
+        ) : 0;
+        const newFinalPrice = course.is_paid ? (
+          course.discount && course.discount > 0 && course.discounted_price
+            ? course.discounted_price
+            : (course.price || 0)
+        ) : 0;
+        const priceChanged = oldFinalPrice !== newFinalPrice;
         const typeChanged = currentCourse.is_paid !== course.is_paid;
 
         if ((priceChanged || typeChanged) && course.stripe_product_id) {
           console.log('💰 Preço ou tipo mudou:', {
-            oldPrice,
-            newPrice,
+            oldFinalPrice,
+            newFinalPrice,
             oldType: currentCourse.is_paid ? 'pago' : 'gratuito',
             newType: course.is_paid ? 'pago' : 'gratuito',
             priceChanged,
@@ -387,7 +402,7 @@ export async function updateCourseWithStripe(
             mentorProfile.stripe_account_id,
             course.stripe_product_id,
             course.stripe_price_id,
-            Math.round(newPrice * 100) // converte para centavos (0 para gratuito)
+            Math.round(newFinalPrice * 100) // converte para centavos (0 para gratuito)
           );
 
           // Atualiza o banco com o novo ID de preço
@@ -418,8 +433,11 @@ export async function updateCourseWithStripe(
         // Se não tem produto no Stripe, cria um novo
         console.log('🆕 Curso não tem produto no Stripe. Criando novo produto e preço...');
         
-        // Determina o preço (0 para cursos gratuitos)
-        const priceInCents = course.is_paid && course.price ? Math.round(course.price * 100) : 0;
+        // Determina o preço final (com desconto se aplicável, 0 para cursos gratuitos)
+        const finalPrice = course.discount && course.discount > 0 && course.discounted_price 
+          ? course.discounted_price 
+          : course.price;
+        const priceInCents = course.is_paid && finalPrice ? Math.round(finalPrice * 100) : 0;
         
         stripeData = await createStripeProductWithPrice(
           mentorProfile.stripe_account_id,

@@ -1,5 +1,6 @@
 import { DocumentSection } from "@/components/DocumentSection";
 import MentorSidebar from '@/components/mentor/MentorSidebar';
+import Navigation from '@/components/shared/Navigation';
 import StripeErrorModal from "@/components/StripeErrorModal";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { createOrUpdateStripeConnectedAccount, type StripeOnboardingData } from "@/services/stripeClientService";
 import { supabase } from '@/utils/supabase';
-import { ArrowLeft, ArrowRight, Building2, Calendar, CheckCircle2, CreditCard, FileText, MapPin, Phone, Shield, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Calendar, CheckCircle2, ChevronRight, CreditCard, FileText, MapPin, Phone, Shield, User } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -246,9 +247,76 @@ export default function MentorStripeOnboardingPage() {
     }
   }, [formData, userProfile?.stripe_onboarding_status, userProfile?.document_verification_status]);
 
-  const nextStep = () => {
+  // Função para salvar dados automaticamente no banco
+  const saveFormDataToDatabase = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const updateData: any = {};
+
+      // Salvar dados baseado na etapa atual
+      switch (currentStep) {
+        case 1: // Informações Pessoais
+          if (formData.phone) updateData.phone = formData.phone;
+          if (formData.dateOfBirth) updateData.date_of_birth = formData.dateOfBirth;
+          if (formData.cpf) updateData.cpf = formData.cpf;
+          break;
+        
+        case 2: // Endereço
+          if (formData.addressLine1) updateData.address_line1 = formData.addressLine1;
+          if (formData.addressLine2) updateData.address_line2 = formData.addressLine2;
+          if (formData.addressCity) updateData.address_city = formData.addressCity;
+          if (formData.addressState) updateData.address_state = formData.addressState;
+          if (formData.addressPostalCode) updateData.address_postal_code = formData.addressPostalCode;
+          updateData.address_country = 'BR';
+          break;
+        
+        case 3: // Informações Bancárias
+          if (formData.bankAccountType) updateData.bank_account_type = formData.bankAccountType;
+          if (formData.bankRoutingNumber) updateData.bank_routing_number = formData.bankRoutingNumber;
+          if (formData.bankBranchNumber) updateData.bank_branch_number = formData.bankBranchNumber;
+          if (formData.bankAccountNumber) updateData.bank_account_number = formData.bankAccountNumber;
+          if (formData.bankAccountHolderName) updateData.bank_account_holder_name = formData.bankAccountHolderName;
+          break;
+        
+        case 4: // Documentos - já são salvos automaticamente pelo DocumentUpload
+          // Os documentos são salvos automaticamente quando enviados
+          break;
+      }
+
+      // Só atualizar se houver dados para salvar
+      if (Object.keys(updateData).length > 0) {
+        updateData.updated_at = new Date().toISOString();
+        
+        const { error } = await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Erro ao salvar dados:', error);
+        } else {
+          console.log('✅ Dados salvos automaticamente:', updateData);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar dados automaticamente:', error);
+    }
+  };
+
+  const nextStep = async () => {
     if (validateStep(currentStep)) {
+      // Salvar dados antes de avançar para a próxima etapa
+      await saveFormDataToDatabase();
+      
       setCurrentStep(prev => prev + 1);
+      
+      toast({
+        title: "Dados salvos",
+        description: "Suas informações foram salvas automaticamente.",
+        variant: "default",
+      });
     } else {
       toast({
         title: "Campos obrigatórios",
@@ -439,60 +507,60 @@ export default function MentorStripeOnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <User className="w-12 h-12 text-orange-600 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Informações Pessoais</h2>
-              <p className="text-gray-600">Precisamos de algumas informações básicas sobre você.</p>
+              <User className="w-12 h-12 text-gold mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Informações Pessoais</h2>
+              <p className="text-muted-foreground">Precisamos de algumas informações básicas sobre você.</p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="phone" className="text-sm font-medium text-foreground">
                   Telefone *
                 </Label>
                 <div className="relative mt-1">
-                  <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="phone"
                     type="tel"
                     placeholder="(11) 99999-9999"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', formatPhone(e.target.value))}
-                    className="pl-10"
+                    className="pl-10 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                     maxLength={15}
                   />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor="cpf" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="cpf" className="text-sm font-medium text-foreground">
                   CPF *
                 </Label>
                 <div className="relative mt-1">
-                  <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="cpf"
                     type="text"
                     placeholder="000.000.000-00"
                     value={formData.cpf}
                     onChange={(e) => handleInputChange('cpf', formatCPF(e.target.value))}
-                    className="pl-10"
+                    className="pl-10 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                     maxLength={14}
                   />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="dateOfBirth" className="text-sm font-medium text-foreground">
                   Data de Nascimento *
                 </Label>
                 <div className="relative mt-1">
-                  <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="dateOfBirth"
                     type="date"
                     value={formData.dateOfBirth}
                     onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                     max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
                   />
                 </div>
@@ -505,26 +573,30 @@ export default function MentorStripeOnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <MapPin className="w-12 h-12 text-orange-600 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Endereço</h2>
-              <p className="text-gray-600">Informe seu endereço completo.</p>
+              <MapPin className="w-12 h-12 text-gold mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Endereço</h2>
+              <p className="text-muted-foreground">Informe seu endereço completo.</p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="addressLine1" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="addressLine1" className="text-sm font-medium text-foreground">
                   Endereço *
                 </Label>
-                <Input
-                  id="addressLine1"
-                  placeholder="Rua/Avenida e número"
-                  value={formData.addressLine1}
-                  onChange={(e) => handleInputChange('addressLine1', e.target.value)}
-                />
+                <div className="relative mt-1">
+                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="addressLine1"
+                    placeholder="Rua/Avenida e número"
+                    value={formData.addressLine1}
+                    onChange={(e) => handleInputChange('addressLine1', e.target.value)}
+                    className="pl-10 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
+                  />
+                </div>
               </div>
               
               <div>
-                <Label htmlFor="addressLine2" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="addressLine2" className="text-sm font-medium text-foreground">
                   Complemento
                 </Label>
                 <Input
@@ -532,12 +604,13 @@ export default function MentorStripeOnboardingPage() {
                   placeholder="Apartamento, bloco, etc. (opcional)"
                   value={formData.addressLine2}
                   onChange={(e) => handleInputChange('addressLine2', e.target.value)}
+                  className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                 />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="addressCity" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="addressCity" className="text-sm font-medium text-foreground">
                     Cidade *
                   </Label>
                   <Input
@@ -545,15 +618,16 @@ export default function MentorStripeOnboardingPage() {
                     placeholder="Cidade"
                     value={formData.addressCity}
                     onChange={(e) => handleInputChange('addressCity', e.target.value)}
+                    className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="addressState" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="addressState" className="text-sm font-medium text-foreground">
                     Estado *
                   </Label>
                   <Select value={formData.addressState} onValueChange={(value) => handleInputChange('addressState', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm">
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
@@ -568,7 +642,7 @@ export default function MentorStripeOnboardingPage() {
               </div>
               
               <div>
-                <Label htmlFor="addressPostalCode" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="addressPostalCode" className="text-sm font-medium text-foreground">
                   CEP *
                 </Label>
                 <Input
@@ -577,6 +651,7 @@ export default function MentorStripeOnboardingPage() {
                   value={formData.addressPostalCode}
                   onChange={(e) => handleInputChange('addressPostalCode', formatCEP(e.target.value))}
                   maxLength={9}
+                  className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                 />
               </div>
             </div>
@@ -587,18 +662,18 @@ export default function MentorStripeOnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <Building2 className="w-12 h-12 text-orange-600 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Informações Bancárias</h2>
-              <p className="text-gray-600">Configure sua conta para receber pagamentos.</p>
+              <Building2 className="w-12 h-12 text-gold mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Informações Bancárias</h2>
+              <p className="text-muted-foreground">Configure sua conta para receber pagamentos.</p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="bankAccountType" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="bankAccountType" className="text-sm font-medium text-foreground">
                   Tipo de Conta *
                 </Label>
                 <Select value={formData.bankAccountType} onValueChange={(value) => handleInputChange('bankAccountType', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm">
                     <SelectValue placeholder="Selecione o tipo de conta" />
                   </SelectTrigger>
                   <SelectContent>
@@ -610,7 +685,7 @@ export default function MentorStripeOnboardingPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bankRoutingNumber" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="bankRoutingNumber" className="text-sm font-medium text-foreground">
                     Código do Banco *
                   </Label>
                   <Input
@@ -619,11 +694,12 @@ export default function MentorStripeOnboardingPage() {
                     value={formData.bankRoutingNumber}
                     onChange={(e) => handleInputChange('bankRoutingNumber', e.target.value.replace(/\D/g, ''))}
                     maxLength={3}
+                    className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="bankBranchNumber" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="bankBranchNumber" className="text-sm font-medium text-foreground">
                     Agência *
                   </Label>
                   <Input
@@ -632,12 +708,13 @@ export default function MentorStripeOnboardingPage() {
                     value={formData.bankBranchNumber}
                     onChange={(e) => handleInputChange('bankBranchNumber', e.target.value.replace(/\D/g, ''))}
                     maxLength={6}
+                    className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                   />
                 </div>
               </div>
               
               <div>
-                <Label htmlFor="bankAccountNumber" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="bankAccountNumber" className="text-sm font-medium text-foreground">
                   Número da Conta *
                 </Label>
                 <Input
@@ -645,14 +722,15 @@ export default function MentorStripeOnboardingPage() {
                   placeholder="125837-0"
                   value={formData.bankAccountNumber}
                   onChange={(e) => handleInputChange('bankAccountNumber', e.target.value)}
+                  className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Inclua o dígito verificador (ex: 125837-0)
                 </p>
               </div>
               
               <div>
-                <Label htmlFor="bankAccountHolderName" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="bankAccountHolderName" className="text-sm font-medium text-foreground">
                   Nome do Titular *
                 </Label>
                 <Input
@@ -660,20 +738,21 @@ export default function MentorStripeOnboardingPage() {
                   placeholder="Nome completo como no banco"
                   value={formData.bankAccountHolderName}
                   onChange={(e) => handleInputChange('bankAccountHolderName', e.target.value)}
+                  className="mt-1 bg-card/50 border-border/50 focus:border-gold/50 focus:ring-gold/20 backdrop-blur-sm"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Digite exatamente como aparece na sua conta bancária
                 </p>
               </div>
               
               {/* Exemplo visual */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">💡 Exemplo:</h4>
-                <div className="text-sm text-blue-800 space-y-1">
-                  <p><strong>Banco:</strong> 341 (Itaú)</p>
-                  <p><strong>Agência:</strong> 1739</p>
-                  <p><strong>Conta:</strong> 125837-0</p>
-                  <p><strong>Titular:</strong> João Silva Santos</p>
+              <div className="bg-card/30 border border-border/50 rounded-lg p-4 backdrop-blur-sm">
+                <h4 className="text-sm font-medium text-gold mb-2">💡 Exemplo:</h4>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong className="text-foreground">Banco:</strong> 341 (Itaú)</p>
+                  <p><strong className="text-foreground">Agência:</strong> 1739</p>
+                  <p><strong className="text-foreground">Conta:</strong> 125837-0</p>
+                  <p><strong className="text-foreground">Titular:</strong> João Silva Santos</p>
                 </div>
               </div>
             </div>
@@ -684,19 +763,21 @@ export default function MentorStripeOnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <FileText className="w-12 h-12 text-purple-600 mx-auto" />
+              <FileText className="w-12 h-12 text-gold mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Documentos</h2>
+              <p className="text-muted-foreground">Anexo de Documentos</p>
             </div>
             
             {/* Verificar se o documento já foi verificado */}
             {userProfile?.document_verification_status === 'verified' ? (
               <div className="text-center space-y-4">
-                <div className="flex items-center justify-center gap-2 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-800">
+                <div className="flex items-center justify-center gap-2 p-4 bg-card/50 border border-border/50 rounded-lg backdrop-blur-sm">
+                  <CheckCircle2 className="h-5 w-5 text-gold" />
+                  <span className="text-sm font-medium text-foreground">
                     Seus documentos já foram verificados
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Você pode prosseguir para a próxima etapa.
                 </p>
               </div>
@@ -718,30 +799,30 @@ export default function MentorStripeOnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <Shield className="w-12 h-12 text-orange-600 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Termos e Condições</h2>
-              <p className="text-gray-600">Revise e aceite os termos para finalizar.</p>
+              <Shield className="w-12 h-12 text-gold mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Termos e Condições</h2>
+              <p className="text-muted-foreground">Revise e aceite os termos para finalizar.</p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-              <h3 className="font-semibold text-gray-900">Resumo das Informações</h3>
+            <div className="bg-card/50 border border-border/50 rounded-lg p-6 space-y-4 backdrop-blur-sm">
+              <h3 className="font-semibold text-foreground">Resumo das Informações</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Nome:</span>
-                  <span className="ml-2 font-medium">{userProfile?.full_name}</span>
+                  <span className="text-muted-foreground">Nome:</span>
+                  <span className="ml-2 font-medium text-foreground">{userProfile?.full_name}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Email:</span>
-                  <span className="ml-2 font-medium">{userProfile?.email || 'N/A'}</span>
+                  <span className="text-muted-foreground">Email:</span>
+                  <span className="ml-2 font-medium text-foreground">{userProfile?.email || 'N/A'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Telefone:</span>
-                  <span className="ml-2 font-medium">{formData.phone}</span>
+                  <span className="text-muted-foreground">Telefone:</span>
+                  <span className="ml-2 font-medium text-foreground">{formData.phone}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Cidade:</span>
-                  <span className="ml-2 font-medium">{formData.addressCity}, {formData.addressState}</span>
+                  <span className="text-muted-foreground">Cidade:</span>
+                  <span className="ml-2 font-medium text-foreground">{formData.addressCity}, {formData.addressState}</span>
                 </div>
               </div>
             </div>
@@ -754,9 +835,9 @@ export default function MentorStripeOnboardingPage() {
                   onCheckedChange={(checked) => handleInputChange('tosAccepted', checked as boolean)}
                   className="mt-1"
                 />
-                <Label htmlFor="tosAccepted" className="text-sm text-gray-700 leading-relaxed">
+                <Label htmlFor="tosAccepted" className="text-sm text-foreground leading-relaxed">
                   Eu aceito os{' '}
-                  <a href="#" className="text-orange-600 hover:underline">
+                  <a href="#" className="text-gold hover:underline">
                     Termos de Serviço do Stripe
                   </a>{' '}
                   e confirmo que todas as informações fornecidas são verdadeiras e precisas.
@@ -774,124 +855,161 @@ export default function MentorStripeOnboardingPage() {
   };
 
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300  min-h-screen bg-gradient-to-br from-orange-50 to-white">
-        <div className="max-w-2xl mx-auto px-6 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="text-center">
-              <CreditCard className="w-16 h-16 text-orange-600 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Configuração de Pagamentos
-              </h1>
-              <p className="text-gray-600">
-                Complete seu perfil para começar a receber pagamentos dos seus cursos
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background">
+      {/* Navigation com z-index muito alto */}
+      <div className="fixed top-0 left-0 right-0 z-[9999]">
+        <Navigation />
+      </div>
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              {[1, 2, 3, 4, 5].map((step) => (
-                <div
-                  key={step}
-                  className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors ${
-                    step <= currentStep
-                      ? 'bg-orange-600 border-orange-600 text-white'
-                      : 'border-gray-300 text-gray-400'
-                  }`}
-                >
-                  {step < currentStep ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    <span className="text-sm font-medium">{step}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Pessoal</span>
-              <span>Endereço</span>
-              <span>Bancário</span>
-              <span>Documentos</span>
-              <span>Finalizar</span>
-            </div>
-          </div>
+      {/* Background Premium */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background-secondary to-background"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40"></div>
+      </div>
 
-          {/* Form Card */}
-          <Card className="shadow-lg border-0">
-            <CardContent className="p-8">
-              {renderStepContent()}
-            </CardContent>
-          </Card>
+      {/* Floating Particles */}
+      <div className="absolute inset-0 z-10">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-gold/20 rounded-full float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              animationDuration: `${4 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+      </div>
 
-          {/* Navigation */}
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="px-6"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Anterior
-            </Button>
-            
-            {currentStep < 5 ? (
-              <Button
-                onClick={nextStep}
-                disabled={!validateStep(currentStep)}
-                className="bg-orange-600 hover:bg-orange-700 px-6"
-              >
-                Próximo
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={!validateStep(5) || isLoading}
-                className="bg-green-600 hover:bg-green-700 px-6"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Processando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Finalizar Configuração
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-
-          {/* Security Notice */}
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-800">
-                <p className="font-medium mb-1">Suas informações estão seguras</p>
-                <p>
-                  Utilizamos criptografia de ponta e processamento seguro através do Stripe,
-                  líder mundial em pagamentos online. Seus dados bancários são protegidos
-                  pelos mais altos padrões de segurança.
+      <div className="flex relative z-20">
+        <MentorSidebar />
+        <div className="flex-1 transition-all duration-300 min-h-screen">
+          <div className="max-w-4xl mx-auto px-6 py-8">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="text-center">
+                <CreditCard className="w-16 h-16 text-gold mx-auto mb-4" />
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  Configuração de Pagamentos
+                </h1>
+                <p className="text-muted-foreground">
+                  Complete seu perfil para começar a receber pagamentos dos seus cursos
                 </p>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-8">
+              <div className="flex items-center justify-center gap-4">
+                {[
+                  { number: 1, label: 'Pessoal' },
+                  { number: 2, label: 'Endereço' },
+                  { number: 3, label: 'Bancário' },
+                  { number: 4, label: 'Documentos' },
+                  { number: 5, label: 'Finalizar' }
+                ].map((step, index) => (
+                  <div key={step.number} className="flex items-center">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-colors mb-2 ${
+                          step.number <= currentStep
+                            ? 'bg-gold border-gold text-background'
+                            : 'border-border text-muted-foreground'
+                        }`}
+                      >
+                        {step.number < currentStep ? (
+                          <CheckCircle2 className="w-6 h-6" />
+                        ) : (
+                          <span className="text-lg font-bold">{step.number}</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground text-center min-w-[60px]">
+                        {step.label}
+                      </span>
+                    </div>
+                    {index < 4 && (
+                      <ChevronRight className="w-5 h-5 text-gold mx-3 mb-6" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Form Card */}
+            <Card className="premium-card shadow-lg border border-border/50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 backdrop-blur-xl">
+              <CardContent className="p-8">
+                {renderStepContent()}
+              </CardContent>
+            </Card>
+
+            {/* Navigation */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="px-6 border-border/50 hover:border-gold/50 hover:text-gold transition-all"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Anterior
+              </Button>
+              
+              {currentStep < 5 ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={!validateStep(currentStep)}
+                  className="bg-gold hover:bg-gold-light text-background px-6 font-semibold"
+                >
+                  Próximo
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!validateStep(5) || isLoading}
+                  className="bg-gold hover:bg-gold-light text-background px-6 font-semibold"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background mr-2" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      Finalizar Configuração
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+
+            {/* Security Notice */}
+            <div className="mt-8 bg-card/50 backdrop-blur-xl border border-border/50 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <Shield className="w-5 h-5 text-gold mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-foreground">
+                  <p className="font-medium mb-1 text-gold">Suas informações estão seguras</p>
+                  <p className="text-muted-foreground">
+                    Utilizamos criptografia de ponta e processamento seguro através do Stripe,
+                    líder mundial em pagamentos online. Seus dados bancários são protegidos
+                    pelos mais altos padrões de segurança.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        {stripeError && (
+          <StripeErrorModal
+            error={stripeError}
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+          />
+        )}
       </div>
-      {stripeError && (
-        <StripeErrorModal
-          error={stripeError}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
-      )}
     </div>
   );
-} 
+}

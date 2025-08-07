@@ -3,7 +3,7 @@ import StatsSection from '@/components/admin/StatsSection';
 import AdminHeader from '@/components/admin/dashboard/AdminHeader';
 import DashboardTabs from '@/components/admin/dashboard/DashboardTabs';
 import { useAuth } from '@/hooks/useAuth';
-import { CourseWithDetails, getAdminProfile, getAllCourses, getAllMentorados, getAllMentors, getPlatformStats, MentoradoWithStats, MentorWithStats } from '@/services/adminService';
+import { CourseWithDetails, getAdminProfile, getAllCourses, getAllMentorados, getMentorsWithCourses, getPlatformStats, MentoradoWithStats, MentorWithCourses } from '@/services/adminService';
 import { Profile } from '@/types/database';
 import { useQuery } from '@tanstack/react-query';
 
@@ -27,9 +27,9 @@ const AdminDashboardPage = () => {
   });
   
   // Fetch recent mentors
-    const { data: mentorsData = [], isLoading: isLoadingMentors } = useQuery<MentorWithStats[]>({
+    const { data: mentorsData = [], isLoading: isLoadingMentors } = useQuery<MentorWithCourses[]>({
     queryKey: ['recentMentors', user?.id],
-    queryFn: () => getAllMentors({ queryKey: ['recentMentors', user?.id], signal: undefined }),
+    queryFn: () => getMentorsWithCourses({ queryKey: ['recentMentors', user?.id], signal: undefined }),
     enabled: !!user?.id,
   });
   

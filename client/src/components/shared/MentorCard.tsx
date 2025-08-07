@@ -270,8 +270,9 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
                     e.stopPropagation();
                     handleViewProfile();
                   }}
-                  className="flex-1 bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background shadow-lg hover:shadow-xl transition-all duration-200 text-xs"
+                  variant="outline"
                   size="sm"
+                  className="flex-1 border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50 text-xs"
                 >
                   <User className="w-3 h-3 mr-1" />
                   Ver Perfil
