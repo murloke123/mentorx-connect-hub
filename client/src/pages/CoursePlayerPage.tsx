@@ -118,7 +118,7 @@ const ContentRenderer: React.FC<{
       case 'texto_rico':
         return (
           <div 
-            className="prose max-w-none p-8"
+            className="prose max-w-none p-8 text-black [&_*]:text-black [&_p]:text-black [&_h1]:text-black [&_h2]:text-black [&_h3]:text-black [&_h4]:text-black [&_h5]:text-black [&_h6]:text-black [&_span]:text-black [&_div]:text-black [&_li]:text-black [&_ul]:text-black [&_ol]:text-black [&_strong]:text-black [&_em]:text-black [&_b]:text-black [&_i]:text-black"
             dangerouslySetInnerHTML={{ __html: content_data?.texto || '' }}
           />
         );
