@@ -46,12 +46,30 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 // Health check endpoint for deployment
 app.get('/health', (req, res) => {
   const envValidation = validateRequiredEnvironmentVariables();
+  
+  // Função para mascarar chaves de API (mostrar apenas os primeiros 8 caracteres)
+  const maskApiKey = (key: string | undefined): string => {
+    if (!key) return 'NOT_SET';
+    if (key.length <= 8) return key;
+    return key.substring(0, 8) + '...';
+  };
+
   res.status(200).json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
     env: config.NODE_ENV,
     environmentValid: envValidation.isValid,
-    missingVars: envValidation.missingVars
+    missingVars: envValidation.missingVars,
+    stripeKeys: {
+      secretKey: maskApiKey(process.env.STRIPE_SECRET_KEY),
+      publishableKey: maskApiKey(process.env.STRIPE_PUBLISHABLE_KEY),
+      webhookSecret: maskApiKey(process.env.STRIPE_WEBHOOK_SECRET)
+    },
+    brevoKeys: {
+      apiKey: maskApiKey(process.env.BREVO_API_KEY),
+      senderEmail: process.env.BREVO_SENDER_EMAIL || 'NOT_SET',
+      senderName: process.env.BREVO_SENDER_NAME || 'NOT_SET'
+    }
   });
 });
 
