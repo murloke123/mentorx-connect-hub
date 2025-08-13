@@ -58,6 +58,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
     navigate(`/curso/${course.id}`);
   };
 
+  const handleCardClick = () => {
+    // Redirecionar para a página do curso quando clicar em qualquer lugar do card
+    navigate(`/curso/${course.id}`);
+  };
 
   const mentorName = course.mentor_info?.full_name || 'Mentor';
   const mentorAvatar = course.mentor_info?.avatar_url;
@@ -74,7 +78,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
       className="w-full group"
     >
       {/* Container principal premium - Layout horizontal */}
-      <div className="relative bg-background rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 glass-card">
+      <div 
+        className="relative bg-background rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 glass-card cursor-pointer"
+        onClick={handleCardClick}
+      >
         {/* Overlay com gradiente dourado no hover */}
         <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
         
@@ -136,7 +143,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
               {/* Avatar do mentor */}
               <div 
                 className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-light border-2 border-white shadow-lg flex items-center justify-center text-background text-xs font-bold cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
-                onClick={handleMentorClick}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMentorClick();
+                }}
               >
                 {mentorAvatar ? (
                   <img 
@@ -185,7 +195,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
 
             {/* Botão Ver Detalhes */}
             <button 
-              onClick={handleCourseDetailsClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCourseDetailsClick();
+              }}
               className="w-full bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-xs mt-auto"
             >
               Ver Detalhes

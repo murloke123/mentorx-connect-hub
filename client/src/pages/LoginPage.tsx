@@ -10,10 +10,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { enviarEmailBoasVindas } from '@/services/emailService';
 import { createOrUpdateStripeConnectedAccount } from '@/services/stripeClientService';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
-import { Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();

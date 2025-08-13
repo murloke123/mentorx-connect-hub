@@ -1,18 +1,18 @@
 import { TypingAnimation } from "@/components/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
-import { Bot, Brain } from 'lucide-react';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Bot, Play, X } from 'lucide-react';
+import { useState } from 'react';
 
 const HeroSection = () => {
-  const scrollToPricing = () => {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-      // Aguardar o scroll e então selecionar o plano PLATINUM
-      setTimeout(() => {
-        const event = new CustomEvent('selectPlatinum');
-        window.dispatchEvent(event);
-      }, 1000);
-    }
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  const openVideoModal = () => {
+    setIsVideoOpen(true);
+  };
+
+  const closeVideoModal = () => {
+    setIsVideoOpen(false);
   };
 
   return (
@@ -52,8 +52,8 @@ const HeroSection = () => {
               TRANSFORME SEU CONHECIMENTO
             </span>
             <br />
-            <span className="text-foreground">
-              EM UM IMPÉRIO DIGITAL
+            <span className="text-foreground text-3xl md:text-5xl italic">
+              COM SUA PRÓPRIA PLATAFORMA DE MENTORIAS POTENCIALIZADA
             </span>
             <br />
             <div style={{ marginTop: '50px' }}>
@@ -80,13 +80,43 @@ const HeroSection = () => {
         {/* CTA Button */}
         <div className="mb-12">
           <Button 
-            onClick={scrollToPricing}
+            onClick={openVideoModal}
             className="btn-gold text-xl py-6 px-12 rounded-2xl shadow-glow hover:shadow-gold transform hover:scale-105 transition-all duration-300"
           >
-            <Brain className="mr-3 h-6 w-6" />
-            QUERO MINHA PLATAFORMA EXCLUSIVA
+            <Play className="mr-3 h-6 w-6" />
+            SAIBA MAIS SOBRE A PLATAFORMA
           </Button>
         </div>
+
+        {/* Video Modal */}
+         <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+           <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black border-none overflow-hidden">
+             <div className="relative w-full h-full">
+
+               
+               {/* Glow Effect */}
+               <div className="absolute inset-0 bg-gradient-to-r from-gold/10 via-transparent to-gold/10 animate-pulse" />
+               
+               {/* Close Button */}
+               <button
+                 onClick={closeVideoModal}
+                 className="absolute top-4 right-4 z-50 bg-black/70 hover:bg-gold/20 text-white hover:text-gold rounded-full p-3 transition-all duration-300 shadow-glow border border-gold/30"
+               >
+                 <X className="h-6 w-6" />
+               </button>
+               
+               {/* Video */}
+               <iframe
+                 src="https://player.vimeo.com/video/1109649210?autoplay=1&loop=1&controls=0"
+                 className="w-full h-full"
+                 frameBorder="0"
+                 allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                 allowFullScreen
+                 title="Introdução - Mentora AI"
+               />
+             </div>
+           </DialogContent>
+         </Dialog>
       </div>
 
       {/* Bottom gradient */}
