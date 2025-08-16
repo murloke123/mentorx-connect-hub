@@ -5,20 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/utils/supabase";
 import { redirectToUserProfile } from "@/utils/userUtils";
 import {
-  BookOpen,
-  ChevronDown,
-  ChevronUp,
-  DollarSign,
-  Frown,
-  Heart,
-  Mail,
-  Search,
-  TrendingUp,
-  User,
-  Users
+    BookOpen,
+    ChevronDown,
+    ChevronUp,
+    DollarSign,
+    Frown,
+    Heart,
+    Mail,
+    Menu,
+    Search,
+    TrendingUp,
+    User,
+    Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +49,7 @@ const MentorMeusMentoradosPage = () => {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [activeFilter, setActiveFilter] = useState<FilterType>('students');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchMentorados = async () => {
@@ -274,8 +277,31 @@ const MentorMeusMentoradosPage = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
+        
+        <div className="pt-16 md:pt-0">
         <div className="space-y-8">
           {/* Header */}
           <div>
@@ -559,6 +585,7 @@ const MentorMeusMentoradosPage = () => {
               )}
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </div>

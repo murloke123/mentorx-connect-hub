@@ -15,7 +15,7 @@ interface StatsSectionProps {
 
 const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalStudents, totalRevenue, totalPaidAmount, totalMatriculasValue, totalAppointmentsValue }: StatsSectionProps) => {
   return (
-    <div className="mb-8 grid gap-6 grid-cols-6">
+    <div className="mb-6 md:mb-8 grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       <StatsCard 
         title="Seguidores" 
         value={followersCount}

@@ -111,7 +111,7 @@ const MentorSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
+    <Sidebar open={open} setOpen={setOpen} animate={false}>
       <SidebarBody className="justify-between gap-10">
         <div className="flex flex-col gap-4 pt-4">
           {menuItems.map((link, idx) => {

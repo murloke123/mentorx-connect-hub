@@ -1,6 +1,6 @@
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Bot, PlusCircle } from "lucide-react";
+import { AlertTriangle, Bot, Menu, PlusCircle } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import ChatModal from "../../components/chat/ChatModal";
@@ -16,6 +16,7 @@ import {
     AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
 import { Button } from "../../components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet";
 import { getMentorCourses } from '../../services/courseService';
 import { supabase } from '../../utils/supabase';
 
@@ -24,6 +25,7 @@ const MeusCursosPage = () => {
   const queryClient = useQueryClient();
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [isUnpublishedCoursesAlertOpen, setIsUnpublishedCoursesAlertOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -103,9 +105,29 @@ const MeusCursosPage = () => {
   const listIsLoading = isLoading || isFetching;
 
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6">
+    <div className="flex-col md:flex-row flex min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>

@@ -21,6 +21,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import VerificationSwitch from "@/components/ui/VerificationSwitch";
@@ -30,7 +31,7 @@ import { supabase } from "@/utils/supabase";
 import { detectUserTimezone } from "@/utils/timezones";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, BookOpen, Calendar, CalendarDays, Camera, Check, Edit, Facebook, GraduationCap, Instagram, Mail, MessageCircle, Quote, Save, Star, User, UserPlus, X, Youtube } from "lucide-react";
+import { AlertTriangle, BookOpen, Calendar, CalendarDays, Camera, Check, Edit, Facebook, GraduationCap, Instagram, Mail, Menu, MessageCircle, Quote, Save, Star, User, UserPlus, X, Youtube } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CourseWithProfile extends Course {
@@ -66,6 +67,7 @@ const MentorProfilePage = () => {
   const [isPublicAccount, setIsPublicAccount] = useState(false);
   const [isUnpublishedProfileAlertOpen, setIsUnpublishedProfileAlertOpen] = useState(false);
   const [hasShownUnpublishedAlert, setHasShownUnpublishedAlert] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Estados para edição dos hero cards
   const [isEditingHeroCards, setIsEditingHeroCards] = useState(false);
@@ -759,7 +761,18 @@ const MentorProfilePage = () => {
   if (isLoading) {
     return (
       <div className="flex">
-        <MentorSidebar />
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <MentorSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <MentorSidebar />
+        </div>
+
         <div className="flex-1 transition-all duration-300">
           <LoadingComponent message="Carregando Dados" />
         </div>
@@ -776,9 +789,30 @@ const MentorProfilePage = () => {
   };
 
   return (
-    <div className="flex">
-      <MentorSidebar />
+    <div className="flex min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
       <div className="flex-1 transition-all duration-300 min-h-screen bg-black relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
         
         {/* Hero Section */}
         <div className="relative w-full">

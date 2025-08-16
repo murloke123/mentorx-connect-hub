@@ -2,15 +2,20 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import StatsSection from '@/components/admin/StatsSection';
 import AdminHeader from '@/components/admin/dashboard/AdminHeader';
 import DashboardTabs from '@/components/admin/dashboard/DashboardTabs';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { CourseWithDetails, getAdminProfile, getAllCourses, getAllMentorados, getMentorsWithCourses, getPlatformStats, MentoradoWithStats, MentorWithCourses } from '@/services/adminService';
 import { Profile } from '@/types/database';
 import { useQuery } from '@tanstack/react-query';
+import { Menu } from 'lucide-react';
+import { useState } from 'react';
 
 
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Fetch admin profile
   const { data: profile, isLoading: isLoadingProfile } = useQuery<Profile | null>({
@@ -60,10 +65,31 @@ const AdminDashboardPage = () => {
   }
   
   return (
-    <div className="flex">
-      <AdminSidebar />
-      <div className="flex-1 p-6 overflow-auto">
-        <AdminHeader fullName={profile?.full_name} />
+    <div className="flex flex-col md:flex-row min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden fixed top-4 left-4 z-50 bg-background/80 backdrop-blur-sm border border-border/50"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-[280px]">
+          <AdminSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <AdminSidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-4 md:p-6 overflow-auto pt-16 md:pt-6">
+        <AdminHeader fullName={profile?.full_name || undefined} />
         
         <StatsSection 
           mentorsCount={stats?.mentorsCount || 0}
@@ -73,8 +99,8 @@ const AdminDashboardPage = () => {
         />
         
         <DashboardTabs 
-          mentors={mentorsData}
-          mentorados={mentorados}
+          mentors={mentorsData as any}
+          mentorados={mentorados as any}
           courses={courses}
           isLoadingMentors={isLoadingMentors}
           isLoadingMentorados={isLoadingMentorados}

@@ -4,11 +4,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import { checkCoursePaymentStatus, checkUserPaymentIntents, getUserTransactions, handleCheckoutSuccess, startCourseCheckout } from "@/services/stripeCheckoutService";
 import { supabase } from "@/utils/supabase";
 import { navigateToTop } from "@/utils/utils";
-import { AlertCircle, Play, PlusCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, Menu, Play, PlusCircle, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -58,6 +59,7 @@ const MentoradoMeusCursosPage = () => {
   const [loading, setLoading] = useState(true);
   const [accessingStripe, setAccessingStripe] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Função para obter as iniciais do mentor (igual ao CourseCard)
   const getMentorInitials = (name: string) => {
@@ -348,18 +350,41 @@ const MentoradoMeusCursosPage = () => {
   }
 
   return (
-    <div className="flex">
-      <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300  p-6">
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
-            <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
-          </div>
-          <Button onClick={() => navigate('/courses')}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
-          </Button>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentoradoSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentoradoSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-6 relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
         </div>
+        
+        <div className="pt-16 md:pt-0">
+          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
+              <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
+            </div>
+            <Button onClick={() => navigate('/courses')}>
+              <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+            </Button>
+          </div>
           
           {/* Alerta de transações pendentes/falhadas */}
           {(() => {
@@ -590,6 +615,7 @@ const MentoradoMeusCursosPage = () => {
           </div>
         </div>
       </div>
+    </div>
   );
 };
 

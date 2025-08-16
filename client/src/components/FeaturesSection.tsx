@@ -6,7 +6,7 @@ const features = [
   {
     icon: Brain,
     title: "IA Que Potencializa Seus Resultados",
-    description: "Nossa IA analisa o comportamento dos mentorados e sugere automaticamente melhorias para aumentar o engajamento e conclusão dos cursos",
+    description: "Nossa IA analisa o comportamento dos mentorados e sugere automaticamente melhorias para aumentar o engajamento e conclusão dos conteúdos",
     color: "from-purple-500 to-blue-500"
   },
   {
@@ -60,7 +60,7 @@ const FeaturesSection = () => {
         {/* Section Title */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-black mb-6 gradient-text text-shadow-gold">
-            POR QUE MENTORES ESCOLHEM
+            POR QUE NOS ESCOLHER COMO SUA PLATAFORMA
           </h2>
           <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             MENTORA AI
@@ -134,7 +134,7 @@ const FeaturesSection = () => {
               </h3>
               <p className="text-xl text-silver-light max-w-2xl mx-auto mb-6">
                 Nossa IA exclusiva aprende com os dados dos seus mentorados e otimiza automaticamente 
-                a experiência de aprendizado, aumentando em <span className="text-gold font-bold">até 67%</span> a taxa de conclusão dos cursos.
+                a experiência de aprendizado, aumentando em <span className="text-gold font-bold">até 67%</span> a taxa de conclusão dos conteúdos passados.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 <div className="text-center">
@@ -153,7 +153,7 @@ const FeaturesSection = () => {
                   <div className="text-3xl font-bold text-gold mb-2">
                     <NumberTicker value={85} className="text-3xl font-bold text-gold" />%
                   </div>
-                  <div className="text-silver">Conclusão de Cursos</div>
+                  <div className="text-silver">Conclusão de Conteúdos</div>
                 </div>
               </div>
             </div>

@@ -883,7 +883,7 @@ export default function MentorStripeOnboardingPage() {
         ))}
       </div>
 
-      <div className="flex relative z-20">
+      <div className="flex-col md:flex-row flex relative z-20 min-h-screen">
         <MentorSidebar />
         <div className="flex-1 transition-all duration-300 min-h-screen">
           <div className="max-w-4xl mx-auto px-6 py-8">

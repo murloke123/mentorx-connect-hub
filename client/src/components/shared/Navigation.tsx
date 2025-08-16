@@ -142,8 +142,19 @@ const Navigation = () => {
     return (
       <nav className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg">
         <div className="container mx-auto px-4">
-          <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center justify-start">
+          <div className="h-16 flex items-center justify-between md:justify-between">
+            {/* Mobile: Logo centralizado */}
+            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
+              <Link to="/" className="flex items-center gap-3 font-bold text-xl text-white">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
+                  <Bot className="h-5 w-5 text-slate-900" />
+                </div>
+                Mentora Ai
+              </Link>
+            </div>
+            
+            {/* Desktop: Logo à esquerda */}
+            <div className="hidden md:flex items-center justify-start">
               <Link to="/" className="flex items-center gap-3 font-bold text-xl text-white -ml-[80px]">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
                   <Bot className="h-5 w-5 text-slate-900" />
@@ -151,6 +162,7 @@ const Navigation = () => {
                 Mentora Ai
               </Link>
             </div>
+            
             <div className="flex items-center space-x-4">
               <div className="h-8 w-20 bg-slate-700 animate-pulse rounded"></div>
             </div>
@@ -163,8 +175,16 @@ const Navigation = () => {
   return (
     <nav className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-sm">
       <div className="container mx-auto px-4">
-        <div className="h-16 flex items-center justify-between">
-          <div className="flex items-center justify-start">
+        <div className="h-16 flex items-center justify-between md:justify-between relative">
+          {/* Mobile: Logo centralizado */}
+          <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
+            <Link to="/" className="flex items-center font-bold text-xl text-white hover:text-gold transition-colors duration-200">
+              Mentora Ai
+            </Link>
+          </div>
+          
+          {/* Desktop: Logo à esquerda */}
+          <div className="hidden md:flex items-center justify-start">
             <Link to="/" className="flex items-center gap-3 font-bold text-xl text-white hover:text-gold transition-colors duration-200 -ml-[80px]">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg hover:shadow-gold transition-all duration-200">
                 <Bot className="h-5 w-5 text-slate-900" />
@@ -173,19 +193,21 @@ const Navigation = () => {
             </Link>
           </div>
           
-          <div className="flex items-center space-x-6">
-            <Link to="/courses" className="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium">
+          <div className="flex items-center space-x-2 md:space-x-6 ml-auto">
+            {/* Links de navegação - ocultos no mobile */}
+            <Link to="/courses" className="hidden md:block text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium">
               Cursos
             </Link>
-            <Link to="/mentors" className="text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium">
+            <Link to="/mentors" className="hidden md:block text-gray-300 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium">
               Mentores
             </Link>
             
+            {/* Botão Meu Painel - oculto no mobile */}
             {user && (
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex items-center gap-2 bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all duration-200"
+                className="hidden md:flex items-center gap-2 bg-white/10 border-white/20 text-gray-300 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all duration-200"
                 onClick={handleDashboardAccess}
               >
                 <LayoutDashboard className="h-4 w-4" />
@@ -195,7 +217,9 @@ const Navigation = () => {
             
             {/* Sininho de notificações - para qualquer usuário logado */}
             {user && (
-              <NotificationBell userId={user.id} />
+              <div className="md:block">
+                <NotificationBell userId={user.id} />
+              </div>
             )}
             
             {user ? (

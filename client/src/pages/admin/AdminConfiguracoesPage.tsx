@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Monitor, Bell, Shield } from "lucide-react";
-import { supabase } from "@/utils/supabase";
-import { useUserSettings } from "@/hooks/useUserSettings";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { Profile } from "@/types/database";
+import { supabase } from "@/utils/supabase";
+import { Bell, Menu, Monitor, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const AdminConfiguracoesPage = () => {
     const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { settings, loading, updateSetting, isSettingActive } = useUserSettings(currentUser?.id);
 
   useEffect(() => {
@@ -63,9 +66,32 @@ const AdminConfiguracoesPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="flex-1 p-8 overflow-y-auto">
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <AdminSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <AdminSidebar />
+      </div>
+
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
+        
+        <div className="pt-16 md:pt-0">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Configurações</h1>
@@ -188,9 +214,10 @@ const AdminConfiguracoesPage = () => {
             </CardContent>
           </Card>
         </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AdminConfiguracoesPage; 
+export default AdminConfiguracoesPage;

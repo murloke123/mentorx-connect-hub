@@ -238,6 +238,44 @@ const StyledWrapper = styled.div`
     width: 80px;
   }
 
+  /* Responsividade para Mobile */
+  @media (max-width: 768px) {
+    .container {
+      height: 80px;
+      gap: 6px;
+      transform: scale(0.8);
+      transform-origin: center;
+    }
+
+    .separator {
+      font-size: 40px;
+      margin: 0 4px;
+    }
+
+    .nums {
+      height: 80px;
+      width: 55px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      height: 60px;
+      gap: 4px;
+      transform: scale(0.65);
+    }
+
+    .separator {
+      font-size: 30px;
+      margin: 0 2px;
+    }
+
+    .nums {
+      height: 60px;
+      width: 40px;
+    }
+  }
+
   .nums:before {
     border-bottom: 2px solid black;
     content: "";
@@ -297,6 +335,27 @@ const StyledWrapper = styled.div`
     transform-style: preserve-3d;
     top: 0;
     width: 100%;
+  }
+
+  /* Ajustes de fonte para mobile */
+  @media (max-width: 768px) {
+    .num {
+      font-size: 60px;
+    }
+    
+    .nums:after {
+      font-size: 60px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .num {
+      font-size: 45px;
+    }
+    
+    .nums:after {
+      font-size: 45px;
+    }
   }
 
   .num:before,

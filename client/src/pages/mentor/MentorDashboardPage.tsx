@@ -3,20 +3,22 @@ import MentorSidebar from '@/components/mentor/MentorSidebar';
 import StatsSection from '@/components/mentor/StatsSection';
 import LoadingComponent from '@/components/shared/LoadingComponent';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeAccountStatus } from '@/hooks/useStripeAccountStatus';
 import { useStripeFinancialData } from '@/hooks/useStripeFinancialData';
 import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from '@/services/mentorService';
 import { Course } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, CheckCircle } from 'lucide-react';
-import { useEffect } from 'react';
+import { AlertCircle, CheckCircle, Menu } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MentorDashboardPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   // Hook que executa polling automático do Stripe
   const { status: stripeStatus } = useStripeAccountStatus();
@@ -98,13 +100,33 @@ const MentorDashboardPage = () => {
   };
   
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black relative">
-        {/* Card de Conta Verificada - Posicionado no canto superior direito */}
+    <div className="flex-col md:flex-row flex min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative">
+        {/* Card de Conta Verificada - Responsivo */}
         {stripeStatus.stripe_onboarding_status && (
-          <div className="absolute top-6 right-6 z-10">
-            <div className="bg-gradient-to-r from-slate-900/50 via-slate-800/50 to-slate-900/50 border border-gold/20 rounded-lg px-4 py-2 backdrop-blur-xl shadow-lg shadow-gold/10 h-[45px] flex items-center min-w-[300px]">
+          <div className="relative md:absolute md:top-6 md:right-6 z-10 mb-4 md:mb-0">
+            <div className="bg-gradient-to-r from-slate-900/50 via-slate-800/50 to-slate-900/50 border border-gold/20 rounded-lg px-4 py-2 backdrop-blur-xl shadow-lg shadow-gold/10 h-[45px] flex items-center w-full md:min-w-[300px] md:w-auto">
               <div className="flex items-center gap-2 w-full">
                 {stripeStatus.stripe_onboarding_status === 'completed' ? (
                   <>
@@ -139,11 +161,11 @@ const MentorDashboardPage = () => {
           </div>
         )}
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gold">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">
             Dashboard do Mentor
           </h1>
-          <p className="text-gray-300 text-lg">
+          <p className="text-gray-300 text-base md:text-lg">
             Gerencie suas mentorias e acompanhe seu progresso
           </p>
         </div>

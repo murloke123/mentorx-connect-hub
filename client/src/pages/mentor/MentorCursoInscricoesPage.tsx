@@ -5,23 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase";
 import {
-  AlertTriangle,
-  Award,
-  BookOpen,
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Mail,
-  MessageSquare,
-  Phone,
-  PlayCircle,
-  Search,
-  TrendingUp,
-  Users
+    AlertTriangle,
+    Award,
+    BookOpen,
+    Calendar,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    Mail,
+    Menu,
+    MessageSquare,
+    Phone,
+    PlayCircle,
+    Search,
+    TrendingUp,
+    Users
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -60,6 +62,7 @@ const MentorCursoInscricoesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'name' | 'progress' | 'enrolled_date' | 'last_access'>('progress');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!courseId) {
@@ -351,11 +354,35 @@ const MentorCursoInscricoesPage = () => {
   if (isLoading) {
     return (
       <div className="flex">
-        <MentorSidebar />
-        <div className="flex-1 p-6">
-          <div className="text-center py-10">
-            <Users className="mx-auto h-12 w-12 text-gray-400 animate-pulse" />
-            <p className="mt-2 text-muted-foreground">Carregando progresso dos alunos...</p>
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <MentorSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <MentorSidebar />
+        </div>
+
+        <div className="flex-1 p-4 md:p-6 relative">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+          </div>
+          
+          <div className="pt-16 md:pt-0">
+            <div className="text-center py-10">
+              <Users className="mx-auto h-12 w-12 text-gray-400 animate-pulse" />
+              <p className="mt-2 text-muted-foreground">Carregando progresso dos alunos...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -364,10 +391,32 @@ const MentorCursoInscricoesPage = () => {
 
   return (
     <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 min-h-screen bg-black relative">
-        {/* Header */}
-        <div className="mb-8">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 min-h-screen bg-black relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
+        
+        <div className="pt-16 md:pt-0">
+          {/* Header */}
+          <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 text-gold">
             Progresso dos Alunos
           </h1>
@@ -662,6 +711,7 @@ const MentorCursoInscricoesPage = () => {
             })}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

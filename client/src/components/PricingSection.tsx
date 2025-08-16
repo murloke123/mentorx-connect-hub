@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Gem, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface PricingSectionProps {
   initialSelectedPlan?: string;
@@ -9,6 +10,7 @@ interface PricingSectionProps {
 
 const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>("GOLD");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initialSelectedPlan) {
@@ -32,7 +34,7 @@ const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
     {
       name: "SILVER",
       description: "Plano Básico - Para quem está começando",
-      price: "R$ 97",
+      price: "Gratuito",
       originalPrice: "R$ 197",
       icon: <Gem className="w-8 h-8" />,
       popular: false,
@@ -163,7 +165,7 @@ const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
                     <span className="text-lg text-muted-foreground line-through">{plan.originalPrice}</span>
                   </div>
                   <p className="text-sm text-gold font-semibold">
-                    Economia de {Math.round(((parseInt(plan.originalPrice.replace('R$ ', '')) - parseInt(plan.price.replace('R$ ', ''))) / parseInt(plan.originalPrice.replace('R$ ', ''))) * 100)}%
+                    {plan.price === 'Gratuito' ? '100% Gratuito!' : `Economia de ${Math.round(((parseInt(plan.originalPrice.replace('R$ ', '')) - parseInt(plan.price.replace('R$ ', ''))) / parseInt(plan.originalPrice.replace('R$ ', ''))) * 100)}%`}
                   </p>
                 </div>
               </CardHeader>
@@ -184,6 +186,11 @@ const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
                       ? 'btn-gold hover:shadow-glow' 
                       : 'bg-gradient-to-r from-border to-muted hover:from-gold/20 hover:to-gold-light/20 hover:text-gold'
                   }`}
+                  onClick={() => {
+                    if (plan.name === 'SILVER') {
+                      navigate('/login');
+                    }
+                  }}
                 >
                   {plan.buttonText}
                 </Button>
@@ -205,7 +212,15 @@ const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
           <p className="text-muted-foreground mb-4">
             💎 Não encontrou o plano ideal? Entre em contato conosco!
           </p>
-          <Button variant="outline" className="border-gold text-gold hover:bg-gold hover:text-primary-foreground">
+          <Button 
+            variant="outline" 
+            className="border-gold text-gold hover:bg-gold hover:text-primary-foreground"
+            onClick={() => {
+              const subject = encodeURIComponent("Estou interessado na plataforma Mentora Ai");
+              const body = encodeURIComponent("Gostaria de falar com o representante, poderia entrar em contato comigo por favor.");
+              window.location.href = `mailto:guilherme.galdino@hotmail.com?subject=${subject}&body=${body}`;
+            }}
+          >
             FALAR COM ESPECIALISTA
           </Button>
         </div>

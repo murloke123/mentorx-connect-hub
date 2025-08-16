@@ -111,39 +111,41 @@ const AdminSidebar = () => {
   };
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
-      <SidebarBody className="justify-between gap-10">
-        <div className="flex flex-col gap-4 pt-4">
-          {menuItems.map((link, idx) => {
-            const active = isActive(link.href);
-            return (
-              <SidebarLink 
-                key={idx} 
-                link={link}
-                className={cn(
-                  "text-gray-300 hover:text-white hover:bg-white/10 rounded-lg px-3 py-3",
-                  active && "bg-white/20 text-white shadow-lg"
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(link.href);
-                }}
-              />
-            );
-          })}
-        </div>
-        <div className="border-t border-gray-700 pt-4 mt-auto">
-          <SidebarLink
-            link={logoutLink}
-            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-3"
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogout();
-            }}
-          />
-        </div>
-      </SidebarBody>
-    </Sidebar>
+    <div className="h-full">
+      <Sidebar open={open} setOpen={setOpen} animate={true}>
+        <SidebarBody className="justify-between gap-10">
+          <div className="flex flex-col gap-4 pt-4">
+            {menuItems.map((link, idx) => {
+              const active = isActive(link.href);
+              return (
+                <SidebarLink 
+                  key={idx} 
+                  link={link}
+                  className={cn(
+                    "text-gray-300 hover:text-white hover:bg-white/10 rounded-lg px-3 py-3",
+                    active && "bg-white/20 text-white shadow-lg"
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(link.href);
+                  }}
+                />
+              );
+            })}
+          </div>
+          <div className="border-t border-gray-700 pt-4 mt-auto">
+            <SidebarLink
+              link={logoutLink}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-3 py-3"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogout();
+              }}
+            />
+          </div>
+        </SidebarBody>
+      </Sidebar>
+    </div>
   );
 };
 

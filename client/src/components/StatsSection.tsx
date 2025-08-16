@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 
 const StatsSection = () => {
   const [stats, setStats] = useState({
-    mentors: 2847,
-    students: 847392,
-    revenue: 47200000,
+    mentors: 15,
+    students: 75,
+    revenue: 1500000,
     satisfaction: 94.7,
-    courses: 523,
+    courses: 35,
     hours: 2800000
   });
 
@@ -71,7 +71,7 @@ const StatsSection = () => {
     },
     {
       icon: BookOpen,
-      label: "Cursos Disponíveis",
+      label: "Conteúdos Disponíveis",
       value: stats.courses.toLocaleString(),
       color: "from-orange-500 to-red-500",
       suffix: ""
@@ -182,7 +182,7 @@ const StatsSection = () => {
               <TrendingUp className="w-8 h-8 text-gold" />
               <div>
                 <div className="text-lg font-bold text-foreground">
-                  Crescimento de <span className="text-gold">+247%</span> nos últimos 12 meses
+                  Crescimento de <span className="text-gold">+117%</span> nos últimos 3 meses
                 </div>
                 <div className="text-sm text-silver-light">
                   A plataforma de mentoria que mais cresce no Brasil

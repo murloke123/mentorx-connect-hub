@@ -24,8 +24,8 @@ const HeroSection = () => {
           alt="Luxury mentor office"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-background/80"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40"></div>
+        <div className="absolute inset-0 bg-background/50"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-background/20"></div>
       </div>
 
       {/* Floating Particles - Otimizado para performance mobile */}
@@ -87,7 +87,7 @@ const HeroSection = () => {
               TRANSFORME SEU CONHECIMENTO
             </span>
             <br />
-            <span className="text-foreground text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl italic">
+            <span className="text-foreground/85 text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl italic">
               COM SUA PRÓPRIA PLATAFORMA DE ENSINO GRATUITAMENTE
             </span>
             <br />
@@ -95,7 +95,7 @@ const HeroSection = () => {
               <span className="text-gold animate-glow-pulse flex items-center justify-center gap-2 sm:gap-3">
                 <Bot className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-18 lg:w-18 xl:h-20 xl:w-20 text-gold animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.6)]" />
                 <span className="text-gold font-black drop-shadow-[0_0_10px_rgba(255,215,0,0.8)] shadow-gold animate-glow-pulse text-lg sm:text-xl md:text-2xl lg:text-3xl">
-                  COM IA
+                  COM AJUDA DA IA
                 </span>
               </span>
             </div>

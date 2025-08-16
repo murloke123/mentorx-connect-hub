@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
 import { createNotification } from "@/services/notificationService";
@@ -16,6 +17,7 @@ import {
     Calendar,
     Heart,
     HeartOff,
+    Menu,
     MessageCircle,
     Search,
     TrendingUp,
@@ -56,6 +58,7 @@ const MentoradoMeusMentoresPage = () => {
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [messageText, setMessageText] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [openDialogs, setOpenDialogs] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -329,9 +332,33 @@ const MentoradoMeusMentoresPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-black">
-        <MentoradoSidebar />
-        <div className="flex-1 transition-all duration-300 p-6">
-          <LoadingComponent message="Carregando Dados" />
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <MentoradoSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <MentoradoSidebar />
+        </div>
+
+        <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+          </div>
+          
+          <div className="pt-16 md:pt-0">
+            <LoadingComponent message="Carregando Dados" />
+          </div>
         </div>
       </div>
     );
@@ -339,9 +366,31 @@ const MentoradoMeusMentoresPage = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300 p-6">
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentoradoSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentoradoSidebar />
+      </div>
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
+        
+        <div className="pt-16 md:pt-0">
+          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-bold text-gold mb-2">Meus Mentores</h1>
             <p className="text-muted-foreground">Mentores que estou seguindo e seus cursos disponíveis</p>
@@ -577,6 +626,7 @@ const MentoradoMeusMentoresPage = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

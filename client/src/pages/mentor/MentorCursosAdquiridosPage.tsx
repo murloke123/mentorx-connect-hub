@@ -1,11 +1,12 @@
 import { Session } from '@supabase/supabase-js';
-import { Play, PlusCircle } from "lucide-react";
+import { Menu, Play, PlusCircle } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
+import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet";
 import { checkCoursePaymentStatus, checkUserPaymentIntents, processPendingPayments } from '../../services/stripeCheckoutService';
 import { supabase } from '../../utils/supabase';
 import { navigateToTop } from '../../utils/utils';
@@ -40,6 +41,7 @@ const MentorCursosAdquiridosPage = () => {
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
   const [loadingEnrolled, setLoadingEnrolled] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Função para buscar role do usuário e redirecionar corretamente
   const navigateToCourse = async (courseId: string) => {
@@ -276,9 +278,29 @@ const MentorCursosAdquiridosPage = () => {
   };
 
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300  p-6">
+    <div className="flex-col md:flex-row flex min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gold">Cursos Adquiridos</h1>

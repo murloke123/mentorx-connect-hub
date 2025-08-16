@@ -1,18 +1,21 @@
 import MentoradoSidebar from "@/components/mentorado/MentoradoSidebar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { Profile } from "@/types/database";
 import { supabase } from "@/utils/supabase";
-import { Bell, Monitor, Shield } from "lucide-react";
+import { Bell, Menu, Monitor, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const MentoradoConfiguracoesPage = () => {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { settings, loading, updateSetting, isSettingActive } = useUserSettings(currentUser?.id);
 
   useEffect(() => {
@@ -63,9 +66,32 @@ const MentoradoConfiguracoesPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-black">
-      <MentoradoSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+    <div className="flex min-h-screen bg-black">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <MentoradoSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <MentoradoSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto relative">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+        </div>
+        
+        <div className="pt-16 md:pt-0">
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold text-gold mb-2">Configurações</h1>
@@ -187,6 +213,7 @@ const MentoradoConfiguracoesPage = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </div>
