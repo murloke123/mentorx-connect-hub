@@ -127,7 +127,7 @@ const MeusCursosPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>

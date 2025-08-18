@@ -378,7 +378,7 @@ const MentorCursoInscricoesPage = () => {
             </Sheet>
           </div>
           
-          <div className="pt-16 md:pt-0">
+          <div className="pt-8 md:pt-0">
             <div className="text-center py-10">
               <Users className="mx-auto h-12 w-12 text-gray-400 animate-pulse" />
               <p className="mt-2 text-muted-foreground">Carregando progresso dos alunos...</p>

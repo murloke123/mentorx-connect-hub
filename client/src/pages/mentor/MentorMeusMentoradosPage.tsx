@@ -289,7 +289,7 @@ const MentorMeusMentoradosPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 overflow-auto relative">
         {/* Mobile Menu Button */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -301,7 +301,7 @@ const MentorMeusMentoradosPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+        <div>
         <div className="space-y-8">
           {/* Header */}
           <div>

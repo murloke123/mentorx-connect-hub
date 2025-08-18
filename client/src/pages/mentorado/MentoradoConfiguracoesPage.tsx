@@ -91,7 +91,7 @@ const MentoradoConfiguracoesPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+        <div className="pt-8 md:pt-6">
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold text-gold mb-2">Configurações</h1>

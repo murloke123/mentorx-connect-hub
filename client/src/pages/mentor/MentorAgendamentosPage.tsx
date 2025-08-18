@@ -122,12 +122,12 @@ const MentorAgendamentosPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative overflow-auto">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative overflow-auto">
         <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gold">Solicitações de Agendamento</h1>
+          <div>
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gold">Agendamentos</h1>
               <p className="text-gray-400">Gerencie todas as suas mentorias agendadas e solicitações recebidas</p>
             </div>
             <Button 

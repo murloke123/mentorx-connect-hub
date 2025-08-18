@@ -375,7 +375,7 @@ const MentoradoMeusCursosPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+        <div className="pt-8 md:pt-0">
           <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>

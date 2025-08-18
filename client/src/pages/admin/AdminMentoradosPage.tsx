@@ -56,7 +56,7 @@ const AdminMentoradosPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+        <div className="pt-8 md:pt-0">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Gerenciar Mentorados</h1>
           <p className="text-gray-600">Administre todos os mentorados da plataforma</p>

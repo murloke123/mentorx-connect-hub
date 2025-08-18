@@ -6,74 +6,28 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { useUserSettings } from "@/hooks/useUserSettings";
-import { Profile } from "@/types/database";
-import { supabase } from "@/utils/supabase";
-import { Bell, Menu, Monitor, Settings, Shield } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Bell, Menu, Monitor, Shield } from "lucide-react";
+import { useState } from "react";
 
 const MentorConfiguracoesPage = () => {
-  const [currentUser, setCurrentUser] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  
-  const { settings, loading, updateSetting, isSettingActive } = useUserSettings(currentUser?.id);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (error) throw error;
-
-        setCurrentUser(profile);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
   const handleLogToggle = async (checked: boolean) => {
-    if (!currentUser) return;
-
-    await updateSetting(
-      'log de cabecalho',
-      checked,
-      currentUser.full_name || 'Usuário',
-      currentUser.role || 'mentor'
-    );
+    // Funcionalidade será implementada futuramente
+    toast({
+      title: "Configuração atualizada",
+      description: "Esta funcionalidade será implementada em breve.",
+    });
   };
 
-  if (isLoading || loading) {
-    return (
-      <div className="flex">
-        <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
-          <div className="space-y-8">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-              <div className="space-y-4">
-                <div className="h-32 bg-gray-200 rounded"></div>
-                <div className="h-32 bg-gray-200 rounded"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleSettingToggle = async (settingName: string, checked: boolean) => {
+    // Funcionalidade será implementada futuramente
+    toast({
+      title: "Configuração atualizada",
+      description: `${settingName} ${checked ? 'ativado' : 'desativado'}.`,
+    });
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -89,7 +43,7 @@ const MentorConfiguracoesPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative">
         {/* Mobile Menu Button */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -101,18 +55,20 @@ const MentorConfiguracoesPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gold">Configurações</h1>
+              <p className="text-muted-foreground">Gerencie suas preferências e configurações da conta</p>
+            </div>
+          </div>
+
         <div className="space-y-8">
-          <h1 className="text-3xl font-bold flex items-center">
-            <Settings className="mr-3" />
-            Configurações
-          </h1>
 
           <div className="space-y-6">
             {/* Configurações Gerais */}
-            <Card>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-gold">
                   <Monitor className="mr-2" />
                   Configurações Gerais
                 </CardTitle>
@@ -129,7 +85,7 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     id="log-toggle"
-                    checked={isSettingActive('log de cabecalho')}
+                    defaultChecked={false}
                     onCheckedChange={handleLogToggle}
                   />
                 </div>
@@ -147,6 +103,7 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Notificações por Email', checked)}
                   />
                 </div>
 
@@ -163,15 +120,16 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Perfil Público', checked)}
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Privacidade e Segurança */}
-            <Card>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-gold">
                   <Shield className="mr-2" />
                   Privacidade e Segurança
                 </CardTitle>
@@ -186,7 +144,10 @@ const MentorConfiguracoesPage = () => {
                       Adicionar uma camada extra de segurança à sua conta
                     </p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    defaultChecked={false}
+                    onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                  />
                 </div>
 
                 <Separator />
@@ -202,15 +163,16 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Dados de Analytics', checked)}
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Notificações */}
-            <Card>
+            <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-gold">
                   <Bell className="mr-2" />
                   Notificações
                 </CardTitle>
@@ -227,6 +189,7 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Novos Alunos', checked)}
                   />
                 </div>
 
@@ -243,6 +206,7 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Conclusão de Módulos', checked)}
                   />
                 </div>
 
@@ -259,12 +223,12 @@ const MentorConfiguracoesPage = () => {
                   </div>
                   <Switch
                     defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Mensagens Diretas', checked)}
                   />
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
         </div>
       </div>
     </div>

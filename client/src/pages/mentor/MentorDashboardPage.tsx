@@ -122,7 +122,7 @@ const MentorDashboardPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-16 md:pt-6 min-h-screen bg-black relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative">
         {/* Card de Conta Verificada - Responsivo */}
         {stripeStatus.stripe_onboarding_status && (
           <div className="relative md:absolute md:top-6 md:right-6 z-10 mb-4 md:mb-0">

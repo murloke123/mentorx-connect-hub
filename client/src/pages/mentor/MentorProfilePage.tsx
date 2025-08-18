@@ -829,9 +829,9 @@ const MentorProfilePage = () => {
             
             {/* Floating Stats with 20% transparency */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 px-2 md:px-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="premium-card group hover:scale-105 transform transition-all duration-500 bg-card/80 backdrop-blur-sm relative p-4 text-center">
+                  <div key={index} className="premium-card group hover:scale-105 transform transition-all duration-500 bg-card/80 backdrop-blur-sm relative p-2 md:p-4 text-center">
                     <div className="mb-2 flex justify-center">
                       <img 
                         src={stat.icon} 
@@ -974,7 +974,7 @@ const MentorProfilePage = () => {
         </div>
         
         {/* Name and CTA section */}
-        <div className="mt-24 max-w-7xl mx-auto text-center px-6">
+        <div className="mt-24 max-w-7xl mx-auto text-center px-4 md:px-6">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-gold via-yellow-400 to-gold bg-clip-text text-transparent mb-2">
             {currentUser?.full_name || ""}
           </h1>
@@ -1071,8 +1071,8 @@ const MentorProfilePage = () => {
           </div>
         </div>
         
-        {/* Sticky Navigation */}
-        <div className="sticky top-0 z-50 glass-card border-t border-b border-gold/20 shadow-sm !rounded-none">
+        {/* Sticky Navigation - Hidden on mobile */}
+        <div className="hidden md:block sticky top-0 z-50 glass-card border-t border-b border-gold/20 shadow-sm !rounded-none">
           <div className="max-w-7xl mx-auto px-6">
             <nav className="flex justify-center space-x-8 py-2">
               {[
@@ -1103,23 +1103,25 @@ const MentorProfilePage = () => {
         </div>
             
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-12">
           
           {/* Sobre Mim Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
-                  <User className="h-8 w-8 text-gold" />
-                  <h2 className="text-3xl font-bold text-gold">Meu Perfil</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 relative rounded-xl">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-0">
+                  <User className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                  <h2 className="text-xl md:text-3xl font-bold text-gold">Meu Perfil</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
-                <VerificationSwitch
-                  id="verified-perfil"
-                  checked={verifiedData.meu_perfil}
-                  onChange={(checked) => handleVerifiedChange('meu_perfil', checked)}
-                />
+                <div className="self-start md:self-auto">
+                  <VerificationSwitch
+                    id="verified-perfil"
+                    checked={verifiedData.meu_perfil}
+                    onChange={(checked) => handleVerifiedChange('meu_perfil', checked)}
+                  />
+                </div>
               </div>
               
               <div className="space-y-8 mb-8">
@@ -1137,19 +1139,21 @@ const MentorProfilePage = () => {
 
           {/* Nova Seção: Por que me seguir? (Cópia) */}
           <section className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
-                  <UserPlus className="h-8 w-8 text-gold" />
-                  <h2 className="text-3xl font-bold text-gold">Por que me seguir?</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 relative rounded-xl">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-0">
+                  <UserPlus className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                  <h2 className="text-xl md:text-3xl font-bold text-gold">Por que me seguir?</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
-                <VerificationSwitch
-                  id="verified-seguir-copy"
-                  checked={verifiedData.por_que_me_seguir}
-                  onChange={(checked) => handleVerifiedChange('por_que_me_seguir', checked)}
-                />
+                <div className="self-start md:self-auto">
+                  <VerificationSwitch
+                    id="verified-seguir-copy"
+                    checked={verifiedData.por_que_me_seguir}
+                    onChange={(checked) => handleVerifiedChange('por_que_me_seguir', checked)}
+                  />
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1287,26 +1291,28 @@ const MentorProfilePage = () => {
 
           {/* Nova Seção: Brasões do Mentor (Cópia) */}
           <section className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 relative rounded-xl">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 relative rounded-xl">
               <BadgesSection />
             </div>
           </section>
 
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-8 w-8 text-gold" />
-                  <h2 className="text-3xl font-bold text-gold">Meus Cursos</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 border border-gold/20 relative rounded-xl">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-0">
+                  <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                  <h2 className="text-xl md:text-3xl font-bold text-gold">Meus Cursos</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
-                <VerificationSwitch
-                  id="verified-cursos"
-                  checked={verifiedData.meus_cursos}
-                  onChange={(checked) => handleVerifiedChange('meus_cursos', checked)}
-                />
+                <div className="self-start md:self-auto">
+                  <VerificationSwitch
+                    id="verified-cursos"
+                    checked={verifiedData.meus_cursos}
+                    onChange={(checked) => handleVerifiedChange('meus_cursos', checked)}
+                  />
+                </div>
               </div>
               
               {coursesLoading ? (
@@ -1348,19 +1354,21 @@ const MentorProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="h-8 w-8 text-gold" />
-                  <h2 className="text-3xl font-bold text-gold">O que dizem meus mentorados ...</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 border border-gold/20 relative rounded-xl">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-0">
+                  <MessageCircle className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                  <h2 className="text-xl md:text-3xl font-bold text-gold">O que dizem meus mentorados ...</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
-                <VerificationSwitch
-                  id="verified-elogios"
-                  checked={verifiedData.elogios}
-                  onChange={(checked) => handleVerifiedChange('elogios', checked)}
-                />
+                <div className="self-start md:self-auto">
+                  <VerificationSwitch
+                    id="verified-elogios"
+                    checked={verifiedData.elogios}
+                    onChange={(checked) => handleVerifiedChange('elogios', checked)}
+                  />
+                </div>
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1490,23 +1498,25 @@ const MentorProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
-              <div className="flex justify-between items-center mb-10">
-                <div className="flex items-center gap-3">
-                  <CalendarDays className="h-8 w-8 text-gold" />
-                  <h2 className="text-3xl font-bold text-gold">Agenda uma Conversa</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 border border-gold/20 relative rounded-xl">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-0">
+                  <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                  <h2 className="text-xl md:text-3xl font-bold text-gold">Agenda uma Conversa</h2>
                 </div>
                 
                 {/* Checkbox de verificação */}
-                <VerificationSwitch
-                  id="verified-calendario"
-                  checked={verifiedData.calendario}
-                  onChange={(checked) => handleVerifiedChange('calendario', checked)}
-                />
+                <div className="self-start md:self-auto">
+                  <VerificationSwitch
+                    id="verified-calendario"
+                    checked={verifiedData.calendario}
+                    onChange={(checked) => handleVerifiedChange('calendario', checked)}
+                  />
+                </div>
               </div>
               
               {/* Layout com dois componentes lado a lado */}
-              <div className="grid lg:grid-cols-2 gap-12 mb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-12 mb-8">
                 {/* Lado esquerdo - Configurações */}
                 <div className="relative">
 
@@ -1532,12 +1542,12 @@ const MentorProfilePage = () => {
 
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-10 border border-gold/20 relative rounded-xl">
-              <div className="flex items-center justify-center gap-3 mb-10">
-                 <Mail className="h-8 w-8 text-gold" />
-                 <h2 className="text-3xl font-bold text-gold">Entre em Contato</h2>
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg backdrop-blur-sm p-2 md:p-10 border border-gold/20 relative rounded-xl">
+              <div className="flex items-center justify-center gap-3 mb-6 md:mb-10">
+                 <Mail className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                 <h2 className="text-xl md:text-3xl font-bold text-gold">Entre em Contato</h2>
                </div>
-                <div className="grid lg:grid-cols-2 gap-12 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-12 mb-8">
                   <div className="space-y-6">
                     <h3 className="text-xl font-semibold text-gold">Formas de Contato</h3>
                     
