@@ -1,3 +1,4 @@
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Calendar, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import SchedulesModal from './SchedulesModal';
@@ -28,10 +29,11 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
   isClickable = false,
   onAppointmentChange
 }) => {
+  const isMobile = useIsMobile();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDayModal, setShowDayModal] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0); // 0 = mês atual, 1 = próximo mês
-  const [showLegend, setShowLegend] = useState(false);
+  const [showLegend, setShowLegend] = useState(isMobile);
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
   
@@ -195,7 +197,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     
     const isWorking = isWorkingDay(dayOfWeek);
     
-    let baseClass = 'text-base rounded-xl transition-all duration-200 flex items-center justify-center h-12 w-12 font-semibold ml-1.5';
+    let baseClass = 'text-sm md:text-base rounded-md md:rounded-xl transition-all duration-200 flex items-center justify-center h-10 w-10 md:h-12 md:w-12 font-semibold -ml-0.5 md:-ml-2';
     
     // Adicionar cursor pointer apenas para dias clicáveis (não passados)
     if (isClickable && mentorId && mentorName && (isWorking || isCurrentDay) && !isPastDay) {
@@ -249,12 +251,12 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           )}
         </div>
         
-        <div key={`calendar-grid-${monthOffset}`} className="grid grid-cols-7 gap-3 flex-1">
+        <div key={`calendar-grid-${monthOffset}`} className="grid grid-cols-7 gap-x-2 gap-y-1 md:gap-3 flex-1">
           {/* Cabeçalho dos dias da semana */}
           {weekDays.map((day) => (
             <div 
               key={day} 
-              className="font-bold text-sm text-gold/80 text-center h-8 flex items-center justify-center -ml-2.5"
+              className="font-bold text-sm text-gold/80 text-center h-8 flex items-center justify-center ml-1 md:-ml-2"
             >
               {day}
             </div>
@@ -264,7 +266,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {calendarData.calendarDays.map((dayInfo, index) => {
                           if (dayInfo === null) {
                 // Espaço vazio para dias antes do primeiro dia do mês
-                return <div key={`empty-${monthOffset}-${index}`} className="h-12 w-12 ml-1.5"></div>;
+                return <div key={`empty-${monthOffset}-${index}`} className="h-10 w-10 md:h-12 md:w-12 ml-1 md:-ml-2"></div>;
               }
             
             const { day, dayOfWeek } = dayInfo;
@@ -300,22 +302,24 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           })}
         </div>
         
-        {/* Botão para mostrar/ocultar legenda */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={() => setShowLegend(!showLegend)}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-gold/20 text-gold hover:text-gold border border-gold/30 rounded-lg transition-all duration-200 hover:scale-105"
-            title={showLegend ? "Ocultar legenda" : "Mostrar legenda"}
-          >
-            <Info className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              {showLegend ? "Ocultar Legenda" : "Mostrar Legenda"}
-            </span>
-          </button>
-        </div>
+        {/* Botão para mostrar/ocultar legenda - oculto no mobile */}
+        {!isMobile && (
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-gold/20 text-gold hover:text-gold border border-gold/30 rounded-lg transition-all duration-200 hover:scale-105"
+              title={showLegend ? "Ocultar legenda" : "Mostrar legenda"}
+            >
+              <Info className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                {showLegend ? "Ocultar Legenda" : "Mostrar Legenda"}
+              </span>
+            </button>
+          </div>
+        )}
 
-        {/* Legenda melhorada com padrão premium - condicional */}
-        {showLegend && (
+        {/* Legenda melhorada com padrão premium - sempre visível no mobile, condicional no desktop */}
+        {(isMobile || showLegend) && (
           <div className="mt-4 p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl border border-gold/30 shadow-lg shadow-gold/10 animate-in slide-in-from-top-2 duration-300">
             <h4 className="text-sm font-semibold text-gold mb-3 text-center">Legenda</h4>
             <div className="grid grid-cols-2 gap-3">

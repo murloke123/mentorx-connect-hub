@@ -15,6 +15,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import MentorCalendarComponent from "@/components/MentorCalendarComponent";
 import Navigation from "@/components/shared/Navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CourseWithProfile extends Course {
   mentor_name?: string;
@@ -44,6 +45,7 @@ const MentorPublicProfilePage = () => {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const isMobile = useIsMobile();
 
   // Função para lidar com o clique no botão WhatsApp
   const handleWhatsAppClick = () => {
@@ -667,7 +669,7 @@ const MentorPublicProfilePage = () => {
         </div>
         
         {/* Name and CTA section */}
-        <div className="mt-24 max-w-5xl mx-auto text-center px-4">
+        <div className="mt-24 max-w-5xl mx-auto text-center px-2 md:px-4">
           <h1 className="text-4xl font-bold text-white mb-2">
             {mentorData.full_name}
           </h1>
@@ -742,10 +744,11 @@ const MentorPublicProfilePage = () => {
           </div>
         </div>
         
-        {/* Sticky Navigation */}
-        <div className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur-sm border-b border-gold/20 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6">
-            <nav className="flex justify-center space-x-8 py-4">
+        {/* Sticky Navigation - Hidden on mobile */}
+        {!isMobile && (
+          <div className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur-sm border-b border-gold/20 shadow-sm">
+            <div className="max-w-7xl mx-auto px-2 md:px-6">
+              <nav className="flex justify-center space-x-2 md:space-x-8 py-2 md:py-4 overflow-x-auto">
               {[
               { id: 'sobre', label: 'Quem Sou Eu', icon: User },
                 { id: 'cursos', label: 'Cursos', icon: GraduationCap },
@@ -758,27 +761,28 @@ const MentorPublicProfilePage = () => {
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                    className={`flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-1 md:py-2 rounded-lg transition-all duration-300 whitespace-nowrap ${
                       activeSection === item.id
                         ? 'bg-gold text-black shadow-lg font-semibold'
                         : 'text-silver hover:text-gold hover:bg-slate-700/50'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <Icon className="h-4 w-4 md:h-5 md:w-5" />
+                    <span className="font-medium text-xs md:text-sm">{item.label}</span>
                   </button>
                 );
               })}
             </nav>
           </div>
         </div>
+        )}
         
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8 space-y-12">
+        <div className="max-w-7xl mx-auto px-2 md:px-6 py-4 md:py-8 space-y-6 md:space-y-12">
           
           {/* Sobre Section */}
           <section id="sobre" className="scroll-mt-24">
-            <div className="glass-card p-10 border border-gold/20">
+            <div className="glass-card p-4 md:p-10 border border-gold/20">
               {/* Minha História - Agora ocupa toda a largura */}
               {mentorData.bio && (
                 <div className="mb-12">
@@ -801,8 +805,8 @@ const MentorPublicProfilePage = () => {
                     Por que me seguir?
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
                     <h4 className="font-bold text-lg mb-2 text-gold">
                       {mentorData.cx_diferenciais?.dif_title_1 || "🎯 Resultados Comprovados"}
                     </h4>
@@ -811,7 +815,7 @@ const MentorPublicProfilePage = () => {
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
+                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
                     <h4 className="font-bold text-lg mb-2 text-gold">
                       {mentorData.cx_diferenciais?.dif_title_2 || "🚀 Metodologia Exclusiva"}
                     </h4>
@@ -820,7 +824,7 @@ const MentorPublicProfilePage = () => {
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
+                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300">
                     <h4 className="font-bold text-lg mb-2 text-gold">
                       {mentorData.cx_diferenciais?.dif_title_3 || "💰 ROI Garantido"}
                     </h4>
@@ -837,7 +841,7 @@ const MentorPublicProfilePage = () => {
 
           {/* Cursos Section */}
           <section id="cursos" className="scroll-mt-24">
-            <div className="glass-card p-10 border border-gold/20">
+            <div className="glass-card p-4 md:p-10 border border-gold/20">
               <div className="flex items-center justify-center gap-3 mb-10">
                 <BookOpen className="h-8 w-8 text-gold" />
                 <h2 className="text-3xl font-bold text-gold">Cursos Disponíveis</h2>
@@ -848,7 +852,7 @@ const MentorPublicProfilePage = () => {
                     <Spinner className="h-8 w-8" />
                   </div>
                 ) : mentorCourses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {mentorCourses.map((course) => (
                   <CourseCard key={course.id} course={course} />
                 ))}
@@ -876,14 +880,14 @@ const MentorPublicProfilePage = () => {
 
           {/* Depoimentos Section */}
           <section id="depoimentos" className="scroll-mt-24">
-            <div className="glass-card p-10 border border-gold/20">
+            <div className="glass-card p-4 md:p-10 border border-gold/20">
               <div className="flex items-center justify-center gap-3 mb-10">
                 <MessageCircle className="h-8 w-8 text-gold" />
                 <h2 className="text-3xl font-bold text-gold">O que dizem meus mentorados ...</h2>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                 {[1, 2, 3].map((index) => (
-                  <div key={index} className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 relative">
+                  <div key={index} className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 relative">
                     <Quote className="absolute top-4 left-4 h-6 w-6 text-gold/60" />
                     <div className="text-center">
                       <div className="w-16 h-16 rounded-full mx-auto mb-4 overflow-hidden border-2 border-gold/30">
@@ -915,24 +919,24 @@ const MentorPublicProfilePage = () => {
 
           {/* Agenda Section */}
           <section id="agenda" className="scroll-mt-24">
-            <div className="glass-card p-10 border border-gold/20">
-              <div className="flex items-center justify-center gap-3 mb-10">
-                <CalendarDays className="h-8 w-8 text-gold" />
-                <h2 className="text-3xl font-bold text-white">
+            <div className="glass-card p-4 md:p-10 border border-gold/20">
+              <div className="flex items-center justify-center gap-3 mb-6 md:mb-10">
+                <CalendarDays className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                <h2 className="text-2xl md:text-3xl font-bold text-white">
                   Agende uma Conversa
                 </h2>
               </div>
               
-              <div className="grid lg:grid-cols-2 gap-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12">
                 {/* Lado esquerdo - Configurações de Disponibilidade (visualização) */}
                 <div className="md:col-span-1">
-                  <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gold/20 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <h3 className="text-2xl font-bold mb-6 text-white">
+                  <div className="bg-slate-800/50 backdrop-blur-sm p-4 md:p-8 rounded-2xl border border-gold/20 h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-white">
                       Disponibilidade
                     </h3>
                     
                     {/* Dias da Semana */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                       <div>
                         <h4 className="text-sm font-medium text-gold mb-3">Dias Disponíveis</h4>
                         <div className="flex flex-wrap gap-2">
@@ -949,7 +953,7 @@ const MentorPublicProfilePage = () => {
                             return (
                               <span
                                 key={day.key}
-                                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                                className={`px-2 md:px-3 py-1 md:py-2 rounded-md text-xs md:text-sm font-medium ${
                                   isAvailable
                                     ? 'bg-gold/20 text-gold border border-gold/30'
                                     : 'bg-slate-700 text-silver border border-slate-600'
@@ -965,7 +969,7 @@ const MentorPublicProfilePage = () => {
                       {/* Horários */}
                       <div>
                         <h4 className="text-sm font-medium text-gold mb-3">Horário de Atendimento</h4>
-                        <div className="bg-slate-700/50 p-4 rounded-lg border border-gold/20">
+                        <div className="p-3 md:p-4 border-b border-gold/20">
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="h-4 w-4 text-gold" />
                             <span className="text-white">{mentorSettings.startTime} às {mentorSettings.endTime}</span>
@@ -976,7 +980,7 @@ const MentorPublicProfilePage = () => {
                       {/* Duração da Sessão */}
                       <div>
                         <h4 className="text-sm font-medium text-gold mb-3">Duração das Sessões</h4>
-                        <div className="bg-slate-700/50 p-4 rounded-lg border border-gold/20">
+                        <div className="p-3 md:p-4 border-b border-gold/20">
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="h-4 w-4 text-gold" />
                             <span className="text-white">{mentorSettings.sessionDuration} minutos</span>
@@ -987,7 +991,7 @@ const MentorPublicProfilePage = () => {
                       {/* Fuso Horário */}
                       <div>
                         <h4 className="text-sm font-medium text-gold mb-3">Fuso Horário</h4>
-                        <div className="bg-slate-700/50 p-4 rounded-lg border border-gold/20">
+                        <div className="p-3 md:p-4 border-b border-gold/20">
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="h-4 w-4 text-gold" />
                             <span className="text-white">{mentorSettings.timezone}</span>
@@ -998,7 +1002,7 @@ const MentorPublicProfilePage = () => {
                       {/* Valor do Agendamento */}
                       <div>
                         <h4 className="text-sm font-medium text-gold mb-3">Valor do Agendamento</h4>
-                        <div className="bg-slate-700/50 p-4 rounded-lg border border-gold/20">
+                        <div className="p-3 md:p-4 border-b border-gold/20">
                           {mentorSettings.price && mentorSettings.price > 0 ? (
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-semibold text-gold">
@@ -1036,12 +1040,12 @@ const MentorPublicProfilePage = () => {
 
           {/* Contato Section */}
           <section id="contato" className="scroll-mt-24">
-            <div className="glass-card p-10 border border-gold/20">
-              <div className="flex items-center justify-center gap-3 mb-10">
-                 <Mail className="h-8 w-8 text-gold" />
-                 <h2 className="text-3xl font-bold text-white">Entre em Contato</h2>
+            <div className="glass-card p-4 md:p-10 border border-gold/20">
+              <div className="flex items-center justify-center gap-3 mb-6 md:mb-10">
+                 <Mail className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+                 <h2 className="text-2xl md:text-3xl font-bold text-white">Entre em Contato</h2>
                </div>
-                <div className="grid lg:grid-cols-2 gap-12 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 mb-6 md:mb-8">
                   <div className="space-y-6">
                     <h3 className="text-xl font-semibold text-white">Formas de Contato</h3>
                     
@@ -1089,14 +1093,14 @@ const MentorPublicProfilePage = () => {
             </section>
 
             {/* CTA Final */}
-            <section className="bg-gradient-to-r from-slate-800 to-slate-900 border border-gold/20 rounded-2xl shadow-xl p-16 text-center text-white">
-              <h2 className="text-4xl font-bold mb-4 text-gold">Pronto para Transformar sua Vida?</h2>
-              <p className="text-xl mb-8 text-silver">
+            <section className="bg-gradient-to-r from-slate-800 to-slate-900 border border-gold/20 rounded-2xl shadow-xl p-6 md:p-16 text-center text-white">
+              <h2 className="text-2xl md:text-4xl font-bold mb-4 text-gold">Pronto para Transformar sua Vida?</h2>
+              <p className="text-lg md:text-xl mb-6 md:mb-8 text-silver">
                 Junte-se aos seguidores de {mentorData.full_name?.split(' ')[0]} e comece sua jornada de transformação
               </p>
               
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-center space-x-8 text-lg text-silver">
+              <div className="space-y-4 mb-6 md:mb-8">
+                <div className="flex flex-col md:flex-row justify-center md:space-x-8 space-y-2 md:space-y-0 text-sm md:text-lg text-silver">
                   <span>✅ Garantia de 7 dias</span>
                   <span>✅ Suporte personalizado</span>
                   <span>✅ Resultados comprovados</span>
@@ -1105,7 +1109,7 @@ const MentorPublicProfilePage = () => {
               
               <Button
                 onClick={handleFollowToggle}
-                className={`px-12 py-6 text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105 ${
+                className={`px-8 md:px-12 py-4 md:py-6 text-lg md:text-xl font-bold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105 ${
                   isFollowing 
                     ? 'bg-red-600 hover:bg-red-700 text-white' 
                     : 'bg-gold hover:bg-yellow-500 text-black'

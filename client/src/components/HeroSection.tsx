@@ -1,11 +1,13 @@
 import { TypingAnimation } from "@/components/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Bot, Play, X } from 'lucide-react';
+import { BookOpen, Bot, Play, Users, X } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const navigate = useNavigate();
 
   const openVideoModal = () => {
     setIsVideoOpen(true);
@@ -13,6 +15,14 @@ const HeroSection = () => {
 
   const closeVideoModal = () => {
     setIsVideoOpen(false);
+  };
+
+  const handleMentorsClick = () => {
+    navigate('/mentors-mobile');
+  };
+
+  const handleCoursesClick = () => {
+    navigate('/courses-mobile');
   };
 
   return (
@@ -112,6 +122,26 @@ const HeroSection = () => {
           </TypingAnimation>
         </div>
 
+        {/* Mobile Navigation Buttons - Only visible on mobile */}
+        <div className="block sm:hidden mb-8">
+          <div className="flex flex-col gap-4 px-4 max-w-sm mx-auto">
+            <Button 
+              onClick={handleMentorsClick}
+              className="bg-black/30 backdrop-blur-sm border border-gold/30 text-gold hover:bg-gold/20 hover:border-gold transition-all duration-300 flex items-center gap-3 font-semibold py-4 rounded-xl shadow-lg hover:shadow-glow transform hover:scale-105"
+            >
+              <Users className="h-5 w-5" />
+              <span>MENTORES</span>
+            </Button>
+            <Button 
+              onClick={handleCoursesClick}
+              className="bg-black/30 backdrop-blur-sm border border-gold/30 text-gold hover:bg-gold/20 hover:border-gold transition-all duration-300 flex items-center gap-3 font-semibold py-4 rounded-xl shadow-lg hover:shadow-glow transform hover:scale-105"
+            >
+              <BookOpen className="h-5 w-5" />
+              <span>CURSOS</span>
+            </Button>
+          </div>
+        </div>
+
         {/* CTA Button */}
         <div className="flex justify-center px-4 mb-12">
           <Button 
@@ -125,20 +155,20 @@ const HeroSection = () => {
 
         {/* Video Modal */}
          <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
-           <DialogContent className="max-w-[100vw] max-h-[100vh] h-[100vh] sm:max-w-lg sm:max-h-none sm:h-auto md:max-w-2xl lg:max-w-4xl w-full p-0 bg-black border-gold/30 overflow-hidden m-0 sm:mx-auto">
+           <DialogContent className="max-w-[100vw] max-h-[85vh] h-[85vh] sm:max-w-lg sm:max-h-none sm:h-auto md:max-w-2xl lg:max-w-4xl w-full p-0 bg-black border-gold/30 overflow-hidden m-0 sm:mx-auto">
              {/* Efeito de brilho de fundo */}
              <div className="absolute inset-0 bg-gradient-to-r from-gold/10 via-transparent to-gold/10 animate-pulse" />
              
-             {/* Botão de fechar customizado - maior para mobile */}
+             {/* Botão de fechar customizado - maior para mobile e mais afastado da borda */}
              <button
                onClick={closeVideoModal}
-               className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-black/80 border-2 border-gold/50 flex items-center justify-center hover:bg-gold/20 hover:border-gold transition-all duration-300 group touch-manipulation"
+               className="absolute top-4 right-4 sm:top-4 sm:right-4 z-50 w-14 h-14 sm:w-10 sm:h-10 rounded-full bg-black/90 border-2 border-gold/70 flex items-center justify-center hover:bg-gold/20 hover:border-gold transition-all duration-300 group touch-manipulation shadow-lg"
              >
-               <X className="h-6 w-6 sm:h-5 sm:w-5 text-gold group-hover:text-white" />
+               <X className="h-7 w-7 sm:h-5 sm:w-5 text-gold group-hover:text-white" />
              </button>
              
-             {/* Iframe do vídeo - responsivo */}
-             <div className="relative w-full h-full sm:h-0 sm:pb-[56.25%]">
+             {/* Iframe do vídeo - responsivo com margem superior no mobile */}
+             <div className="relative w-full h-full mt-16 sm:mt-0 sm:h-0 sm:pb-[56.25%]">
                <iframe
                  src="https://player.vimeo.com/video/1109649210?autoplay=1&loop=1&controls=0"
                  className="absolute top-0 left-0 w-full h-full"

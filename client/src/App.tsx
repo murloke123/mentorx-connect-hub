@@ -33,6 +33,7 @@ import {
     // Páginas públicas
     CoursePlayerPage,
     CoursePublicView,
+    CoursesMobilePage,
     CoursesPage,
     LoginPage,
     MentoradoConfiguracoesPage,
@@ -60,6 +61,7 @@ import {
     MentorProfilePage, MentorPublicProfilePage,
     MentorPublicSchedulePage,
     MentorRotasPage,
+    MentorsMobilePage,
     MentorsPage,
     MentorStripeOnboardingPage,
     NotFound,
@@ -67,6 +69,7 @@ import {
     preloadCriticalComponents
 } from '@/utils/lazyComponents';
 // Importar funções utilitárias para debug (disponíveis no console)
+import MobileRedirect from '@/components/MobileRedirect';
 import '@/utils/updateVerificationStatus';
 
 const queryClient = new QueryClient({
@@ -106,8 +109,18 @@ const AppContent = () => {
           <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/mentors" element={<MentorsPage />} />
+          <Route path="/courses" element={
+            <MobileRedirect mobileRoute="/courses-mobile">
+              <CoursesPage />
+            </MobileRedirect>
+          } />
+          <Route path="/courses-mobile" element={<CoursesMobilePage />} />
+          <Route path="/mentors" element={
+            <MobileRedirect mobileRoute="/mentors-mobile">
+              <MentorsPage />
+            </MobileRedirect>
+          } />
+          <Route path="/mentors-mobile" element={<MentorsMobilePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/document-test" element={<DocumentTestPage />} />

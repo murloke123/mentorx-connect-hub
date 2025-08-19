@@ -9,10 +9,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { preloadUserRoutes } from '@/utils/lazyComponents';
-import { Bot, LayoutDashboard, LogOut, Settings, UserCircle } from "lucide-react";
+import { BookOpen, Bot, LayoutDashboard, LogOut, Settings, UserCircle, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from '../../utils/supabase';
@@ -29,6 +30,7 @@ const Navigation = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   // Buscar perfil quando usuário mudar
   useEffect(() => {
@@ -145,7 +147,7 @@ const Navigation = () => {
           <div className="h-16 flex items-center justify-between md:justify-between">
             {/* Mobile: Logo centralizado */}
             <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
-              <Link to="/" className="flex items-center gap-3 font-bold text-xl text-white">
+              <Link to="/" className="flex items-center gap-3 font-bold text-xl text-gold">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
                   <Bot className="h-5 w-5 text-slate-900" />
                 </div>
@@ -178,14 +180,14 @@ const Navigation = () => {
         <div className="h-16 flex items-center justify-between md:justify-between relative">
           {/* Mobile: Logo centralizado */}
           <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
-            <Link to="/" className="flex items-center font-bold text-xl text-white hover:text-gold transition-colors duration-200">
+            <Link to="/" className="flex items-center font-bold text-xl text-foreground hover:text-gold-light transition-colors duration-200">
               Mentora Ai
             </Link>
           </div>
           
           {/* Desktop: Logo à esquerda */}
           <div className="hidden md:flex items-center justify-start">
-            <Link to="/" className="flex items-center gap-3 font-bold text-xl text-white hover:text-gold transition-colors duration-200 -ml-[80px]">
+            <Link to="/" className="flex items-center gap-3 font-bold text-xl text-foreground hover:text-gold transition-colors duration-200 -ml-[80px]">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg hover:shadow-gold transition-all duration-200">
                 <Bot className="h-5 w-5 text-slate-900" />
               </div>
@@ -277,6 +279,18 @@ const Navigation = () => {
                       <LayoutDashboard className="h-4 w-4 mr-3 text-gray-400" />
                     Meu Painel
                   </DropdownMenuItem>
+                    <Link to={isMobile ? "/courses-mobile" : "/courses"}>
+                      <DropdownMenuItem className="cursor-pointer px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200">
+                        <BookOpen className="h-4 w-4 mr-3 text-gray-400" />
+                        Todos os Cursos
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link to={isMobile ? "/mentors-mobile" : "/mentors"}>
+                      <DropdownMenuItem className="cursor-pointer px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200">
+                        <Users className="h-4 w-4 mr-3 text-gray-400" />
+                        Todos os Mentores
+                      </DropdownMenuItem>
+                    </Link>
                     <Link to={configRoute}>
                       <DropdownMenuItem className="cursor-pointer px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-200">
                         <Settings className="h-4 w-4 mr-3 text-gray-400" />

@@ -165,20 +165,20 @@ const MentorPublicSchedulePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
-        <div className="space-y-8">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto">
+        <div className="space-y-6 md:space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
               {/* Avatar do Mentor - mesmo design do MentorCard2 */}
-              <div className="w-16 h-16 relative group">
+              <div className="w-12 h-12 md:w-16 md:h-16 relative group flex-shrink-0">
                 <Avatar className="w-full h-full border-4 border-gold/30 group-hover:border-gold transition-all duration-300">
                   <AvatarImage 
                     src={mentorData.avatar_url || ''} 
                     alt={mentorData.full_name || 'Mentor'}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-gold/20 to-gold-light/20 text-gold font-bold text-lg">
+                  <AvatarFallback className="bg-gradient-to-br from-gold/20 to-gold-light/20 text-gold font-bold text-sm md:text-lg">
                     {getInitials(mentorData.full_name || 'Mentor')}
                   </AvatarFallback>
                 </Avatar>
@@ -186,43 +186,43 @@ const MentorPublicSchedulePage: React.FC = () => {
               </div>
               
               {/* Título e Subtítulo */}
-              <div>
-                <h1 className="text-3xl font-bold text-gold">Agendar com {mentorData.full_name}</h1>
-                <p className="text-gray-400">Escolha o melhor horário para sua mentoria</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl md:text-3xl font-bold text-gold truncate">Agendar com {mentorData.full_name}</h1>
+                <p className="text-sm md:text-base text-gray-400">Escolha o melhor horário para sua mentoria</p>
               </div>
             </div>
             <Button 
               onClick={() => navigate(`/mentor/publicview/${id}`)}
-              className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90 transition-all duration-300"
+              className="flex items-center gap-2 bg-gold text-black hover:bg-gold/90 transition-all duration-300 w-full sm:w-auto text-sm md:text-base"
             >
               <User className="h-4 w-4" />
               Ver Perfil Completo
             </Button>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Painel de Disponibilidade */}
-            <div className="md:col-span-1">
-              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 h-full">
-                <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-gold gradient-text flex items-center gap-2">
-                    <Calendar className="h-6 w-6" />
+            <div className="order-2 lg:order-1">
+              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 lg:p-8 rounded-2xl border border-gold/20 shadow-lg hover:shadow-gold/20 transition-all duration-300 h-full">
+                <div className="mb-6 md:mb-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-gold gradient-text flex items-center gap-2">
+                    <Calendar className="h-5 w-5 md:h-6 md:w-6" />
                     Disponibilidade
                   </h3>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {/* Dias Disponíveis */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
-                      <Calendar className="h-4 w-4" />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-xs md:text-sm font-medium flex items-center gap-2 text-gold">
+                      <Calendar className="h-3 w-3 md:h-4 md:w-4" />
                       Dias Disponíveis
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 md:gap-2">
                       {allDays.map((day) => (
                         <span
                           key={day}
-                          className={`px-3 py-2 rounded-md text-sm font-medium border transition-all ${
+                          className={`px-2 md:px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium border transition-all ${
                             workingDaysPortuguese.includes(day)
                               ? 'bg-slate-800/50 text-gold border-gold/50 shadow-md'
                               : 'bg-slate-800/30 text-gray-400 border-gold/20'
@@ -235,59 +235,59 @@ const MentorPublicSchedulePage: React.FC = () => {
                   </div>
 
                   {/* Horário de Atendimento */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
-                      <Clock className="h-4 w-4" />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-xs md:text-sm font-medium flex items-center gap-2 text-gold">
+                      <Clock className="h-3 w-3 md:h-4 md:w-4" />
                       Horário de Atendimento
                     </label>
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-gold" />
+                    <div className="bg-slate-800/50 p-3 md:p-4 rounded-lg border-b border-gold/20">
+                      <div className="flex items-center gap-2 text-xs md:text-sm">
+                        <Calendar className="h-3 w-3 md:h-4 md:w-4 text-gold" />
                         <span className="text-white">{mentorSettings.startTime} às {mentorSettings.endTime}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Duração das Sessões */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-gold">Duração das Sessões</label>
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-gold" />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-xs md:text-sm font-medium text-gold">Duração das Sessões</label>
+                    <div className="bg-slate-800/50 p-3 md:p-4 rounded-lg border-b border-gold/20">
+                      <div className="flex items-center gap-2 text-xs md:text-sm">
+                        <Clock className="h-3 w-3 md:h-4 md:w-4 text-gold" />
                         <span className="text-white">{mentorSettings.sessionDuration} minutos</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Fuso Horário */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
-                      <Globe className="h-4 w-4" />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-xs md:text-sm font-medium flex items-center gap-2 text-gold">
+                      <Globe className="h-3 w-3 md:h-4 md:w-4" />
                       Fuso Horário
                     </label>
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Globe className="h-4 w-4 text-gold" />
+                    <div className="bg-slate-800/50 p-3 md:p-4 rounded-lg border-b border-gold/20">
+                      <div className="flex items-center gap-2 text-xs md:text-sm">
+                        <Globe className="h-3 w-3 md:h-4 md:w-4 text-gold" />
                         <span className="text-white">{mentorSettings.timezone}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Valor do Agendamento */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium flex items-center gap-2 text-gold">
-                      <DollarSign className="h-4 w-4" />
+                  <div className="space-y-2 md:space-y-3">
+                    <label className="text-xs md:text-sm font-medium flex items-center gap-2 text-gold">
+                      <DollarSign className="h-3 w-3 md:h-4 md:w-4" />
                       Valor do Agendamento
                     </label>
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-gold/20">
+                    <div className="bg-slate-800/50 p-3 md:p-4 rounded-lg border-b border-gold/20">
                       {mentorSettings.price && mentorSettings.price > 0 ? (
-                        <div className="flex items-center gap-2 text-sm">
+                        <div className="flex items-center gap-2 text-xs md:text-sm">
                           <span className="font-semibold text-gold">
                             R$ {mentorSettings.price.toFixed(2).replace('.', ',')}
                           </span>
                         </div>
                       ) : (
-                        <div className="text-sm">
+                        <div className="text-xs md:text-sm">
                           <span className="font-medium text-gold">
                             🎉 Essa mentoria está gratuita no momento, aproveite!
                           </span>
@@ -300,7 +300,7 @@ const MentorPublicSchedulePage: React.FC = () => {
             </div>
 
             {/* Calendário */}
-            <div className="md:col-span-1">
+            <div className="order-1 lg:order-2">
               <MentorCalendarComponent
                 mentorId={id || ''}
                 mentorName={mentorData.full_name || 'Mentor'}

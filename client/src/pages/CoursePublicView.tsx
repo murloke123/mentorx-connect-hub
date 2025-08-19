@@ -415,16 +415,11 @@ const CoursePublicView: React.FC = () => {
 
       <div className="flex relative z-20">
         <div className="flex-1 transition-all duration-300">
-          <div className="p-8">
-            {/* Header sem botão voltar */}
-            <div className="mb-8">
-              {/* Espaço reservado para header */}
-            </div>
-
+          <div className="p-4 md:p-8 pt-6 md:pt-8">
             {/* Hero Section Premium */}
             <div className="max-w-7xl mx-auto">
               {/* Título Principal com tag premium posicionada */}
-              <div className="text-center mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm border border-gold/20 shadow-xl">
+              <div className="text-center mb-4 md:mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm border border-gold/20 shadow-xl">
                 {/* Vídeo de fundo apenas para o título */}
                 <video
                    autoPlay
@@ -440,20 +435,20 @@ const CoursePublicView: React.FC = () => {
                  <div className="absolute inset-0 bg-gradient-to-br from-background/20 via-background/10 to-background/20 z-10"></div>
                 
                 {/* Conteúdo do título */}
-                <div className="relative z-20 py-16 px-8">
+                <div className="relative z-20 py-8 md:py-16 px-4 md:px-8">
                   <h1 className="text-2xl md:text-4xl font-black mb-4 leading-tight">
                     <span className="gradient-text text-shadow-gold">
                       {landingData.headline}
                     </span>
                   </h1>
-                  <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+                  <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed">
                     {landingData.subheadline}
                   </p>
                   
                   {/* Tag Premium no canto inferior direito */}
-                  <div className="absolute bottom-4 right-4 inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-gold/20 via-gold-light/20 to-gold/20 border border-gold/30 backdrop-blur-sm">
-                    <Zap className="w-4 h-4 text-gold mr-2" />
-                    <span className="text-gold font-medium">Curso Premium</span>
+                  <div className="absolute bottom-4 right-4 inline-flex items-center px-3 md:px-4 py-1 md:py-2 rounded-full bg-gradient-to-r from-gold/20 via-gold-light/20 to-gold/20 border border-gold/30 backdrop-blur-sm">
+                    <Zap className="w-3 md:w-4 h-3 md:h-4 text-gold mr-1 md:mr-2" />
+                    <span className="text-gold font-medium text-xs md:text-sm">Curso Premium</span>
                   </div>
                 </div>
                 
@@ -471,8 +466,8 @@ const CoursePublicView: React.FC = () => {
               </div>
 
               {/* Card do Curso com Imagem */}
-              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 mb-6 md:mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   {/* Imagem do Curso */}
                   <div className="relative overflow-hidden rounded-lg shadow-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:border-gold/30 transition-all duration-500 group">
                     {/* Glowing Border Effect */}
@@ -483,7 +478,7 @@ const CoursePublicView: React.FC = () => {
                     <img
                       src={courseData.image_url || '/images/course-placeholder.jpg'}
                       alt={courseData.title}
-                      className="w-full h-64 object-cover rounded-lg"
+                      className="w-full h-48 md:h-64 object-cover rounded-lg"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = '/images/course-placeholder.jpg';
@@ -558,14 +553,14 @@ const CoursePublicView: React.FC = () => {
               </div>
 
               {/* Layout Principal */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
                 {/* Coluna Principal - Cards de Conteúdo */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-4 md:space-y-8">
                   
                   {/* Card: Sobre o Mentor */}
                   {mentorData && (
                     <div 
-                      className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:border-gold/30"
+                      className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:border-gold/30"
                       onClick={() => navigate(`/mentor/publicview/${mentorData.id}`)}
                     >
                       <div className="flex items-center gap-4">
@@ -603,7 +598,7 @@ const CoursePublicView: React.FC = () => {
                   )}
                   
                   {/* Card: O que você vai aprender */}
-                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-gold" />
@@ -622,7 +617,7 @@ const CoursePublicView: React.FC = () => {
                   </div>
 
                   {/* Card: Social Proof Premium */}
-                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
                         <User className="w-5 h-5 text-gold" />
@@ -685,24 +680,24 @@ const CoursePublicView: React.FC = () => {
                   </div>
 
                   {/* Card: Course Content Menu */}
-                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                     <h3 className="text-xl font-semibold text-foreground mb-6">Conteúdo do Curso</h3>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                      <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <Play className="w-8 h-8 text-gold mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-foreground">{contentStats.videos}</div>
-                        <div className="text-sm text-muted-foreground">Vídeos</div>
+                    <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+                      <div className="text-center p-2 md:p-4 rounded-lg bg-muted/30">
+                        <Play className="w-6 md:w-8 h-6 md:h-8 text-gold mx-auto mb-1 md:mb-2" />
+                        <div className="text-lg md:text-2xl font-bold text-foreground">{contentStats.videos}</div>
+                        <div className="text-xs md:text-sm text-muted-foreground">Vídeos</div>
                       </div>
-                      <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <FileText className="w-8 h-8 text-gold mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-foreground">{contentStats.texts}</div>
-                        <div className="text-sm text-muted-foreground">Textos</div>
+                      <div className="text-center p-2 md:p-4 rounded-lg bg-muted/30">
+                        <FileText className="w-6 md:w-8 h-6 md:h-8 text-gold mx-auto mb-1 md:mb-2" />
+                        <div className="text-lg md:text-2xl font-bold text-foreground">{contentStats.texts}</div>
+                        <div className="text-xs md:text-sm text-muted-foreground">Textos</div>
                       </div>
-                      <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <FileIcon className="w-8 h-8 text-gold mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-foreground">{contentStats.pdfs}</div>
-                        <div className="text-sm text-muted-foreground">PDFs</div>
+                      <div className="text-center p-2 md:p-4 rounded-lg bg-muted/30">
+                        <FileIcon className="w-6 md:w-8 h-6 md:h-8 text-gold mx-auto mb-1 md:mb-2" />
+                        <div className="text-lg md:text-2xl font-bold text-foreground">{contentStats.pdfs}</div>
+                        <div className="text-xs md:text-sm text-muted-foreground">PDFs</div>
                       </div>
                     </div>
 
@@ -752,7 +747,7 @@ const CoursePublicView: React.FC = () => {
 
                   {/* Descrição do Curso */}
                   {courseData.description && (
-                    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                       <h3 className="text-xl font-semibold text-foreground mb-4">Sobre o Curso</h3>
                       <div className="text-muted-foreground leading-relaxed">
                         {isDescriptionExpanded ? (
@@ -785,7 +780,7 @@ const CoursePublicView: React.FC = () => {
 
                 {/* Coluna Lateral - Checkout Premium */}
                 <div className="lg:col-span-1">
-                  <div className="bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm border border-gold/20 rounded-xl p-6 shadow-xl sticky top-8">
+                  <div className="bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm border border-gold/20 rounded-xl p-4 md:p-6 shadow-xl lg:sticky lg:top-8">
                     {/* Ícone Premium */}
                     <div className="text-center mb-6">
                       <div className="w-16 h-16 bg-gradient-to-br from-gold to-gold-dark rounded-full flex items-center justify-center mx-auto mb-4">

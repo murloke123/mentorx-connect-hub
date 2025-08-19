@@ -252,7 +252,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
         {/* Filtros e Busca sempre visíveis */}
         <div className="mb-4 flex flex-col gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Buscar cursos..."
               value={searchQuery}
@@ -477,7 +477,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
       {/* Filtros e Busca sempre visíveis */}
       <div className="mb-4 flex flex-col gap-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Buscar cursos..."
             value={searchQuery}

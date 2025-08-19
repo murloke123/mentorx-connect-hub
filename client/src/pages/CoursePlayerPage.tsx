@@ -87,7 +87,7 @@ const ContentRenderer: React.FC<{
           
           if (embedUrl) {
             return (
-              <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0">
+              <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0 pt-[15px] md:pt-0">
                 <div className="w-full h-full md:w-full md:h-full">
                   <iframe
                     src={embedUrl}
@@ -151,11 +151,18 @@ const ContentRenderer: React.FC<{
         {renderContent()}
       </div>
 
+      {/* Certificate Banner - Mobile Only */}
+      <div className="md:hidden bg-gradient-to-r from-gold/20 via-gold-light/15 to-gold/20 border-t border-gold/30 px-4 py-2 max-h-[25px] flex items-center justify-center pb-[5px] mb-[10px]">
+        <span className="text-xs text-gold font-medium text-center truncate">
+          Conclua todos os conteúdos para ter direito ao certificado
+        </span>
+      </div>
+
       {/* Navigation Footer - Mobile */}
-      <div className="md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700">
+      <div className="md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 mb-[10px]">
 
         {/* Mobile Footer - Duas linhas */}
-        <div className="md:hidden p-3">
+        <div className="md:hidden p-3 pb-[15px]">
           {/* Primeira linha - Botões de navegação */}
           <div className="flex gap-2 mb-2">
             <Button 
@@ -195,7 +202,7 @@ const ContentRenderer: React.FC<{
             >
               <Check className={`w-3 h-3 flex-shrink-0 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
               <span className="truncate">
-                {isCurrentContentCompleted ? "Concluído" : "Marcar"}
+                {isCurrentContentCompleted ? "Concluído" : "Concluir"}
               </span>
             </button>
           </div>
@@ -1163,7 +1170,7 @@ const CoursePlayerPage = () => {
           </div>
           
           {/* Segunda linha - Breadcrumb */}
-          <div className="px-4 pb-2">
+          <div className="px-4 pb-2 pt-[15px]">
             <div className="flex items-center space-x-1 text-xs overflow-hidden">
               <span className="text-gray-200 font-medium truncate max-w-[120px]">
                 {curso?.title || 'Carregando...'}

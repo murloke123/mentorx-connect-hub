@@ -8,6 +8,8 @@ export const HomePage = lazy(() => import('../pages/HomePage'));
 export const AboutPage = lazy(() => import('@/pages/AboutPage'));
 export const CoursesPage = lazy(() => import('@/pages/CoursesPage'));
 export const MentorsPage = lazy(() => import('@/pages/MentorsPage'));
+export const CoursesMobilePage = lazy(() => import('@/pages/CoursesMobilePage'));
+export const MentorsMobilePage = lazy(() => import('@/pages/MentorsMobilePage'));
 export const LoginPage = lazy(() => import('@/pages/LoginPage'));
 export const NotFound = lazy(() => import('@/pages/NotFound'));
 
