@@ -29,21 +29,22 @@ const EnrollmentChart = () => {
 
   return (
     <Card className="col-span-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between pb-2 space-y-4 md:space-y-0">
         <div>
           <CardTitle className="text-white">Tendência de Inscrições</CardTitle>
           <CardDescription className="text-gray-300">
             Novas inscrições ao longo do tempo
           </CardDescription>
         </div>
-        <div className="flex gap-1">
+        {/* Filtros - Abaixo do título no mobile, ao lado no desktop */}
+        <div className="flex flex-wrap gap-2 md:gap-1">
           {PERIODS.map((period) => (
             <Button 
               key={period.days} 
               variant={periodDays === period.days ? "default" : "outline"} 
               size="sm"
               onClick={() => setPeriodDays(period.days)}
-              className={periodDays === period.days ? "bg-gold text-slate-900 hover:bg-gold/90" : "border-gold/30 text-white hover:bg-gold/20"}
+              className={`${periodDays === period.days ? "bg-gold text-slate-900 hover:bg-gold/90" : "border-gold/30 text-white hover:bg-gold/20"} flex-1 md:flex-none`}
             >
               {period.label}
             </Button>
@@ -52,16 +53,16 @@ const EnrollmentChart = () => {
       </CardHeader>
       <CardContent className="pt-4">
         {isLoading ? (
-          <div className="flex h-[300px] items-center justify-center">
+          <div className="flex h-[200px] md:h-[300px] items-center justify-center">
             <p className="text-gray-300">Carregando dados...</p>
           </div>
         ) : chartData && chartData.length > 0 ? (
           <ChartContainer 
             config={{ enrollments: { label: 'Inscrições', color: "#d4af37" } }}
-            className="aspect-[4/3] h-[300px]"
+            className="aspect-[4/3] h-[200px] md:h-[300px]"
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 20, left: 0 }}>
+              <BarChart data={chartData} margin={{ top: 5, right: 10, bottom: 20, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d4af37" opacity={0.3} />
                 <XAxis 
                   dataKey="date" 
@@ -110,7 +111,7 @@ const EnrollmentChart = () => {
             </ResponsiveContainer>
           </ChartContainer>
         ) : (
-          <div className="flex h-[300px] items-center justify-center">
+          <div className="flex h-[200px] md:h-[300px] items-center justify-center">
             <p className="text-gray-300">Sem dados de inscrição para este período.</p>
           </div>
         )}

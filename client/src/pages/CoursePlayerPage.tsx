@@ -10,7 +10,7 @@ import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } 
 import { triggerSuccessConfetti } from '@/utils/confetti';
 import { supabase } from '@/utils/supabase';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, MessageSquare, Video } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Menu, MessageSquare, Video, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -87,14 +87,16 @@ const ContentRenderer: React.FC<{
           
           if (embedUrl) {
             return (
-              <div className="aspect-video w-full">
-                <iframe
-                  src={embedUrl}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  title={currentConteudo.title}
-                />
+              <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0">
+                <div className="w-full h-full md:w-full md:h-full">
+                  <iframe
+                    src={embedUrl}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={currentConteudo.title}
+                  />
+                </div>
               </div>
             );
           } else {
@@ -143,55 +145,108 @@ const ContentRenderer: React.FC<{
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Content - Removido o cabeçalho duplicado */}
-      <div className="flex-1 bg-white overflow-auto">
+      <div className="flex-1 bg-black overflow-auto">
         {renderContent()}
       </div>
 
-      {/* Navigation Footer */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 p-4">
-        <div className="flex items-center gap-2">
-          {/* Botão Comentários - Esquerda */}
-          <button
-            onClick={() => setShowCommentsModal(true)}
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-10 px-4 py-2 bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700"
-          >
-            <MessageSquare className="w-4 h-4" />
-            Comentários
-          </button>
-          
-          {/* Botões de navegação - Centro */}
-          <div className="flex gap-2 flex-1 justify-center">
+      {/* Navigation Footer - Mobile */}
+      <div className="md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700">
+
+        {/* Mobile Footer - Duas linhas */}
+        <div className="md:hidden p-3">
+          {/* Primeira linha - Botões de navegação */}
+          <div className="flex gap-2 mb-2">
             <Button 
               variant="outline" 
               onClick={onPreviousContent}
-              className="bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700"
+              size="sm"
+              className="flex-1 bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700 h-8 text-xs"
             >
-              <ChevronLeft className="w-4 h-4 mr-2" />
+              <ChevronLeft className="w-3 h-3 mr-1" />
               Anterior
             </Button>
             
             <Button 
                onClick={onNextContent}
-               className="bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+               size="sm"
+               className="flex-1 bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-lg hover:shadow-xl transition-all duration-300 h-8 text-xs"
              >
                Próximo
-               <ChevronRight className="w-4 h-4 ml-2" />
+               <ChevronRight className="w-3 h-3 ml-1" />
              </Button>
           </div>
           
-          {/* Botão Marcar como Concluído - Direita */}
-          <button
-            onClick={onToggleCurrentContentCompleted}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors shadow-sm border border-slate-600"
-            title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Marcar como concluído"}
-          >
-            <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
-            <span className="hidden sm:inline">
-              {isCurrentContentCompleted ? "Concluído" : "Marcar como Concluído"}
-            </span>
-          </button>
+          {/* Segunda linha - Comentários e Marcar como Concluído */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowCommentsModal(true)}
+              className="flex-1 inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-8 px-2 py-1 bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700"
+            >
+              <MessageSquare className="w-3 h-3" />
+              <span className="truncate">Comentários</span>
+            </button>
+            
+            <button
+              onClick={onToggleCurrentContentCompleted}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors shadow-sm border border-slate-600 h-8"
+              title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Marcar como concluído"}
+            >
+              <Check className={`w-3 h-3 flex-shrink-0 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
+              <span className="truncate">
+                {isCurrentContentCompleted ? "Concluído" : "Marcar"}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Floating Navigation - Sobreposto ao vídeo - Apenas versão web */}
+      <div className="hidden md:block absolute bottom-[75px] left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl px-8 py-3 min-w-[600px]">
+          <div className="flex items-center justify-between gap-6">
+            {/* Botão Comentários */}
+            <button
+              onClick={() => setShowCommentsModal(true)}
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-9 px-4 py-2 bg-slate-800/80 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700/80"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Comentários
+            </button>
+            
+            {/* Botões de navegação - Centro */}
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={onPreviousContent}
+                className="bg-slate-800/80 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700/80 h-9 px-4"
+              >
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Anterior
+              </Button>
+              
+              <Button 
+                 onClick={onNextContent}
+                 className="bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-lg hover:shadow-xl transition-all duration-300 h-9 px-4"
+               >
+                 Próximo
+                 <ChevronRight className="w-4 h-4 ml-2" />
+               </Button>
+            </div>
+            
+            {/* Botão Concluir */}
+            <button
+              onClick={onToggleCurrentContentCompleted}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700/80 rounded-md transition-colors shadow-sm border border-slate-600 h-9 whitespace-nowrap"
+              title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Concluir conteúdo"}
+            >
+              <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
+              <span>
+                {isCurrentContentCompleted ? "Concluído" : "Concluir"}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -240,6 +295,8 @@ const CourseSidebar: React.FC<{
   onNextContent: () => void;
   hasPreviousContent: boolean;
   hasNextContent: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 }> = ({ 
   modulos, 
   currentConteudo, 
@@ -250,7 +307,9 @@ const CourseSidebar: React.FC<{
   onPreviousContent,
   onNextContent,
   hasPreviousContent,
-  hasNextContent
+  hasNextContent,
+  isOpen = true,
+  onClose
 }) => {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
@@ -267,12 +326,24 @@ const CourseSidebar: React.FC<{
   };
 
   return (
-    <div className="w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-l border-slate-700 flex flex-col shadow-2xl">
+    <div className={`${isOpen ? 'translate-x-0' : 'translate-x-full'} fixed md:relative top-0 right-0 h-full w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-l border-slate-700 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out z-50 md:translate-x-0`}>
       {/* Progress Header */}
       <div className="p-4 border-b border-slate-700">
-        <div className="mb-2">
-          <span className="text-sm font-medium text-white">Progresso do Curso</span>
-          <span className="text-sm text-gold ml-2">{Math.round(progress)}%</span>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <span className="text-sm font-medium text-white">Progresso do Curso</span>
+            <span className="text-sm text-gold ml-2">{Math.round(progress)}%</span>
+          </div>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="md:hidden text-gray-400 hover:text-white p-1 h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         <Progress value={progress} className="w-full bg-slate-700" />
       </div>
@@ -410,6 +481,7 @@ const CoursePlayerPage = () => {
   const [progress, setProgress] = useState(0);
   const [hasAccess, setHasAccess] = useState(false);
   const [isCurrentContentCompleted, setIsCurrentContentCompleted] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
 
   // Função para encontrar um conteúdo específico por ID
@@ -921,6 +993,9 @@ const CoursePlayerPage = () => {
   // Função para voltar à página anterior e invalidar cache para atualizar dados em tempo real
   const handleGoBack = async () => {
     try {
+      console.log('🔄 handleGoBack: Iniciando processo de voltar');
+      console.log('👤 handleGoBack: User email:', user?.email);
+      
       // Invalidar cache do React Query para atualizar dados em tempo real
       await queryClient.invalidateQueries({ 
         queryKey: ['menteeCourses', user?.id] 
@@ -929,11 +1004,34 @@ const CoursePlayerPage = () => {
         queryKey: ['menteeProfile', user?.id] 
       });
       
-      // Voltar para a página anterior
-      navigate(-1);
+      // Buscar o profile do usuário para obter o role
+      if (user?.email) {
+        console.log('🔍 handleGoBack: Buscando profile do usuário...');
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('email', user.email)
+          .single();
+        
+        console.log('📊 handleGoBack: Profile encontrado:', profile);
+        console.log('❌ handleGoBack: Erro na busca:', profileError);
+        
+        // Redirecionar baseado no role do profile
+        if (profile?.role === 'mentor') {
+          console.log('🎯 handleGoBack: Redirecionando mentor para /mentor/cursos-adquiridos');
+          navigate('/mentor/cursos-adquiridos');
+        } else {
+          console.log('🎯 handleGoBack: Redirecionando mentorado para /mentorado/cursos');
+          navigate('/mentorado/cursos');
+        }
+      } else {
+        console.log('⚠️ handleGoBack: Email não encontrado, usando fallback');
+        // Fallback se não conseguir determinar o role
+        navigate(-1);
+      }
     } catch (error) {
-      console.error('Erro ao invalidar cache:', error);
-      // Fallback: voltar para página anterior mesmo se houver erro
+      console.error('❌ handleGoBack: Erro ao buscar role do usuário:', error);
+      // Fallback em caso de erro
       navigate(-1);
     }
   };
@@ -973,74 +1071,129 @@ const CoursePlayerPage = () => {
 
     return (
     <div className="flex flex-col h-screen">
-      {/* Header com altura fixa de 45px */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm h-[45px] flex items-center px-6">
-        <div className="flex items-center space-x-4 w-full">
-          {/* Botão voltar */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleGoBack}
-            className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-          
-          {/* Breadcrumb alinhado à esquerda */}
-          <div className="flex items-center space-x-2 text-sm flex-1">
-            <span className="text-gray-200 truncate max-w-[200px] font-medium">
-              {curso?.title || 'Carregando...'}
-            </span>
+      {/* Header responsivo */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
+        {/* Desktop Header - Uma linha */}
+        <div className="hidden md:flex items-center px-6 h-[45px]">
+          <div className="flex items-center space-x-4 w-full">
+            {/* Botão voltar */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoBack}
+              className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
             
-            {currentModule && (
-              <>
-                <ChevronRight className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-300 truncate max-w-[150px]">
-                  {currentModule.title}
-                </span>
-              </>
-            )}
-            
-            {currentConteudo && (
-              <>
-                <ChevronRight className="w-4 h-4 text-gray-500" />
-                <span className="text-white font-medium truncate max-w-[200px]">
-                  {currentConteudo.title}
-                </span>
-              </>
-            )}
-          </div>
-          
-          {/* Badge do tipo de conteúdo */}
-          {currentConteudo && (
-            <div className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded-lg">
-              {currentConteudo.content_type === 'video_externo' && (
+            {/* Breadcrumb alinhado à esquerda */}
+            <div className="flex items-center space-x-2 text-sm flex-1">
+              <span className="text-gray-200 truncate max-w-[200px] font-medium">
+                {curso?.title || 'Carregando...'}
+              </span>
+              
+              {currentModule && (
                 <>
-                  <Video className="w-4 h-4 text-gray-300" />
-                  <span className="text-sm text-gray-200">Vídeo</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <span className="text-gray-300 truncate max-w-[150px]">
+                    {currentModule.title}
+                  </span>
                 </>
               )}
-              {currentConteudo.content_type === 'texto_rico' && (
+              
+              {currentConteudo && (
                 <>
-                  <FileText className="w-4 h-4 text-gray-300" />
-                  <span className="text-sm text-gray-200">Texto</span>
-                </>
-              )}
-              {currentConteudo.content_type === 'pdf' && (
-                <>
-                  <FileText className="w-4 h-4 text-gray-300" />
-                  <span className="text-sm text-gray-200">PDF</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <span className="text-white font-medium truncate max-w-[200px]">
+                    {currentConteudo.title}
+                  </span>
                 </>
               )}
             </div>
-          )}
+            
+            {/* Badge do tipo de conteúdo */}
+            {currentConteudo && (
+              <div className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded-lg">
+                {currentConteudo.content_type === 'video_externo' && (
+                  <>
+                    <Video className="w-4 h-4 text-gray-300" />
+                    <span className="text-sm text-gray-200">Vídeo</span>
+                  </>
+                )}
+                {currentConteudo.content_type === 'texto_rico' && (
+                  <>
+                    <FileText className="w-4 h-4 text-gray-300" />
+                    <span className="text-sm text-gray-200">Texto</span>
+                  </>
+                )}
+                {currentConteudo.content_type === 'pdf' && (
+                  <>
+                    <FileText className="w-4 h-4 text-gray-300" />
+                    <span className="text-sm text-gray-200">PDF</span>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Header - Duas linhas */}
+        <div className="md:hidden mt-[15px]">
+          {/* Primeira linha - Botão voltar e menu */}
+          <div className="flex items-center justify-between px-4 py-2 h-[45px]">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoBack}
+              className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Voltar</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSidebarOpen(true)}
+              className="text-gold hover:text-gold-light hover:bg-slate-700 h-10 w-10 p-0 ring-2 ring-gold/20 hover:ring-gold/40 transition-all duration-200"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </div>
+          
+          {/* Segunda linha - Breadcrumb */}
+          <div className="px-4 pb-2">
+            <div className="flex items-center space-x-1 text-xs overflow-hidden">
+              <span className="text-gray-200 font-medium truncate max-w-[120px]">
+                {curso?.title || 'Carregando...'}
+              </span>
+              
+              {currentModule && (
+                <>
+                  <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 truncate max-w-[100px]">
+                    {currentModule.title}
+                  </span>
+                </>
+              )}
+              
+              {currentConteudo && (
+                <>
+                  <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                  <span className="text-white font-medium truncate max-w-[120px]">
+                    {currentConteudo.title}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-100">
+        <main className="flex-1 bg-black h-[calc(100vh-90px)] md:min-h-screen overflow-hidden md:overflow-auto flex flex-col">
           <ContentRenderer 
             currentConteudo={currentConteudo}
             modulos={curso?.modulos || []}
@@ -1051,19 +1204,50 @@ const CoursePlayerPage = () => {
           />
         </main>
 
-        {/* Sidebar / Course Navigation */}
-        <CourseSidebar 
-          modulos={curso?.modulos || []}
-          currentConteudo={currentConteudo}
-          conteudosConcluidos={conteudosConcluidos}
-          onConteudoSelect={handleConteudoSelection}
-          onToggleConteudoConcluido={handleToggleConteudoConcluido}
-          progress={progress}
-          onPreviousContent={handlePreviousContent}
-          onNextContent={handleNextContent}
-          hasPreviousContent={hasPreviousContent}
-          hasNextContent={hasNextContent}
-        />
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <CourseSidebar 
+            modulos={curso?.modulos || []}
+            currentConteudo={currentConteudo}
+            conteudosConcluidos={conteudosConcluidos}
+            onConteudoSelect={handleConteudoSelection}
+            onToggleConteudoConcluido={handleToggleConteudoConcluido}
+            progress={progress}
+            onPreviousContent={handlePreviousContent}
+            onNextContent={handleNextContent}
+            hasPreviousContent={hasPreviousContent}
+            hasNextContent={hasNextContent}
+          />
+        </div>
+
+        {/* Mobile Sidebar Overlay */}
+        {isSidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            
+            {/* Mobile Sidebar */}
+            <div className="fixed right-0 top-0 h-full w-80 z-50 md:hidden">
+              <CourseSidebar 
+                modulos={curso?.modulos || []}
+                currentConteudo={currentConteudo}
+                conteudosConcluidos={conteudosConcluidos}
+                onConteudoSelect={handleConteudoSelection}
+                onToggleConteudoConcluido={handleToggleConteudoConcluido}
+                progress={progress}
+                onPreviousContent={handlePreviousContent}
+                onNextContent={handleNextContent}
+                hasPreviousContent={hasPreviousContent}
+                hasNextContent={hasNextContent}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

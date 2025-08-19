@@ -383,36 +383,36 @@ const MentorMeusMentoradosPage = () => {
           </div>
 
           {/* Table */}
-          <Card className="premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
+          <Card className="premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl p-1.5">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <Button
                     variant={activeFilter === 'students' ? 'default' : 'outline'}
                     onClick={() => setActiveFilter('students')}
-                    className={`flex items-center gap-2 ${
+                    className={`flex items-center justify-center gap-2 w-full sm:w-auto ${
                       activeFilter === 'students' 
                         ? 'bg-gold text-black hover:bg-gold/90' 
                         : 'border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50'
                     }`}
                   >
                     <BookOpen className="w-4 h-4" />
-                    Alunos Matriculados ({stats.students})
+                    <span className="text-sm sm:text-base">Alunos Matriculados ({stats.students})</span>
                   </Button>
                   <Button
                     variant={activeFilter === 'followers' ? 'default' : 'outline'}
                     onClick={() => setActiveFilter('followers')}
-                    className={`flex items-center gap-2 ${
+                    className={`flex items-center justify-center gap-2 w-full sm:w-auto ${
                       activeFilter === 'followers' 
                         ? 'bg-gold text-black hover:bg-gold/90' 
                         : 'border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50'
                     }`}
                   >
                     <Frown className="w-4 h-4" />
-                    Seguidores sem Curso ({stats.followersWithoutCourse})
+                    <span className="text-sm sm:text-base">Seguidores sem Curso ({stats.followersWithoutCourse})</span>
                   </Button>
                 </div>
-                <div className="text-sm text-gold/60">
+                <div className="text-sm text-gold/60 text-center sm:text-right">
                   {filteredAndSortedMentorados.length} registros
                 </div>
               </div>
@@ -425,7 +425,7 @@ const MentorMeusMentoradosPage = () => {
                 </div>
               ) : mentorados.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full mb-2.5">
                     {/* Header da Tabela */}
                     <thead className="bg-slate-800/50 border-b border-gold/20">
                       <tr>
@@ -437,17 +437,18 @@ const MentorMeusMentoradosPage = () => {
                           />
                         </th>
                         <th 
-                          className="text-left p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                          className="text-left p-2 sm:p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('name')}
                         >
-                          <div className="flex items-center gap-2 font-semibold text-gold">
-                            <User className="w-4 h-4" />
-                            Nome do Mentorado
+                          <div className="flex items-center gap-1 sm:gap-2 font-semibold text-gold text-xs sm:text-sm">
+                            <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Nome do Mentorado</span>
+                            <span className="sm:hidden">Nome</span>
                             {getSortIcon('name')}
                           </div>
                         </th>
                         <th 
-                          className="text-left p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                          className="text-left p-2 sm:p-4 cursor-pointer hover:bg-slate-700/50 transition-colors hidden sm:table-cell"
                           onClick={() => handleSort('email')}
                         >
                           <div className="flex items-center gap-2 font-semibold text-gold">
@@ -457,17 +458,18 @@ const MentorMeusMentoradosPage = () => {
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                          className="text-center p-2 sm:p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
                           onClick={() => handleSort('courses_acquired')}
                         >
-                          <div className="flex items-center justify-center gap-2 font-semibold text-gold">
-                            <BookOpen className="w-4 h-4" />
-                            Cursos Adquiridos
+                          <div className="flex items-center justify-center gap-1 sm:gap-2 font-semibold text-gold text-xs sm:text-sm">
+                            <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Cursos Adquiridos</span>
+                            <span className="sm:hidden">Cursos</span>
                             {getSortIcon('courses_acquired')}
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                          className="text-center p-2 sm:p-4 cursor-pointer hover:bg-slate-700/50 transition-colors hidden md:table-cell"
                           onClick={() => handleSort('total_spent')}
                         >
                           <div className="flex items-center justify-center gap-2 font-semibold text-gold">
@@ -477,7 +479,7 @@ const MentorMeusMentoradosPage = () => {
                           </div>
                         </th>
                         <th 
-                          className="text-center p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                          className="text-center p-2 sm:p-4 cursor-pointer hover:bg-slate-700/50 transition-colors hidden lg:table-cell"
                           onClick={() => handleSort('is_following')}
                         >
                           <div className="flex items-center justify-center gap-2 font-semibold text-gold">
@@ -498,54 +500,57 @@ const MentorMeusMentoradosPage = () => {
                             selectedMentorados.includes(mentorado.id) ? 'bg-gold/10' : ''
                           }`}
                         >
-                          <td className="p-4">
+                          <td className="p-2 sm:p-4">
                             <Checkbox 
                               checked={selectedMentorados.includes(mentorado.id)}
                               onCheckedChange={() => toggleSelectMentorado(mentorado.id)}
                               className="border-gold/30 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
                             />
                           </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
+                          <td className="p-2 sm:p-4">
+                            <div className="flex items-center gap-2 sm:gap-3">
                               <Avatar 
-                                className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-gold/50 transition-all"
+                                className="w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:ring-2 hover:ring-gold/50 transition-all"
                                 onClick={() => redirectToUserProfile(mentorado.id, navigate)}
                               >
                                 {mentorado.avatar_url ? (
                                   <AvatarImage src={mentorado.avatar_url} alt={mentorado.full_name || ''} />
                                 ) : (
-                                  <AvatarFallback className="bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black">
+                                  <AvatarFallback className="bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black text-xs sm:text-sm">
                                     {mentorado.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                                   </AvatarFallback>
                                 )}
                               </Avatar>
-                              <div>
-                                <p className="font-medium text-white">
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-white text-sm sm:text-base truncate">
                                   {mentorado.full_name || 'Nome não informado'}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-xs sm:text-sm text-gray-400 truncate sm:block">
                                   {mentorado.courses_acquired > 0 
                                     ? `Aluno desde ${new Date(mentorado.first_enrollment_date).toLocaleDateString('pt-BR')}`
                                     : `Segue desde ${new Date(mentorado.first_enrollment_date).toLocaleDateString('pt-BR')}`
                                   }
                                 </p>
+                                <p className="text-xs text-gray-300 sm:hidden truncate">
+                                  {mentorado.email}
+                                </p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-4">
+                          <td className="p-2 sm:p-4 hidden sm:table-cell">
                             <p className="text-white">{mentorado.email}</p>
                           </td>
-                          <td className="p-4 text-center">
-                            <Badge variant="secondary" className="bg-gold/20 text-gold border-gold/30">
+                          <td className="p-2 sm:p-4 text-center">
+                            <Badge variant="secondary" className="bg-gold/20 text-gold border-gold/30 text-xs sm:text-sm">
                               {mentorado.courses_acquired}
                             </Badge>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-2 sm:p-4 text-center hidden md:table-cell">
                             <span className="font-semibold text-gold">
                               R$ {mentorado.total_spent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </span>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-2 sm:p-4 text-center hidden lg:table-cell">
                             {mentorado.is_following ? (
                               <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
                                 <Heart className="w-3 h-3 mr-1 fill-current" />

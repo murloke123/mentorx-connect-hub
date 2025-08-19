@@ -6,15 +6,6 @@ import { useNavigate } from "react-router-dom";
 import ChatModal from "../../components/chat/ChatModal";
 import CoursesList from "../../components/mentor/CoursesList";
 import MentorSidebar from "../../components/mentor/MentorSidebar";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "../../components/ui/alert-dialog";
 import { Button } from "../../components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet";
 import { getMentorCourses } from '../../services/courseService';
@@ -105,7 +96,7 @@ const MeusCursosPage = () => {
   const listIsLoading = isLoading || isFetching;
 
   return (
-    <div className="flex-col md:flex-row flex min-h-screen">
+    <div className="flex-col md:flex-row flex min-h-screen max-w-full overflow-x-hidden">
       {/* Mobile Sidebar */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
         <SheetTrigger asChild>
@@ -127,21 +118,26 @@ const MeusCursosPage = () => {
         <MentorSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative">
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex-1 transition-all duration-300 p-3 md:p-6 pt-8 md:pt-6 min-h-screen bg-black max-w-full overflow-x-hidden">
+        <div className="mb-6 flex flex-col gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gold">Meus Cursos</h1>
-            <p className="text-muted-foreground">Gerencie e acompanhe seus cursos criados</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gold">Meus Cursos</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Gerencie e acompanhe seus cursos criados</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             <Button 
               variant="outline" 
               onClick={handleOpenChatModal}
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0"
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 w-full sm:w-auto text-sm"
+              size="sm"
             >
               <Bot className="mr-2 h-4 w-4" /> Criar com IA
             </Button>
-            <Button onClick={handleCreateCourse}>
+            <Button 
+              onClick={handleCreateCourse}
+              className="w-full sm:w-auto text-sm"
+              size="sm"
+            >
               <PlusCircle className="mr-2 h-4 w-4" /> Criar Novo Curso
             </Button>
           </div>
@@ -170,32 +166,52 @@ const MeusCursosPage = () => {
         }}
       />
 
-      {/* Modal de alerta para cursos não publicados */}
-      <AlertDialog open={isUnpublishedCoursesAlertOpen} onOpenChange={setIsUnpublishedCoursesAlertOpen}>
-        <AlertDialogContent className="max-w-md p-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
-          <AlertDialogHeader className="p-6 pb-4 border-b border-slate-700">
-            <AlertDialogTitle className="text-lg font-semibold text-white flex items-center">
-              <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
-                <AlertTriangle className="h-4 w-4 text-slate-900" />
+      {/* Modal customizado para cursos não publicados */}
+      {isUnpublishedCoursesAlertOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setIsUnpublishedCoursesAlertOpen(false)}
+        >
+          <div 
+            className="w-full max-w-md mx-auto bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border border-slate-700 shadow-2xl rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxHeight: '90vh',
+              overflow: 'auto'
+            }}
+          >
+            {/* Header */}
+            <div className="p-6 pb-4 border-b border-slate-700">
+              <div className="text-lg font-semibold text-white flex items-center">
+                <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center mr-3 shadow-lg">
+                  <AlertTriangle className="h-4 w-4 text-slate-900" />
+                </div>
+                Atenção: Cursos não publicados ...
               </div>
-              Atenção: Cursos não publicados ...
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm leading-relaxed text-gray-300 mt-3">
-              Você possui cursos que ainda não estão publicados e não aparecem na plataforma para os outros usuários. 
-              <br /><br />
-              Analise as informações do curso se estão corretas, crie módulos e conteúdos para o mesmo e também revise a página de vendas. Só depois disso publique o seu curso.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="p-6 pt-4">
-            <AlertDialogAction 
-              onClick={() => setIsUnpublishedCoursesAlertOpen(false)}
-              className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Entendi
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <div className="text-sm leading-relaxed text-gray-300 mt-3">
+                Você possui cursos que ainda não estão publicados e não aparecem na plataforma para os outros usuários. 
+                <br /><br />
+                Analise as informações do curso se estão corretas, crie módulos e conteúdos para o mesmo e também revise a página de vendas. Só depois disso publique o seu curso.
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="p-6 pt-4">
+              <Button
+                onClick={() => setIsUnpublishedCoursesAlertOpen(false)}
+                className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-slate-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Entendi
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

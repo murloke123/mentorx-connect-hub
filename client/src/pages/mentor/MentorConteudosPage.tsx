@@ -10,6 +10,12 @@ import ModuloHeader from '@/components/mentor/content/ModuloHeader';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { Button } from '@/components/ui/button';
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger
+} from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
 
 import { ConteudoFormValues } from '@/components/mentor/content/types';
 import { toast } from '@/hooks/use-toast';
@@ -31,6 +37,7 @@ const ConteudosPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Redirecionar se não tem ids necessários
   useEffect(() => {
@@ -184,9 +191,33 @@ const ConteudosPage = () => {
   if (isError) {
     return (
       <div className="flex">
-        <MentorSidebar />
-        <div className="flex-1 transition-all duration-300  p-6">
-          <ConteudoError onRetry={refetch} />
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <MentorSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <MentorSidebar />
+        </div>
+        
+        <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+          </div>
+          
+          <div className="pt-16 md:pt-0">
+            <ConteudoError onRetry={refetch} />
+          </div>
         </div>
       </div>
     );
@@ -199,33 +230,60 @@ const ConteudosPage = () => {
   ];
 
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300  p-6">
-        <Breadcrumbs 
-          items={breadcrumbItems} 
-          className="mb-6"
-        />
+    <div className="flex-col md:flex-row flex min-h-screen max-w-full overflow-x-hidden">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
 
-        <ModuloHeader modulo={modulo} isLoading={isLoadingModulo} />
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+      
+      <div className="flex-1 transition-all duration-300 p-3 md:p-6 pt-8 md:pt-6 min-h-screen bg-black max-w-full overflow-x-hidden">
+        <div className="mb-6 flex flex-col gap-4">
+          <Breadcrumbs 
+            items={breadcrumbItems} 
+          />
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gold">Conteúdos do Módulo</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Gerencie os conteúdos e materiais do módulo</p>
+          </div>
+        </div>
+        
+        <div>
+          <ModuloHeader modulo={modulo as any} isLoading={isLoadingModulo} />
 
-        {isLoading ? (
-          <ConteudoLoading />
-        ) : (
-          <>
-            <div className="mb-6">
-              <Button onClick={handleAddConteudo}>
-                Adicionar Conteúdo
-              </Button>
-            </div>
-            <ConteudoList 
-              conteudos={conteudos}
-              onEdit={handleEditConteudo}
-              onDelete={handleDeleteConteudo}
-              isLoading={isLoading}
-            />
-          </>
-        )}
+          {isLoading ? (
+            <ConteudoLoading />
+          ) : (
+            <>
+              <div className="mb-6">
+                <Button onClick={handleAddConteudo}>
+                  Adicionar Conteúdo
+                </Button>
+              </div>
+              <ConteudoList 
+                conteudos={conteudos as any}
+                onEdit={handleEditConteudo}
+                onDelete={handleDeleteConteudo}
+                isLoading={isLoading}
+              />
+            </>
+          )}
+        </div>
 
         <ConteudoDialog
           isOpen={isModalOpen}
@@ -235,11 +293,7 @@ const ConteudosPage = () => {
           onSubmit={handleSubmitConteudo}
           onCancel={handleCloseModal}
           editingId={editingId}
-          conteudoParaEditar={{
-            ...conteudoParaEditar,
-            pdf_url: conteudoParaEditar?.content_data?.pdf_url,
-            pdf_filename: conteudoParaEditar?.content_data?.pdf_filename,
-          }}
+          conteudoParaEditar={conteudoParaEditar as any}
         />
       </div>
     </div>

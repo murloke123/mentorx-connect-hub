@@ -52,7 +52,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [activeCardFilter, setActiveCardFilter] = useState<string>('all');
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -154,10 +154,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
       });
     }
 
-    // Filtro por status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(apt => apt.status === statusFilter);
-    }
+
 
     // Filtro por data
     if (dateFilter === 'today') {
@@ -173,7 +170,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
     }
 
     setFilteredAppointments(filtered);
-  }, [appointments, searchTerm, statusFilter, dateFilter]);
+  }, [appointments, searchTerm, dateFilter]);
 
   // Carregar agendamentos quando o componente montar ou quando refreshTrigger mudar
   useEffect(() => {
@@ -380,156 +377,147 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
   };
 
   return (
-    <Card className="w-full premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
-      <CardContent className="space-y-4 pt-6">
-        {/* Estatísticas */}
-        <div className="grid grid-cols-5 gap-4">
-          {/* Card Passados */}
-          <div 
-            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-              activeCardFilter === 'past' 
-                ? 'bg-slate-800/50 border-gold/50 shadow-md'
-                : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
-            }`}
-            onClick={() => handleCardClick('past')}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-2 bg-orange-500/20 text-orange-400">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm font-medium">Passados</span>
-              </div>
-              <p className="text-2xl font-bold text-orange-400">{stats.past}</p>
-            </div>
-          </div>
-          
-          {/* Card Hoje */}
-          <div 
-            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-              activeCardFilter === 'today' 
-                ? 'bg-slate-800/50 border-gold/50 shadow-md'
-                : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
-            }`}
-            onClick={() => handleCardClick('today')}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-2 bg-blue-500/20 text-blue-400">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm font-medium">Hoje</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-400">{stats.today}</p>
-            </div>
-          </div>
-          
-          {/* Card Futuros */}
-          <div 
-            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-              activeCardFilter === 'future' 
-                ? 'bg-slate-800/50 border-gold/50 shadow-md'
-                : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
-            }`}
-            onClick={() => handleCardClick('future')}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-2 bg-purple-500/20 text-purple-400">
-                <CheckCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Futuros</span>
-              </div>
-              <p className="text-2xl font-bold text-purple-400">{stats.future}</p>
-            </div>
-          </div>
-          
-          {/* Card Concluídos */}
-          <div 
-            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-              activeCardFilter === 'completed' 
-                ? 'bg-slate-800/50 border-gold/50 shadow-md'
-                : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
-            }`}
-            onClick={() => handleCardClick('completed')}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-2 bg-green-500/20 text-green-400">
-                <CheckCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Concluídos</span>
-              </div>
-              <p className="text-2xl font-bold text-green-400">{stats.completed}</p>
-            </div>
-          </div>
-          
-          {/* Card Cancelados */}
-          <div 
-            className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-              activeCardFilter === 'cancelled' 
-                ? 'bg-slate-800/50 border-gold/50 shadow-md'
-                : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
-            }`}
-            onClick={() => handleCardClick('cancelled')}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full mb-2 bg-red-500/20 text-red-400">
-                <XCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Cancelados</span>
-              </div>
-              <p className="text-2xl font-bold text-red-400">{stats.cancelled}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Filtros */}
-        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border bg-slate-800/30 border-gold/20">
-          <div className="flex items-center gap-2 flex-1">
-            <Search className="h-4 w-4 text-gold/60" />
-            <Input
-              placeholder={showAcquiredOnly ? "Buscar por nome do mentor..." : "Buscar por nome do mentorado..."}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 bg-slate-700/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/50"
-            />
-            {searchTerm && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSearchTerm('')}
-                className="p-1 h-8 w-8 text-gold/60 hover:text-gold hover:bg-gold/10"
+    <>
+      <Card className="w-full premium-card bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-gold/30 backdrop-blur-xl">
+        <CardContent className="p-0">
+          <div className="space-y-4">
+            {/* Estatísticas */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              {/* Card Passados */}
+              <div 
+                className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                  activeCardFilter === 'past' 
+                    ? 'bg-slate-800/50 border-gold/50 shadow-md'
+                    : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
+                }`}
+                onClick={() => handleCardClick('past')}
               >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gold/60" />
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-48 bg-slate-700/50 border-gold/20 text-white focus:border-gold/50">
-                <SelectValue placeholder="Filtrar por data" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-gold/20">
-                <SelectItem value="all" className="text-white hover:bg-slate-700">Todos os agendamentos</SelectItem>
-                <SelectItem value="past" className="text-white hover:bg-slate-700">Agendamentos Passados</SelectItem>
-                <SelectItem value="today" className="text-white hover:bg-slate-700">Agendamentos para Hoje</SelectItem>
-                <SelectItem value="future" className="text-white hover:bg-slate-700">Agendamentos Futuros</SelectItem>
-                <SelectItem value="completed" className="text-white hover:bg-slate-700">Agendamentos Concluídos</SelectItem>
-                <SelectItem value="cancelled" className="text-white hover:bg-slate-700">Agendamentos Cancelados</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40 bg-slate-700/50 border-gold/20 text-white focus:border-gold/50">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-gold/20">
-                <SelectItem value="all" className="text-white hover:bg-slate-700">Todos</SelectItem>
-                <SelectItem value="scheduled" className="text-white hover:bg-slate-700">Agendados</SelectItem>
-                <SelectItem value="completed" className="text-white hover:bg-slate-700">Concluídos</SelectItem>
-                <SelectItem value="cancelled" className="text-white hover:bg-slate-700">Cancelados</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full mb-2 bg-orange-500/20 text-orange-400">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Passados</span>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-400">{stats.past}</p>
+                </div>
+              </div>
+              
+              {/* Card Hoje */}
+              <div 
+                className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                  activeCardFilter === 'today' 
+                    ? 'bg-slate-800/50 border-gold/50 shadow-md'
+                    : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
+                }`}
+                onClick={() => handleCardClick('today')}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full mb-2 bg-blue-500/20 text-blue-400">
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Hoje</span>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-400">{stats.today}</p>
+                </div>
+              </div>
+              
+              {/* Card Futuros */}
+              <div 
+                className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                  activeCardFilter === 'future' 
+                    ? 'bg-slate-800/50 border-gold/50 shadow-md'
+                    : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
+                }`}
+                onClick={() => handleCardClick('future')}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full mb-2 bg-purple-500/20 text-purple-400">
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Futuros</span>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-400">{stats.future}</p>
+                </div>
+              </div>
+              
+              {/* Card Concluídos */}
+              <div 
+                className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                  activeCardFilter === 'completed' 
+                    ? 'bg-slate-800/50 border-gold/50 shadow-md'
+                    : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
+                }`}
+                onClick={() => handleCardClick('completed')}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full mb-2 bg-green-500/20 text-green-400">
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Concluídos</span>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-green-400">{stats.completed}</p>
+                </div>
+              </div>
+              
+              {/* Card Cancelados */}
+              <div 
+                className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md col-span-2 sm:col-span-1 ${
+                  activeCardFilter === 'cancelled' 
+                    ? 'bg-slate-800/50 border-gold/50 shadow-md'
+                    : 'bg-slate-800/30 border-gold/20 hover:border-gold/40'
+                }`}
+                onClick={() => handleCardClick('cancelled')}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full mb-2 bg-red-500/20 text-red-400">
+                    <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm font-medium">Cancelados</span>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-red-400">{stats.cancelled}</p>
+                </div>
+              </div>
+            </div>
 
-        {/* Lista de agendamentos */}
+            {/* Filtros */}
+            <div className="flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border bg-slate-800/30 border-gold/20">
+              <div className="flex items-center gap-2 flex-1">
+                <Search className="h-4 w-4 text-gold/60 flex-shrink-0" />
+                <Input
+                  placeholder={showAcquiredOnly ? "Buscar por nome do mentor..." : "Buscar por nome do mentorado..."}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 bg-slate-700/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/50"
+                />
+                {searchTerm && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchTerm('')}
+                    className="p-1 h-8 w-8 text-gold/60 hover:text-gold hover:bg-gold/10 flex-shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gold/60 flex-shrink-0" />
+                <Select value={dateFilter} onValueChange={setDateFilter}>
+                  <SelectTrigger className="w-full sm:w-48 bg-slate-700/50 border-gold/20 text-white focus:border-gold/50">
+                    <SelectValue placeholder="Filtrar por data" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-gold/20">
+                    <SelectItem value="all" className="text-white hover:bg-slate-700">Todos os agendamentos</SelectItem>
+                    <SelectItem value="past" className="text-white hover:bg-slate-700">Agendamentos Passados</SelectItem>
+                    <SelectItem value="today" className="text-white hover:bg-slate-700">Agendamentos para Hoje</SelectItem>
+                    <SelectItem value="future" className="text-white hover:bg-slate-700">Agendamentos Futuros</SelectItem>
+                    <SelectItem value="completed" className="text-white hover:bg-slate-700">Agendamentos Concluídos</SelectItem>
+                    <SelectItem value="cancelled" className="text-white hover:bg-slate-700">Agendamentos Cancelados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista de agendamentos */}
         <div className="space-y-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -540,12 +528,12 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             <div className="text-center py-12">
               <Calendar className="h-12 w-12 mx-auto mb-4 text-gold/60" />
               <h3 className="text-lg font-medium mb-2 text-white">
-                {searchTerm || statusFilter !== 'all' || dateFilter !== 'all' 
+                {searchTerm || dateFilter !== 'all' 
                   ? 'Nenhum agendamento encontrado' 
                   : 'Nenhum agendamento ainda'}
               </h3>
               <p className="text-gray-400">
-                {searchTerm || statusFilter !== 'all' || dateFilter !== 'all' 
+                {searchTerm || dateFilter !== 'all' 
                   ? 'Tente ajustar os filtros para encontrar os agendamentos desejados.'
                   : 'Quando você tiver mentorias agendadas, elas aparecerão aqui.'}
               </p>
@@ -645,17 +633,16 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
           )}
         </div>
 
-        {/* Modal de cancelamento de agendamento */}
-        {showCancelModal && (
-          <CancelAppointmentModal
-            isOpen={showCancelModal}
-            onClose={() => setShowCancelModal(false)}
-            onSuccess={handleCancelSuccess}
-            appointment={appointmentToCancel}
-          />
-        )}
-      </CardContent>
-    </Card>
+      {/* Modal de cancelamento de agendamento */}
+      {showCancelModal && (
+        <CancelAppointmentModal
+          isOpen={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          onSuccess={handleCancelSuccess}
+          appointment={appointmentToCancel}
+        />
+      )}
+    </>
   );
 };
 

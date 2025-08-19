@@ -162,7 +162,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
   const handlePublishChange = async (courseId: string, newStatus: boolean) => {
     try {
-      setIsUpdating(prev => new Set([...prev, courseId]));
+      setIsUpdating(prev => new Set(Array.from(prev).concat(courseId)));
 
       // Se está tentando publicar, validar primeiro
       if (newStatus) {
@@ -210,7 +210,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
     if (!courseToDelete || !user?.id) return;
 
     try {
-      setIsDeleting(prev => new Set([...prev, courseToDelete.id]));
+      setIsDeleting(prev => new Set(Array.from(prev).concat(courseToDelete.id)));
       await deleteCourse(courseToDelete.id, user.id);
       
       toast({
@@ -250,23 +250,23 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
     return (
       <div className="mb-8">
         {/* Filtros e Busca sempre visíveis */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-grow">
+        <div className="mb-4 flex flex-col gap-3">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
             <Input
               placeholder="Buscar cursos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
+              className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40 text-sm"
             />
           </div>
-          <Tabs defaultValue="all" className="w-full sm:w-auto">
-            <TabsList>
-              <TabsTrigger value="all" onClick={() => handleFilterChange('all')}>Todos</TabsTrigger>
-              <TabsTrigger value="public" onClick={() => handleFilterChange('public')}>Públicos</TabsTrigger>
-              <TabsTrigger value="private" onClick={() => handleFilterChange('private')}>Privados</TabsTrigger>
-              <TabsTrigger value="paid" onClick={() => handleFilterChange('paid')}>Pagos</TabsTrigger>
-              <TabsTrigger value="free" onClick={() => handleFilterChange('free')}>Gratuitos</TabsTrigger>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid grid-cols-5 w-full h-auto">
+              <TabsTrigger value="all" onClick={() => handleFilterChange('all')} className="text-xs px-1 py-2">Todos</TabsTrigger>
+              <TabsTrigger value="public" onClick={() => handleFilterChange('public')} className="text-xs px-1 py-2">Públicos</TabsTrigger>
+              <TabsTrigger value="private" onClick={() => handleFilterChange('private')} className="text-xs px-1 py-2">Privados</TabsTrigger>
+              <TabsTrigger value="paid" onClick={() => handleFilterChange('paid')} className="text-xs px-1 py-2">Pagos</TabsTrigger>
+              <TabsTrigger value="free" onClick={() => handleFilterChange('free')} className="text-xs px-1 py-2">Gratuitos</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -311,46 +311,46 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
 
     // Renderizar lista de cursos
     return (
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1">
         {filteredCourses.map((course) => {
           const hasImageLoadingError = imageLoadErrors.has(course.id);
           const canDisplayImage = course.image_url && course.image_url.trim() !== '' && !hasImageLoadingError;
 
           return (
             <Card key={course.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex items-start gap-4 min-w-0">
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     {canDisplayImage ? (
                       <img 
                         src={course.image_url || ''} 
                         alt={course.title || ''} 
-                        className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gold shadow-lg shadow-gold/20"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0 border-2 border-gold shadow-lg shadow-gold/20"
                         onError={() => handleImageError(course.id)}
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground border-2 border-gold shadow-lg shadow-gold/20">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground border-2 border-gold shadow-lg shadow-gold/20">
                         {hasImageLoadingError ? 
-                          <AlertTriangle className="h-8 w-8 text-destructive" /> : 
-                          <BookOpen className="h-8 w-8" />
+                          <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-destructive" /> : 
+                          <BookOpen className="h-6 w-6 sm:h-8 sm:w-8" />
                         }
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-lg truncate">{course.title || 'Curso sem título'}</CardTitle>
+                      <CardTitle className="text-base sm:text-lg truncate">{course.title || 'Curso sem título'}</CardTitle>
                       {hasImageLoadingError && (
                         <p className="text-xs text-destructive mt-1">Erro ao carregar imagem.</p>
                       )}
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                         <Badge 
                           variant="secondary" 
-                          className="bg-transparent text-white border border-white/30 hover:border-white/50"
+                          className="bg-transparent text-white border border-white/30 hover:border-white/50 text-xs px-2 py-1"
                         >
                           {course.is_public ? 'Público' : 'Privado'}
                         </Badge>
                         <Badge 
                           variant="secondary"
-                          className="bg-transparent text-white border border-white/30 hover:border-white/50"
+                          className="bg-transparent text-white border border-white/30 hover:border-white/50 text-xs px-2 py-1"
                         >
                           {course.is_paid ? 
                             `R$${(course.discount && course.discount > 0 && course.discounted_price ? 
@@ -361,7 +361,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                         {course.discount && course.discount > 0 && (
                           <Badge 
                             variant="secondary"
-                            className="bg-green-600/20 text-green-400 border border-green-500/30 hover:border-green-500/50"
+                            className="bg-green-600/20 text-green-400 border border-green-500/30 hover:border-green-500/50 text-xs px-2 py-1"
                           >
                             -{course.discount}%
                           </Badge>
@@ -369,14 +369,31 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 justify-start">
+                    <div className="flex items-center space-x-2 mr-2">
+                      <div className="relative">
+                        <Switch
+                          id={`publish-${course.id}`}
+                          checked={course.is_published}
+                          onCheckedChange={(checked) => handlePublishChange(course.id, checked)}
+                          disabled={isUpdating.has(course.id)}
+                          className="relative z-10 scale-75"
+                        />
+                        {!course.is_published && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/30 to-orange-400/30 rounded-full opacity-50 blur-sm animate-pulse"></div>
+                        )}
+                      </div>
+                      <Label htmlFor={`publish-${course.id}`} className="text-xs">
+                        {isUpdating.has(course.id) ? "Atualizando..." : (course.is_published ? "Despublicar" : "Publicar")}
+                      </Label>
+                    </div>
                     <Button 
                       variant="outline" 
                       onClick={() => handleViewCourse(course.id)}
-                      className="h-auto py-2 px-3"
+                      className="h-auto py-2 px-2 sm:px-3 text-xs"
                       size="sm"
                     >
-                      <Eye className="mr-2 h-4 w-4" /> Ver Curso
+                      <Eye className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Ver Curso</span><span className="sm:hidden">Ver</span>
                     </Button>
                     <Button 
                       variant="outline" 
@@ -385,7 +402,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       className="h-auto py-2 px-2"
                     >
                       <Link to={`/mentor/meus-cursos/${course.id}/editar`}>
-                        <Edit2 className="h-4 w-4" />
+                        <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Link>
                     </Button>
                     <Button 
@@ -395,7 +412,7 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                       size="sm"
                       disabled={isDeleting.has(course.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
@@ -430,36 +447,23 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex items-center gap-4">
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Switch
-                      id={`publish-${course.id}`}
-                      checked={course.is_published}
-                      onCheckedChange={(checked) => handlePublishChange(course.id, checked)}
-                      disabled={isUpdating.has(course.id)}
-                      className="relative z-10"
-                    />
-                    {course.is_published && (
-                      <div className="absolute -inset-1 bg-gradient-to-r from-green-400/30 to-emerald-400/30 rounded-full opacity-50 blur-sm animate-pulse"></div>
-                    )}
-                  </div>
-                  <Label htmlFor={`publish-${course.id}`} className="text-sm whitespace-nowrap">
-                    {isUpdating.has(course.id) ? "Atualizando..." : (course.is_published ? "Publicado" : "Não Publicado")}
-                  </Label>
+              <CardFooter className="flex flex-col gap-3 pt-3">
+                <div className="flex gap-2 w-full">
+                  <Button
+                    className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-xs py-2"
+                    onClick={() => navigate(`/mentor/meus-cursos/${course.id}/modulos`)}
+                    size="sm"
+                  >
+                    Módulos
+                  </Button>
+                  <Button
+                    className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-xs py-2"
+                    onClick={() => navigate(`/mentor/meus-cursos/${course.id}/landing-page`)}
+                    size="sm"
+                  >
+                    Página de Venda
+                  </Button>
                 </div>
-                <Button
-                  className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-sm"
-                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/modulos`)}
-                >
-                  Gerenciar Módulos
-                </Button>
-                <Button
-                  className="flex-1 bg-gold/80 hover:bg-gold text-slate-900 font-medium shadow-lg hover:shadow-xl backdrop-blur-sm text-sm"
-                  onClick={() => navigate(`/mentor/meus-cursos/${course.id}/landing-page`)}
-                >
-                  Página de Venda
-                </Button>
               </CardFooter>
             </Card>
           );
@@ -471,23 +475,23 @@ const CoursesList = ({ courses, isLoading, totalEnrollments }: CoursesListProps)
   return (
     <div className="mb-8">
       {/* Filtros e Busca sempre visíveis */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-grow">
+      <div className="mb-4 flex flex-col gap-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 w-4 h-4" />
           <Input
             placeholder="Buscar cursos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
+            className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40 text-sm"
           />
         </div>
-        <Tabs defaultValue="all" className="w-full sm:w-auto">
-          <TabsList>
-            <TabsTrigger value="all" onClick={() => handleFilterChange('all')}>Todos</TabsTrigger>
-            <TabsTrigger value="public" onClick={() => handleFilterChange('public')}>Públicos</TabsTrigger>
-            <TabsTrigger value="private" onClick={() => handleFilterChange('private')}>Privados</TabsTrigger>
-            <TabsTrigger value="paid" onClick={() => handleFilterChange('paid')}>Pagos</TabsTrigger>
-            <TabsTrigger value="free" onClick={() => handleFilterChange('free')}>Gratuitos</TabsTrigger>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid grid-cols-5 w-full h-auto">
+            <TabsTrigger value="all" onClick={() => handleFilterChange('all')} className="text-xs px-1 py-2">Todos</TabsTrigger>
+            <TabsTrigger value="public" onClick={() => handleFilterChange('public')} className="text-xs px-1 py-2">Públicos</TabsTrigger>
+            <TabsTrigger value="private" onClick={() => handleFilterChange('private')} className="text-xs px-1 py-2">Privados</TabsTrigger>
+            <TabsTrigger value="paid" onClick={() => handleFilterChange('paid')} className="text-xs px-1 py-2">Pagos</TabsTrigger>
+            <TabsTrigger value="free" onClick={() => handleFilterChange('free')} className="text-xs px-1 py-2">Gratuitos</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

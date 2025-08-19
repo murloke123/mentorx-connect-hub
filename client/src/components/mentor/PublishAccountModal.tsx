@@ -1,12 +1,12 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { updateMentorPublicStatus } from '@/services/mentorService';
@@ -49,6 +49,11 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
     meus_cursos: 'Meus Cursos',
     elogios: 'O que dizem meus mentorados ...',
     calendario: 'Agenda uma Conversa'
+  };
+
+  // Mapeamento para mensagens complementares específicas
+  const sectionComplementMap: Record<string, string> = {
+    cards_sucesso: 'Fica localizado no canto superior direito da página'
   };
 
   useEffect(() => {
@@ -245,12 +250,25 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
         <div className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 backdrop-blur-sm">
           <h4 className="font-medium text-white mb-3">Seções que precisam ser verificadas:</h4>
           <ul className="space-y-2">
-            {missingFields.map((section, index) => (
-              <li key={index} className="flex items-center gap-2">
-                <X className="h-4 w-4 text-red-400 shrink-0" />
-                <span className="text-gray-300 font-medium">{section}</span>
-              </li>
-            ))}
+            {missingFields.map((section, index) => {
+              // Encontrar a chave correspondente para verificar se há mensagem complementar
+              const sectionKey = Object.keys(fieldToSectionMap).find(key => fieldToSectionMap[key] === section);
+              const complementMessage = sectionKey ? sectionComplementMap[sectionKey] : null;
+              
+              return (
+                <li key={index} className="flex items-start gap-2">
+                  <X className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <span className="text-gray-300 font-medium">{section}</span>
+                    {complementMessage && (
+                      <p className="text-sm text-gray-400 mt-1 italic">
+                        {complementMessage}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

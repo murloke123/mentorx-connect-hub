@@ -2,8 +2,9 @@ import AppointmentsList from '@/components/AppointmentsList';
 import MentorSidebar from '@/components/mentor/MentorSidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/utils/supabase';
-import { CalendarCheck, MessageSquare, Users } from 'lucide-react';
+import { CalendarCheck, Menu, MessageSquare, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +13,7 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
   const [mentorId, setMentorId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [refreshAppointments, setRefreshAppointments] = useState<number>(0);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [stats, setStats] = useState({
     pendingRequests: 0,
     completedAppointments: 0,
@@ -97,9 +99,29 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-black">
-        <MentorSidebar />
-        <div className="flex-1 transition-all duration-300 p-6 overflow-auto flex items-center justify-center">
+      <div className="flex-col md:flex-row flex min-h-screen">
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+            >
+              <Menu className="h-6 w-6 text-gold" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-0">
+            <MentorSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block">
+          <MentorSidebar />
+        </div>
+
+        <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative overflow-auto flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto"></div>
             <p className="mt-4 text-gray-400">Carregando...</p>
@@ -110,13 +132,33 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-black">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto">
+    <div className="flex-col md:flex-row flex min-h-screen">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative overflow-auto">
         <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
+          <div>
+            <div className="mb-4">
               <h1 className="text-3xl font-bold text-gold">Agendamentos Adquiridos</h1>
               <p className="text-gray-400">Visualize todos os agendamentos que você adquiriu com outros mentores</p>
             </div>

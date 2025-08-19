@@ -42,9 +42,9 @@ const ModuloList = ({ modulos, cursoId, onAddModulo, onEditModulo, onDeleteModul
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Módulos do Curso</h2>
-        <Button onClick={onAddModulo}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl md:text-2xl font-bold">Módulos do Curso</h2>
+        <Button onClick={onAddModulo} className="w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Módulo
         </Button>
       </div>
@@ -82,23 +82,25 @@ const ModuloList = ({ modulos, cursoId, onAddModulo, onEditModulo, onDeleteModul
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex justify-between items-center mt-4">
-                  <Button asChild>
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-4">
+                  <Button asChild className="w-full sm:w-auto">
                     <Link to={`/mentor/meus-cursos/${cursoId}/modulos/${modulo.id}`}>
                       Gerenciar Conteúdos <ChevronRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
 
-                  <div className="flex items-center space-x-2">
-                    <Button variant="default" size="sm" onClick={() => onEditModulo(modulo)} className="bg-gray-800 hover:bg-gray-700 text-white">
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
+                    <Button variant="default" size="sm" onClick={() => onEditModulo(modulo)} className="bg-gray-800 hover:bg-gray-700 text-white flex-1 sm:flex-none">
                       <Edit className="mr-2 h-4 w-4" /> 
-                      Editar
+                      <span className="hidden sm:inline">Editar</span>
+                      <span className="sm:hidden">Editar</span>
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="default" size="sm" className="bg-gray-800 hover:bg-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] text-white transition-all duration-300">
+                        <Button variant="default" size="sm" className="bg-gray-800 hover:bg-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] text-white transition-all duration-300 flex-1 sm:flex-none">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
+                          <span className="hidden sm:inline">Excluir</span>
+                          <span className="sm:hidden">Excluir</span>
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl backdrop-blur-sm">

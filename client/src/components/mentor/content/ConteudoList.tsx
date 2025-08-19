@@ -101,20 +101,20 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
         return (
         <Card key={conteudo.id} className="bg-slate-800/50 border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm">
           <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3 flex-1">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
+              <div className="flex items-start space-x-3 flex-1 min-w-0">
                 {getContentIcon(conteudo.content_type)}
                 <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg text-white">{conteudo.title}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg text-white break-words">{conteudo.title}</CardTitle>
                   {conteudo.description && (
-                    <p className="text-sm text-gray-300 mt-1">
+                    <p className="text-sm text-gray-300 mt-1 break-words">
                       {conteudo.description}
                     </p>
                   )}
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 flex-shrink-0">
                 <Badge variant="secondary" className="text-xs bg-gold/20 text-gold border-gold/30">
                   {conteudo.content_type === 'texto_rico' ? 'Texto'
                     : conteudo.content_type === 'video_externo' ? 'Vídeo'
@@ -143,25 +143,27 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                         <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
-                    <div className="flex space-x-2">
+                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Button
                         variant="default"
                         size="sm"
                         onClick={() => onEdit(conteudo.id)}
-                        className="h-8 px-3 bg-gray-800 hover:bg-gray-700 text-white transition-all duration-300"
+                        className="h-8 px-3 bg-gray-800 hover:bg-gray-700 text-white transition-all duration-300 w-full sm:w-auto"
                       >
                         <Edit className="w-3 h-3 mr-1" />
-                        Editar
+                        <span className="hidden sm:inline">Editar</span>
+                        <span className="sm:hidden">Editar</span>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="default"
                             size="sm"
-                            className="h-8 px-3 bg-gray-800 hover:bg-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] text-white transition-all duration-300"
+                            className="h-8 px-3 bg-gray-800 hover:bg-red-600 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)] text-white transition-all duration-300 w-full sm:w-auto"
                           >
                             <Trash2 className="w-3 h-3 mr-1" />
-                            Excluir
+                            <span className="hidden sm:inline">Excluir</span>
+                            <span className="sm:hidden">Excluir</span>
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl backdrop-blur-sm">

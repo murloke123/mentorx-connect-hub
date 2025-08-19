@@ -2,12 +2,18 @@ import MentorSidebar from '@/components/mentor/MentorSidebar';
 import ModuloForm from '@/components/mentor/modulos/ModuloForm';
 import ModuloList from '@/components/mentor/modulos/ModuloList';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle
 } from '@/components/ui/dialog';
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger
+} from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -18,7 +24,7 @@ import {
     Modulo
 } from '@/services/moduloService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Library } from 'lucide-react';
+import { Library, Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -30,6 +36,7 @@ const ModulosPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingModulo, setEditingModulo] = useState<Modulo | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Redirecionar se não tem cursoId
   useEffect(() => {
@@ -155,17 +162,41 @@ const ModulosPage = () => {
   if (isError) {
     return (
       <div className="flex">
-        <MentorSidebar />
-        <div className="flex-1 transition-all duration-300  p-6">
-          <div className="text-center py-10">
-            <h1 className="text-2xl font-bold text-red-500">Erro ao carregar módulos</h1>
-            <p className="mt-2">Não foi possível carregar os módulos deste curso.</p>
-            <button 
-              onClick={() => refetch()}
-              className="mt-4 px-4 py-2 bg-primary text-white rounded"
-            >
-              Tentar novamente
-            </button>
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <MentorSidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <MentorSidebar />
+        </div>
+        
+        <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+          </div>
+          
+          <div className="pt-16 md:pt-0">
+            <div className="text-center py-10">
+              <h1 className="text-2xl font-bold text-red-500">Erro ao carregar módulos</h1>
+              <p className="mt-2">Não foi possível carregar os módulos deste curso.</p>
+              <button 
+                onClick={() => refetch()}
+                className="mt-4 px-4 py-2 bg-primary text-white rounded"
+              >
+                Tentar novamente
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -173,38 +204,64 @@ const ModulosPage = () => {
   }
 
   return (
-    <div className="flex">
-      <MentorSidebar />
-      <div className="flex-1 transition-all duration-300  p-6">
-        <Breadcrumbs 
-          items={[
-            { label: 'Meus Cursos', href: '/mentor/meus-cursos' },
-            { label: 'Módulos do Curso' }
-          ]} 
-          className="mb-6"
-        />
+    <div className="flex-col md:flex-row flex min-h-screen max-w-full overflow-x-hidden">
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
+          <MentorSidebar />
+        </SheetContent>
+      </Sheet>
 
-        <div className="flex items-center gap-3 mb-6">
-          <Library className="h-8 w-8 text-gold" />
-          <h1 className="text-3xl font-bold text-gold">Gerenciar Módulos</h1>
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        ) : (
-          <ModuloList 
-            modulos={modulos}
-            cursoId={cursoId!}
-            onAddModulo={handleAddModulo}
-            onEditModulo={handleEditModulo}
-            onDeleteModulo={handleDeleteModulo}
-            isLoading={isLoading}
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <MentorSidebar />
+      </div>
+      
+      <div className="flex-1 transition-all duration-300 p-3 md:p-6 pt-8 md:pt-6 min-h-screen bg-black max-w-full overflow-x-hidden">
+        <div className="mb-6 flex flex-col gap-4">
+          <Breadcrumbs 
+            items={[
+              { label: 'Meus Cursos', href: '/mentor/meus-cursos' },
+              { label: 'Módulos do Curso' }
+            ]} 
           />
-        )}
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gold flex items-center gap-3">
+              <Library className="h-6 w-6 md:h-8 md:w-8 text-gold" />
+              Gerenciar Módulos
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground">Organize e gerencie os módulos do seu curso</p>
+          </div>
+        </div>
+        
+        <div>
+
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          ) : (
+            <ModuloList 
+              modulos={modulos}
+              cursoId={cursoId!}
+              onAddModulo={handleAddModulo}
+              onEditModulo={handleEditModulo}
+              onDeleteModulo={handleDeleteModulo}
+              isLoading={isLoading}
+            />
+          )}
+        </div>
 
         {/* Modal de Adicionar Módulo */}
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
