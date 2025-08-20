@@ -389,59 +389,57 @@ const MentoradoMeusMentoresPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-gold mb-2">Meus Mentores</h1>
-            <p className="text-muted-foreground">Mentores que estou seguindo e seus cursos disponíveis</p>
+        <div className="pt-0 md:pt-0">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">Meus Mentores</h1>
+            <p className="text-gray-300 text-base md:text-lg">Mentores que estou seguindo e seus cursos disponíveis</p>
           </div>
-        </div>
 
         {/* Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-            <CardContent className="p-4">
-              <div className="flex flex-col items-center justify-center text-center gap-3">
-                <Users className="h-8 w-8 text-gold" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-xl md:rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex flex-col items-center justify-center text-center gap-2 md:gap-3">
+                <Users className="h-6 w-6 md:h-8 md:w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold text-white">{stats.total}</p>
-                  <p className="text-sm text-gold">Total de Mentores</p>
+                  <p className="text-lg md:text-2xl font-bold text-white">{stats.total}</p>
+                  <p className="text-xs md:text-sm text-gold">Total de Mentores</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-            <CardContent className="p-4">
-              <div className="flex flex-col items-center justify-center text-center gap-3">
-                <Heart className="h-8 w-8 text-gold" />
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-xl md:rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex flex-col items-center justify-center text-center gap-2 md:gap-3">
+                <Heart className="h-6 w-6 md:h-8 md:w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold text-white">{stats.following}</p>
-                  <p className="text-sm text-gold">Seguindo</p>
+                  <p className="text-lg md:text-2xl font-bold text-white">{stats.following}</p>
+                  <p className="text-xs md:text-sm text-gold">Seguindo</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-            <CardContent className="p-4">
-              <div className="flex flex-col items-center justify-center text-center gap-3">
-                <BookOpen className="h-8 w-8 text-gold" />
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-xl md:rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex flex-col items-center justify-center text-center gap-2 md:gap-3">
+                <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold text-white">{stats.withCourses}</p>
-                  <p className="text-sm text-gold">Com Cursos</p>
+                  <p className="text-lg md:text-2xl font-bold text-white">{stats.withCourses}</p>
+                  <p className="text-xs md:text-sm text-gold">Com Cursos</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-            <CardContent className="p-4">
-              <div className="flex flex-col items-center justify-center text-center gap-3">
-                <TrendingUp className="h-8 w-8 text-gold" />
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-xl md:rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex flex-col items-center justify-center text-center gap-2 md:gap-3">
+                <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-gold" />
                 <div>
-                  <p className="text-2xl font-bold text-white">{formatPrice(stats.totalSpent)}</p>
-                  <p className="text-sm text-gold">Total Investido</p>
+                  <p className="text-lg md:text-2xl font-bold text-white">{formatPrice(stats.totalSpent)}</p>
+                  <p className="text-xs md:text-sm text-gold">Total Investido</p>
                 </div>
               </div>
             </CardContent>
@@ -449,14 +447,14 @@ const MentoradoMeusMentoresPage = () => {
         </div>
 
         {/* Barra de busca */}
-        <div className="mb-6">
+        <div className="mb-6 md:mb-8">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60 h-4 w-4 md:h-5 md:w-5" />
             <Input
               placeholder="Buscar mentores por nome, email ou categoria..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40"
+              className="pl-9 md:pl-10 pr-4 py-2.5 md:py-3 bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40 text-sm md:text-base rounded-lg md:rounded-xl"
             />
           </div>
         </div>
@@ -481,8 +479,149 @@ const MentoradoMeusMentoresPage = () => {
           <div className="space-y-4">
             {filteredMentores.map((mentor) => (
               <Card key={mentor.id} className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-4 gap-4 items-stretch">
+                <CardContent className="p-4 md:p-6">
+                  {/* Layout Mobile: Vertical Stack */}
+                  <div className="md:hidden space-y-4">
+                    {/* Header: Avatar + Nome */}
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 flex-shrink-0">
+                        <AvatarImage src={mentor.avatar_url || ""} alt={mentor.full_name || ""} />
+                        <AvatarFallback className="bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black text-sm">
+                          {mentor.full_name ? getMentorInitials(mentor.full_name) : "M"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base text-white truncate">{mentor.full_name || "Nome não informado"}</h3>
+                        {mentor.category && (
+                          <p className="text-xs text-gold/80">{mentor.category}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Cursos */}
+                    <div className="bg-slate-800/30 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="h-4 w-4 text-gold flex-shrink-0" />
+                        <span className="text-sm font-medium text-gold">Cursos ({mentor.courses_created.length})</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {mentor.courses_created.length > 0 ? (
+                          mentor.courses_created.slice(0, 2).map((course) => (
+                            <Badge
+                              key={course.id}
+                              variant="secondary"
+                              className="cursor-pointer bg-gold/20 text-gold border-gold/30 hover:bg-gold/30 hover:text-gold transition-colors text-xs"
+                              onClick={() => navigate(`/curso/${course.id}`)}
+                            >
+                              {course.title.length > 20 ? `${course.title.substring(0, 20)}...` : course.title}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-400">Nenhum curso disponível</span>
+                        )}
+                        {mentor.courses_created.length > 2 && (
+                          <Badge variant="outline" className="text-xs border-gold/30 text-gold">
+                            +{mentor.courses_created.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Botões de Ação */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigateToTop(navigate, `/mentor/publicview/${mentor.id}`)}
+                        className="justify-center text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+                      >
+                        <User className="h-3 w-3 mr-1" />
+                        Ver Perfil
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/mentor/publicschedule/${mentor.id}`)}
+                        className="justify-center text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+                      >
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Agendar
+                      </Button>
+                      
+                      <Dialog 
+                        open={openDialogs[mentor.id] || false} 
+                        onOpenChange={(open) => setOpenDialogs(prev => ({ ...prev, [mentor.id]: open }))}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedMentor(mentor);
+                              setOpenDialogs(prev => ({ ...prev, [mentor.id]: true }));
+                            }}
+                            className="justify-center text-xs border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+                          >
+                            <MessageCircle className="h-3 w-3 mr-1" />
+                            Notificar
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-900 border-gold/30 mx-4">
+                          <DialogHeader>
+                            <DialogTitle className="text-white text-base">Enviar Notificação</DialogTitle>
+                            <DialogDescription className="text-gray-400 text-sm">
+                              Envie uma mensagem para {selectedMentor?.full_name || mentor.full_name}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <Textarea
+                              placeholder="Digite sua mensagem..."
+                              value={messageText}
+                              onChange={(e) => setMessageText(e.target.value)}
+                              rows={3}
+                              className="bg-slate-800/50 border-gold/20 text-white placeholder:text-gray-400 focus:border-gold/40 text-sm"
+                            />
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              onClick={handleSendMessage}
+                              disabled={!messageText.trim() || sendingMessage}
+                              className="bg-gold text-black hover:bg-gold/90 text-sm"
+                            >
+                              {sendingMessage ? "Enviando..." : "Enviar"}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button
+                        variant={mentor.is_following ? "outline" : "default"}
+                        size="sm"
+                        onClick={() => handleToggleFollow(mentor.id, mentor.is_following)}
+                        className={`justify-center text-xs ${
+                          mentor.is_following 
+                            ? 'border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500/70' 
+                            : 'bg-gold text-black hover:bg-gold/90'
+                        }`}
+                      >
+                        {mentor.is_following ? (
+                          <>
+                            <HeartOff className="h-3 w-3 mr-1" />
+                            Parar
+                          </>
+                        ) : (
+                          <>
+                            <Heart className="h-3 w-3 mr-1" />
+                            Seguir
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Layout Desktop: Grid Original */}
+                  <div className="hidden md:grid md:grid-cols-4 gap-4 items-stretch">
                     {/* Coluna 1: Avatar + Nome do mentor */}
                     <div className="flex items-center gap-4 h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300">
                       <Avatar className="h-16 w-16 flex-shrink-0">
@@ -496,13 +635,10 @@ const MentoradoMeusMentoresPage = () => {
 
                     {/* Coluna 2: Cursos do mentor */}
                     <div className="h-24 bg-slate-800/50 rounded-lg shadow-sm border border-gold/20 p-4 hover:shadow-md hover:border-gold/40 transition-all duration-300 overflow-hidden">
-                      {/* Título com ícone */}
                       <div className="flex items-center gap-2 mb-2">
                         <BookOpen className="h-4 w-4 text-gold flex-shrink-0" />
                         <span className="text-sm font-medium text-gold">Cursos:</span>
                       </div>
-                      
-                      {/* Tags dos cursos */}
                       <div className="flex flex-wrap gap-1 overflow-hidden">
                         {mentor.courses_created.length > 0 ? (
                           mentor.courses_created.slice(0, 3).map((course) => (

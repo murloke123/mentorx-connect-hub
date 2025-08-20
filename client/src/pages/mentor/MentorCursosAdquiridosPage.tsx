@@ -303,7 +303,7 @@ const MentorCursosAdquiridosPage = () => {
       <div className="flex-1 transition-all duration-300 p-4 md:p-6 pt-8 md:pt-6 min-h-screen bg-black relative">
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gold">Cursos Adquiridos</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gold">Cursos Adquiridos</h1>
             <p className="text-muted-foreground">Cursos que adquiri de outros mentores</p>
           </div>
           <Button onClick={() => navigate('/courses')}>

@@ -305,49 +305,49 @@ const MentorMeusMentoradosPage = () => {
         <div className="space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gold via-yellow-400 to-gold bg-clip-text text-transparent">Meus Mentorados</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gold">Meus Mentorados</h1>
             <p className="text-gray-400">Gerencie e acompanhe seus alunos, seguidores e suas métricas de engajamento</p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gold text-center">Total de Alunos</CardTitle>
-                <Users className="h-4 w-4 text-gold ml-2" />
+                <CardTitle className="text-xs md:text-sm font-medium text-gold text-center truncate">Total de Alunos</CardTitle>
+                <Users className="h-3 w-3 md:h-4 md:w-4 text-gold ml-1 md:ml-2 flex-shrink-0" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.students}</div>
+                <div className="text-lg md:text-2xl font-bold text-white">{stats.students}</div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gold text-center">Total de Seguidores</CardTitle>
-                <Heart className="h-4 w-4 text-gold ml-2" />
+                <CardTitle className="text-xs md:text-sm font-medium text-gold text-center truncate">Total de Seguidores</CardTitle>
+                <Heart className="h-3 w-3 md:h-4 md:w-4 text-gold ml-1 md:ml-2 flex-shrink-0" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.followers}</div>
+                <div className="text-lg md:text-2xl font-bold text-white">{stats.followers}</div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gold text-center">Seguidores sem Curso</CardTitle>
-                <Frown className="h-4 w-4 text-gold ml-2" />
+                <CardTitle className="text-xs md:text-sm font-medium text-gold text-center truncate">Seguidores sem Curso</CardTitle>
+                <Frown className="h-3 w-3 md:h-4 md:w-4 text-gold ml-1 md:ml-2 flex-shrink-0" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.followersWithoutCourse}</div>
+                <div className="text-lg md:text-2xl font-bold text-white">{stats.followersWithoutCourse}</div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gold text-center">Cursos por Aluno</CardTitle>
-                <TrendingUp className="h-4 w-4 text-gold ml-2" />
+                <CardTitle className="text-xs md:text-sm font-medium text-gold text-center truncate">Cursos por Aluno</CardTitle>
+                <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-gold ml-1 md:ml-2 flex-shrink-0" />
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-white">{stats.avgCoursesPerStudent.toFixed(1)}</div>
+                <div className="text-lg md:text-2xl font-bold text-white">{stats.avgCoursesPerStudent.toFixed(1)}</div>
               </CardContent>
             </Card>
           </div>

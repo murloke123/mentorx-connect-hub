@@ -159,7 +159,7 @@ const MentorAgendamentosAdquiridosPage: React.FC = () => {
           {/* Header */}
           <div>
             <div className="mb-4">
-              <h1 className="text-3xl font-bold text-gold">Agendamentos Adquiridos</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gold">Agendamentos Adquiridos</h1>
               <p className="text-gray-400">Visualize todos os agendamentos que você adquiriu com outros mentores</p>
             </div>
             <Button 

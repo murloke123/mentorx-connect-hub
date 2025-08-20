@@ -330,40 +330,88 @@ const MentoradoMeusCursosPage = () => {
 
   if (loading) {
     return (
-      <div className="flex">
-        <MentoradoSidebar />
-        <div className="flex-1 transition-all duration-300  p-6">
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
-              <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
-            </div>
-            <Button onClick={() => navigate('/courses')}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+      <div className="flex-col md:flex-row flex min-h-screen">
+        {/* Mobile Sidebar */}
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+            >
+              <Menu className="h-6 w-6 text-gold" />
             </Button>
-          </div>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-0">
+            <MentoradoSidebar />
+          </SheetContent>
+        </Sheet>
 
-          <LoadingComponent message="Carregando Cursos" />
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block">
+          <MentoradoSidebar />
+        </div>
+
+        <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden fixed top-4 left-4 z-50">
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-background/80 backdrop-blur-sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+          </div>
+          
+          <div className="pt-0 md:pt-0">
+            <div className="mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">Meus Cursos</h1>
+              <p className="text-gray-300 text-base md:text-lg mb-4 md:mb-0">Cursos que foram adquiridos por mim</p>
+              <div className="block md:hidden">
+                <Button onClick={() => navigate('/courses')} className="w-full sm:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+                </Button>
+              </div>
+            </div>
+          
+            <div className="mb-8 hidden md:flex flex-row justify-end items-center">
+              <Button onClick={() => navigate('/courses')}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+              </Button>
+            </div>
+
+            <LoadingComponent message="Carregando Cursos" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex-col md:flex-row flex min-h-screen overflow-x-hidden">
       {/* Mobile Sidebar */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
           <MentoradoSidebar />
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Sidebar - Hidden on mobile */}
+      {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <MentoradoSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-6 relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
         {/* Mobile Menu Button */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -375,12 +423,18 @@ const MentoradoMeusCursosPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-8 md:pt-0">
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-gold mb-2">Meus Cursos</h1>
-              <p className="text-muted-foreground">Cursos que foram adquiridos por mim</p>
+        <div className="pt-0 md:pt-0">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">Meus Cursos</h1>
+            <p className="text-gray-300 text-base md:text-lg mb-4 md:mb-0">Cursos que foram adquiridos por mim</p>
+            <div className="block md:hidden">
+              <Button onClick={() => navigate('/courses')} className="w-full sm:w-auto">
+                <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
+              </Button>
             </div>
+          </div>
+          
+          <div className="mb-8 hidden md:flex flex-row justify-end items-center">
             <Button onClick={() => navigate('/courses')}>
               <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
             </Button>
@@ -412,21 +466,21 @@ const MentoradoMeusCursosPage = () => {
             );
           })()}
 
-        <div>
-          {enrolledCourses.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Play className="mx-auto h-12 w-12 text-gold mb-4" />
-                <p className="text-gray-600 mb-4">
-                  Você ainda não está matriculado em nenhum curso.
-                </p>
-                <Button onClick={() => navigate('/courses')}>
-                  Explorar Cursos
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            {enrolledCourses.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Play className="mx-auto h-12 w-12 text-gold mb-4" />
+                  <p className="text-gray-600 mb-4">
+                    Você ainda não está matriculado em nenhum curso.
+                  </p>
+                  <Button onClick={() => navigate('/courses')}>
+                    Explorar Cursos
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {enrolledCourses.map((enrollment) => (
                 <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
                   <div className="aspect-video relative">
@@ -614,9 +668,9 @@ const MentoradoMeusCursosPage = () => {
             )}
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
+       </div>
+     </div>
+   );
+ };
 
 export default MentoradoMeusCursosPage;

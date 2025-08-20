@@ -124,21 +124,21 @@ const MeusCursosPage = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gold">Meus Cursos</h1>
             <p className="text-sm md:text-base text-muted-foreground">Gerencie e acompanhe seus cursos criados</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+          <div className="flex flex-row gap-2 sm:gap-3 w-full">
+            <Button 
+              onClick={handleCreateCourse}
+              className="flex-1 sm:w-auto text-sm"
+              size="sm"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Criar Curso
+            </Button>
             <Button 
               variant="outline" 
               onClick={handleOpenChatModal}
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 w-full sm:w-auto text-sm"
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-0 flex-1 sm:w-auto text-sm"
               size="sm"
             >
               <Bot className="mr-2 h-4 w-4" /> Criar com IA
-            </Button>
-            <Button 
-              onClick={handleCreateCourse}
-              className="w-full sm:w-auto text-sm"
-              size="sm"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" /> Criar Novo Curso
             </Button>
           </div>
         </div>

@@ -104,11 +104,11 @@ const CoursesMobilePage = () => {
   return (
     <div className="min-h-screen bg-black">
       {/* Mobile Hero Section - Sem vídeo */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-black px-4 py-8">
-        <div className="max-w-md mx-auto text-center">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-black/80 px-4 pt-2.5 pb-2.5">
+        <div className="max-w-sm mx-auto text-center">
           {/* Banner Dourado */}
           {showBanner && (
-            <div className="mb-6">
+            <div className="mb-2.5">
               <GoldenBanner
                 title="Jornada de cursos específica para você"
                 subtitle="Nossa IA é um reflexo da mente dos nossos mentores e foi treinada para guiar e potencializar o seu aprendizado."
@@ -118,13 +118,14 @@ const CoursesMobilePage = () => {
           )}
           
           {/* Campo de busca */}
-          <div className="relative mb-6">
+          <div className="relative mb-2.5">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar cursos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-slate-400 transition-all duration-200 shadow-lg backdrop-blur-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-slate-400 transition-all duration-200 shadow-lg backdrop-blur-sm"
             />
           </div>
           
@@ -132,7 +133,7 @@ const CoursesMobilePage = () => {
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full mb-4 bg-black/30 text-white border-gold/30 hover:bg-gold/10 flex items-center justify-center gap-2"
+            className="w-full mb-2.5 h-10 bg-black/30 text-white border-gold/30 hover:bg-gold/10 flex items-center justify-center gap-2"
           >
             <Filter className="h-4 w-4" />
             Filtros
@@ -144,7 +145,7 @@ const CoursesMobilePage = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="space-y-4"
+              className="space-y-4 mb-2.5"
             >
               {/* Price Filter Pills */}
               <div className="flex gap-2 justify-center">

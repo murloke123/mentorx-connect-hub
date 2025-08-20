@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { BarChart3, Calendar, Code, Crown, Grid3X3, Handshake, MessageCircle, Star, User } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MentorCardProps {
   mentor: Mentor;
@@ -82,6 +83,7 @@ const truncateText = (text: string, maxLength: number = 350) => {
 
 export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleViewProfile = () => {
@@ -120,9 +122,24 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
         <div 
           className="relative w-full h-96 cursor-pointer"
           style={{ perspective: '1000px' }}
-          onMouseEnter={() => setIsFlipped(true)}
-          onMouseLeave={() => setIsFlipped(false)}
-          onClick={handleViewProfile}
+          onMouseEnter={() => !isMobile && setIsFlipped(true)}
+          onMouseLeave={() => !isMobile && setIsFlipped(false)}
+          onClick={(e) => {
+            if (isMobile) {
+              // No mobile, primeiro clique gira o card, segundo clique vai para o perfil
+              if (!isFlipped) {
+                e.preventDefault();
+                setIsFlipped(true);
+                // Volta automaticamente após 3 segundos
+                setTimeout(() => setIsFlipped(false), 3000);
+              } else {
+                handleViewProfile();
+              }
+            } else {
+              // No desktop, clique sempre vai para o perfil
+              handleViewProfile();
+            }
+          }}
         >
           <motion.div
             className="relative w-full h-full"
@@ -216,7 +233,9 @@ export const MentorCard: React.FC<MentorCardProps> = ({ mentor, index = 0 }) => 
               )}
 
               {/* Indicação para virar o card */}
-              <p className="text-xs text-muted-foreground mt-auto pt-4">Passe o mouse para saber mais</p>
+              <p className="text-xs text-muted-foreground mt-auto pt-4">
+                {isMobile ? "Toque para saber mais" : "Passe o mouse para saber mais"}
+              </p>
             </div>
           </div>
 

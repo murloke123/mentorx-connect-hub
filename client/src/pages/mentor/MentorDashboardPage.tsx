@@ -162,7 +162,7 @@ const MentorDashboardPage = () => {
         )}
 
         <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gold">
             Dashboard do Mentor
           </h1>
           <p className="text-gray-300 text-base md:text-lg">

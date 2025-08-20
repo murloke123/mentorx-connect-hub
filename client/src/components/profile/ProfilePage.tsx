@@ -92,7 +92,7 @@ const ProfilePage = ({ userRole }: ProfilePageProps) => {
           onProfileUpdate={() => fetchProfileData(user?.id || "")}
         />
       )}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         <ProfileForm 
           user={user} 
           profileData={profileData}

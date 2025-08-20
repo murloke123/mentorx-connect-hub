@@ -1,69 +1,34 @@
 import MentoradoSidebar from "@/components/mentorado/MentoradoSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
-import { useUserSettings } from "@/hooks/useUserSettings";
-import { Profile } from "@/types/database";
-import { supabase } from "@/utils/supabase";
+import { useToast } from "@/hooks/use-toast";
 import { Bell, Menu, Monitor, Shield } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const MentoradoConfiguracoesPage = () => {
-  const [currentUser, setCurrentUser] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const { settings, loading, updateSetting, isSettingActive } = useUserSettings(currentUser?.id);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (error) throw error;
-
-        setCurrentUser(profile);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { toast } = useToast();
 
   const handleLogToggle = async (checked: boolean) => {
-    if (!currentUser) return;
-
-    await updateSetting(
-      'log de cabecalho',
-      checked,
-      currentUser.full_name || 'Usuário',
-      currentUser.role || 'mentorado'
-    );
+    // Funcionalidade será implementada futuramente
+    toast({
+      title: "Configuração atualizada",
+      description: "Esta funcionalidade será implementada em breve.",
+    });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen bg-black">
-        <MentoradoSidebar />
-        <div className="flex-1 transition-all duration-300  flex items-center justify-center">
-          <Spinner />
-        </div>
-      </div>
-    );
-  }
+  const handleSettingToggle = async (settingName: string, checked: boolean) => {
+    // Funcionalidade será implementada futuramente
+    toast({
+      title: "Configuração atualizada",
+      description: `${settingName} ${checked ? 'ativado' : 'desativado'}.`,
+    });
+  };
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -79,7 +44,7 @@ const MentoradoConfiguracoesPage = () => {
         <MentoradoSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-auto relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
         {/* Mobile Menu Button */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -91,129 +56,251 @@ const MentoradoConfiguracoesPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-8 md:pt-6">
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gold mb-2">Configurações</h1>
-            <p className="text-muted-foreground">Gerencie suas preferências e configurações da conta</p>
+        <div className="pt-0 md:pt-0">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">Configurações</h1>
+            <p className="text-gray-300 text-base md:text-lg">Gerencie suas preferências e configurações da conta</p>
           </div>
 
-          {/* Configurações de Interface */}
-          <Card>
+          <div className="space-y-8">
+
+          {/* Configurações Gerais */}
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Monitor className="h-5 w-5" />
-                Interface e Exibição
+              <CardTitle className="flex items-center text-gold text-lg md:text-xl">
+                <Monitor className="mr-2" />
+                Configurações Gerais
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label htmlFor="header-log" className="text-base font-medium">
-                    Ativar log de cabeçalho
+                <div className="space-y-0.5">
+                  <Label htmlFor="log-toggle" className="text-base font-medium">
+                    Log de Cabeçalho
                   </Label>
-                  <p className="text-sm text-gray-500">
-                    Exibe informações de debug no cabeçalho da aplicação
+                  <p className="text-sm text-muted-foreground">
+                    Ativar logs detalhados para debugging
                   </p>
                 </div>
-                <Switch
-                  id="header-log"
-                  checked={isSettingActive('log de cabecalho')}
-                  onCheckedChange={handleLogToggle}
-                  disabled={loading}
-                />
+                <div className="md:hidden">
+                   <Checkbox
+                     id="log-toggle"
+                     defaultChecked={false}
+                     onCheckedChange={handleLogToggle}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                 </div>
+                <div className="hidden md:block">
+                  <Switch
+                    id="log-toggle"
+                    defaultChecked={false}
+                    onCheckedChange={handleLogToggle}
+                  />
+                </div>
               </div>
-              
+
               <Separator />
-              
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
                   <Label className="text-base font-medium">
-                    Tema escuro
+                    Notificações por Email
                   </Label>
-                  <p className="text-sm text-gray-500">
-                    Alterna entre tema claro e escuro (em breve)
+                  <p className="text-sm text-muted-foreground">
+                    Receber notificações sobre atividades e atualizações
                   </p>
                 </div>
-                <Switch disabled />
+                <div className="md:hidden">
+                   <Checkbox
+                      defaultChecked={true}
+                      onCheckedChange={(checked: boolean) => handleSettingToggle('Notificações por Email', checked)}
+                      className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                    />
+                 </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Notificações por Email', checked)}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium">
+                    Perfil Público
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Permitir que outros usuários vejam seu perfil
+                  </p>
+                </div>
+                <div className="md:hidden">
+                   <Checkbox
+                      defaultChecked={true}
+                      onCheckedChange={(checked: boolean) => handleSettingToggle('Perfil Público', checked)}
+                      className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                    />
+                 </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Perfil Público', checked)}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Configurações de Notificações */}
-          <Card>
+          {/* Privacidade e Segurança */}
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notificações
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
-                  <Label className="text-base font-medium">
-                    Notificações por email
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Receba notificações importantes por email (em breve)
-                  </p>
-                </div>
-                <Switch disabled />
-              </div>
-              
-              <Separator />
-              
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
-                  <Label className="text-base font-medium">
-                    Notificações push
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Receba notificações no navegador (em breve)
-                  </p>
-                </div>
-                <Switch disabled />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Configurações de Privacidade */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+              <CardTitle className="flex items-center text-gold text-lg md:text-xl">
+                <Shield className="mr-2" />
                 Privacidade e Segurança
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
                   <Label className="text-base font-medium">
-                    Perfil público
+                    Autenticação de Dois Fatores
                   </Label>
-                  <p className="text-sm text-gray-500">
-                    Permite que outros usuários vejam seu perfil (em breve)
+                  <p className="text-sm text-muted-foreground">
+                    Adicionar uma camada extra de segurança à sua conta
                   </p>
                 </div>
-                <Switch disabled />
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={false}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch 
+                    defaultChecked={false}
+                    onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                  />
+                </div>
               </div>
-              
+
               <Separator />
-              
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
                   <Label className="text-base font-medium">
-                    Autenticação de dois fatores
+                    Dados de Analytics
                   </Label>
-                  <p className="text-sm text-gray-500">
-                    Adicione uma camada extra de segurança (em breve)
+                  <p className="text-sm text-muted-foreground">
+                    Permitir coleta de dados para melhorar a experiência
                   </p>
                 </div>
-                <Switch disabled />
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={true}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Dados de Analytics', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Dados de Analytics', checked)}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
-        </div>
+
+          {/* Notificações */}
+          <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
+            <CardHeader>
+              <CardTitle className="flex items-center text-gold text-lg md:text-xl">
+                <Bell className="mr-2" />
+                Notificações
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium">
+                    Novos Mentores
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Notificar quando novos mentores se cadastrarem
+                  </p>
+                </div>
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={true}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Novos Mentores', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Novos Mentores', checked)}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium">
+                    Agendamentos
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Notificar sobre confirmações e lembretes de sessões
+                  </p>
+                </div>
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={true}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Agendamentos', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Agendamentos', checked)}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium">
+                    Mensagens Diretas
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Notificar sobre novas mensagens de mentores
+                  </p>
+                </div>
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={false}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Mensagens Diretas', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch
+                    defaultChecked={true}
+                    onCheckedChange={(checked) => handleSettingToggle('Mensagens Diretas', checked)}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -57,7 +58,7 @@ const MentorConfiguracoesPage = () => {
         
           <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gold">Configurações</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gold">Configurações</h1>
               <p className="text-muted-foreground">Gerencie suas preferências e configurações da conta</p>
             </div>
           </div>
@@ -68,7 +69,7 @@ const MentorConfiguracoesPage = () => {
             {/* Configurações Gerais */}
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center text-gold">
+                <CardTitle className="flex items-center text-gold text-lg md:text-xl">
                   <Monitor className="mr-2" />
                   Configurações Gerais
                 </CardTitle>
@@ -83,11 +84,21 @@ const MentorConfiguracoesPage = () => {
                       Ativar logs detalhados para debugging
                     </p>
                   </div>
-                  <Switch
-                    id="log-toggle"
-                    defaultChecked={false}
-                    onCheckedChange={handleLogToggle}
-                  />
+                  <div className="md:hidden">
+                     <Checkbox
+                       id="log-toggle"
+                       defaultChecked={false}
+                       onCheckedChange={handleLogToggle}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                   </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      id="log-toggle"
+                      defaultChecked={false}
+                      onCheckedChange={handleLogToggle}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -101,10 +112,19 @@ const MentorConfiguracoesPage = () => {
                       Receber notificações sobre novos alunos e atividades
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Notificações por Email', checked)}
-                  />
+                  <div className="md:hidden">
+                     <Checkbox
+                        defaultChecked={true}
+                        onCheckedChange={(checked: boolean) => handleSettingToggle('Notificações por Email', checked)}
+                        className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                      />
+                   </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Notificações por Email', checked)}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -118,10 +138,19 @@ const MentorConfiguracoesPage = () => {
                       Permitir que outros usuários vejam seu perfil
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Perfil Público', checked)}
-                  />
+                  <div className="md:hidden">
+                     <Checkbox
+                        defaultChecked={true}
+                        onCheckedChange={(checked: boolean) => handleSettingToggle('Perfil Público', checked)}
+                        className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                      />
+                   </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Perfil Público', checked)}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -129,7 +158,7 @@ const MentorConfiguracoesPage = () => {
             {/* Privacidade e Segurança */}
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center text-gold">
+                <CardTitle className="flex items-center text-gold text-lg md:text-xl">
                   <Shield className="mr-2" />
                   Privacidade e Segurança
                 </CardTitle>
@@ -144,10 +173,19 @@ const MentorConfiguracoesPage = () => {
                       Adicionar uma camada extra de segurança à sua conta
                     </p>
                   </div>
-                  <Switch 
-                    defaultChecked={false}
-                    onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
-                  />
+                  <div className="md:hidden">
+                    <Checkbox
+                       defaultChecked={false}
+                       onCheckedChange={(checked: boolean) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                  </div>
+                  <div className="hidden md:block">
+                    <Switch 
+                      defaultChecked={false}
+                      onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -161,10 +199,19 @@ const MentorConfiguracoesPage = () => {
                       Permitir coleta de dados para melhorar a experiência
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Dados de Analytics', checked)}
-                  />
+                  <div className="md:hidden">
+                    <Checkbox
+                       defaultChecked={true}
+                       onCheckedChange={(checked: boolean) => handleSettingToggle('Dados de Analytics', checked)}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                  </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Dados de Analytics', checked)}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -172,7 +219,7 @@ const MentorConfiguracoesPage = () => {
             {/* Notificações */}
             <Card className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-gold/30 rounded-2xl backdrop-blur-xl shadow-lg hover:border-gold/50 transition-all duration-300 hover:shadow-gold/30">
               <CardHeader>
-                <CardTitle className="flex items-center text-gold">
+                <CardTitle className="flex items-center text-gold text-lg md:text-xl">
                   <Bell className="mr-2" />
                   Notificações
                 </CardTitle>
@@ -187,10 +234,19 @@ const MentorConfiguracoesPage = () => {
                       Notificar quando um novo aluno se inscrever
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Novos Alunos', checked)}
-                  />
+                  <div className="md:hidden">
+                    <Checkbox
+                       defaultChecked={true}
+                       onCheckedChange={(checked: boolean) => handleSettingToggle('Novos Alunos', checked)}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                  </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Novos Alunos', checked)}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -204,10 +260,19 @@ const MentorConfiguracoesPage = () => {
                       Notificar quando alunos completarem módulos
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Conclusão de Módulos', checked)}
-                  />
+                  <div className="md:hidden">
+                    <Checkbox
+                       defaultChecked={true}
+                       onCheckedChange={(checked: boolean) => handleSettingToggle('Conclusão de Módulos', checked)}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                  </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Conclusão de Módulos', checked)}
+                    />
+                  </div>
                 </div>
 
                 <Separator />
@@ -221,10 +286,19 @@ const MentorConfiguracoesPage = () => {
                       Notificar sobre novas mensagens de alunos
                     </p>
                   </div>
-                  <Switch
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => handleSettingToggle('Mensagens Diretas', checked)}
-                  />
+                  <div className="md:hidden">
+                    <Checkbox
+                       defaultChecked={false}
+                       onCheckedChange={(checked: boolean) => handleSettingToggle('Mensagens Diretas', checked)}
+                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                     />
+                  </div>
+                  <div className="hidden md:block">
+                    <Switch
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => handleSettingToggle('Mensagens Diretas', checked)}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

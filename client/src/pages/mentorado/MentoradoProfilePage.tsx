@@ -35,7 +35,7 @@ const MentoradoProfilePage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
+        <div className="pt-0 md:pt-0">
           <ProfilePage userRole="mentorado" />
         </div>
       </div>

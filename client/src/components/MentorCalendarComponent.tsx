@@ -197,7 +197,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     
     const isWorking = isWorkingDay(dayOfWeek);
     
-    let baseClass = 'text-sm md:text-base rounded-md md:rounded-xl transition-all duration-200 flex items-center justify-center h-10 w-10 md:h-12 md:w-12 font-semibold -ml-0.5 md:-ml-2';
+    let baseClass = 'text-sm md:text-base rounded-md md:rounded-xl transition-all duration-200 flex items-center justify-center h-8 w-8 md:h-10 md:w-10 font-semibold ml-1 md:-ml-0.5';
     
     // Adicionar cursor pointer apenas para dias clicáveis (não passados)
     if (isClickable && mentorId && mentorName && (isWorking || isCurrentDay) && !isPastDay) {
@@ -256,7 +256,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {weekDays.map((day) => (
             <div 
               key={day} 
-              className="font-bold text-sm text-gold/80 text-center h-8 flex items-center justify-center ml-1 md:-ml-2"
+              className="font-bold text-sm text-gold/80 text-center h-6 flex items-center justify-center ml-2 md:-ml-0.5"
             >
               {day}
             </div>
@@ -266,7 +266,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
           {calendarData.calendarDays.map((dayInfo, index) => {
                           if (dayInfo === null) {
                 // Espaço vazio para dias antes do primeiro dia do mês
-                return <div key={`empty-${monthOffset}-${index}`} className="h-10 w-10 md:h-12 md:w-12 ml-1 md:-ml-2"></div>;
+                return <div key={`empty-${monthOffset}-${index}`} className="h-8 w-8 md:h-10 md:w-10 ml-2 md:-ml-0.5"></div>;
               }
             
             const { day, dayOfWeek } = dayInfo;

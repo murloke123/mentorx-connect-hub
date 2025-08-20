@@ -80,20 +80,29 @@ const MentoradoDashboardPage = () => {
   const activeMentors = Array.from(new Set(coursesArray.map(course => course.mentor_id))).length;
   
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex-col md:flex-row flex min-h-screen overflow-x-hidden">
       {/* Mobile Sidebar */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden bg-slate-900/80 backdrop-blur-sm border border-gold/20 hover:bg-slate-800/80 hover:border-gold/40"
+          >
+            <Menu className="h-6 w-6 text-gold" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] p-0">
           <MentoradoSidebar />
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Sidebar - Hidden on mobile */}
+      {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <MentoradoSidebar />
       </div>
 
-      <div className="flex-1 transition-all duration-300 p-6 overflow-auto relative">
+      <div className="flex-1 transition-all duration-300 p-4 md:p-6 relative">
         {/* Mobile Menu Button */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
@@ -105,29 +114,29 @@ const MentoradoDashboardPage = () => {
           </Sheet>
         </div>
         
-        <div className="pt-16 md:pt-0">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-gold">
+        <div className="pt-0 md:pt-0">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">
               {profile ? `Bem-vindo, ${profile.full_name || 'Mentorado'}!` : 'Dashboard do Mentorado'}
             </h1>
-            <p className="text-gray-300 text-lg">
+            <p className="text-gray-300 text-base md:text-lg">
               Acompanhe seus cursos e seu progresso
             </p>
           </div>
 
-        {/* Stats Section */}
-        <StatsSection 
-          enrolledCourses={coursesArray.length}
-          completedLessons={completedLessons}
-          activeMentors={activeMentors}
-          followingMentors={followingCount}
-        />
+          {/* Stats Section */}
+          <StatsSection 
+            enrolledCourses={coursesArray.length}
+            completedLessons={completedLessons}
+            activeMentors={activeMentors}
+            followingMentors={followingCount}
+          />
 
-        {/* Enrolled Courses Section */}
-        <EnrolledCoursesList 
-          courses={coursesArray} 
-          isLoading={isLoadingCourses} 
-        />
+          {/* Enrolled Courses Section */}
+          <EnrolledCoursesList 
+            courses={coursesArray} 
+            isLoading={isLoadingCourses} 
+          />
         </div>
       </div>
     </div>

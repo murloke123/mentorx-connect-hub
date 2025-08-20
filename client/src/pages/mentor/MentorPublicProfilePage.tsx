@@ -670,43 +670,46 @@ const MentorPublicProfilePage = () => {
         
         {/* Name and CTA section */}
         <div className="mt-24 max-w-5xl mx-auto text-center px-2 md:px-4">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
             {mentorData.full_name}
           </h1>
           
           {mentorData.highlight_message && (
-            <p className="text-xl text-silver mb-6 max-w-3xl mx-auto italic">
+            <p className="text-lg md:text-xl text-silver mb-6 max-w-3xl mx-auto italic">
               "{mentorData.highlight_message}"
             </p>
           )}
           
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+          {/* Botões Seguir e Categoria */}
+          <div className="flex flex-row justify-center items-center gap-4 mb-4">
           {/* Only show follow button if user is not viewing their own profile */}
           {currentUser?.id !== id && (
             <button
               onClick={handleFollowToggle}
-              className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border transition-all ${
+              className={`inline-flex items-center px-4 py-3 rounded-full text-sm md:text-base font-medium backdrop-blur-sm border transition-all ${
                 isFollowing 
                   ? 'bg-red-600/80 hover:bg-red-700/80 text-white border-red-500/20 hover:border-red-500/40' 
                   : 'bg-slate-800/80 hover:bg-slate-700/80 text-gold border-gold/20 hover:border-gold/40'
               }`}
             >
-              <Heart className={`w-4 h-4 mr-2 ${isFollowing ? 'fill-current text-white' : 'text-gold'}`} />
-              {isFollowing ? 'Seguindo' : 'Seguir Mentor'}
+              <Heart className={`w-4 h-4 md:w-5 md:h-5 mr-2 ${isFollowing ? 'fill-current text-white' : 'text-gold'}`} />
+              {isFollowing ? 'Seguindo' : 'Seguir'}
             </button>
           )}
 
           {/* Categoria do Mentor */}
           {mentorData.category && (
             <div className="flex items-center">
-              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-slate-800/80 backdrop-blur-sm text-gold border border-gold/20">
-                <Star className="w-4 h-4 mr-2 text-gold" />
+              <span className="inline-flex items-center px-4 py-3 rounded-full text-sm md:text-base font-medium bg-slate-800/80 backdrop-blur-sm text-gold border border-gold/20">
+                <Star className="w-4 h-4 md:w-5 md:h-5 mr-2 text-gold" />
                 {mentorData.category}
               </span>
             </div>
           )}
+          </div>
             
-            <div className="flex gap-3">
+          {/* Botões das Redes Sociais */}
+          <div className="flex justify-center gap-3 mb-6">
               <a 
                 href={mentorData?.social_media?.instagram || "#"} 
                 target={mentorData?.social_media?.instagram ? "_blank" : "_self"}
@@ -741,7 +744,6 @@ const MentorPublicProfilePage = () => {
                 <Youtube className="h-6 w-6 text-gold" />
               </a>
             </div>
-          </div>
         </div>
         
         {/* Sticky Navigation - Hidden on mobile */}
