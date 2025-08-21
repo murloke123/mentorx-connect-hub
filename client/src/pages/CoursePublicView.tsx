@@ -11,11 +11,13 @@ import {
     Play,
     Star,
     User,
+    X,
     Zap
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { toast } from '../hooks/use-toast';
 import { CursoItemLocal, getCursoCompleto } from '../services/coursePlayerService';
 import { createFreeEnrollment, redirectAfterEnrollment } from '../services/courseService';
@@ -23,6 +25,37 @@ import { startCourseCheckout } from '../services/stripeCheckoutService';
 import '../styles/landing-page.css';
 import { triggerEnrollmentConfetti } from '../utils/confetti';
 import { supabase } from '../utils/supabase';
+
+// Função para converter URLs do YouTube para embed
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = url.match(youtubeRegex);
+  if (match && match[1]) {
+    const params = new URLSearchParams({
+      'modestbranding': '1',
+      'rel': '0',
+      'showinfo': '0',
+      'controls': '1',
+      'disablekb': '1',
+      'fs': '0',
+      'iv_load_policy': '3',
+      'cc_load_policy': '0',
+      'playsinline': '1'
+    });
+    return `https://www.youtube.com/embed/${match[1]}?${params.toString()}`;
+  }
+  return null;
+};
+
+// Função para converter URLs do Vimeo para embed
+const getVimeoEmbedUrl = (url: string): string | null => {
+  const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
+  const match = url.match(vimeoRegex);
+  if (match && match[1]) {
+    return `https://player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`;
+  }
+  return null;
+};
 
 interface CourseData {
   id: string;
@@ -83,6 +116,8 @@ const CoursePublicView: React.FC = () => {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [processingEnrollment, setProcessingEnrollment] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [firstContent, setFirstContent] = useState<any>(null);
   const [landingData, setLandingData] = useState<LandingPageData>({
     headline: "Domine as Habilidades que Vão Transformar Sua Carreira",
     subheadline: "Um curso prático e direto ao ponto para você alcançar resultados reais em tempo recorde",
@@ -151,6 +186,20 @@ const CoursePublicView: React.FC = () => {
         // Carregar dados completos do curso com módulos e conteúdos
         const realCourse = await getCursoCompleto(courseId);
         setRealCourseData(realCourse);
+
+        // Buscar o primeiro conteúdo do curso para o preview
+        if (realCourse && realCourse.modulos.length > 0) {
+          const firstModule = realCourse.modulos[0];
+          console.log('First module:', firstModule);
+          if (firstModule.conteudos && firstModule.conteudos.length > 0) {
+            const firstContentItem = firstModule.conteudos[0];
+            console.log('First content item:', firstContentItem);
+            console.log('Content type:', firstContentItem.content_type);
+            console.log('Video URL:', firstContentItem.video_url);
+            console.log('Content data:', firstContentItem.content_data);
+            setFirstContent(firstContentItem);
+          }
+        }
 
         // Carregar dados da landing page
         const { data: landingPage } = await supabase
@@ -275,6 +324,18 @@ const CoursePublicView: React.FC = () => {
 
   const toggleDescription = () => {
     setIsDescriptionExpanded(prev => !prev);
+  };
+
+  const handlePreviewClick = () => {
+    if (firstContent) {
+      setShowPreviewModal(true);
+    } else {
+      toast({
+        title: "Preview não disponível",
+        description: "Este curso ainda não possui conteúdo disponível para preview",
+        variant: "destructive"
+      });
+    }
   };
 
   const truncateDescription = (text: string, maxLength: number = 150) => {
@@ -500,10 +561,13 @@ const CoursePublicView: React.FC = () => {
                     
                     {/* Enhanced Preview Button */}
                     <div className="absolute bottom-4 left-4 text-white">
-                      <div className="flex items-center space-x-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-white/20 hover:bg-gold/20 hover:border-gold/40 transition-all duration-300">
+                      <button 
+                        onClick={handlePreviewClick}
+                        className="flex items-center space-x-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-white/20 hover:bg-gold/20 hover:border-gold/40 transition-all duration-300 cursor-pointer"
+                      >
                         <Play className="w-5 h-5" />
                         <span className="font-light">Preview do Curso</span>
-                      </div>
+                      </button>
                     </div>
                     
                     {/* Floating Glow Effect */}
@@ -943,6 +1007,91 @@ const CoursePublicView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Preview */}
+      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Play className="w-5 h-5 text-gold" />
+              Preview do Curso: {firstContent?.title || 'Conteúdo'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {firstContent && (
+            <div className="space-y-4">
+              {firstContent.content_type === 'video_externo' && firstContent.content_data?.url && (() => {
+                const videoUrl = firstContent.content_data.url;
+                let embedUrl: string | null = null;
+                
+                if (videoUrl) {
+                  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                    embedUrl = getYouTubeEmbedUrl(videoUrl);
+                  } else if (videoUrl.includes('vimeo.com')) {
+                    embedUrl = getVimeoEmbedUrl(videoUrl);
+                  } else {
+                    embedUrl = videoUrl;
+                  }
+                }
+                
+                return embedUrl ? (
+                  <div className="aspect-video">
+                    <iframe
+                      src={embedUrl}
+                      className="w-full h-full rounded-lg"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={firstContent.title}
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-black rounded-lg flex items-center justify-center">
+                    <p className="text-white">Não foi possível carregar o vídeo</p>
+                  </div>
+                );
+              })()}
+              
+              {firstContent.content_type === 'texto_rico' && firstContent.rich_text && (
+                <div 
+                  className="prose prose-sm max-w-none dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: firstContent.rich_text }}
+                />
+              )}
+              
+              {firstContent.content_type === 'pdf' && firstContent.pdf_url && (
+                <div className="text-center p-8 border-2 border-dashed border-border rounded-lg">
+                  <FileIcon className="w-12 h-12 text-gold mx-auto mb-4" />
+                  <p className="text-foreground font-medium mb-2">{firstContent.title}</p>
+                  <p className="text-muted-foreground text-sm mb-4">Arquivo PDF disponível no curso completo</p>
+                  <Button 
+                    onClick={() => window.open(firstContent.pdf_url, '_blank')}
+                    className="bg-gold hover:bg-gold-dark text-background"
+                  >
+                    Visualizar PDF
+                  </Button>
+                </div>
+              )}
+              
+              <div className="text-center pt-4 border-t border-border">
+                <p className="text-muted-foreground text-sm mb-4">
+                  Este é apenas um preview. Adquira o curso completo para acessar todo o conteúdo.
+                </p>
+                <Button 
+                  onClick={() => {
+                    setShowPreviewModal(false);
+                    // Scroll para o botão de compra
+                    const checkoutSection = document.querySelector('.lg\\:col-span-1');
+                    checkoutSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-gold hover:bg-gold-dark text-background"
+                >
+                  {courseData?.is_paid ? 'Comprar Curso Completo' : 'Inscrever-se Gratuitamente'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

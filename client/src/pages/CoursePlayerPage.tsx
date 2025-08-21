@@ -502,7 +502,7 @@ const CoursePlayerPage = () => {
   const [currentConteudo, setCurrentConteudo] = useState<ConteudoItemLocal | null>(null);
   const [conteudosConcluidos, setConteudosConcluidos] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState(0);
-  const [hasAccess, setHasAccess] = useState(false);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null); // null = verificando, true = tem acesso, false = sem acesso
   const [isCurrentContentCompleted, setIsCurrentContentCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
@@ -631,26 +631,20 @@ const CoursePlayerPage = () => {
           });
 
           if (enrollmentError || !enrollment) {
+            console.log('❌ CoursePlayerPage: Usuário não matriculado');
             setError("Você não está matriculado neste curso.");
             setHasAccess(false);
             setLoading(false);
-            toast({
-              title: "Acesso negado",
-              description: "Você precisa estar matriculado para acessar este curso.",
-              variant: "destructive"
-            });
+            // Toast será exibido apenas quando o componente renderizar o estado de erro
             return;
           }
 
           if (enrollment.status !== 'active') {
+            console.log('❌ CoursePlayerPage: Matrícula inativa:', enrollment.status);
             setError("Sua matrícula está pendente. Complete o pagamento para acessar o curso.");
             setHasAccess(false);
             setLoading(false);
-            toast({
-              title: "Pagamento pendente",
-              description: "Complete o pagamento para acessar o conteúdo do curso.",
-              variant: "destructive"
-            });
+            // Toast será exibido apenas quando o componente renderizar o estado de erro
             return;
           }
 
@@ -1059,9 +1053,30 @@ const CoursePlayerPage = () => {
     }
   };
 
-  if (loading) return <LoadingComponent message="Carregando curso" variant="full-screen" />;
+  // Mostrar loading enquanto verifica acesso ou carrega dados
+  if (loading || hasAccess === null) {
+    return <LoadingComponent message="Carregando curso" variant="full-screen" />;
+  }
   
-  if (error) {
+  // Mostrar erro apenas quando definitivamente não tem acesso
+  if (error && hasAccess === false) {
+    // Mostrar toast apenas uma vez quando o erro é estabelecido
+    React.useEffect(() => {
+      if (error.includes('não está matriculado')) {
+        toast({
+          title: "Acesso negado",
+          description: "Você precisa estar matriculado para acessar este curso.",
+          variant: "destructive"
+        });
+      } else if (error.includes('pendente')) {
+        toast({
+          title: "Pagamento pendente",
+          description: "Complete o pagamento para acessar o conteúdo do curso.",
+          variant: "destructive"
+        });
+      }
+    }, [error]);
+
     return (
       <div className="flex justify-center items-center h-screen">
         <Card className="w-96">
