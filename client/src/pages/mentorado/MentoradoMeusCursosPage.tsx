@@ -367,15 +367,11 @@ const MentoradoMeusCursosPage = () => {
           <div className="pt-0 md:pt-0">
             <div className="mb-6 md:mb-8">
               <h1 className="text-2xl md:text-4xl font-bold mb-2 text-gold">Meus Cursos</h1>
-              <p className="text-gray-300 text-base md:text-lg mb-4 md:mb-0">Cursos que foram adquiridos por mim</p>
-              <div className="block md:hidden">
-                <Button onClick={() => navigate('/courses')} className="w-full sm:w-auto">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
-                </Button>
-              </div>
+              <p className="text-gray-300 text-base md:text-lg">Cursos que foram adquiridos por mim</p>
             </div>
           
-            <div className="mb-8 hidden md:flex flex-row justify-end items-center">
+            <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div></div>
               <Button onClick={() => navigate('/courses')}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Explorar Mais Cursos
               </Button>

@@ -19,7 +19,21 @@ const getYouTubeEmbedUrl = (url: string): string | null => {
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(youtubeRegex);
   if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}`;
+    // Parâmetros para esconder branding do YouTube e melhorar a experiência
+    const params = new URLSearchParams({
+      'modestbranding': '1',        // Remove logo do YouTube
+      'rel': '0',                   // Não mostra vídeos relacionados
+      'showinfo': '0',              // Remove informações do vídeo
+      'controls': '1',              // Mantém controles básicos (play, pause, volume, velocidade)
+      'disablekb': '1',             // Desabilita controles do teclado
+      'fs': '0',                    // Remove botão de tela cheia
+      'iv_load_policy': '3',        // Remove anotações
+      'cc_load_policy': '0',        // Remove legendas automáticas
+      'playsinline': '1',           // Reproduz inline no mobile
+      'widget_referrer': window.location.origin // Define referrer para analytics
+    });
+    
+    return `https://www.youtube.com/embed/${match[1]}?${params.toString()}`;
   }
   return null;
 };
@@ -87,8 +101,8 @@ const ContentRenderer: React.FC<{
           
           if (embedUrl) {
             return (
-              <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0 pt-[15px] md:pt-0">
-                <div className="w-full h-full md:w-full md:h-full">
+              <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0 pt-[15px] md:pt-2">
+                <div className="w-full h-full md:w-full md:h-full md:-mt-[55px]">
                   <iframe
                     src={embedUrl}
                     className="w-full h-full"
@@ -211,44 +225,46 @@ const ContentRenderer: React.FC<{
 
       {/* Desktop Floating Navigation - Sobreposto ao vídeo - Apenas versão web */}
       <div className="hidden md:block absolute bottom-[75px] left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-2xl px-8 py-3 min-w-[600px]">
-          <div className="flex items-center justify-between gap-6">
+        <div className="bg-gradient-to-br from-slate-900/70 via-slate-800/70 to-slate-900/70 backdrop-blur-md border border-slate-700/30 rounded-lg shadow-xl px-4 py-2 min-w-[400px]">
+          <div className="flex items-center justify-between gap-3">
             {/* Botão Comentários */}
             <button
               onClick={() => setShowCommentsModal(true)}
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-9 px-4 py-2 bg-slate-800/80 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700/80"
+              className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-xs font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border h-7 px-3 py-1 bg-slate-800/60 border-slate-600/50 text-gray-300 hover:text-white hover:bg-slate-700/60"
             >
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-3 h-3" />
               Comentários
             </button>
             
             {/* Botões de navegação - Centro */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button 
                 variant="outline" 
                 onClick={onPreviousContent}
-                className="bg-slate-800/80 border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700/80 h-9 px-4"
+                size="sm"
+                className="bg-slate-800/60 border-slate-600/50 text-gray-300 hover:text-white hover:bg-slate-700/60 h-7 px-3 text-xs transition-all duration-200"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" />
+                <ChevronLeft className="w-3 h-3 mr-1" />
                 Anterior
               </Button>
               
               <Button 
                  onClick={onNextContent}
-                 className="bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-lg hover:shadow-xl transition-all duration-300 h-9 px-4"
+                 size="sm"
+                 className="bg-gradient-to-r from-gold via-gold-light to-gold text-slate-900 hover:from-gold-light hover:to-gold-dark font-medium shadow-md hover:shadow-lg transition-all duration-200 h-7 px-3 text-xs"
                >
                  Próximo
-                 <ChevronRight className="w-4 h-4 ml-2" />
+                 <ChevronRight className="w-3 h-3 ml-1" />
                </Button>
             </div>
             
             {/* Botão Concluir */}
             <button
               onClick={onToggleCurrentContentCompleted}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-slate-700/80 rounded-md transition-colors shadow-sm border border-slate-600 h-9 whitespace-nowrap"
+              className="flex items-center gap-1 px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-slate-700/60 rounded-md transition-all duration-200 shadow-sm border border-slate-600/50 h-7 whitespace-nowrap"
               title={isCurrentContentCompleted ? "Desmarcar como concluído" : "Concluir conteúdo"}
             >
-              <Check className={`w-4 h-4 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
+              <Check className={`w-3 h-3 ${isCurrentContentCompleted ? 'text-green-400' : 'text-gray-400'}`} />
               <span>
                 {isCurrentContentCompleted ? "Concluído" : "Concluir"}
               </span>

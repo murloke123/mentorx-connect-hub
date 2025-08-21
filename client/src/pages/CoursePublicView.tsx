@@ -1,17 +1,17 @@
 import {
-  Award,
-  BookOpen,
-  CheckCircle,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  FileIcon,
-  FileText,
-  MessageCircle,
-  Play,
-  Star,
-  User,
-  Zap
+    Award,
+    BookOpen,
+    CheckCircle,
+    ChevronDown,
+    ChevronRight,
+    Clock,
+    FileIcon,
+    FileText,
+    MessageCircle,
+    Play,
+    Star,
+    User,
+    Zap
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
