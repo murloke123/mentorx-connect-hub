@@ -122,6 +122,7 @@ const AppContent = () => {
           } />
           <Route path="/mentors-mobile" element={<MentorsMobilePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/document-test" element={<DocumentTestPage />} />
           <Route path="/contador-test" element={<ContadorTestPage />} />

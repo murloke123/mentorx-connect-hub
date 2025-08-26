@@ -145,6 +145,9 @@ const CoursePublicView: React.FC = () => {
   });
 
   useEffect(() => {
+    // Garantir que a página carregue no topo
+    window.scrollTo(0, 0);
+    
     const loadData = async () => {
       if (!courseId) return;
       

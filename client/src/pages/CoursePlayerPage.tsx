@@ -702,6 +702,9 @@ const CoursePlayerPage = () => {
   };
 
   useEffect(() => {
+    // Garantir que a página carregue no topo
+    window.scrollTo(0, 0);
+    
     if (!cursoId) {
       setError("ID do curso não encontrado.");
       setLoading(false);

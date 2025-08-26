@@ -37,6 +37,7 @@ const LoginPage = () => {
   const from = location.state?.from?.pathname || null;
 
   // useEffect para capturar email e mensagem passados via state (ex: após reset de senha)
+  // e detectar se veio da rota /register para mostrar o card de cadastro
   useEffect(() => {
     if (location.state?.email) {
       setEmail(location.state.email);
@@ -51,7 +52,14 @@ const LoginPage = () => {
       // Limpar o state para evitar mostrar a mensagem novamente
       window.history.replaceState({}, document.title);
     }
-  }, [location.state, toast]);
+
+    // Se veio da rota /register, mostrar automaticamente o card de cadastro
+    if (location.pathname === '/register') {
+      setIsSignUp(true);
+      // Garantir que a página carregue no topo
+      window.scrollTo(0, 0);
+    }
+  }, [location.state, location.pathname, toast]);
 
   // Função para redirecionar baseado no role e página de origem
   const redirectAfterLogin = (userRole: string) => {
