@@ -721,9 +721,25 @@ const CoursePlayerPage = () => {
           return;
         }
         
-        // Se o curso é gratuito e o usuário não está logado, permitir acesso
+        // Se o curso é gratuito e o usuário não está logado, verificar se preencheu dados do lead
         if (!data.is_paid && !user) {
-          console.log('✅ CoursePlayerPage: Curso gratuito, permitindo acesso sem login');
+          console.log('🔍 CoursePlayerPage: Curso gratuito sem login, verificando lead...');
+          
+          // Verificar se existe token de lead no localStorage
+          const leadToken = localStorage.getItem(`lead_access_${cursoId}`);
+          
+          if (!leadToken) {
+            console.log('❌ CoursePlayerPage: Lead não capturado, redirecionando para página pública');
+            setError("Para assistir este curso gratuito, você precisa preencher seus dados na página do curso.");
+            setLoading(false);
+            // Redirecionar para a página pública do curso
+            setTimeout(() => {
+              window.location.href = `/curso/${cursoId}`;
+            }, 2000);
+            return;
+          }
+          
+          console.log('✅ CoursePlayerPage: Lead capturado, permitindo acesso');
           setHasAccess(true);
           setCurso(data);
           

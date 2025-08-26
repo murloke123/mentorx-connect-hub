@@ -18,6 +18,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import ModuleItem from '../components/ModuleItem';
 import { toast } from '../hooks/use-toast';
 import { CursoItemLocal, getCursoCompleto } from '../services/coursePlayerService';
@@ -121,6 +123,12 @@ const CoursePublicView: React.FC = () => {
   const [firstContent, setFirstContent] = useState<any>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [hasAccessedFreeCourse, setHasAccessedFreeCourse] = useState(false);
+  const [leadData, setLeadData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [leadError, setLeadError] = useState('');
   const [landingData, setLandingData] = useState<LandingPageData>({
     headline: "Domine as Habilidades que Vão Transformar Sua Carreira",
     subheadline: "Um curso prático e direto ao ponto para você alcançar resultados reais em tempo recorde",
@@ -273,6 +281,28 @@ const CoursePublicView: React.FC = () => {
     }
   };
 
+  const saveLead = async (leadInfo: { name: string; email: string; phone: string }) => {
+    if (!courseData || !mentorData) return;
+
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .insert({
+          course_id: courseData.id,
+          course_name: courseData.title,
+          mentor_name: mentorData.full_name || 'Mentor',
+          lead_name: leadInfo.name,
+          lead_email: leadInfo.email,
+          lead_phone: leadInfo.phone
+        });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Erro ao salvar lead:', error);
+      throw error;
+    }
+  };
+
   const handleStartFreeCourse = async () => {
     if (!courseId) return;
 
@@ -309,6 +339,38 @@ const CoursePublicView: React.FC = () => {
       });
     } finally {
       setProcessingEnrollment(false);
+    }
+  };
+
+  const handleStartWatching = async () => {
+    // Validar se todos os campos estão preenchidos
+    if (!leadData.name.trim() || !leadData.email.trim() || !leadData.phone.trim()) {
+      setLeadError('Você precisa preencher nome, email e telefone para poder assistir o curso gratuitamente');
+      return;
+    }
+
+    // Limpar erro
+    setLeadError('');
+
+    try {
+      // Salvar lead na tabela
+      await saveLead(leadData);
+      
+      // Salvar token no localStorage para permitir acesso ao curso
+      if (courseId) {
+        localStorage.setItem(`lead_access_${courseId}`, 'true');
+        console.log('✅ Token de acesso salvo no localStorage para curso:', courseId);
+      }
+      
+      // Fechar modal e redirecionar
+      setShowWelcomeModal(false);
+      navigate(`/cursoplayer/${courseId}`);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao processar seus dados. Tente novamente.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -1090,38 +1152,81 @@ const CoursePublicView: React.FC = () => {
               </p>
               
               <p className="text-muted-foreground text-sm">
-                Obrigado pela confiança! Você não precisa se logar na plataforma para assistir o conteúdo.
+                Para começar a assistir, precisamos de algumas informações:
               </p>
               
-              <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">
-                <p className="text-foreground text-sm mb-2">
-                  Porém, se você quiser ter acesso a mais conteúdos, você pode realizar seu cadastro na plataforma:
-                </p>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="border-gold text-gold hover:bg-gold hover:text-background"
-                  onClick={() => {
-                    setShowWelcomeModal(false);
-                    navigate('/register');
-                  }}
-                >
-                  Cadastro
-                </Button>
+              {/* Formulário de Lead */}
+              <div className="space-y-3 text-left">
+                <div>
+                  <Label htmlFor="lead-name" className="text-sm font-medium">
+                    Nome completo *
+                  </Label>
+                  <Input
+                    id="lead-name"
+                    type="text"
+                    placeholder="Digite seu nome completo"
+                    value={leadData.name}
+                    onChange={(e) => setLeadData(prev => ({ ...prev, name: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="lead-email" className="text-sm font-medium">
+                    E-mail *
+                  </Label>
+                  <Input
+                    id="lead-email"
+                    type="email"
+                    placeholder="Digite seu e-mail"
+                    value={leadData.email}
+                    onChange={(e) => setLeadData(prev => ({ ...prev, email: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="lead-phone" className="text-sm font-medium">
+                    Telefone *
+                  </Label>
+                  <Input
+                    id="lead-phone"
+                    type="tel"
+                    placeholder="Digite seu telefone"
+                    value={leadData.phone}
+                    onChange={(e) => setLeadData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
               </div>
               
-              <p className="text-muted-foreground text-sm">
-                Ou apenas clique em OK para começar a assistir o conteúdo.
-              </p>
+              {/* Mensagem de erro */}
+              {leadError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-red-600 text-sm">{leadError}</p>
+                </div>
+              )}
+              
+              <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">
+                <p className="text-foreground text-sm">
+                  Se você quiser ter acesso a mais conteúdos, você pode realizar seu{' '}
+                  <span 
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer underline font-medium"
+                    onClick={() => {
+                      setShowWelcomeModal(false);
+                      navigate('/register');
+                    }}
+                  >
+                    cadastro na plataforma
+                  </span>
+                  .
+                </p>
+              </div>
             </div>
             
             <Button 
               className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-background font-bold"
-              onClick={() => {
-                 setShowWelcomeModal(false);
-                 // Redirecionar para o Course Player
-                 navigate(`/cursoplayer/${courseId}`);
-               }}
+              onClick={handleStartWatching}
             >
               OK - Começar a Assistir
             </Button>
