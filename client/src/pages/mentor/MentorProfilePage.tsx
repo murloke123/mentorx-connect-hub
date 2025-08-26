@@ -216,8 +216,11 @@ const MentorProfilePage = () => {
     // Combinar código do país com o número de telefone
     const fullPhoneNumber = `${countryCode}${cleanPhone}`;
     
-    // Abrir WhatsApp Web em nova guia
-    const whatsappUrl = `https://wa.me/${fullPhoneNumber}`;
+    // Mensagem pré-carregada
+    const message = encodeURIComponent("Olá, vim através da plataforma Mentora Ai e preciso falar com você.");
+    
+    // Abrir WhatsApp Web em nova guia com mensagem pré-carregada
+    const whatsappUrl = `https://wa.me/${fullPhoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -1533,6 +1536,7 @@ const MentorProfilePage = () => {
                     mentorId={currentUser?.id}
                     mentorName={currentUser?.full_name || 'Mentor'}
                     isClickable={true}
+                    smallSquaresProfile={true}
                     onAppointmentChange={handleAppointmentChange}
                   />
                 </div>

@@ -47,7 +47,7 @@ interface CourseInfo {
   title: string;
   description: string;
   image_url: string | null;
-  price: number;
+  price: number | null;
   total_modules: number;
   total_contents: number;
 }
@@ -454,7 +454,7 @@ const MentorCursoInscricoesPage = () => {
                     </span>
                     <span className="flex items-center gap-1 text-gold">
                       <DollarSign className="w-4 h-4" />
-                      R$ {courseInfo.price.toFixed(2)}
+                      R$ {courseInfo.price ? courseInfo.price.toFixed(2) : '0.00'}
                     </span>
                   </div>
                 </div>
@@ -681,7 +681,10 @@ const MentorCursoInscricoesPage = () => {
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                onClick={() => window.open(`https://wa.me/${student.student_phone?.replace(/\D/g, '')}`, '_blank')}
+                                onClick={() => {
+                                  const message = encodeURIComponent("Olá, vim através da plataforma Mentora Ai e preciso falar com você.");
+                                  window.open(`https://wa.me/${student.student_phone?.replace(/\D/g, '')}?text=${message}`, '_blank');
+                                }}
                               >
                                 <MessageSquare className="w-4 h-4 mr-2" />
                                 WhatsApp

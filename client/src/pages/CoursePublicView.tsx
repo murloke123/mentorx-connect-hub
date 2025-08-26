@@ -14,10 +14,11 @@ import {
     X,
     Zap
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import ModuleItem from '../components/ModuleItem';
 import { toast } from '../hooks/use-toast';
 import { CursoItemLocal, getCursoCompleto } from '../services/coursePlayerService';
 import { createFreeEnrollment, redirectAfterEnrollment } from '../services/courseService';
@@ -118,6 +119,8 @@ const CoursePublicView: React.FC = () => {
   const [processingEnrollment, setProcessingEnrollment] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [firstContent, setFirstContent] = useState<any>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [hasAccessedFreeCourse, setHasAccessedFreeCourse] = useState(false);
   const [landingData, setLandingData] = useState<LandingPageData>({
     headline: "Domine as Habilidades que Vão Transformar Sua Carreira",
     subheadline: "Um curso prático e direto ao ponto para você alcançar resultados reais em tempo recorde",
@@ -138,70 +141,41 @@ const CoursePublicView: React.FC = () => {
       if (!courseId) return;
       
       try {
-        // Carregar usuário atual
-        const { data: { user } } = await supabase.auth.getUser();
+        // Carregar apenas dados essenciais primeiro para mostrar a página rapidamente
+        const [userResult, courseResult] = await Promise.all([
+          supabase.auth.getUser(),
+          supabase.from('cursos').select('*').eq('id', courseId).single()
+        ]);
+
+        const { data: { user } } = userResult;
+        const { data: course, error: courseError } = courseResult;
+
+        if (courseError) throw courseError;
+        setCourseData(course);
+
+        // Carregar dados básicos do usuário se logado
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
+          
           setCurrentUser(profile);
-
-          // Verificar se já está matriculado (apenas matrículas ativas)
-          const { data: enrollment, error: enrollmentError } = await supabase
-            .from('matriculas')
+          
+          // Verificar matrícula em background (não bloqueia o loading)
+          supabase.from('matriculas')
             .select('*')
             .eq('course_id', courseId)
             .eq('student_id', user.id)
             .eq('status', 'active')
-            .single();
-          
-          setIsEnrolled(!!enrollment && !enrollmentError);
+            .single()
+            .then(({ data: enrollment, error: enrollmentError }) => {
+              setIsEnrolled(!!enrollment && !enrollmentError);
+            });
         }
 
-        // Carregar dados básicos do curso
-        const { data: course, error: courseError } = await supabase
-          .from('cursos')
-          .select('*')
-          .eq('id', courseId)
-          .single();
-
-        if (courseError) throw courseError;
-        setCourseData(course);
-
-        // Carregar dados do mentor
-        if (course.mentor_id) {
-          const { data: mentor, error: mentorError } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, bio, highlight_message')
-            .eq('id', course.mentor_id)
-            .single();
-
-          if (!mentorError && mentor) {
-            setMentorData(mentor);
-          }
-        }
-
-        // Carregar dados completos do curso com módulos e conteúdos
-        const realCourse = await getCursoCompleto(courseId);
-        setRealCourseData(realCourse);
-
-        // Buscar o primeiro conteúdo do curso para o preview
-        if (realCourse && realCourse.modulos.length > 0) {
-          const firstModule = realCourse.modulos[0];
-          console.log('First module:', firstModule);
-          if (firstModule.conteudos && firstModule.conteudos.length > 0) {
-            const firstContentItem = firstModule.conteudos[0];
-            console.log('First content item:', firstContentItem);
-            console.log('Content type:', firstContentItem.content_type);
-            console.log('Video URL:', firstContentItem.video_url);
-            console.log('Content data:', firstContentItem.content_data);
-            setFirstContent(firstContentItem);
-          }
-        }
-
-        // Carregar dados da landing page
+        // Carregar dados da landing page (essencial para exibição)
         const { data: landingPage } = await supabase
           .from('course_landing_pages')
           .select('layout_body')
@@ -209,9 +183,40 @@ const CoursePublicView: React.FC = () => {
           .single();
 
         if (landingPage?.layout_body) {
-          const loadedData = { ...landingData, ...landingPage.layout_body };
-          setLandingData(loadedData);
+          setLandingData(prev => ({ ...prev, ...landingPage.layout_body }));
         }
+
+        // Finalizar loading aqui para mostrar a página rapidamente
+        setIsLoading(false);
+
+        // Carregar dados secundários em background
+        Promise.all([
+          // Dados do mentor
+          course.mentor_id ? 
+            supabase.from('profiles')
+              .select('id, full_name, avatar_url, bio, highlight_message')
+              .eq('id', course.mentor_id)
+              .single() : 
+            Promise.resolve({ data: null, error: null }),
+          // Dados completos do curso
+          getCursoCompleto(courseId)
+        ]).then(([mentorResult, realCourse]) => {
+          // Processar dados do mentor
+          const { data: mentor, error: mentorError } = mentorResult;
+          if (!mentorError && mentor) {
+            setMentorData(mentor);
+          }
+
+          // Processar dados do curso
+          setRealCourseData(realCourse);
+
+          // Buscar o primeiro conteúdo para preview
+          if (realCourse?.modulos?.[0]?.conteudos?.[0]) {
+            setFirstContent(realCourse.modulos[0].conteudos[0]);
+          }
+        }).catch(error => {
+          console.error('Erro ao carregar dados secundários:', error);
+        });
 
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -220,7 +225,6 @@ const CoursePublicView: React.FC = () => {
           description: "Não foi possível carregar os dados do curso",
           variant: "destructive"
         });
-      } finally {
         setIsLoading(false);
       }
     };
@@ -270,33 +274,31 @@ const CoursePublicView: React.FC = () => {
   };
 
   const handleStartFreeCourse = async () => {
-    if (!currentUser) {
-      toast({
-        title: "Login necessário",
-        description: "Você precisa estar logado para se inscrever",
-        variant: "destructive"
-      });
-      navigate('/login');
-      return;
-    }
-
     if (!courseId) return;
 
     setProcessingEnrollment(true);
     
     try {
-      await createFreeEnrollment(courseId, currentUser.id);
-      triggerEnrollmentConfetti();
+      // Se o usuário está logado, criar matrícula normal
+      if (currentUser) {
+        await createFreeEnrollment(courseId, currentUser.id);
+        triggerEnrollmentConfetti();
 
-      toast({
-        title: "Sucesso!",
-        description: "Que bom que você adquiriu este curso gratuito! Aproveite!",
-        variant: "default"
-      });
-      
-      setTimeout(async () => {
-        await redirectAfterEnrollment(currentUser.id, navigate);
-      }, 2000);
+        toast({
+          title: "Sucesso!",
+          description: "Que bom que você adquiriu este curso gratuito! Aproveite!",
+          variant: "default"
+        });
+        
+        setTimeout(async () => {
+          await redirectAfterEnrollment(currentUser.id, navigate);
+        }, 2000);
+      } else {
+        // Se não está logado, permitir acesso direto para cursos gratuitos
+        triggerEnrollmentConfetti();
+        setHasAccessedFreeCourse(true);
+        setShowWelcomeModal(true);
+      }
       
     } catch (error: any) {
       console.error('Erro ao se inscrever:', error);
@@ -310,7 +312,7 @@ const CoursePublicView: React.FC = () => {
     }
   };
 
-  const toggleModule = (moduleIndex: number) => {
+  const toggleModule = useCallback((moduleIndex: number) => {
     setExpandedModules(prev => {
       const newSet = new Set(prev);
       if (newSet.has(moduleIndex)) {
@@ -320,13 +322,13 @@ const CoursePublicView: React.FC = () => {
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const toggleDescription = () => {
+  const toggleDescription = useCallback(() => {
     setIsDescriptionExpanded(prev => !prev);
-  };
+  }, []);
 
-  const handlePreviewClick = () => {
+  const handlePreviewClick = useCallback(() => {
     if (firstContent) {
       setShowPreviewModal(true);
     } else {
@@ -336,15 +338,15 @@ const CoursePublicView: React.FC = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [firstContent]);
 
-  const truncateDescription = (text: string, maxLength: number = 150) => {
+  const truncateDescription = useCallback((text: string, maxLength: number = 150) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + '...';
-  };
+  }, []);
 
-  // Função para calcular estatísticas de conteúdo
-  const getContentStats = () => {
+  // Memoizar estatísticas de conteúdo para evitar recálculos desnecessários
+  const contentStats = useMemo(() => {
     if (!realCourseData) return { videos: 0, texts: 0, pdfs: 0 };
     
     let videos = 0;
@@ -368,7 +370,7 @@ const CoursePublicView: React.FC = () => {
     });
     
     return { videos, texts, pdfs };
-  };
+  }, [realCourseData]);
 
   if (isLoading) {
     return (
@@ -448,8 +450,6 @@ const CoursePublicView: React.FC = () => {
     );
   }
 
-  const contentStats = getContentStats();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background relative overflow-hidden">
       {/* Background Premium */}
@@ -458,9 +458,9 @@ const CoursePublicView: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40"></div>
       </div>
 
-      {/* Floating Particles */}
+      {/* Floating Particles - Reduced for performance */}
       <div className="absolute inset-0 z-10">
-        {[...Array(15)].map((_, i) => (
+        {[...Array(8)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-gold/20 rounded-full float"
@@ -481,12 +481,13 @@ const CoursePublicView: React.FC = () => {
             <div className="max-w-7xl mx-auto">
               {/* Título Principal com tag premium posicionada */}
               <div className="text-center mb-4 md:mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-sm border border-gold/20 shadow-xl">
-                {/* Vídeo de fundo apenas para o título */}
+                {/* Vídeo de fundo apenas para o título - Otimizado */}
                 <video
                    autoPlay
                    loop
                    muted
                    playsInline
+                   preload="metadata"
                    className="absolute inset-0 w-full h-full object-cover opacity-40 z-0"
                  >
                   <source src="https://cdn.pixabay.com/video/2019/10/09/27669-365224683_large.mp4" type="video/mp4" />
@@ -770,40 +771,13 @@ const CoursePublicView: React.FC = () => {
                       <div className="space-y-3">
                         <h4 className="font-semibold text-foreground mb-4">Módulos do Curso</h4>
                         {realCourseData.modulos.map((modulo, moduleIndex) => (
-                          <div key={modulo.id} className="border border-border/50 rounded-lg overflow-hidden">
-                            <button
-                              onClick={() => toggleModule(moduleIndex)}
-                              className="w-full p-4 text-left bg-muted/20 hover:bg-muted/30 transition-colors flex items-center justify-between"
-                            >
-                              <div className="flex items-center gap-3">
-                                <BookOpen className="w-5 h-5 text-gold" />
-                                <span className="font-medium text-foreground">{modulo.title}</span>
-                                <span className="text-sm text-muted-foreground">
-                                  ({modulo.conteudos.length} {modulo.conteudos.length === 1 ? 'item' : 'itens'})
-                                </span>
-                              </div>
-                              {expandedModules.has(moduleIndex) ? (
-                                <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                              )}
-                            </button>
-                            
-                            {expandedModules.has(moduleIndex) && (
-                              <div className="p-4 bg-card/30 border-t border-border/50">
-                                <div className="space-y-2">
-                                  {modulo.conteudos.map((conteudo) => (
-                                    <div key={conteudo.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted/20 transition-colors">
-                                      {conteudo.content_type === 'video_externo' && <Play className="w-4 h-4 text-gold" />}
-                                       {conteudo.content_type === 'texto_rico' && <FileText className="w-4 h-4 text-gold" />}
-                                       {conteudo.content_type === 'pdf' && <FileIcon className="w-4 h-4 text-gold" />}
-                                       <span className="text-sm text-foreground">{conteudo.title}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                          <ModuleItem
+                            key={modulo.id}
+                            modulo={modulo}
+                            moduleIndex={moduleIndex}
+                            isExpanded={expandedModules.has(moduleIndex)}
+                            onToggle={toggleModule}
+                          />
                         ))}
                       </div>
                     )}
@@ -976,7 +950,11 @@ const CoursePublicView: React.FC = () => {
                       <Button 
                         className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-background font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 mb-4"
                         disabled={processingPayment || processingEnrollment}
-                        onClick={courseData.is_paid ? handlePurchase : handleStartFreeCourse}
+                        onClick={courseData.is_paid ? handlePurchase : 
+                           (hasAccessedFreeCourse ? () => {
+                             // Redirecionar diretamente para o Course Player
+                             navigate(`/cursoplayer/${courseId}`);
+                           } : handleStartFreeCourse)}
                       >
                         {processingPayment ? (
                           <>
@@ -989,7 +967,8 @@ const CoursePublicView: React.FC = () => {
                             Inscrevendo...
                           </>
                         ) : (
-                          courseData.is_paid ? 'Comprar Agora' : 'Inscrever-se Gratuitamente'
+                          courseData.is_paid ? 'Comprar Agora' : 
+                          (hasAccessedFreeCourse ? 'Assistir Gratuitamente' : 'Assistir Gratuitamente')
                         )}
                       </Button>
                     )}
@@ -1090,6 +1069,63 @@ const CoursePublicView: React.FC = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Boas-vindas para Curso Gratuito */}
+      <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-gold mb-4">
+              🎉 Bem-vindo(a)!
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="text-center space-y-4">
+            <div className="text-6xl mb-4">🎊</div>
+            
+            <div className="space-y-3">
+              <p className="text-foreground font-medium">
+                O conteúdo já está pronto para você!
+              </p>
+              
+              <p className="text-muted-foreground text-sm">
+                Obrigado pela confiança! Você não precisa se logar na plataforma para assistir o conteúdo.
+              </p>
+              
+              <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">
+                <p className="text-foreground text-sm mb-2">
+                  Porém, se você quiser ter acesso a mais conteúdos, você pode realizar seu cadastro na plataforma:
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-gold text-gold hover:bg-gold hover:text-background"
+                  onClick={() => {
+                    setShowWelcomeModal(false);
+                    navigate('/register');
+                  }}
+                >
+                  Cadastro
+                </Button>
+              </div>
+              
+              <p className="text-muted-foreground text-sm">
+                Ou apenas clique em OK para começar a assistir o conteúdo.
+              </p>
+            </div>
+            
+            <Button 
+              className="w-full bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:from-gold-dark hover:via-gold hover:to-gold-light text-background font-bold"
+              onClick={() => {
+                 setShowWelcomeModal(false);
+                 // Redirecionar para o Course Player
+                 navigate(`/cursoplayer/${courseId}`);
+               }}
+            >
+              OK - Começar a Assistir
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

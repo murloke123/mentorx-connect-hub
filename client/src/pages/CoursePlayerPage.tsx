@@ -10,9 +10,35 @@ import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } 
 import { triggerSuccessConfetti } from '@/utils/confetti';
 import { supabase } from '@/utils/supabase';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Menu, MessageSquare, Video, X } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Menu, MessageSquare, Video, X, LogIn } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+
+// Hook para detectar orientação da tela
+const useOrientation = () => {
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobileDevice = window.innerWidth < 768; // md breakpoint
+      const isLandscapeMode = window.innerWidth > window.innerHeight;
+      setIsMobile(isMobileDevice);
+      setIsLandscape(isLandscapeMode && isMobileDevice);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
+  return { isLandscape, isMobile };
+};
 
 // Função para converter URLs do YouTube para embed
 const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -55,13 +81,15 @@ const ContentRenderer: React.FC<{
   onPreviousContent: () => void;
   isCurrentContentCompleted: boolean;
   onToggleCurrentContentCompleted: () => void;
+  isLandscapeFullscreen?: boolean;
 }> = ({ 
   currentConteudo, 
   modulos, 
   onNextContent, 
   onPreviousContent,
   isCurrentContentCompleted,
-  onToggleCurrentContentCompleted
+  onToggleCurrentContentCompleted,
+  isLandscapeFullscreen = false
 }) => {
   const { toast } = useToast();
   const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -100,6 +128,21 @@ const ContentRenderer: React.FC<{
           console.log('🔗 URL convertida:', { original: videoUrl, embed: embedUrl, provider });
           
           if (embedUrl) {
+            // Se estiver em landscape fullscreen no mobile, mostrar vídeo em tela cheia
+            if (isLandscapeFullscreen) {
+              return (
+                <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+                  <iframe
+                    src={embedUrl}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={currentConteudo.title}
+                  />
+                </div>
+              );
+            }
+            
             return (
               <div className="bg-black h-[calc(100vh-16rem)] md:h-full flex items-center justify-center p-0 pt-[15px] md:pt-2">
                 <div className="w-full h-full md:w-full md:h-full md:-mt-[55px]">
@@ -157,6 +200,15 @@ const ContentRenderer: React.FC<{
         return <div className="p-8 text-center text-gray-500">Tipo de conteúdo não suportado</div>;
     }
   };
+
+  // Se estiver em landscape fullscreen, mostrar apenas o conteúdo
+  if (isLandscapeFullscreen) {
+    return (
+      <div className="w-full h-full">
+        {renderContent()}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full relative">
@@ -307,6 +359,44 @@ const ContentRenderer: React.FC<{
   );
 };
 
+// Componente de Dialog para Login
+const LoginRequiredDialog: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  feature: string;
+}> = ({ isOpen, onClose, feature }) => {
+  const navigate = useNavigate();
+  
+  const handleLogin = () => {
+    navigate('/login');
+  };
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <LogIn className="w-5 h-5" />
+            Login Necessário
+          </DialogTitle>
+          <DialogDescription>
+            Para {feature}, você precisa estar logado em sua conta.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-3 mt-4">
+          <Button onClick={handleLogin} className="w-full">
+            <LogIn className="w-4 h-4 mr-2" />
+            Fazer Login
+          </Button>
+          <Button variant="outline" onClick={onClose} className="w-full">
+            Continuar Assistindo
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const CourseSidebar: React.FC<{
   modulos: ModuloItemLocal[];
   currentConteudo: ConteudoItemLocal | null;
@@ -320,6 +410,7 @@ const CourseSidebar: React.FC<{
   hasNextContent: boolean;
   isOpen?: boolean;
   onClose?: () => void;
+  isUserLoggedIn: boolean;
 }> = ({ 
   modulos, 
   currentConteudo, 
@@ -332,10 +423,13 @@ const CourseSidebar: React.FC<{
   hasPreviousContent,
   hasNextContent,
   isOpen = true,
-  onClose
+  onClose,
+  isUserLoggedIn
 }) => {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [loginFeature, setLoginFeature] = useState('');
 
   // Efeito para expandir automaticamente o módulo do conteúdo atual
   useEffect(() => {
@@ -436,6 +530,11 @@ const CourseSidebar: React.FC<{
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (!isUserLoggedIn) {
+                              setLoginFeature('marcar conteúdos como concluídos');
+                              setShowLoginDialog(true);
+                              return;
+                            }
                             onToggleConteudoConcluido(conteudo.id, conteudo.module_id);
                           }}
                           className="ml-2 hover:scale-110 transition-transform duration-200"
@@ -456,35 +555,61 @@ const CourseSidebar: React.FC<{
         })}
       </div>
 
-      {/* AI Assistant Footer */}
-      <div className="p-4 border-t border-slate-700 space-y-2 flex justify-center bg-slate-900/50">
-        <div 
-          className="cursor-pointer hover:scale-105 transition-transform duration-200 relative group"
-          onClick={() => setIsChatModalOpen(true)}
-          title="Clique para conversar com o assistente de IA"
-        >
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            className="rounded-lg shadow-lg"
+      {/* AI Assistant Footer - Só mostra se usuário estiver logado */}
+      {isUserLoggedIn && (
+        <div className="p-4 border-t border-slate-700 space-y-2 flex justify-center bg-slate-900/50">
+          <div 
+            className="cursor-pointer hover:scale-105 transition-transform duration-200 relative group"
+            onClick={() => setIsChatModalOpen(true)}
+            title="Clique para conversar com o assistente de IA"
           >
-            <source src="/images/robo2.webm" type="video/webm" />
-            Seu navegador não suporta o elemento de vídeo.
-          </video>
-          <div className="absolute inset-0 bg-gold/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-            <span className="text-slate-900 text-xs font-medium bg-gold/90 px-2 py-1 rounded shadow-lg">
-              Chat IA
-            </span>
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              className="rounded-lg shadow-lg"
+            >
+              <source src="/images/robo2.webm" type="video/webm" />
+              Seu navegador não suporta o elemento de vídeo.
+            </video>
+            <div className="absolute inset-0 bg-gold/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+              <span className="text-slate-900 text-xs font-medium bg-gold/90 px-2 py-1 rounded shadow-lg">
+                Chat IA
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Botão de Login para usuários deslogados */}
+      {!isUserLoggedIn && (
+        <div className="p-4 border-t border-slate-700 bg-slate-900/50">
+          <Button 
+            onClick={() => {
+              setLoginFeature('conversar com o assistente de IA');
+              setShowLoginDialog(true);
+            }}
+            variant="outline" 
+            className="w-full border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Chat IA (Login Necessário)
+          </Button>
+        </div>
+      )}
 
       {/* Chat Modal */}
       <ChatModal
         isOpen={isChatModalOpen}
         onClose={() => setIsChatModalOpen(false)}
         contentData={currentConteudo?.content_data}
+      />
+      
+      {/* Login Required Dialog */}
+      <LoginRequiredDialog
+        isOpen={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        feature={loginFeature}
       />
     </div>
   );
@@ -506,6 +631,16 @@ const CoursePlayerPage = () => {
   const [isCurrentContentCompleted, setIsCurrentContentCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
+  
+  // Verificar se é usuário deslogado na rota pública
+  const isPublicRoute = window.location.pathname.startsWith('/cursoplayer/');
+  const isUserLoggedIn = !!user;
+  
+  // Hook para detectar orientação
+  const { isLandscape, isMobile } = useOrientation();
+  
+  // Verificar se deve mostrar em fullscreen (landscape + mobile + vídeo)
+  const shouldShowLandscapeFullscreen = isLandscape && isMobile && currentConteudo?.content_type === 'video_externo';
 
   // Função para encontrar um conteúdo específico por ID
   const findConteudoById = (conteudoId: string, modulos: ModuloItemLocal[]): ConteudoItemLocal | null => {
@@ -573,26 +708,11 @@ const CoursePlayerPage = () => {
       return;
     }
 
-    if (!user) {
-      setError("Você precisa estar logado para acessar este curso.");
-      setLoading(false);
-      return;
-    }
-
     const checkEnrollmentAndFetchData = async () => {
       try {
         setLoading(true);
         
-        // PRIMEIRO: Verificar se o usuário está na rota correta baseado no role
-        const hasRoutePermission = await checkRoutePermission();
-        if (!hasRoutePermission) {
-          setLoading(false);
-          return; // Se foi redirecionado, não continuar
-        }
-        
-        console.log('🔍 CoursePlayerPage: Verificando acesso ao curso...');
-
-        // Primeiro, buscar dados do curso para verificar se o usuário é o dono
+        // Primeiro, buscar dados do curso
         const data = await getCursoCompleto(cursoId);
         
         if (!data) {
@@ -600,11 +720,43 @@ const CoursePlayerPage = () => {
           setLoading(false);
           return;
         }
-
+        
+        // Se o curso é gratuito e o usuário não está logado, permitir acesso
+        if (!data.is_paid && !user) {
+          console.log('✅ CoursePlayerPage: Curso gratuito, permitindo acesso sem login');
+          setHasAccess(true);
+          setCurso(data);
+          
+          // Configurar primeiro conteúdo
+          if (data.modulos.length > 0 && data.modulos[0].conteudos.length > 0) {
+            const initialContent = data.modulos[0].conteudos[0];
+            setCurrentConteudo(initialContent);
+            updateUrlWithContent(initialContent);
+          }
+          
+          setLoading(false);
+          return;
+        }
+        
+        // Se o curso é pago e o usuário não está logado, exigir login
+        if (data.is_paid && !user) {
+          setError("Você precisa estar logado para acessar este curso.");
+          setLoading(false);
+          return;
+        }
+        
+        // Se chegou aqui, o usuário está logado - verificar permissões de rota
+        const hasRoutePermission = await checkRoutePermission();
+        if (!hasRoutePermission) {
+          setLoading(false);
+          return; // Se foi redirecionado, não continuar
+        }
+        
+        console.log('🔍 CoursePlayerPage: Verificando acesso ao curso...');
         // Verificar se o usuário é o dono do curso
-        const isOwner = data.mentor_id === user.id;
+        const isOwner = data.mentor_id === user!.id;
         console.log('👑 CoursePlayerPage: Verificação de propriedade:', {
-          userId: user.id,
+           userId: user!.id,
           mentorId: data.mentor_id,
           isOwner
         });
@@ -619,11 +771,11 @@ const CoursePlayerPage = () => {
           console.log('🔍 CoursePlayerPage: Verificando matrícula do usuário...');
 
           const { data: enrollment, error: enrollmentError } = await supabase
-            .from('matriculas')
-            .select('status')
-            .eq('course_id', cursoId)
-            .eq('student_id', user.id)
-            .single();
+             .from('matriculas')
+             .select('status')
+             .eq('course_id', cursoId)
+             .eq('student_id', user!.id)
+             .single();
 
           console.log('📊 CoursePlayerPage: Resultado da matrícula:', {
             enrollment,
@@ -707,13 +859,19 @@ const CoursePlayerPage = () => {
   // Carregar conteúdos concluídos do usuário
   useEffect(() => {
     const loadCompletedContent = async () => {
-      // Aguardar user e curso estarem disponíveis
-      if (!user?.id || !cursoId || !curso) {
+      // Aguardar curso estar disponível
+      if (!cursoId || !curso) {
         console.log('⏳ Aguardando dados necessários...', { 
-          hasUser: !!user?.id, 
           hasCursoId: !!cursoId, 
           hasCurso: !!curso 
         });
+        return;
+      }
+      
+      // Se não há usuário logado, não carregar progresso
+      if (!user?.id) {
+        console.log('👤 Usuário não logado, sem progresso salvo');
+        setConteudosConcluidos(new Set());
         return;
       }
 
@@ -754,7 +912,17 @@ const CoursePlayerPage = () => {
 
   // Função para alternar conclusão do conteúdo atual
   const onToggleCurrentContentCompleted = async () => {
-    if (!currentConteudo || !user || !curso) return;
+    if (!currentConteudo || !curso) return;
+    
+    // Se o usuário não está logado, não permitir marcar como concluído
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para salvar seu progresso no curso.",
+        variant: "default"
+      });
+      return;
+    }
 
     try {
       const isCompleted = conteudosConcluidos.has(currentConteudo.id);
@@ -1107,131 +1275,169 @@ const CoursePlayerPage = () => {
 
   const currentModule = getCurrentModule();
 
+  // Se estiver em landscape fullscreen, mostrar apenas o conteúdo do vídeo
+  if (shouldShowLandscapeFullscreen) {
     return (
+      <div className="w-full h-screen bg-black">
+        <ContentRenderer 
+          currentConteudo={currentConteudo}
+          modulos={curso?.modulos || []}
+          onNextContent={handleNextContent}
+          onPreviousContent={handlePreviousContent}
+          isCurrentContentCompleted={isCurrentContentCompleted}
+          onToggleCurrentContentCompleted={onToggleCurrentContentCompleted}
+          isLandscapeFullscreen={true}
+        />
+      </div>
+    );
+  }
+
+  return (
     <div className="flex flex-col h-screen">
-      {/* Header responsivo */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
-        {/* Desktop Header - Uma linha */}
-        <div className="hidden md:flex items-center px-6 h-[45px]">
-          <div className="flex items-center space-x-4 w-full">
-            {/* Botão voltar */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoBack}
-              className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
-            
-            {/* Breadcrumb alinhado à esquerda */}
-            <div className="flex items-center space-x-2 text-sm flex-1">
-              <span className="text-gray-200 truncate max-w-[200px] font-medium">
-                {curso?.title || 'Carregando...'}
-              </span>
+      {/* Header responsivo - Só mostra para usuários logados */}
+      {isUserLoggedIn && (
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
+          {/* Desktop Header - Uma linha */}
+          <div className="hidden md:flex items-center px-6 h-[45px]">
+            <div className="flex items-center space-x-4 w-full">
+              {/* Botão voltar */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar
+              </Button>
               
-              {currentModule && (
-                <>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-300 truncate max-w-[150px]">
-                    {currentModule.title}
-                  </span>
-                </>
-              )}
-              
-              {currentConteudo && (
-                <>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                  <span className="text-white font-medium truncate max-w-[200px]">
-                    {currentConteudo.title}
-                  </span>
-                </>
-              )}
-            </div>
-            
-            {/* Badge do tipo de conteúdo */}
-            {currentConteudo && (
-              <div className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded-lg">
-                {currentConteudo.content_type === 'video_externo' && (
+              {/* Breadcrumb alinhado à esquerda */}
+              <div className="flex items-center space-x-2 text-sm flex-1">
+                <span className="text-gray-200 truncate max-w-[200px] font-medium">
+                  {curso?.title || 'Carregando...'}
+                </span>
+                
+                {currentModule && (
                   <>
-                    <Video className="w-4 h-4 text-gray-300" />
-                    <span className="text-sm text-gray-200">Vídeo</span>
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-300 truncate max-w-[150px]">
+                      {currentModule.title}
+                    </span>
                   </>
                 )}
-                {currentConteudo.content_type === 'texto_rico' && (
+                
+                {currentConteudo && (
                   <>
-                    <FileText className="w-4 h-4 text-gray-300" />
-                    <span className="text-sm text-gray-200">Texto</span>
-                  </>
-                )}
-                {currentConteudo.content_type === 'pdf' && (
-                  <>
-                    <FileText className="w-4 h-4 text-gray-300" />
-                    <span className="text-sm text-gray-200">PDF</span>
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                    <span className="text-white font-medium truncate max-w-[200px]">
+                      {currentConteudo.title}
+                    </span>
                   </>
                 )}
               </div>
-            )}
+              
+              {/* Badge do tipo de conteúdo */}
+              {currentConteudo && (
+                <div className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded-lg">
+                  {currentConteudo.content_type === 'video_externo' && (
+                    <>
+                      <Video className="w-4 h-4 text-gray-300" />
+                      <span className="text-sm text-gray-200">Vídeo</span>
+                    </>
+                  )}
+                  {currentConteudo.content_type === 'texto_rico' && (
+                    <>
+                      <FileText className="w-4 h-4 text-gray-300" />
+                      <span className="text-sm text-gray-200">Texto</span>
+                    </>
+                  )}
+                  {currentConteudo.content_type === 'pdf' && (
+                    <>
+                      <FileText className="w-4 h-4 text-gray-300" />
+                      <span className="text-sm text-gray-200">PDF</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Header - Duas linhas */}
+          <div className="md:hidden mt-[15px]">
+            {/* Primeira linha - Botão voltar e menu */}
+            <div className="flex items-center justify-between px-4 py-2 h-[45px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm">Voltar</span>
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidebarOpen(true)}
+                className="text-gold hover:text-gold-light hover:bg-slate-700 h-10 w-10 p-0 ring-2 ring-gold/20 hover:ring-gold/40 transition-all duration-200"
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            </div>
+            
+            {/* Segunda linha - Breadcrumb */}
+            <div className="px-4 pb-2 pt-[15px]">
+              <div className="flex items-center space-x-1 text-xs overflow-hidden">
+                <span className="text-gray-200 font-medium truncate max-w-[120px]">
+                  {curso?.title || 'Carregando...'}
+                </span>
+                
+                {currentModule && (
+                  <>
+                    <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                    <span className="text-gray-300 truncate max-w-[100px]">
+                      {currentModule.title}
+                    </span>
+                  </>
+                )}
+                
+                {currentConteudo && (
+                  <>
+                    <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                    <span className="text-white font-medium truncate max-w-[120px]">
+                      {currentConteudo.title}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Mobile Header - Duas linhas */}
-        <div className="md:hidden mt-[15px]">
-          {/* Primeira linha - Botão voltar e menu */}
-          <div className="flex items-center justify-between px-4 py-2 h-[45px]">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoBack}
-              className="text-gray-300 hover:text-white hover:bg-slate-700 flex items-center gap-2 h-8"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Voltar</span>
-            </Button>
-            
+      )}
+      
+      {/* Header simplificado para usuários deslogados - apenas mobile menu */}
+      {!isUserLoggedIn && (
+        <div className="md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
+          <div className="flex items-center justify-center px-4 py-2 h-[45px] relative">
+            <span className="text-gold text-sm font-medium text-center">
+              Assista pelo PC para melhor experiência
+            </span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsSidebarOpen(true)}
-              className="text-gold hover:text-gold-light hover:bg-slate-700 h-10 w-10 p-0 ring-2 ring-gold/20 hover:ring-gold/40 transition-all duration-200"
+              className="text-gold hover:text-gold-light hover:bg-slate-700 h-12 w-12 p-0 transition-all duration-200 absolute right-4"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-8 w-8" />
             </Button>
           </div>
-          
-          {/* Segunda linha - Breadcrumb */}
-          <div className="px-4 pb-2 pt-[15px]">
-            <div className="flex items-center space-x-1 text-xs overflow-hidden">
-              <span className="text-gray-200 font-medium truncate max-w-[120px]">
-                {curso?.title || 'Carregando...'}
-              </span>
-              
-              {currentModule && (
-                <>
-                  <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-300 truncate max-w-[100px]">
-                    {currentModule.title}
-                  </span>
-                </>
-              )}
-              
-              {currentConteudo && (
-                <>
-                  <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
-                  <span className="text-white font-medium truncate max-w-[120px]">
-                    {currentConteudo.title}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
         </div>
-      </div>
+      )}
       
       <div className="flex flex-1 overflow-hidden relative">
         {/* Main Content Area */}
-        <main className="flex-1 bg-black h-[calc(100vh-90px)] md:min-h-screen overflow-hidden md:overflow-auto flex flex-col">
+        <main className={`flex-1 bg-black ${isUserLoggedIn ? 'h-[calc(100vh-90px)] md:min-h-screen' : 'h-[calc(100vh-45px)] md:h-screen'} overflow-hidden md:overflow-auto flex flex-col`}>
           <ContentRenderer 
             currentConteudo={currentConteudo}
             modulos={curso?.modulos || []}
@@ -1239,6 +1445,7 @@ const CoursePlayerPage = () => {
             onPreviousContent={handlePreviousContent}
             isCurrentContentCompleted={isCurrentContentCompleted}
             onToggleCurrentContentCompleted={onToggleCurrentContentCompleted}
+            isLandscapeFullscreen={false}
           />
         </main>
 
@@ -1255,6 +1462,7 @@ const CoursePlayerPage = () => {
             onNextContent={handleNextContent}
             hasPreviousContent={hasPreviousContent}
             hasNextContent={hasNextContent}
+            isUserLoggedIn={isUserLoggedIn}
           />
         </div>
 
@@ -1282,6 +1490,7 @@ const CoursePlayerPage = () => {
                 hasNextContent={hasNextContent}
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
+                isUserLoggedIn={isUserLoggedIn}
               />
             </div>
           </>

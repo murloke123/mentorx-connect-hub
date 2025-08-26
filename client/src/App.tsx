@@ -320,6 +320,9 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           
+          {/* Rota pública do Course Player para usuários deslogados */}
+          <Route path="/cursoplayer/:id" element={<CoursePlayerPage />} />
+          
           {/* Rotas de Teste */}
           <Route path="/testemcp" element={<TestMCPPage />} />
           <Route path="/test/jitsi-meet" element={<JitsiMeetTestPage />} />

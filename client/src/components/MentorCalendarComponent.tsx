@@ -19,6 +19,8 @@ interface MentorCalendarComponentProps {
   mentorName?: string;
   isClickable?: boolean;
   onAppointmentChange?: () => void;
+  smallSquares?: boolean;
+  smallSquaresProfile?: boolean;
 }
 
 const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
@@ -27,7 +29,9 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
   mentorId,
   mentorName,
   isClickable = false,
-  onAppointmentChange
+  onAppointmentChange,
+  smallSquares = false,
+  smallSquaresProfile = false
 }) => {
   const isMobile = useIsMobile();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -197,7 +201,9 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     
     const isWorking = isWorkingDay(dayOfWeek);
     
-    let baseClass = 'text-sm md:text-base rounded-md md:rounded-xl transition-all duration-200 flex items-center justify-center h-8 w-8 md:h-10 md:w-10 font-semibold ml-1 md:-ml-0.5';
+    const squareSize = smallSquares ? 'h-8 w-8 md:h-12 md:w-12' : smallSquaresProfile ? 'h-8 w-8 md:h-12 md:w-12' : 'h-8 w-8 md:h-14 md:w-14';
+    const marginClass = smallSquaresProfile ? 'ml-2 md:ml-2' : 'ml-2 md:ml-4';
+     let baseClass = `text-sm md:text-lg rounded-md md:rounded-xl transition-all duration-200 flex items-center justify-center ${squareSize} font-semibold ${marginClass}`;
     
     // Adicionar cursor pointer apenas para dias clicáveis (não passados)
     if (isClickable && mentorId && mentorName && (isWorking || isCurrentDay) && !isPastDay) {
@@ -220,7 +226,7 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
     <>
       <div 
         key={`calendar-${monthOffset}`}
-        className={`bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/30 shadow-lg shadow-gold/10 hover:shadow-xl hover:shadow-gold/20 transition-all duration-300 h-[650px] flex flex-col ${className}`}
+        className={`bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 rounded-2xl border border-gold/30 shadow-lg shadow-gold/10 hover:shadow-xl hover:shadow-gold/20 transition-all duration-300 h-[650px] flex flex-col max-w-[650px] mx-auto ${className}`}
       >
         {/* Cabeçalho com ícone, título e botão de navegação */}
         <div className="flex items-center justify-between mb-8">
@@ -253,20 +259,25 @@ const MentorCalendarComponent: React.FC<MentorCalendarComponentProps> = ({
         
         <div key={`calendar-grid-${monthOffset}`} className="grid grid-cols-7 gap-x-2 gap-y-1 md:gap-3 flex-1">
           {/* Cabeçalho dos dias da semana */}
-          {weekDays.map((day) => (
-            <div 
-              key={day} 
-              className="font-bold text-sm text-gold/80 text-center h-6 flex items-center justify-center ml-2 md:-ml-0.5"
-            >
-              {day}
-            </div>
-          ))}
+          {weekDays.map((day) => {
+            const headerMarginClass = smallSquaresProfile ? 'ml-3 md:ml-2' : 'ml-3 md:ml-4';
+            return (
+              <div 
+                key={day} 
+                className={`font-bold text-sm text-gold/80 text-center h-6 flex items-center justify-center ${headerMarginClass}`}
+              >
+                {day}
+              </div>
+            );
+          })}
           
           {/* Dias do mês */}
           {calendarData.calendarDays.map((dayInfo, index) => {
                           if (dayInfo === null) {
                 // Espaço vazio para dias antes do primeiro dia do mês
-                return <div key={`empty-${monthOffset}-${index}`} className="h-8 w-8 md:h-10 md:w-10 ml-2 md:-ml-0.5"></div>;
+                const emptySquareSize = smallSquares ? 'h-8 w-8 md:h-12 md:w-12' : smallSquaresProfile ? 'h-8 w-8 md:h-12 md:w-12' : 'h-8 w-8 md:h-14 md:w-14';
+                const emptyMarginClass = smallSquaresProfile ? 'ml-3 md:ml-2' : 'ml-3 md:ml-4';
+                return <div key={`empty-${monthOffset}-${index}`} className={`${emptySquareSize} ${emptyMarginClass}`}></div>;
               }
             
             const { day, dayOfWeek } = dayInfo;
