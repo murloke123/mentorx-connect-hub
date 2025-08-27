@@ -6,18 +6,22 @@ export interface ContentData {
   pdf_url?: string;
   pdf_filename?: string;
   storage_path?: string;
+  button_name?: string;
+  redirect_url?: string;
 }
 
 export interface Conteudo {
   id: string;
   module_id: string;
-  content_type: 'texto_rico' | 'video_externo' | 'pdf';
+  content_type: 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button';
   order_index: number;
   created_at: string;
   updated_at: string;
   title: string;
   description: string | null;
   content_data: ContentData | null;
+  cta_button_name?: string | null;
+  cta_redirect_url?: string | null;
 }
 
 export interface Profile {

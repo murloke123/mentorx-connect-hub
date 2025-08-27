@@ -193,7 +193,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
               </div>
             </div>
 
-            {/* Botão Ver Detalhes */}
+            {/* Botão Assistir Gratuitamente */}
             <button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -201,7 +201,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, index = 0 }) => {
               }}
               className="w-full bg-gradient-to-r from-gold to-gold-light hover:from-gold-light hover:to-gold text-background font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-xs mt-auto"
             >
-              Ver Detalhes
+              Assistir Gratuitamente
             </button>
           </div>
         </div>

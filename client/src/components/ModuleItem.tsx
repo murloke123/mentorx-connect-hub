@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { ChevronDown, ChevronRight, Play, FileText, Download } from 'lucide-react';
+import { ChevronDown, ChevronRight, Download, ExternalLink, FileText, Play } from 'lucide-react';
+import { memo } from 'react';
 import { ConteudoItemLocal, ModuloItemLocal } from '../services/coursePlayerService';
 
 interface ModuleItemProps {
@@ -19,6 +19,8 @@ const ModuleItem = memo(({ modulo, moduleIndex, isExpanded, onToggle, onPreviewC
         return <FileText className="w-4 h-4 text-green-500" />;
       case 'pdf':
         return <Download className="w-4 h-4 text-red-500" />;
+      case 'cta_button':
+        return <ExternalLink className="w-4 h-4 text-gold" />;
       default:
         return <FileText className="w-4 h-4 text-gray-500" />;
     }

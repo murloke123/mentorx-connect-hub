@@ -70,6 +70,8 @@ const ConteudoDialog = ({
                 pdf_url: conteudoParaEditar?.content_data?.pdf_url || undefined,
                 pdf_filename: conteudoParaEditar?.content_data?.pdf_filename || undefined,
                 storage_path: conteudoParaEditar?.content_data?.storage_path || undefined,
+                cta_button_name: conteudoParaEditar?.cta_button_name || conteudoParaEditar?.content_data?.button_name || undefined,
+                cta_redirect_url: conteudoParaEditar?.cta_redirect_url || conteudoParaEditar?.content_data?.redirect_url || undefined,
               }}
             />
           )}

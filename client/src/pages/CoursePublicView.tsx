@@ -2,8 +2,6 @@ import {
     Award,
     BookOpen,
     CheckCircle,
-    ChevronDown,
-    ChevronRight,
     Clock,
     FileIcon,
     FileText,
@@ -11,16 +9,15 @@ import {
     Play,
     Star,
     User,
-    X,
     Zap
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import ModuleItem from '../components/ModuleItem';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import ModuleItem from '../components/ModuleItem';
 import { toast } from '../hooks/use-toast';
 import { CursoItemLocal, getCursoCompleto } from '../services/coursePlayerService';
 import { createFreeEnrollment, redirectAfterEnrollment } from '../services/courseService';
@@ -84,6 +81,7 @@ interface LandingPageData {
   bonus_offer: string;
   urgency_message: string;
   comment?: string;
+  capture_leads?: boolean;
   course_features?: {
     content_complete: { title: string; subtitle: string };
     lifetime_access: { title: string; subtitle: string };
@@ -346,20 +344,38 @@ const CoursePublicView: React.FC = () => {
   };
 
   const handleStartWatching = async () => {
-    // Validar se todos os campos estão preenchidos
-    if (!leadData.name.trim() || !leadData.email.trim() || !leadData.phone.trim()) {
-      setLeadError('Você precisa preencher nome, email e telefone para poder assistir o curso gratuitamente');
-      return;
-    }
+    // Se a captura de leads estiver ativada, validar campos
+    if (landingData.capture_leads) {
+      if (!leadData.name.trim() || !leadData.email.trim() || !leadData.phone.trim()) {
+        setLeadError('Você precisa preencher nome, email e telefone para poder assistir o curso gratuitamente');
+        return;
+      }
 
-    // Limpar erro
-    setLeadError('');
+      // Limpar erro
+      setLeadError('');
 
-    try {
-      // Salvar lead na tabela
-      await saveLead(leadData);
-      
-      // Salvar token no localStorage para permitir acesso ao curso
+      try {
+        // Salvar lead na tabela
+        await saveLead(leadData);
+        
+        // Salvar token no localStorage para permitir acesso ao curso
+        if (courseId) {
+          localStorage.setItem(`lead_access_${courseId}`, 'true');
+          console.log('✅ Token de acesso salvo no localStorage para curso:', courseId);
+        }
+        
+        // Fechar modal e redirecionar
+        setShowWelcomeModal(false);
+        navigate(`/cursoplayer/${courseId}`);
+      } catch (error: any) {
+        toast({
+          title: "Erro",
+          description: "Erro ao processar seus dados. Tente novamente.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Se a captura de leads estiver desativada, permitir acesso direto
       if (courseId) {
         localStorage.setItem(`lead_access_${courseId}`, 'true');
         console.log('✅ Token de acesso salvo no localStorage para curso:', courseId);
@@ -368,12 +384,6 @@ const CoursePublicView: React.FC = () => {
       // Fechar modal e redirecionar
       setShowWelcomeModal(false);
       navigate(`/cursoplayer/${courseId}`);
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: "Erro ao processar seus dados. Tente novamente.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -1154,60 +1164,68 @@ const CoursePublicView: React.FC = () => {
                 O conteúdo já está pronto para você!
               </p>
               
-              <p className="text-muted-foreground text-sm">
-                Para começar a assistir, precisamos de algumas informações:
-              </p>
-              
-              {/* Formulário de Lead */}
-              <div className="space-y-3 text-left">
-                <div>
-                  <Label htmlFor="lead-name" className="text-sm font-medium">
-                    Nome completo *
-                  </Label>
-                  <Input
-                    id="lead-name"
-                    type="text"
-                    placeholder="Digite seu nome completo"
-                    value={leadData.name}
-                    onChange={(e) => setLeadData(prev => ({ ...prev, name: e.target.value }))}
-                    className="mt-1"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="lead-email" className="text-sm font-medium">
-                    E-mail *
-                  </Label>
-                  <Input
-                    id="lead-email"
-                    type="email"
-                    placeholder="Digite seu e-mail"
-                    value={leadData.email}
-                    onChange={(e) => setLeadData(prev => ({ ...prev, email: e.target.value }))}
-                    className="mt-1"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="lead-phone" className="text-sm font-medium">
-                    Telefone *
-                  </Label>
-                  <Input
-                    id="lead-phone"
-                    type="tel"
-                    placeholder="Digite seu telefone"
-                    value={leadData.phone}
-                    onChange={(e) => setLeadData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              
-              {/* Mensagem de erro */}
-              {leadError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-red-600 text-sm">{leadError}</p>
-                </div>
+              {landingData.capture_leads ? (
+                <>
+                  <p className="text-muted-foreground text-sm">
+                    Para começar a assistir, precisamos de algumas informações:
+                  </p>
+                  
+                  {/* Formulário de Lead */}
+                  <div className="space-y-3 text-left">
+                    <div>
+                      <Label htmlFor="lead-name" className="text-sm font-medium">
+                        Nome completo *
+                      </Label>
+                      <Input
+                        id="lead-name"
+                        type="text"
+                        placeholder="Digite seu nome completo"
+                        value={leadData.name}
+                        onChange={(e) => setLeadData(prev => ({ ...prev, name: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="lead-email" className="text-sm font-medium">
+                        E-mail *
+                      </Label>
+                      <Input
+                        id="lead-email"
+                        type="email"
+                        placeholder="Digite seu e-mail"
+                        value={leadData.email}
+                        onChange={(e) => setLeadData(prev => ({ ...prev, email: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="lead-phone" className="text-sm font-medium">
+                        Telefone *
+                      </Label>
+                      <Input
+                        id="lead-phone"
+                        type="tel"
+                        placeholder="Digite seu telefone"
+                        value={leadData.phone}
+                        onChange={(e) => setLeadData(prev => ({ ...prev, phone: e.target.value }))}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Mensagem de erro */}
+                  {leadError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-red-600 text-sm">{leadError}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Para começar a assistir, basta clicar em OK
+                </p>
               )}
               
               <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">

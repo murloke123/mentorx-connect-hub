@@ -55,7 +55,7 @@ export type ConteudoItemLocal = {
   id: string;
   title: string; // nome_conteudo -> title
   description?: string; // Campo para descrição do conteúdo
-  content_type: 'video_externo' | 'texto_rico' | 'pdf'; // tipo_conteudo -> content_type
+  content_type: 'video_externo' | 'texto_rico' | 'pdf' | 'cta_button'; // tipo_conteudo -> content_type
   content_data: { // dados_conteudo -> content_data
     url?: string;
     video_url?: string; // Campo usado no banco de dados
@@ -64,11 +64,16 @@ export type ConteudoItemLocal = {
     pdf_url?: string;
     pdf_filename?: string;
     provider?: 'youtube' | 'vimeo';
+    button_name?: string; // Para botões CTA
+    redirect_url?: string; // Para botões CTA
   };
   ordem: number; // order_index -> ordem (compatibilidade)
   module_id: string; // modulo_id -> module_id (CORRIGIDO)
   created_at: string;
   updated_at: string;
+  // Campos específicos para CTA
+  cta_button_name?: string;
+  cta_redirect_url?: string;
 };
 
 export type ModuloItemLocal = {
@@ -143,12 +148,15 @@ export async function getCursoCompleto(cursoId: string): Promise<CursoItemLocal 
           id: conteudo.id,
           title: conteudo.title, // nome_conteudo -> title
           description: conteudo.description, // Campo para descrição do conteúdo
-          content_type: conteudo.content_type as 'texto_rico' | 'video_externo' | 'pdf', // tipo_conteudo -> content_type
+          content_type: conteudo.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button', // tipo_conteudo -> content_type
           content_data: conteudo.content_data, // dados_conteudo -> content_data
           ordem: conteudo.order_index, // order_index -> ordem (compatibilidade)
           module_id: conteudo.module_id, // CORRIGIDO: modulo_id -> module_id
           created_at: conteudo.created_at,
-          updated_at: conteudo.updated_at
+          updated_at: conteudo.updated_at,
+          // Campos específicos para CTA
+          cta_button_name: (conteudo as any).cta_button_name,
+          cta_redirect_url: (conteudo as any).cta_redirect_url
         }))
       });
     }

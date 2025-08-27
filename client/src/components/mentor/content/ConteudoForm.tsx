@@ -7,6 +7,7 @@ import { Button } from '../../ui/button';
 import { Form } from '../../ui/form';
 import { ScrollArea } from '../../ui/scroll-area';
 import BasicContentFields from './BasicContentFields';
+import CtaContentField from './CtaContentField';
 import PdfContentField from './PdfContentField';
 import TextContentField from './TextContentField';
 import { ConteudoFormProps, ConteudoFormValues, conteudoSchema } from './types';
@@ -31,6 +32,8 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
       video_url: initialData?.video_url || '',
       pdf_url: initialData?.pdf_url,
       pdf_filename: initialData?.pdf_filename,
+      cta_button_name: initialData?.cta_button_name || '',
+      cta_redirect_url: initialData?.cta_redirect_url || '',
     },
   });
 
@@ -46,6 +49,8 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
         video_url: initialData.video_url || '',
         pdf_url: initialData.pdf_url,
         pdf_filename: initialData.pdf_filename,
+        cta_button_name: initialData.cta_button_name || '',
+        cta_redirect_url: initialData.cta_redirect_url || '',
       });
       setHtmlContent(initialData.html_content || '');
       setVideoUrl(initialData.video_url || '');
@@ -62,6 +67,8 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
         video_url: '',
         pdf_url: undefined,
         pdf_filename: undefined,
+        cta_button_name: '',
+        cta_redirect_url: '',
       });
       setHtmlContent('');
       setVideoUrl('');
@@ -117,6 +124,8 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
       pdf_file: values.content_type === 'pdf' ? pdfFile : undefined,
       pdf_url: (values.content_type === 'pdf' && !pdfFile && existingPdfUrl) ? existingPdfUrl : undefined,
       pdf_filename: (values.content_type === 'pdf' && !pdfFile && existingPdfFilename) ? existingPdfFilename : undefined,
+      cta_button_name: values.content_type === 'cta_button' ? values.cta_button_name : undefined,
+      cta_redirect_url: values.content_type === 'cta_button' ? values.cta_redirect_url : undefined,
     };
     
     await onSubmit(submissionData);
@@ -143,6 +152,13 @@ const ConteudoForm = ({ onSubmit, initialData, isSubmitting, onCancel }: Conteud
                   initialUrl={videoUrl}
                   initialProvider={provider}
                   onChange={handleVideoChange}
+                  isSubmitting={isSubmitting}
+                />
+              )}
+
+              {tipoConteudo === 'cta_button' && (
+                <CtaContentField
+                  form={form}
                   isSubmitting={isSubmitting}
                 />
               )}

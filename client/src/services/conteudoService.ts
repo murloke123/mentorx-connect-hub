@@ -54,13 +54,17 @@ export interface Conteudo {
   module_id: string;
   title: string;
   description?: string;
-  content_type: 'texto_rico' | 'video_externo' | 'pdf';
+  content_type: 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button';
   content_data?: {
     texto?: string;
     video_url?: string;
     pdf_url?: string;
+    button_name?: string;
+    redirect_url?: string;
     [key: string]: unknown;
   };
+  cta_button_name?: string;
+  cta_redirect_url?: string;
   order_index: number;
   created_at: string;
   updated_at: string;
@@ -80,7 +84,7 @@ export async function getConteudosByModuloId(moduloId: string): Promise<Conteudo
     // Garantir que os dados retornados sejam do tipo Conteudo[]
     return (data || []).map(item => ({
       ...item,
-      content_type: item.content_type as 'texto_rico' | 'video_externo' | 'pdf',
+      content_type: item.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button',
       content_data: item.content_data as Conteudo['content_data']
     }));
   } catch (error) {
@@ -109,7 +113,7 @@ export async function getConteudoById(conteudoId: string): Promise<Conteudo | nu
     
     return {
       ...data,
-      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf',
+      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button',
       content_data: data.content_data as Conteudo['content_data']
     };
   } catch (error) {
@@ -167,7 +171,7 @@ export async function criarConteudoTexto(dados: {
     
     return {
       ...data,
-      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf',
+      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button',
       content_data: data.content_data as Conteudo['content_data']
     };
   } catch (error) {
@@ -225,7 +229,7 @@ export async function criarConteudoVideo(dados: {
     
     return {
       ...data,
-      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf',
+      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button',
       content_data: data.content_data as Conteudo['content_data']
     };
   } catch (error) {
@@ -329,6 +333,8 @@ export async function atualizarConteudo(
     title?: string;
     description?: string;
     content_data?: Conteudo['content_data'];
+    cta_button_name?: string;
+    cta_redirect_url?: string;
   }
 ): Promise<Conteudo | null> {
   try {
@@ -350,6 +356,8 @@ export async function atualizarConteudo(
     const atualizacoes: Partial<Conteudo> = {};
     if (dados.title !== undefined) atualizacoes.title = dados.title;
     if (dados.description !== undefined) atualizacoes.description = dados.description;
+    if (dados.cta_button_name !== undefined) atualizacoes.cta_button_name = dados.cta_button_name;
+    if (dados.cta_redirect_url !== undefined) atualizacoes.cta_redirect_url = dados.cta_redirect_url;
     atualizacoes.content_data = dadosConteudoAtualizados;
 
     const { data, error } = await supabase
@@ -368,7 +376,7 @@ export async function atualizarConteudo(
     
     return {
       ...data,
-      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf',
+      content_type: data.content_type as 'texto_rico' | 'video_externo' | 'pdf' | 'cta_button',
       content_data: data.content_data as Conteudo['content_data']
     };
   } catch (error) {

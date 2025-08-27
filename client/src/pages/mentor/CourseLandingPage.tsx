@@ -54,6 +54,7 @@ interface LandingPageData {
   guarantee: string;
   bonus_offer: string;
   urgency_message: string;
+  capture_leads?: boolean;
   course_features?: {
     content_complete: { title: string; subtitle: string; };
     lifetime_access: { title: string; subtitle: string; };
@@ -83,6 +84,7 @@ const CourseLandingPage: React.FC = () => {
     guarantee: "Garantia incondicional de 7 dias",
     bonus_offer: "Bônus exclusivo: Kit de ferramentas profissionais",
     urgency_message: "Contato direto com o mentor",
+    capture_leads: false,
     course_features: {
       content_complete: { title: "Conteúdo Completo", subtitle: "Módulos práticos e teóricos" },
       lifetime_access: { title: "Acesso Vitalício", subtitle: "Estude no seu ritmo" },
@@ -1221,6 +1223,80 @@ const CourseLandingPage: React.FC = () => {
                           <span>
                             {landingData.guarantee}
                           </span>
+                        </div>
+                      </div>
+
+                      {/* Lead Capture Settings */}
+                      <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg backdrop-blur-sm">
+                        <div className="flex items-start space-x-3">
+                          <input
+                            type="checkbox"
+                            id="capture-leads"
+                            checked={landingData.capture_leads || false}
+                            onChange={async (e) => {
+                              const newValue = e.target.checked;
+                              const updatedData = { ...landingData, capture_leads: newValue };
+                              setLandingData(updatedData);
+                              
+                              // Salvar automaticamente
+                              if (!courseId) return;
+                              
+                              try {
+                                const { data: existingRecord } = await supabase
+                                  .from('course_landing_pages')
+                                  .select('id')
+                                  .eq('course_id', courseId)
+                                  .single();
+
+                                let error;
+                                
+                                if (existingRecord) {
+                                  const { error: updateError } = await supabase
+                                    .from('course_landing_pages')
+                                    .update({
+                                      layout_body: updatedData,
+                                      capture_leads_enabled: newValue,
+                                      updated_at: new Date().toISOString()
+                                    })
+                                    .eq('course_id', courseId);
+                                  error = updateError;
+                                } else {
+                                  const { error: insertError } = await supabase
+                                    .from('course_landing_pages')
+                                    .insert({
+                                      course_id: courseId,
+                                      layout_body: updatedData,
+                                      capture_leads_enabled: newValue,
+                                      is_active: true
+                                    });
+                                  error = insertError;
+                                }
+
+                                if (error) throw error;
+
+                                toast({
+                                  title: "Configuração salva",
+                                  description: newValue ? "Captura de leads ativada" : "Captura de leads desativada",
+                                  variant: "default"
+                                });
+                              } catch (error) {
+                                console.error('Erro ao salvar configuração:', error);
+                                toast({
+                                  title: "Erro",
+                                  description: "Não foi possível salvar a configuração",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                          <label htmlFor="capture-leads" className="text-sm text-foreground leading-relaxed">
+                            <span className="font-medium">Você deseja capturar o nome, e-mail e telefone das pessoas que vão assistir seu curso gratuitamente?</span>
+                            <br />
+                            <span className="text-xs text-muted-foreground mt-1 block">
+                              Se marcado, os usuários precisarão preencher seus dados para acessar o curso gratuito.
+                            </span>
+                          </label>
                         </div>
                       </div>
                     </div>

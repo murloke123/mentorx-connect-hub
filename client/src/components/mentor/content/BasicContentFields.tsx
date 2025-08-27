@@ -59,7 +59,7 @@ const BasicContentFields = ({ form, isSubmitting }: BasicContentFieldsProps) => 
           <FormItem>
             <FormLabel className="text-white font-medium">Tipo de Conteúdo</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={field.value === 'cta_button' || isSubmitting}>
                 <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white focus:border-gold/50 focus:ring-gold/20 transition-all duration-300">
                   <SelectValue placeholder="Selecione o tipo..." className="text-gray-400" />
                 </SelectTrigger>
@@ -67,6 +67,7 @@ const BasicContentFields = ({ form, isSubmitting }: BasicContentFieldsProps) => 
                   <SelectItem value="texto_rico" className="text-white hover:bg-slate-700 focus:bg-slate-700">Texto Rico</SelectItem>
                   <SelectItem value="video_externo" className="text-white hover:bg-slate-700 focus:bg-slate-700">Vídeo Externo</SelectItem>
                   <SelectItem value="pdf" className="text-white hover:bg-slate-700 focus:bg-slate-700">PDF</SelectItem>
+                  <SelectItem value="cta_button" className="text-white hover:bg-slate-700 focus:bg-slate-700">Chamada para Ação</SelectItem>
                 </SelectContent>
               </Select>
             </FormControl>

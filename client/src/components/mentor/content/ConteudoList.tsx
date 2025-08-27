@@ -5,6 +5,7 @@ import {
     Download,
     Edit,
     Eye,
+    ExternalLink,
     FileIcon,
     FileText,
     Trash2,
@@ -88,6 +89,8 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
         return <Video className="w-5 h-5 text-gold" />;
       case 'pdf':
         return <FileIcon className="w-5 h-5 text-gold" />;
+      case 'cta_button':
+        return <ExternalLink className="w-5 h-5 text-gold" />;
       default:
         return <FileText className="w-5 h-5 text-gold" />;
     }
@@ -118,6 +121,7 @@ const ConteudoList: React.FC<ConteudoListProps> = ({
                 <Badge variant="secondary" className="text-xs bg-gold/20 text-gold border-gold/30">
                   {conteudo.content_type === 'texto_rico' ? 'Texto'
                     : conteudo.content_type === 'video_externo' ? 'Vídeo'
+                    : conteudo.content_type === 'cta_button' ? 'Link'
                     : 'PDF'}
                 </Badge>
                 <span className="text-xs text-gray-400">#{index + 1}</span>

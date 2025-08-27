@@ -10,7 +10,7 @@ import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } 
 import { triggerSuccessConfetti } from '@/utils/confetti';
 import { supabase } from '@/utils/supabase';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, Menu, MessageSquare, Video, X, LogIn } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, LogIn, Menu, MessageSquare, Video, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -93,6 +93,26 @@ const ContentRenderer: React.FC<{
 }) => {
   const { toast } = useToast();
   const [showCommentsModal, setShowCommentsModal] = useState(false);
+
+  // Função para encontrar CTAs no módulo atual
+  const getCurrentModuleCTAs = () => {
+    if (!currentConteudo) return [];
+    
+    const currentModule = modulos.find(m => m.id === currentConteudo.module_id);
+    if (!currentModule) return [];
+    
+    return currentModule.conteudos.filter(c => c.content_type === 'cta_button');
+  };
+
+  const currentModuleCTAs = getCurrentModuleCTAs();
+
+  // Função para lidar com clique no CTA
+  const handleCtaClick = (cta: ConteudoItemLocal) => {
+    const redirectUrl = cta.cta_redirect_url || (cta.content_data as any)?.redirect_url;
+    if (redirectUrl) {
+      window.open(redirectUrl, '_blank');
+    }
+  };
 
   const renderContent = () => {
     if (!currentConteudo) {
@@ -217,6 +237,24 @@ const ContentRenderer: React.FC<{
         {renderContent()}
       </div>
 
+      {/* CTAs - Mobile Only */}
+      {currentModuleCTAs.length > 0 && (
+        <div className="md:hidden px-4 py-2 space-y-2">
+          {currentModuleCTAs.map((cta) => (
+            <button
+              key={cta.id}
+              onClick={() => handleCtaClick(cta)}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 animate-pulse text-sm"
+              style={{
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}
+            >
+              {cta.cta_button_name || cta.title}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Certificate Banner - Mobile Only */}
       <div className="md:hidden bg-gradient-to-r from-gold/20 via-gold-light/15 to-gold/20 border-t border-gold/30 px-4 py-2 max-h-[25px] flex items-center justify-center pb-[5px] mb-[10px]">
         <span className="text-xs text-gold font-medium text-center truncate">
@@ -274,6 +312,26 @@ const ContentRenderer: React.FC<{
           </div>
         </div>
       </div>
+
+      {/* CTAs - Desktop Only */}
+      {currentModuleCTAs.length > 0 && (
+        <div className="hidden md:block absolute bottom-[140px] left-1/2 transform -translate-x-1/2 z-50">
+          <div className="flex flex-col gap-2 items-center">
+            {currentModuleCTAs.map((cta) => (
+              <button
+                key={cta.id}
+                onClick={() => handleCtaClick(cta)}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 animate-pulse whitespace-nowrap"
+                style={{
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
+              >
+                {cta.cta_button_name || cta.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Desktop Floating Navigation - Sobreposto ao vídeo - Apenas versão web */}
       <div className="hidden md:block absolute bottom-[75px] left-1/2 transform -translate-x-1/2 z-50">
@@ -502,7 +560,14 @@ const CourseSidebar: React.FC<{
                   {modulo.conteudos.map((conteudo) => {
                     const isActive = currentConteudo?.id === conteudo.id;
                     const isConcluido = conteudosConcluidos.has(conteudo.id);
+                    const isCtaButton = conteudo.content_type === 'cta_button';
                     
+                    // Se for um botão CTA, não renderizar no sidebar
+                    if (isCtaButton) {
+                      return null;
+                    }
+                    
+                    // Renderização normal para outros tipos de conteúdo
                     return (
                       <div
                         key={conteudo.id}
@@ -724,25 +789,11 @@ const CoursePlayerPage = () => {
           return;
         }
         
-        // Se o curso é gratuito e o usuário não está logado, verificar se preencheu dados do lead
+        // Se o curso é gratuito e o usuário não está logado, permitir acesso direto
         if (!data.is_paid && !user) {
-          console.log('🔍 CoursePlayerPage: Curso gratuito sem login, verificando lead...');
+          console.log('🔍 CoursePlayerPage: Curso gratuito sem login, permitindo acesso direto');
           
-          // Verificar se existe token de lead no localStorage
-          const leadToken = localStorage.getItem(`lead_access_${cursoId}`);
-          
-          if (!leadToken) {
-            console.log('❌ CoursePlayerPage: Lead não capturado, redirecionando para página pública');
-            setError("Para assistir este curso gratuito, você precisa preencher seus dados na página do curso.");
-            setLoading(false);
-            // Redirecionar para a página pública do curso
-            setTimeout(() => {
-              window.location.href = `/curso/${cursoId}`;
-            }, 2000);
-            return;
-          }
-          
-          console.log('✅ CoursePlayerPage: Lead capturado, permitindo acesso');
+          console.log('✅ CoursePlayerPage: Acesso liberado para curso gratuito');
           setHasAccess(true);
           setCurso(data);
           
