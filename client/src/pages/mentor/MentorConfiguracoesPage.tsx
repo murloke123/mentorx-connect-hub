@@ -2,16 +2,25 @@ import MentorSidebar from "@/components/mentor/MentorSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Bell, Menu, Monitor, Shield } from "lucide-react";
+import { supabase } from "@/utils/supabase";
+import { Bell, Eye, EyeOff, Menu, Monitor, Shield } from "lucide-react";
 import { useState } from "react";
 
 const MentorConfiguracoesPage = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const { toast } = useToast();
 
   const handleLogToggle = async (checked: boolean) => {
@@ -28,6 +37,77 @@ const MentorConfiguracoesPage = () => {
       title: "Configuração atualizada",
       description: `${settingName} ${checked ? 'ativado' : 'desativado'}.`,
     });
+  };
+
+  const handleChangePassword = async () => {
+    // Validação básica
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      // Obter o usuário atual
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      // Chamar endpoint do backend para trocar senha
+      const response = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          newPassword: newPassword
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao alterar senha');
+      }
+      
+      toast({
+        title: "Sucesso",
+        description: "Senha alterada com sucesso!",
+      });
+      
+      // Fechar modal e limpar campos
+      setShowChangePasswordModal(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+    } catch (error) {
+      console.error('Erro ao alterar senha:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao alterar senha. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -164,31 +244,7 @@ const MentorConfiguracoesPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-medium">
-                      Autenticação de Dois Fatores
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Adicionar uma camada extra de segurança à sua conta
-                    </p>
-                  </div>
-                  <div className="md:hidden">
-                    <Checkbox
-                       defaultChecked={false}
-                       onCheckedChange={(checked: boolean) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
-                       className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
-                     />
-                  </div>
-                  <div className="hidden md:block">
-                    <Switch 
-                      defaultChecked={false}
-                      onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
-                    />
-                  </div>
-                </div>
 
-                <Separator />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -212,6 +268,26 @@ const MentorConfiguracoesPage = () => {
                       onCheckedChange={(checked) => handleSettingToggle('Dados de Analytics', checked)}
                     />
                   </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base font-medium">
+                      Trocar Senha
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Alterar a senha da sua conta
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+                    onClick={() => setShowChangePasswordModal(true)}
+                  >
+                    Alterar Senha
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -305,6 +381,102 @@ const MentorConfiguracoesPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Troca de Senha */}
+      <Dialog open={showChangePasswordModal} onOpenChange={setShowChangePasswordModal}>
+        <DialogContent className="bg-slate-900 border-gold/30 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-gold text-center">Trocar Senha</DialogTitle>
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-gold to-transparent mt-2"></div>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            {/* Campo Nova Senha */}
+            <div className="space-y-2">
+              <Label htmlFor="new-password" className="text-sm font-medium">
+                Nova Senha
+              </Label>
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="bg-slate-800 border-gold/30 text-white pr-10"
+                  placeholder="Digite sua nova senha"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-4 w-4 text-gold" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gold" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Campo Confirmar Senha */}
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password" className="text-sm font-medium">
+                Confirmar Nova Senha
+              </Label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-slate-800 border-gold/30 text-white pr-10"
+                  placeholder="Confirme sua nova senha"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-gold" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gold" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Botões */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowChangePasswordModal(false);
+                  setNewPassword("");
+                  setConfirmPassword("");
+                  setShowNewPassword(false);
+                  setShowConfirmPassword(false);
+                }}
+                className="flex-1 border-gold/30 text-gold hover:bg-gold/10"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleChangePassword}
+                disabled={isChangingPassword || !newPassword || !confirmPassword}
+                className="flex-1 bg-gold text-black hover:bg-gold/90"
+              >
+                {isChangingPassword ? "Alterando..." : "Confirmar"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

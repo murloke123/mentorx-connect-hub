@@ -2434,6 +2434,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ##########################################################################################
+  // ###################### ENDPOINT DE TROCA DE SENHA ####################################
+  // ##########################################################################################
+  
+  // ENDPOINT: Trocar senha do usuário
+  app.post('/api/user/change-password', async (req, res) => {
+    try {
+      const { userId, newPassword } = req.body;
+      
+      console.log('🔐 [API] Requisição de troca de senha recebida para usuário:', userId);
+      
+      // Validação básica
+      if (!userId || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'userId e newPassword são obrigatórios'
+        });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          error: 'A senha deve ter pelo menos 6 caracteres'
+        });
+      }
+      
+      // Importar Supabase dinamicamente
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseUrl = process.env.VITE_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE;
+      
+      if (!supabaseUrl || !supabaseServiceKey) {
+        console.error('❌ [API] Variáveis de ambiente do Supabase não configuradas');
+        console.error('❌ [API] VITE_SUPABASE_URL:', supabaseUrl ? 'OK' : 'MISSING');
+        console.error('❌ [API] SUPABASE_SERVICE_ROLE:', supabaseServiceKey ? 'OK' : 'MISSING');
+        return res.status(500).json({
+          success: false,
+          error: 'Configuração do servidor incompleta'
+        });
+      }
+      
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Atualizar senha no Supabase Auth
+      const { error: authError } = await supabase.auth.admin.updateUserById(
+        userId,
+        { password: newPassword }
+      );
+      
+      if (authError) {
+        console.error('❌ [API] Erro ao atualizar senha no Supabase Auth:', authError);
+        return res.status(500).json({
+          success: false,
+          error: 'Erro ao atualizar senha'
+        });
+      }
+      
+      // Atualizar campo lead para false se for true
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('lead')
+        .eq('id', userId)
+        .single();
+      
+      if (!profileError && profile?.lead === true) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ lead: false })
+          .eq('id', userId);
+        
+        if (updateError) {
+          console.error('❌ [API] Erro ao atualizar campo lead:', updateError);
+          // Não retornar erro aqui, pois a senha já foi alterada com sucesso
+        } else {
+          console.log('✅ [API] Campo lead atualizado para false');
+        }
+      }
+      
+      console.log('✅ [API] Senha alterada com sucesso para usuário:', userId);
+      
+      res.json({
+        success: true,
+        message: 'Senha alterada com sucesso'
+      });
+      
+    } catch (error) {
+      console.error('❌ [API] Erro crítico na troca de senha:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // ##########################################################################################
   // ###################### PROXY PARA N8N WEBHOOK (CORS) ####################################
   // ##########################################################################################
   

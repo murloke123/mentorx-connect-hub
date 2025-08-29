@@ -23,7 +23,7 @@ const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalSt
         description="Pessoas que seguem seu perfil" 
       />
       <StatsCard 
-        title="Cursos Adquiridos" 
+        title="Cursos" 
         value={activeEnrollments} 
         icon={<Library />} 
         description="Total de cursos adquiridos pelos seus Alunos" 

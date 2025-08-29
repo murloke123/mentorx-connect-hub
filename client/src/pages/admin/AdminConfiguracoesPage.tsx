@@ -200,17 +200,7 @@ const AdminConfiguracoesPage = () => {
               
               <Separator />
               
-              <div className="flex items-center justify-between opacity-50">
-                <div className="space-y-1">
-                  <Label className="text-base font-medium">
-                    Autenticação de dois fatores
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Adicione uma camada extra de segurança (em breve)
-                  </p>
-                </div>
-                <Switch disabled />
-              </div>
+
             </CardContent>
           </Card>
         </div>

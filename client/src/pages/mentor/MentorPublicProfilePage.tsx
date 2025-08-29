@@ -47,6 +47,11 @@ const MentorPublicProfilePage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const isMobile = useIsMobile();
 
+  // Garantir que a página sempre carregue no topo
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Função para lidar com o clique no botão WhatsApp
   const handleWhatsAppClick = () => {
     if (!mentorData?.phone) {

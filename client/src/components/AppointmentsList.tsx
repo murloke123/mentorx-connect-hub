@@ -1,13 +1,13 @@
 import {
-  AlertCircle,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Filter,
-  MessageSquare,
-  Search,
-  X,
-  XCircle
+    AlertCircle,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Filter,
+    MessageSquare,
+    Search,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -475,7 +475,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
             </div>
 
             {/* Filtros */}
-            <div className="flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border bg-slate-800/30 border-gold/20">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border bg-slate-800/30 border-gold/20">
               <div className="flex items-center gap-2 flex-1">
                 <Search className="h-4 w-4 text-gold/60 flex-shrink-0" />
                 <Input
@@ -496,7 +496,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ mentorId, refreshTr
                 )}
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:min-w-[200px]">
                 <Filter className="h-4 w-4 text-gold/60 flex-shrink-0" />
                 <Select value={dateFilter} onValueChange={setDateFilter}>
                   <SelectTrigger className="w-full sm:w-48 bg-slate-700/50 border-gold/20 text-white focus:border-gold/50">

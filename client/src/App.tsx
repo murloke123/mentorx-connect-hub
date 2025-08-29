@@ -54,6 +54,7 @@ import {
     // Mentor
     MentorDashboardPage,
     MentorEditarCursoPage,
+    MentorLeadsPage,
     MentorMapeamentoDBPage,
     MentorMeusCursosPage,
     MentorMeusMentoradosPage,
@@ -233,6 +234,11 @@ const AppContent = () => {
           <Route path="/mentor/stripe-onboarding" element={
             <ProtectedRoute allowedRoles={['mentor']}>
               <MentorStripeOnboardingPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor/leads" element={
+            <ProtectedRoute allowedRoles={['mentor']}>
+              <MentorLeadsPage />
             </ProtectedRoute>
           } />
 

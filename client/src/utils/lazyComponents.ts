@@ -57,6 +57,7 @@ export const MentorConfiguracoesPage = lazy(() => import('@/pages/mentor/MentorC
 export const MentorRotasPage = lazy(() => import('@/pages/mentor/MentorRotasPage'));
 export const MentorMapeamentoDBPage = lazy(() => import('@/pages/mentor/MentorMapeamentoDBPage'));
 export const MentorStripeOnboardingPage = lazy(() => import('@/pages/mentor/MentorStripeOnboardingPage'));
+export const MentorLeadsPage = lazy(() => import('@/pages/mentor/MentorLeadsPage'));
 
 
 // ===== MENTORADO PAGES - Chunk separado =====

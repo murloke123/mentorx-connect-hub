@@ -1214,7 +1214,43 @@ const CoursePlayerPage = () => {
     return null;
   };
 
-  const handleNextContent = () => {
+  const handleNextContent = async () => {
+    // Marcar o conteúdo atual como concluído antes de avançar
+    if (currentConteudo && user && curso && !conteudosConcluidos.has(currentConteudo.id)) {
+      try {
+        const { error } = await supabase
+          .from('conteudo_concluido')
+          .insert({
+            user_id: user.id,
+            course_id: curso.id,
+            module_id: currentConteudo.module_id,
+            content_id: currentConteudo.id
+          });
+
+        if (!error) {
+          const newSet = new Set(conteudosConcluidos);
+          newSet.add(currentConteudo.id);
+          setConteudosConcluidos(newSet);
+          setIsCurrentContentCompleted(true);
+
+          // Verificar se todos os conteúdos foram concluídos
+          const totalContent = curso.modulos.reduce((total, modulo) => total + modulo.conteudos.length, 0);
+          if (newSet.size === totalContent) {
+            // Curso 100% concluído!
+            triggerSuccessConfetti();
+            toast({
+              title: "🎉 Parabéns!",
+              description: "Você concluiu 100% do curso! Excelente trabalho!",
+              duration: 5000,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao marcar conteúdo como concluído:', error);
+      }
+    }
+
+    // Avançar para o próximo conteúdo
     const nextContent = findNextContent();
     if (nextContent) {
       setCurrentConteudo(nextContent);

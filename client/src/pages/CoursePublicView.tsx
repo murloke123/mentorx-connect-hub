@@ -102,6 +102,7 @@ interface MentorProfile {
   avatar_url?: string;
   bio?: string;
   highlight_message?: string;
+  email?: string;
 }
 
 const CoursePublicView: React.FC = () => {
@@ -127,6 +128,8 @@ const CoursePublicView: React.FC = () => {
     phone: ''
   });
   const [leadError, setLeadError] = useState('');
+  const [showLeadExistsModal, setShowLeadExistsModal] = useState(false);
+  const [showEmailExistsModal, setShowEmailExistsModal] = useState(false);
   const [landingData, setLandingData] = useState<LandingPageData>({
     headline: "Domine as Habilidades que Vão Transformar Sua Carreira",
     subheadline: "Um curso prático e direto ao ponto para você alcançar resultados reais em tempo recorde",
@@ -203,7 +206,7 @@ const CoursePublicView: React.FC = () => {
           // Dados do mentor
           course.mentor_id ? 
             supabase.from('profiles')
-              .select('id, full_name, avatar_url, bio, highlight_message')
+              .select('id, full_name, avatar_url, bio, highlight_message, email')
               .eq('id', course.mentor_id)
               .single() : 
             Promise.resolve({ data: null, error: null }),
@@ -286,18 +289,45 @@ const CoursePublicView: React.FC = () => {
     if (!courseData || !mentorData) return;
 
     try {
+      // 🛡️ PREVENÇÃO DE DUPLICAÇÃO: Verificar se o lead já existe para este curso e email
+      const { data: existingLead, error: checkError } = await supabase
+        .from('leads')
+        .select('id')
+        .eq('course_id', courseData.id)
+        .eq('lead_email', leadInfo.email.trim())
+        .single();
+      
+      if (existingLead) {
+        console.log('⚠️ Lead já existe para este curso e email, pulando inserção:', {
+          courseId: courseData.id,
+          email: leadInfo.email,
+          existingLeadId: existingLead.id
+        });
+        return; // Lead já existe, não inserir novamente
+      }
+      
+      // Se não existe, inserir novo lead
+      console.log('✅ Inserindo novo lead:', {
+        courseId: courseData.id,
+        email: leadInfo.email,
+        name: leadInfo.name
+      });
+      
       const { error } = await supabase
         .from('leads')
         .insert({
           course_id: courseData.id,
           course_name: courseData.title,
           mentor_name: mentorData.full_name || 'Mentor',
+          mentor_email: mentorData.email || null,
           lead_name: leadInfo.name,
           lead_email: leadInfo.email,
           lead_phone: leadInfo.phone
         });
 
       if (error) throw error;
+      
+      console.log('✅ Lead salvo com sucesso');
     } catch (error: any) {
       console.error('Erro ao salvar lead:', error);
       throw error;
@@ -355,19 +385,137 @@ const CoursePublicView: React.FC = () => {
       setLeadError('');
 
       try {
+        // 🔍 VERIFICAR SE E-MAIL JÁ EXISTE COMO LEAD
+        console.log('🔍 Verificando se e-mail já existe como lead...');
+        
+        const { data: existingProfile, error: checkError } = await supabase
+          .from('profiles')
+          .select('id, email, lead')
+          .eq('email', leadData.email.trim())
+          .single();
+        
+        // Se usuário já existe e é um lead, mostrar modal informativo
+        if (existingProfile && existingProfile.lead === true) {
+          console.log('⚠️ E-mail já cadastrado como lead');
+          setShowLeadExistsModal(true);
+          return; // Parar execução aqui
+        }
+        
+        // Se usuário já existe mas não é lead, mostrar modal para fazer login
+        if (existingProfile && existingProfile.lead === false) {
+          console.log('⚠️ E-mail já cadastrado (não é lead)');
+          setShowEmailExistsModal(true);
+          return; // Parar execução aqui
+        }
+        
         // Salvar lead na tabela
         await saveLead(leadData);
         
-        // Salvar token no localStorage para permitir acesso ao curso
-        if (courseId) {
-          localStorage.setItem(`lead_access_${courseId}`, 'true');
-          console.log('✅ Token de acesso salvo no localStorage para curso:', courseId);
+        // 🚀 NOVA FUNCIONALIDADE: Cadastro automático do lead
+        console.log('🔄 Iniciando cadastro automático do lead...');
+        
+        // Verificar se o usuário já existe (mas não é lead)
+        const { data: existingUser, error: userCheckError } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', leadData.email.trim())
+          .single();
+        
+        let userId = null;
+        
+        if (existingUser) {
+          // Usuário já existe, fazer login
+          console.log('👤 Usuário já existe, fazendo login automático...');
+          userId = existingUser.id;
+          
+          // Tentar fazer login com senha padrão
+          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email: leadData.email.trim(),
+            password: '123456'
+          });
+          
+          if (loginError) {
+            console.log('⚠️ Login com senha padrão falhou, usuário pode ter senha diferente');
+            // Se falhar, continuar com acesso via localStorage (comportamento atual)
+            if (courseId) {
+              localStorage.setItem(`lead_access_${courseId}`, 'true');
+              console.log('✅ Token de acesso salvo no localStorage para curso:', courseId);
+            }
+            setShowWelcomeModal(false);
+            navigate(`/cursoplayer/${courseId}`);
+            return;
+          }
+          
+          userId = loginData.user?.id || existingUser.id;
+        } else {
+          // Usuário não existe, criar conta
+          console.log('🆕 Criando nova conta para o lead...');
+          
+          const { data: signupData, error: signupError } = await supabase.auth.signUp({
+            email: leadData.email.trim(),
+            password: '123456'
+          });
+          
+          if (signupError) {
+            console.error('❌ Erro ao criar conta:', signupError);
+            throw signupError;
+          }
+          
+          if (signupData.user) {
+            userId = signupData.user.id;
+            
+            // Criar perfil do usuário com campo lead = true
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: userId,
+                full_name: leadData.name.trim(),
+                email: leadData.email.trim(),
+                phone: leadData.phone.trim(),
+                role: 'mentorado',
+                lead: true, // 🎯 Campo lead marcado como true
+                created_at: new Date().toISOString()
+              }, {
+                onConflict: 'id'
+              });
+            
+            if (profileError) {
+              console.error('❌ Erro ao criar perfil:', profileError);
+              throw profileError;
+            }
+            
+            console.log('✅ Perfil criado com sucesso para lead');
+          }
         }
         
-        // Fechar modal e redirecionar
+        // 🎯 Matricular automaticamente no curso se tiver userId
+        if (userId && courseId) {
+          console.log('📚 Matriculando lead no curso automaticamente...');
+          
+          try {
+            // Importar função de matrícula gratuita
+            const { createFreeEnrollment } = await import('../services/courseService');
+            await createFreeEnrollment(courseId, userId);
+            console.log('✅ Lead matriculado no curso com sucesso');
+          } catch (enrollmentError) {
+            console.error('⚠️ Erro ao matricular no curso:', enrollmentError);
+            // Continuar mesmo se a matrícula falhar
+          }
+        }
+        
+        // Fechar modal e redirecionar para courseplayer
         setShowWelcomeModal(false);
         navigate(`/cursoplayer/${courseId}`);
+        
+        // Mostrar mensagem de sucesso
+        toast({
+          title: "Bem-vindo!",
+          description: "Sua conta foi criada e você já está matriculado no curso. Aproveite!",
+          variant: "default"
+        });
+        
       } catch (error: any) {
+        console.error('❌ Erro no processo de cadastro do lead:', error);
         toast({
           title: "Erro",
           description: "Erro ao processar seus dados. Tente novamente.",
@@ -1144,6 +1292,58 @@ const CoursePublicView: React.FC = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Lead Existente */}
+      <Dialog open={showLeadExistsModal} onOpenChange={setShowLeadExistsModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold text-foreground mb-4">
+              Este e-mail já tem um cadastro na plataforma como Lead, faça o login com este e-mail e a senha: 123456
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="text-center space-y-4">
+            <div className="h-px bg-border my-5"></div>
+            
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Se você não quer ser mais um Lead e ter acesso completo à plataforma, após se logar, altere sua senha na opção trocar senha que está localizada em 'Configurações', após fazer isso você se tornará uma conta e não mais um Lead.
+            </p>
+            
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5"
+              onClick={() => {
+                setShowLeadExistsModal(false);
+                navigate('/login');
+              }}
+            >
+              OK, fazer meu login
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de E-mail Já Existente (Não Lead) */}
+      <Dialog open={showEmailExistsModal} onOpenChange={setShowEmailExistsModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold text-foreground mb-4">
+              Este e-mail já tem um cadastro na plataforma, faça o login por favor.
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="text-center space-y-4">
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5"
+              onClick={() => {
+                setShowEmailExistsModal(false);
+                navigate('/login');
+              }}
+            >
+              OK, fazer meu login
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
