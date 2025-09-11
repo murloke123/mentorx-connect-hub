@@ -1216,7 +1216,7 @@ const CoursePlayerPage = () => {
 
   const handleNextContent = async () => {
     // Marcar o conteúdo atual como concluído antes de avançar
-    if (currentConteudo && user && curso && !conteudosConcluidos.has(currentConteudo.id)) {
+    if (currentConteudo && user && !conteudosConcluidos.has(currentConteudo.id)) {
       try {
         const { error } = await supabase
           .from('conteudo_concluido')

@@ -23,7 +23,7 @@ const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalSt
         description="Pessoas que seguem seu perfil" 
       />
       <StatsCard 
-        title="Cursos" 
+        title="Cursos Adquiridos" 
         value={activeEnrollments} 
         icon={<Library />} 
         description="Total de cursos adquiridos pelos seus Alunos" 
@@ -43,7 +43,7 @@ const StatsSection = ({ followersCount, totalCourses, activeEnrollments, totalSt
         title="Receita Estimada" 
         value={formatCurrency(totalRevenue)} 
         description="Taxa base Stripe 2.9% + R$0,30 por transação" 
-        tooltipText="A plataforma Mentora Ai não cobra nenhuma taxa adicional na venda de seus produtos, essas taxas são cobradas pela empresa que processa os pagamentos via cartão, é uma das empresas mais seguras e famosas para processamento de pagamentos de nome Stripe." 
+        tooltipText="A plataforma Mentor X não cobra nenhuma taxa adicional na venda de seus produtos, essas taxas são cobradas pela empresa que processa os pagamentos via cartão, é uma das empresas mais seguras e famosas para processamento de pagamentos de nome Stripe." 
       />
       <StatsCard 
         title="Valores Pagos" 

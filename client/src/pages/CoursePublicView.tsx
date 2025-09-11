@@ -1324,29 +1324,6 @@ const CoursePublicView: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de E-mail Já Existente (Não Lead) */}
-      <Dialog open={showEmailExistsModal} onOpenChange={setShowEmailExistsModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center text-lg font-bold text-foreground mb-4">
-              Este e-mail já tem um cadastro na plataforma, faça o login por favor.
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="text-center space-y-4">
-            <Button 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5"
-              onClick={() => {
-                setShowEmailExistsModal(false);
-                navigate('/login');
-              }}
-            >
-              OK, fazer meu login
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* Modal de Boas-vindas para Curso Gratuito */}
       <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
         <DialogContent className="max-w-md">

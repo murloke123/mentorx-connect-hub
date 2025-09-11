@@ -6,7 +6,7 @@
 import { EmailTemplate } from '../../types/emailTypes';
 
 export const calendarCancelTemplate: EmailTemplate = {
-  subject: '⚠️ Agendamento Cancelado - {{MENTOR_NAME}}',
+  subject: 'Mentoria Cancelada - Mentor X',
   htmlContent: `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -39,7 +39,7 @@ export const calendarCancelTemplate: EmailTemplate = {
                     <tr>
                         <td style="background-color: #e53e3e; padding: 40px 30px; text-align: center;">
                             <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0;">
-                                ⚠️ Agendamento Cancelado
+                                Mentoria Cancelada - Mentor X
                             </h1>
                             <p style="color: #fed7d7; font-size: 16px; margin: 10px 0 0 0;">
                                 Informações sobre o cancelamento
@@ -55,7 +55,7 @@ export const calendarCancelTemplate: EmailTemplate = {
                             </h2>
                             
                             <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                                Lamentamos informar que seu agendamento com <strong>{{MENTOR_NAME}}</strong> foi cancelado.
+                                Sua mentoria agendada na plataforma <strong>Mentor X</strong> foi cancelada.
                             </p>
                             
                             <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
@@ -83,12 +83,12 @@ export const calendarCancelTemplate: EmailTemplate = {
                                 <!--[if mso]>
                                 <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#667eea" fillcolor="#667eea">
                                     <w:anchorlock/>
-                                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">🔄 Reagendar na Mentora AI</center>
+                                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">🔄 Reagendar na Mentor X</center>
                                 </v:roundrect>
                                 <![endif]-->
                                 <!--[if !mso]><!-->
                                 <a href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="display: inline-block; background-color: #667eea; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border: 2px solid #667eea; text-align: center; min-width: 200px;">
-                                    🔄 Reagendar na Mentora AI
+                                    🔄 Reagendar na Mentor X
                                 </a>
                                 <!--<![endif]-->
                             </div>
@@ -135,7 +135,7 @@ export const calendarCancelTemplate: EmailTemplate = {
                                 Este e-mail foi enviado para {{MENTEE_EMAIL}}
                             </p>
                             <p style="color: #a0aec0; font-size: 13px; margin: 0;">
-                                © {{CURRENT_YEAR}} Mentora AI. Todos os direitos reservados.
+                                © {{ANO_ATUAL}} Mentor X. Todos os direitos reservados.
                             </p>
                         </td>
                     </tr>
@@ -169,7 +169,7 @@ Pedimos sinceras desculpas pelo inconveniente e esperamos que você possa reagen
 • Motivo: {{CANCELLATION_REASON}}
 {{/if}}
 
-🔄 Reagendar na Mentora AI: {{PLATFORM_URL}}
+🔄 Reagendar na Mentor X: {{PLATFORM_URL}}
 
 💡 Próximos passos:
 1. Reagende quando quiser - Acesse a plataforma e escolha um novo horário
@@ -181,6 +181,6 @@ Nossa equipe está sempre pronta para ajudar você a encontrar o mentor ideal.
 Suporte: {{SUPPORT_URL}}
 
 Este e-mail foi enviado para {{MENTEE_EMAIL}}
-© {{CURRENT_YEAR}} Mentora AI. Todos os direitos reservados.
+© {{CURRENT_YEAR}} Mentor X. Todos os direitos reservados.
   `
-}; 
+};

@@ -151,7 +151,7 @@ const Navigation = () => {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
                   <Bot className="h-5 w-5 text-slate-900" />
                 </div>
-                Mentora Ai
+                Mentor X
               </Link>
             </div>
             
@@ -161,7 +161,7 @@ const Navigation = () => {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg">
                   <Bot className="h-5 w-5 text-slate-900" />
                 </div>
-                Mentora Ai
+                Mentor X
               </Link>
             </div>
             
@@ -181,7 +181,7 @@ const Navigation = () => {
           {/* Mobile: Logo centralizado */}
           <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
             <Link to="/" className="flex items-center font-bold text-xl text-foreground hover:text-gold-light transition-colors duration-200">
-              Mentora Ai
+              Mentor X
             </Link>
           </div>
           
@@ -191,7 +191,7 @@ const Navigation = () => {
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold via-gold-light to-gold-dark flex items-center justify-center shadow-lg hover:shadow-gold transition-all duration-200">
                 <Bot className="h-5 w-5 text-slate-900" />
               </div>
-              Mentora Ai
+              Mentor X
             </Link>
           </div>
           

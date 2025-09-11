@@ -2462,12 +2462,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Importar Supabase dinamicamente
       const { createClient } = await import('@supabase/supabase-js');
       const supabaseUrl = process.env.VITE_SUPABASE_URL;
-      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (!supabaseUrl || !supabaseServiceKey) {
         console.error('❌ [API] Variáveis de ambiente do Supabase não configuradas');
-        console.error('❌ [API] VITE_SUPABASE_URL:', supabaseUrl ? 'OK' : 'MISSING');
-        console.error('❌ [API] SUPABASE_SERVICE_ROLE:', supabaseServiceKey ? 'OK' : 'MISSING');
         return res.status(500).json({
           success: false,
           error: 'Configuração do servidor incompleta'

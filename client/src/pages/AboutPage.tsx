@@ -7,10 +7,10 @@ const AboutPage = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-purple-50 to-white py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-6">Sobre a Mentora Ai</h1>
+          <h1 className="text-4xl font-bold mb-6">Sobre a Mentor X</h1>
           <div className="max-w-3xl mx-auto">
             <p className="text-lg mb-6">
-              A Mentora Ai nasceu para transformar conhecimento em conexões. Aqui, mentores experientes compartilham seus saberes com quem deseja aprender de forma simples, prática e acessível.
+              A Mentor X nasceu para transformar conhecimento em conexões. Aqui, mentores experientes compartilham seus saberes com quem deseja aprender de forma simples, prática e acessível.
               Nossos pilares são: autonomia, conhecimento e resultado real.
             </p>
             <p className="text-lg mb-8">
@@ -31,7 +31,7 @@ const AboutPage = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-xl font-medium mb-3">Autonomia</h3>
               <p className="text-gray-600">
-                Acreditamos no poder da autonomia para o desenvolvimento pessoal e profissional. Na Mentora Ai, cada usuário tem liberdade para escolher seu caminho de aprendizado.
+                Acreditamos no poder da autonomia para o desenvolvimento pessoal e profissional. Na Mentor X, cada usuário tem liberdade para escolher seu caminho de aprendizado.
               </p>
             </div>
             <div className="bg-gray-50 p-6 rounded-lg">
@@ -43,7 +43,7 @@ const AboutPage = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-xl font-medium mb-3">Resultado Real</h3>
               <p className="text-gray-600">
-                Nossa plataforma é focada em resultados tangíveis. Queremos que cada interação na Mentora Ai gere impacto positivo e transformação na vida dos mentorados.
+                Nossa plataforma é focada em resultados tangíveis. Queremos que cada interação na Mentor X gere impacto positivo e transformação na vida dos mentorados.
               </p>
             </div>
           </div>
@@ -97,9 +97,9 @@ const AboutPage = () => {
       {/* Join Us */}
       <section className="py-16 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-6">Faça Parte da Mentora Ai</h2>
+          <h2 className="text-2xl font-bold mb-6">Faça Parte da Mentor X</h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto">
-            Seja você um especialista querendo compartilhar conhecimento ou alguém em busca de evolução, a Mentora Ai está aqui para conectar pessoas e transformar vidas através do aprendizado.
+            Seja você um especialista querendo compartilhar conhecimento ou alguém em busca de evolução, a Mentor X está aqui para conectar pessoas e transformar vidas através do aprendizado.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link to="/register?role=mentor">

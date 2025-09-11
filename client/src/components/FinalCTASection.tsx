@@ -92,7 +92,7 @@ const FinalCTASection = () => {
           <Button 
             className="btn-gold text-xl px-12 py-6 mb-4 hover:scale-105 transform transition-all duration-300 shadow-glow md:text-xl sm:text-lg sm:px-8 sm:py-4 xs:text-base xs:px-6 xs:py-3"
             onClick={() => {
-              const subject = encodeURIComponent("Estou interessado na plataforma Mentora Ai");
+              const subject = encodeURIComponent("Estou interessado na plataforma Mentor X");
               const body = encodeURIComponent("Gostaria de falar com o representante, poderia entrar em contato comigo por favor.");
               window.location.href = `mailto:guilherme.galdino@hotmail.com?subject=${subject}&body=${body}`;
             }}

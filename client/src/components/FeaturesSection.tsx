@@ -63,7 +63,7 @@ const FeaturesSection = () => {
             POR QUE NOS ESCOLHER COMO SUA PLATAFORMA
           </h2>
           <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-            MENTORA AI
+MENTOR X
           </h3>
           
           {/* Counter Card - Acima do texto da plataforma */}

@@ -217,7 +217,7 @@ const MentorProfilePage = () => {
     const fullPhoneNumber = `${countryCode}${cleanPhone}`;
     
     // Mensagem pré-carregada
-    const message = encodeURIComponent("Olá, vim através da plataforma Mentora Ai e preciso falar com você.");
+    const message = encodeURIComponent("Olá, vim através da plataforma Mentor X e preciso falar com você.");
     
     // Abrir WhatsApp Web em nova guia com mensagem pré-carregada
     const whatsappUrl = `https://wa.me/${fullPhoneNumber}?text=${message}`;

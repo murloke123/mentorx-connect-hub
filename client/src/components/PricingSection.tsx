@@ -216,7 +216,7 @@ const PricingSection = ({ initialSelectedPlan }: PricingSectionProps) => {
             variant="outline" 
             className="border-gold text-gold hover:bg-gold hover:text-primary-foreground"
             onClick={() => {
-              const subject = encodeURIComponent("Estou interessado na plataforma Mentora Ai");
+              const subject = encodeURIComponent("Estou interessado na plataforma Mentor X");
               const body = encodeURIComponent("Gostaria de falar com o representante, poderia entrar em contato comigo por favor.");
               window.location.href = `mailto:guilherme.galdino@hotmail.com?subject=${subject}&body=${body}`;
             }}

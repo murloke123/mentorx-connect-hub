@@ -249,7 +249,31 @@ const MentoradoConfiguracoesPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium">
+                    Autenticação de Dois Fatores
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Adicionar uma camada extra de segurança à sua conta
+                  </p>
+                </div>
+                <div className="md:hidden">
+                  <Checkbox
+                     defaultChecked={false}
+                     onCheckedChange={(checked: boolean) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                     className="data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black rounded-sm m-2"
+                   />
+                </div>
+                <div className="hidden md:block">
+                  <Switch 
+                    defaultChecked={false}
+                    onCheckedChange={(checked) => handleSettingToggle('Autenticação de Dois Fatores', checked)}
+                  />
+                </div>
+              </div>
 
+              <Separator />
 
               <div className="flex items-center justify-between">
                   <div className="space-y-0.5">

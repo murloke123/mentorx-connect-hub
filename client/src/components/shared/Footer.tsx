@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-white mb-4">Mentora Ai</h3>
+            <h3 className="text-xl font-bold text-white mb-4">Mentor X</h3>
             <p className="mb-4">
               Conectando mentores e mentorados para um futuro de conhecimento compartilhado.
             </p>
@@ -62,7 +62,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p>&copy; {new Date().getFullYear()} Mentora Ai. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Mentor X. Todos os direitos reservados.</p>
           <div className="mt-4 md:mt-0 flex space-x-4">
             <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-white transition-colors">Privacidade</a>

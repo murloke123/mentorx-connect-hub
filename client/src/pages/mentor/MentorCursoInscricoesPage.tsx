@@ -682,7 +682,7 @@ const MentorCursoInscricoesPage = () => {
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => {
-                                  const message = encodeURIComponent("Olá, vim através da plataforma Mentora Ai e preciso falar com você.");
+                                  const message = encodeURIComponent("Olá, vim através da plataforma Mentor X e preciso falar com você.");
                                   window.open(`https://wa.me/${student.student_phone?.replace(/\D/g, '')}?text=${message}`, '_blank');
                                 }}
                               >

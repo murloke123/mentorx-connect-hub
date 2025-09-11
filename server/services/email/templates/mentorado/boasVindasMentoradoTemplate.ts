@@ -6,7 +6,7 @@
 import { EmailTemplate } from '../../types/emailTypes';
 
 export const boasVindasMentoradoTemplate: EmailTemplate = {
-  subject: '🌟 Bem-vindo(a) à Mentora AI - Sua jornada de aprendizado começa aqui!',
+  subject: 'Bem-vindo à Mentor X! 🎉',
   htmlContent: `
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -14,7 +14,7 @@ export const boasVindasMentoradoTemplate: EmailTemplate = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Bem-vindo à Mentora AI</title>
+    <title>Bem-vindo à Mentor X</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -47,7 +47,7 @@ export const boasVindasMentoradoTemplate: EmailTemplate = {
                             <![endif]-->
                             <div style="color: #ffffff;">
                                 <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; line-height: 32px;">
-                                    🌟 Bem-vindo à Mentora AI!
+                                    🎉 Bem-vindo à Mentor X!
                                 </h1>
                                 <p style="color: #ffffff; font-size: 16px; margin: 10px 0 0 0; padding: 0; font-family: Arial, Helvetica, sans-serif; line-height: 20px;">
                                     Sua jornada de aprendizado começa aqui
@@ -68,7 +68,7 @@ export const boasVindasMentoradoTemplate: EmailTemplate = {
                             </h2>
                             
                             <p style="color: #4a5568; font-size: 16px; line-height: 24px; margin: 0 0 20px 0; padding: 0; font-family: Arial, Helvetica, sans-serif;">
-                                É com grande alegria que damos as boas-vindas à <strong>Mentora AI</strong>! Você acaba de dar um passo importante em direção ao seu crescimento pessoal e profissional.
+                                É com grande alegria que damos as boas-vindas à <strong>Mentor X</strong>, a plataforma que conecta conhecimento e transforma vidas através da mentoria.
                             </p>
                             
                             <p style="color: #4a5568; font-size: 16px; line-height: 24px; margin: 0 0 30px 0; padding: 0; font-family: Arial, Helvetica, sans-serif;">
@@ -179,7 +179,7 @@ export const boasVindasMentoradoTemplate: EmailTemplate = {
                                             Este e-mail foi enviado para {{EMAIL_USUARIO}}
                                         </p>
                                         <p style="color: #a0aec0; font-size: 13px; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; line-height: 16px;">
-                                            © {{ANO_ATUAL}} Mentora AI. Todos os direitos reservados.
+                                            © {{ANO_ATUAL}} Mentor X. Todos os direitos reservados.
                                         </p>
                                     </td>
                                 </tr>
@@ -194,11 +194,11 @@ export const boasVindasMentoradoTemplate: EmailTemplate = {
 </html>
   `,
   textContent: `
-🌟 Bem-vindo à Mentora AI!
+🌟 Bem-vindo à Mentor X!
 
 Olá, {{NOME_USUARIO}}!
 
-É com grande alegria que damos as boas-vindas à Mentora AI, a plataforma que conecta você aos melhores mentores e conhecimentos para acelerar seu crescimento pessoal e profissional.
+É com grande alegria que damos as boas-vindas à <strong>Mentor X</strong>, a plataforma que conecta você aos melhores mentores e conhecimentos para acelerar seu crescimento pessoal e profissional.
 
 Como mentorado, você tem acesso a uma comunidade incrível de especialistas prontos para compartilhar suas experiências e ajudar você a alcançar seus objetivos.
 
@@ -223,6 +223,6 @@ Nossa equipe está aqui para garantir que você tenha a melhor experiência de a
 Suporte: {{URL_SUPORTE}}
 
 Este e-mail foi enviado para {{EMAIL_USUARIO}}
-© {{ANO_ATUAL}} Mentora AI. Todos os direitos reservados.
+© {{ANO_ATUAL}} Mentor X. Todos os direitos reservados.
   `
 };
