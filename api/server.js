@@ -49,16 +49,21 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    env: config.NODE_ENV,
-    environmentValid: envValidation.isValid,
-    missingVars: envValidation.missingVars,
-    platform: 'vercel-serverless'
+    environment: process.env.NODE_ENV || 'development',
+    validation: envValidation,
+    stripe: {
+      secretKey: maskApiKey(process.env.STRIPE_SECRET_KEY),
+      publishableKey: maskApiKey(process.env.STRIPE_PUBLISHABLE_KEY)
+    }
   });
 });
 
-// Register API routes
-const server = createServer(app);
-registerRoutes(app);
+// Register all routes
+registerRoutes(app).then(() => {
+  console.log('✅ Routes registered successfully');
+}).catch((error) => {
+  console.error('❌ Error registering routes:', error);
+});
 
-// Export for Vercel
+// Export the app for Vercel
 module.exports = app;
