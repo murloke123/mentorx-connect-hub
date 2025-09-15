@@ -3,7 +3,21 @@
  * Manages environment variables and provides fallback values for development
  */
 
-function getEnvironmentConfig() {
+export interface EnvironmentConfig {
+  NODE_ENV: string;
+  PORT: number;
+  DATABASE_URL: string;
+  STRIPE_SECRET_KEY: string;
+  STRIPE_PUBLISHABLE_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  SUPABASE_URL: string;
+  SUPABASE_ANON_KEY: string;
+  BREVO_API_KEY: string;
+  BREVO_SENDER_EMAIL: string;
+  BREVO_SENDER_NAME: string;
+}
+
+function getEnvironmentConfig(): EnvironmentConfig {
   return {
     NODE_ENV: process.env.NODE_ENV || 'development',
     PORT: parseInt(process.env.PORT || '5000', 10),
@@ -19,9 +33,9 @@ function getEnvironmentConfig() {
   };
 }
 
-const config = getEnvironmentConfig();
+export const config = getEnvironmentConfig();
 
-function validateRequiredEnvironmentVariables() {
+export function validateRequiredEnvironmentVariables(): { isValid: boolean; missingVars: string[] } {
   const requiredVars = [
     'DATABASE_URL',
     'STRIPE_SECRET_KEY', 
@@ -37,18 +51,13 @@ function validateRequiredEnvironmentVariables() {
   };
 }
 
-function isDevelopment() {
+export function isDevelopment(): boolean {
   return config.NODE_ENV === 'development';
 }
 
-function isProduction() {
+export function isProduction(): boolean {
   return config.NODE_ENV === 'production';
 }
 
-// CommonJS exports
-module.exports = {
-  config,
-  validateRequiredEnvironmentVariables,
-  isDevelopment,
-  isProduction
-};
+// Default export for deployment compatibility
+export default config;

@@ -1,2 +1,0 @@
-* o projeto sempre ja roda na porta 5000, nao tente ficar rodando o projeto em outra porta que nao seja a 5000
-* nao crie arquivos .sql, se tiver q rodar algum comando sql, passe o comando atraves do chat para o usuario

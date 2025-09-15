@@ -1,4 +1,4 @@
-import { DocumentUploadTest } from '@/components/DocumentUploadTest';
+import { DocumentUploadTest } from './DocumentUploadTest';
 
 export default function DocumentTestPage() {
   return (

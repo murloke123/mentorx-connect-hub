@@ -5,12 +5,7 @@ import Navigation from "@/components/shared/Navigation";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import ContadorTestPage from "@/pages/ContadorTestPage";
-import DocumentTestPage from "@/pages/DocumentTestPage";
-import { TestDocumentVerificationPage } from "@/pages/TestDocumentVerificationPage";
 
-import JitsiMeetTestPage from "@/pages/test/JitsiMeetTestPage";
-import TestMCPPage from "@/pages/TestMCPPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
@@ -125,9 +120,7 @@ const AppContent = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/document-test" element={<DocumentTestPage />} />
-          <Route path="/contador-test" element={<ContadorTestPage />} />
-          <Route path="/test-document-verification" element={<TestDocumentVerificationPage />} />
+
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
           <Route path="/appointment-checkout-success" element={<AppointmentCheckoutSuccessPage />} />
           <Route path="/curso/:courseId" element={<CoursePublicView />} />
@@ -330,9 +323,7 @@ const AppContent = () => {
           {/* Rota pública do Course Player para usuários deslogados */}
           <Route path="/cursoplayer/:id" element={<CoursePlayerPage />} />
           
-          {/* Rotas de Teste */}
-          <Route path="/testemcp" element={<TestMCPPage />} />
-          <Route path="/test/jitsi-meet" element={<JitsiMeetTestPage />} />
+
           
           {/* Rota 404 - deve ser a última */}
           <Route path="*" element={<NotFound />} />

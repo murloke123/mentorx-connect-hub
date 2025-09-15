@@ -10,9 +10,8 @@
     "build:server": "tsc server/index.ts --outDir dist --target es2022 --module esnext --moduleResolution bundler --allowSyntheticDefaultImports",
     "start": "NODE_ENV=production node dist/index.js",
     "vercel-build": "npm run build:client && npm run prepare:serverless",
-    "prepare:serverless": "mkdir -p api && cp server/environment.js api/ && cp server/routes.js api/ && cp -r shared api/",
-    "check": "tsc --noEmit",
-    "db:push": "drizzle-kit push"
+    "prepare:serverless": "mkdir -p api && cp server/environment.ts api/environment.js && cp server/routes.ts api/routes.js && cp -r shared api/",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@getbrevo/brevo": "^2.5.0",
@@ -57,8 +56,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^16.6.1",
-    "drizzle-orm": "^0.39.1",
-    "drizzle-zod": "^0.7.0",
+
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
@@ -111,7 +109,7 @@
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.30.4",
+
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",

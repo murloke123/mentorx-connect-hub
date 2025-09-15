@@ -36,5 +36,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      external: [
+        // Excluir arquivos de teste do build de produção
+        /\/dev\/test-pages\//,
+      ],
+    },
   },
 });
