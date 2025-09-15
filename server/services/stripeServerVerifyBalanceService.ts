@@ -29,7 +29,6 @@ async function verifyConnectedAccountBalance(connectedAccountId: string): Promis
       VERCEL_ENV: process.env.VERCEL_ENV,
       hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
       stripeKeyPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 10) + '...',
-      stripeApiVersion: stripe.getApiField('version'),
       timestamp: new Date().toISOString()
     });
 
