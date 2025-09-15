@@ -4,10 +4,13 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "dev": "tsx watch server/index.ts",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc server/index.ts --outDir dist --target es2022 --module esnext --moduleResolution bundler --allowSyntheticDefaultImports",
     "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc",
+    "vercel-build": "npm run build:client",
+    "check": "tsc --noEmit",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
