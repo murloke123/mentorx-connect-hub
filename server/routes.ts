@@ -1026,37 +1026,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ENDPOINT 19: Verificar saldo pendente da conta conectada
   app.post('/api/stripe/verify-balance', async (req, res) => {
+    const startTime = Date.now();
+    
     try {
       const { stripeAccountId } = req.body;
       
       console.log('🚀 ROUTES.TS: Requisição recebida em /api/stripe/verify-balance');
+      console.log('📦 ROUTES.TS: Request body:', req.body);
       console.log('📦 ROUTES.TS: Stripe Account ID:', stripeAccountId);
+      console.log('🌐 ROUTES.TS: Environment info:', {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+        stripeKeyPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 10) + '...',
+        timestamp: new Date().toISOString()
+      });
+      console.log('📡 ROUTES.TS: Request headers:', {
+        'content-type': req.headers['content-type'],
+        'user-agent': req.headers['user-agent'],
+        'x-forwarded-for': req.headers['x-forwarded-for'],
+        'x-vercel-id': req.headers['x-vercel-id']
+      });
       
       // 🔍 VALIDAÇÃO: stripeAccountId é obrigatório
       if (!stripeAccountId) {
+        console.error('❌ ROUTES.TS: stripeAccountId não fornecido');
         return res.status(400).json({
           success: false,
           error: 'stripeAccountId é obrigatório para verificar saldo'
         });
       }
       
+      // Verificar se a chave do Stripe está configurada
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('❌ ROUTES.TS: STRIPE_SECRET_KEY não configurada');
+        return res.status(500).json({
+          success: false,
+          error: 'Configuração do Stripe não encontrada'
+        });
+      }
+      
+      console.log('📥 ROUTES.TS: Importando serviço de balance...');
       // Importar dinamicamente o serviço de balance
       const { verifyConnectedAccountBalance } = await import('./services/stripeServerVerifyBalanceService');
+      console.log('✅ ROUTES.TS: Serviço importado com sucesso');
       
+      console.log('🔄 ROUTES.TS: Chamando verifyConnectedAccountBalance...');
       const result = await verifyConnectedAccountBalance(stripeAccountId);
+      console.log('📊 ROUTES.TS: Resultado do serviço:', {
+        success: result.success,
+        pendingAmount: result.pendingAmount,
+        currency: result.currency,
+        hasError: !!result.error,
+        errorMessage: result.error
+      });
       
       if (!result.success) {
+        console.error('❌ ROUTES.TS: Serviço retornou erro:', result);
         return res.status(400).json(result);
       }
       
+      const duration = Date.now() - startTime;
+      console.log(`✅ ROUTES.TS: Resposta enviada com sucesso em ${duration}ms`);
+      
       res.json(result);
     } catch (error) {
-      console.error('❌ ROUTES.TS: Erro em /api/stripe/verify-balance:', error);
-      res.status(500).json({ 
-        success: false, 
+      const duration = Date.now() - startTime;
+      console.error(`❌ ROUTES.TS: Erro em /api/stripe/verify-balance após ${duration}ms:`, error);
+      
+      // Log detalhado do erro
+      if (error instanceof Error) {
+        console.error('❌ ROUTES.TS: Error name:', error.name);
+        console.error('❌ ROUTES.TS: Error message:', error.message);
+        console.error('❌ ROUTES.TS: Error stack:', error.stack);
+      }
+      
+      // Verificar se é um erro de timeout ou rede
+      const isNetworkError = error instanceof Error && (
+        error.message.includes('timeout') ||
+        error.message.includes('ECONNRESET') ||
+        error.message.includes('ENOTFOUND') ||
+        error.message.includes('fetch')
+      );
+      
+      const errorResponse = {
+        success: false,
         error: error instanceof Error ? error.message : 'Erro interno do servidor',
-        details: error instanceof Error ? error.stack : undefined
-      });
+        errorType: error instanceof Error ? error.name : 'UnknownError',
+        isNetworkError,
+        timestamp: new Date().toISOString(),
+        duration: `${duration}ms`,
+        environment: {
+          NODE_ENV: process.env.NODE_ENV,
+          VERCEL: process.env.VERCEL,
+          VERCEL_ENV: process.env.VERCEL_ENV
+        }
+      };
+      
+      console.error('❌ ROUTES.TS: Enviando resposta de erro:', errorResponse);
+      
+      res.status(500).json(errorResponse);
     }
   });
 
