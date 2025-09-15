@@ -10,7 +10,7 @@
     "build:server": "tsc server/index.ts --outDir dist --target es2022 --module esnext --moduleResolution bundler --allowSyntheticDefaultImports",
     "start": "NODE_ENV=production node dist/index.js",
     "vercel-build": "npm run build:client && npm run prepare:serverless",
-    "prepare:serverless": "mkdir -p api && cp -r server api/ && cp -r shared api/",
+    "prepare:serverless": "mkdir -p api && cp server/environment.js api/ && cp server/routes.js api/ && cp -r shared api/",
     "check": "tsc --noEmit",
     "db:push": "drizzle-kit push"
   },

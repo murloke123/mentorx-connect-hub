@@ -1,10 +1,10 @@
 // Vercel Serverless Function
-import { createServer } from 'http';
-import express from 'express';
-import cors from 'cors';
-import 'dotenv/config';
-import { config, validateRequiredEnvironmentVariables } from '../server/environment.js';
-import { registerRoutes } from '../server/routes.js';
+const { createServer } = require('http');
+const express = require('express');
+const cors = require('cors');
+require('dotenv/config');
+const { config, validateRequiredEnvironmentVariables } = require('./environment.js');
+const { registerRoutes } = require('./routes.js');
 
 const app = express();
 
@@ -61,4 +61,4 @@ const server = createServer(app);
 registerRoutes(app);
 
 // Export for Vercel
-export default app;
+module.exports = app;
