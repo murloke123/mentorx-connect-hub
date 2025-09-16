@@ -1,10 +1,10 @@
 // Vercel Serverless Function
-const { createServer } = require('http');
-const express = require('express');
-const cors = require('cors');
-require('dotenv/config');
-const { config, validateRequiredEnvironmentVariables } = require('./environment.js');
-const { registerRoutes } = require('./routes.js');
+import { createServer } from 'http';
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config';
+import { config, validateRequiredEnvironmentVariables } from './environment.js';
+import { registerRoutes } from './routes.js';
 
 const app = express();
 
@@ -49,21 +49,16 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    validation: envValidation,
-    stripe: {
-      secretKey: maskApiKey(process.env.STRIPE_SECRET_KEY),
-      publishableKey: maskApiKey(process.env.STRIPE_PUBLISHABLE_KEY)
-    }
+    env: config.NODE_ENV,
+    environmentValid: envValidation.isValid,
+    missingVars: envValidation.missingVars,
+    platform: 'vercel-serverless'
   });
 });
 
-// Register all routes
-registerRoutes(app).then(() => {
-  console.log('✅ Routes registered successfully');
-}).catch((error) => {
-  console.error('❌ Error registering routes:', error);
-});
+// Register API routes
+const server = createServer(app);
+registerRoutes(app);
 
-// Export the app for Vercel
-module.exports = app;
+// Export for Vercel
+export default app;

@@ -32,7 +32,7 @@ const environment_1 = require("../environment");
 // ##########################################################################################
 // Inicializar cliente Stripe com chave secreta do servidor
 const stripe = new stripe_1.default(environment_1.config.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-06-30.basil',
+
     typescript: true,
 });
 exports.stripe = stripe;

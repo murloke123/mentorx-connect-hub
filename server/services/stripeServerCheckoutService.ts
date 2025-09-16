@@ -54,8 +54,7 @@ import Stripe from "stripe";
 import { config } from '../environment';
 
 // Inicializar cliente Stripe com chave secreta do servidor
-const stripe = new Stripe(config.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-06-30.basil',
+const stripe = new Stripe(config.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
 
