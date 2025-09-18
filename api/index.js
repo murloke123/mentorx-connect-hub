@@ -643,12 +643,17 @@ app.post('/api/email/boas-vindas', async (req, res) => {
     // Importar as funções de email
     const { enviarEmailBoasVindasMentor, enviarEmailBoasVindasMentorado } = await import('./services/email/emailService-clean.js');
 
+    // Definir URL de login baseada no role do usuário
+    const defaultLoginUrl = userRole === 'mentor'
+      ? 'https://www.mentorx.com.br/mentor/dashboard'
+      : 'https://www.mentorx.com.br/mentorado/dashboard';
+    
     // Preparar dados para o email
     const emailData = {
       userName,
       userEmail,
-      loginUrl: loginUrl || 'https://mentorx.com.br/login',
-      supportUrl: supportUrl || 'https://mentorx.com.br/suporte'
+      loginUrl: loginUrl || defaultLoginUrl,
+      supportUrl: supportUrl || 'https://www.mentorx.com.br/suporte'
     };
 
     let result;

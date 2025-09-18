@@ -285,7 +285,7 @@ async function enviarEmailBoasVindasMentor(data) {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.loginUrl || 'https://mentorx.com.br/mentor/dashboard'}" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${data.loginUrl || 'https://www.mentorx.com.br/mentor/dashboard'}" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Acessar Dashboard
             </a>
           </div>
@@ -383,7 +383,7 @@ async function enviarEmailBoasVindasMentorado(data) {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.loginUrl || 'https://mentorx.com.br/mentorado/dashboard'}" style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${data.loginUrl || 'https://www.mentorx.com.br/mentorado/dashboard'}" style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Começar Agora
             </a>
           </div>
@@ -489,7 +489,7 @@ async function enviarEmailCompraCurso(data) {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${data.courseUrl || 'https://mentorx.com.br/mentorado/cursos'}" style="background: #ff6b35; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="${data.courseUrl || 'https://www.mentorx.com.br/mentorado/cursos'}" style="background: #ff6b35; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Acessar Curso
             </a>
           </div>
@@ -596,7 +596,7 @@ async function enviarEmailCancelamentoAgendamento(data) {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://mentorx.com.br/${data.recipientRole}/agendamentos" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="https://www.mentorx.com.br/${data.recipientRole}/agendamentos" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Ver Meus Agendamentos
             </a>
           </div>

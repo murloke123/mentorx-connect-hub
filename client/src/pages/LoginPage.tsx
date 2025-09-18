@@ -252,11 +252,16 @@ const LoginPage = () => {
           // 📧 ENVIAR E-MAIL DE BOAS-VINDAS
           console.log('📧 [SIGNUP] Iniciando envio de e-mail de boas-vindas...');
           try {
+            // Definir URL de login baseada no role do usuário
+            const dashboardUrl = role === 'mentor' 
+              ? `${clientConfig.APP_URL}/mentor/dashboard`
+              : `${clientConfig.APP_URL}/mentorado/dashboard`;
+            
             const emailResult = await enviarEmailBoasVindas({
               userName: fullName,
               userEmail: email,
               userRole: role,
-              loginUrl: clientConfig.APP_URL + '/login',
+              loginUrl: dashboardUrl,
               supportUrl: clientConfig.APP_URL + '/suporte'
             });
 
