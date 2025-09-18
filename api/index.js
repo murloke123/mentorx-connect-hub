@@ -607,6 +607,85 @@ app.post('/api/test-email/compra-curso', async (req, res) => {
   }
 });
 
+// ENDPOINT: E-mail de boas-vindas (genérico que direciona baseado no role)
+app.post('/api/email/boas-vindas', async (req, res) => {
+  console.log('📧 [BOAS-VINDAS] Nova requisição de e-mail de boas-vindas');
+
+  try {
+    const { userName, userEmail, userRole, loginUrl, supportUrl } = req.body;
+
+    // Validações básicas
+    if (!userName || !userEmail || !userRole) {
+      console.error('❌ [BOAS-VINDAS] Dados obrigatórios ausentes');
+      return res.status(400).json({
+        success: false,
+        error: 'Dados obrigatórios ausentes: userName, userEmail, userRole'
+      });
+    }
+
+    // Verificar se o role é válido
+    if (userRole !== 'mentor' && userRole !== 'mentorado') {
+      console.error('❌ [BOAS-VINDAS] Role inválido:', userRole);
+      return res.status(400).json({
+        success: false,
+        error: 'userRole deve ser "mentor" ou "mentorado"'
+      });
+    }
+
+    console.log('📋 [BOAS-VINDAS] Dados recebidos:', {
+      userName,
+      userEmail,
+      userRole,
+      loginUrl: loginUrl || 'default',
+      supportUrl: supportUrl || 'default'
+    });
+
+    // Importar as funções de email
+    const { enviarEmailBoasVindasMentor, enviarEmailBoasVindasMentorado } = await import('./services/email/emailService-clean.js');
+
+    // Preparar dados para o email
+    const emailData = {
+      userName,
+      userEmail,
+      loginUrl: loginUrl || 'https://mentorx.com.br/login',
+      supportUrl: supportUrl || 'https://mentorx.com.br/suporte'
+    };
+
+    let result;
+
+    // Direcionar para a função correta baseada no role
+    if (userRole === 'mentor') {
+      console.log('📧 [BOAS-VINDAS] Enviando email de boas-vindas para mentor');
+      result = await enviarEmailBoasVindasMentor(emailData);
+    } else {
+      console.log('📧 [BOAS-VINDAS] Enviando email de boas-vindas para mentorado');
+      result = await enviarEmailBoasVindasMentorado(emailData);
+    }
+
+    if (result.success) {
+      console.log('✅ [BOAS-VINDAS] Email enviado com sucesso!', result.messageId);
+      res.json({
+        success: true,
+        messageId: result.messageId,
+        message: `E-mail de boas-vindas ${userRole} enviado com sucesso`
+      });
+    } else {
+      console.error('❌ [BOAS-VINDAS] Falha no envio:', result.error);
+      res.status(500).json({
+        success: false,
+        error: result.error || 'Erro no envio do email'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ [BOAS-VINDAS] Erro crítico:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Erro interno do servidor'
+    });
+  }
+});
+
 // ENDPOINT: Teste de e-mail de cancelamento
 app.post('/api/test-email/cancelamento', async (req, res) => {
   console.log('🧪 [TESTE] Testando email cancelamento');
