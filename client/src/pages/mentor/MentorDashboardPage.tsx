@@ -7,12 +7,12 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeAccountStatus } from '@/hooks/useStripeAccountStatus';
 import { useStripeFinancialData } from '@/hooks/useStripeFinancialData';
-import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from '@/services/mentorService';
-import { Course } from '@/types/database';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, CheckCircle, Menu } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { getMentorCoursesById, getMentorEnrollmentStatsById, getMentorFollowersCountById, getMentorProfileById } from "@/services/mentorService";
+import { Course } from "@/types/database";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MentorDashboardPage = () => {
   const { user } = useAuth();
@@ -40,25 +40,25 @@ const MentorDashboardPage = () => {
   
   // ✅ OTIMIZADO: Usar funções que recebem userId (eliminam chamadas getUser)
   const { data: profile } = useQuery({
-    queryKey: ['mentorProfile', user?.id],
+    queryKey: ["mentorProfile", user?.id],
     queryFn: () => getMentorProfileById(user!.id),
     enabled: !!user?.id,
   });
   
   const { data: courses = [] } = useQuery<Course[]>({
-    queryKey: ['mentorCourses', user?.id],
+    queryKey: ["mentorCourses", user?.id],
     queryFn: () => getMentorCoursesById(user!.id),
     enabled: !!user?.id,
   });
   
   const { data: followersCount = 0 } = useQuery<number>({
-    queryKey: ['mentorFollowers', user?.id],
+    queryKey: ["mentorFollowers", user?.id],
     queryFn: () => getMentorFollowersCountById(user!.id),
     enabled: !!user?.id,
   });
   
   const { data: enrollmentStats } = useQuery({
-    queryKey: ['mentorEnrollmentStats', user?.id],
+    queryKey: ["mentorEnrollmentStats", user?.id],
     queryFn: () => getMentorEnrollmentStatsById(user!.id),
     enabled: !!user?.id,
   });
@@ -68,7 +68,7 @@ const MentorDashboardPage = () => {
   // Log dos dados do Stripe para debug - MOVIDO PARA ANTES DO EARLY RETURN
   useEffect(() => {
     if (lastUpdated) {
-      console.log('📊 MentorDashboard: Dados financeiros do Stripe atualizados:', {
+      console.log("📊 MentorDashboard: Dados financeiros do Stripe atualizados:", {
         pendingAmount,
         paidAmount,
         totalRevenue: pendingAmount,

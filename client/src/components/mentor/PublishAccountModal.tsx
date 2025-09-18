@@ -9,10 +9,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { updateMentorPublicStatus } from '@/services/mentorService';
-import { supabase } from '@/utils/supabase';
-import { CheckCircle, Loader2, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { updateMentorPublicStatus } from "@/services/mentorService";
+import { supabase } from "@/utils/supabase";
+import { CheckCircle, Loader2, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 interface PublishAccountModalProps {
   isOpen: boolean;
@@ -43,17 +43,17 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
 
   // Mapeamento dos campos do banco para nomes das seções
   const fieldToSectionMap: Record<string, string> = {
-    cards_sucesso: 'Cards de Sucesso',
-    meu_perfil: 'Meu Perfil',
-    por_que_me_seguir: 'Por que me seguir?',
-    meus_cursos: 'Meus Cursos',
-    elogios: 'O que dizem meus mentorados ...',
-    calendario: 'Agenda uma Conversa'
+    cards_sucesso: "Cards de Sucesso",
+    meu_perfil: "Meu Perfil",
+    por_que_me_seguir: "Por que me seguir?",
+    meus_cursos: "Meus Cursos",
+    elogios: "O que dizem meus mentorados ...",
+    calendario: "Agenda uma Conversa"
   };
 
   // Mapeamento para mensagens complementares específicas
   const sectionComplementMap: Record<string, string> = {
-    cards_sucesso: 'Fica localizado no canto superior direito da página'
+    cards_sucesso: "Fica localizado no canto superior direito da página"
   };
 
   useEffect(() => {
@@ -67,14 +67,14 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        throw new Error('Usuário não autenticado');
+        throw new Error("Usuário não autenticado");
       }
 
       // Buscar o campo verified e avatar_url do perfil
       const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('verified, avatar_url')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("verified, avatar_url")
+        .eq("id", user.id)
         .single();
 
       if (error) {
@@ -85,7 +85,7 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       const avatarUrl = profile?.avatar_url;
       
       // Verificar se tem avatar
-      const hasValidAvatar = avatarUrl && avatarUrl.trim() !== '';
+      const hasValidAvatar = avatarUrl && avatarUrl.trim() !== "";
       setHasAvatar(hasValidAvatar);
       
       // Mapear os campos do banco para o formato esperado
@@ -112,17 +112,17 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       
       // Adicionar avatar se não tiver
       if (!hasValidAvatar) {
-        missing.push('Foto de Avatar');
+        missing.push("Foto de Avatar");
       }
       
       setMissingFields(missing);
 
     } catch (error) {
-      console.error('Erro ao verificar status:', error);
+      console.error("Erro ao verificar status:", error);
       toast({
-        title: 'Erro ao verificar status',
-        description: 'Não foi possível verificar o status de verificação.',
-        variant: 'destructive',
+        title: "Erro ao verificar status",
+        description: "Não foi possível verificar o status de verificação.",
+        variant: "destructive",
       });
     }
   };
@@ -139,15 +139,15 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        throw new Error('Usuário não autenticado');
+        throw new Error("Usuário não autenticado");
       }
       
       // Usar o serviço para atualizar o status público
       await updateMentorPublicStatus(user.id, true);
       
       toast({
-        title: 'Conta publicada com sucesso!',
-        description: 'Sua conta agora está visível para o público.',
+        title: "Conta publicada com sucesso!",
+        description: "Sua conta agora está visível para o público.",
       });
       
       // Chamar callback de sucesso se fornecido
@@ -157,11 +157,11 @@ export const PublishAccountModal: React.FC<PublishAccountModalProps> = ({
       
       onClose();
     } catch (error) {
-      console.error('Erro ao publicar conta:', error);
+      console.error("Erro ao publicar conta:", error);
       toast({
-        title: 'Erro ao publicar conta',
-        description: 'Ocorreu um erro ao tentar publicar sua conta. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro ao publicar conta",
+        description: "Ocorreu um erro ao tentar publicar sua conta. Tente novamente.",
+        variant: "destructive",
       });
     } finally {
       setIsPublishing(false);

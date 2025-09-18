@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { clientConfig } from '@/config/environment';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
-import { enviarEmailBoasVindas } from '@/services/emailService';
-import { createOrUpdateStripeConnectedAccount } from '@/services/stripeClientService';
+import { enviarEmailBoasVindas } from "@/services/emailService";
+import { createOrUpdateStripeConnectedAccount } from "@/services/stripeClientService";
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

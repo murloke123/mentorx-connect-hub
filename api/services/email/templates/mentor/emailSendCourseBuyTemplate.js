@@ -96,7 +96,7 @@ exports.emailSendCourseBuyTemplate = {
 
         <!-- CTA Button - Simple for Outlook compatibility -->
         <div style="text-align: center; margin: 30px 0;">
-            <a href="https://mentoraai.com.br" style="display: inline-block; background-color: #4299e1; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 6px; font-weight: bold; font-size: 16px;">
+            <a href="https://mentorx.com.br" style="display: inline-block; background-color: #4299e1; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 6px; font-weight: bold; font-size: 16px;">
                 🎯 Acessar Plataforma
             </a>
         </div>
@@ -143,7 +143,7 @@ Próximos Passos:
 - Considere enviar uma mensagem de boas-vindas
 - Continue criando conteúdo de qualidade para mais vendas
 
-Acesse a plataforma: https://mentoraai.com.br
+Acesse a plataforma: https://mentorx.com.br
 
 Parabéns pelo seu sucesso!
 Continue compartilhando seu conhecimento e transformando vidas.

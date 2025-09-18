@@ -1,8 +1,8 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import MentorsList from '@/components/admin/MentorsList';
 import { useAuth } from '@/hooks/useAuth';
-import { getAllMentors, MentorWithStats } from '@/services/adminService';
-import { useQuery } from '@tanstack/react-query';
+import { getAllMentors, MentorWithStats } from "@/services/adminService";
+import { useQuery } from "@tanstack/react-query";
 
 
 
@@ -10,7 +10,7 @@ const AdminMentorsPage = () => {
   const { user } = useAuth();
   
   const { data: mentors = [], isLoading, refetch } = useQuery<MentorWithStats[]>({
-    queryKey: ['allMentors'],
+    queryKey: ["allMentors"],
     queryFn: getAllMentors,
     enabled: !!user?.id, // Só executa se há usuário autenticado
   });

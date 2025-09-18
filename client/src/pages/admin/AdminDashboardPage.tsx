@@ -5,11 +5,11 @@ import DashboardTabs from '@/components/admin/dashboard/DashboardTabs';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
-import { CourseWithDetails, getAdminProfile, getAllCourses, getAllMentorados, getMentorsWithCourses, getPlatformStats, MentoradoWithStats, MentorWithCourses } from '@/services/adminService';
-import { Profile } from '@/types/database';
-import { useQuery } from '@tanstack/react-query';
-import { Menu } from 'lucide-react';
-import { useState } from 'react';
+import { CourseWithDetails, getAdminProfile, getAllCourses, getAllMentorados, getMentorsWithCourses, getPlatformStats, MentoradoWithStats, MentorWithCourses } from "@/services/adminService";
+import { Profile } from "@/types/database";
+import { useQuery } from "@tanstack/react-query";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 
 
@@ -19,36 +19,36 @@ const AdminDashboardPage = () => {
   
   // Fetch admin profile
   const { data: profile, isLoading: isLoadingProfile } = useQuery<Profile | null>({
-    queryKey: ['adminProfile', user?.id],
+    queryKey: ["adminProfile", user?.id],
     queryFn: getAdminProfile,
     enabled: !!user?.id,
   });
   
   // Fetch platform statistics
   const { data: stats, isLoading: isLoadingStats } = useQuery<{ mentorsCount: number; mentoreesCount: number; coursesCount: number; enrollmentsCount: number; }>({
-    queryKey: ['platformStats', user?.id],
+    queryKey: ["platformStats", user?.id],
     queryFn: getPlatformStats,
     enabled: !!user?.id,
   });
   
   // Fetch recent mentors
     const { data: mentorsData = [], isLoading: isLoadingMentors } = useQuery<MentorWithCourses[]>({
-    queryKey: ['recentMentors', user?.id],
-    queryFn: () => getMentorsWithCourses({ queryKey: ['recentMentors', user?.id], signal: undefined }),
+    queryKey: ["recentMentors", user?.id],
+    queryFn: () => getMentorsWithCourses({ queryKey: ["recentMentors", user?.id], signal: undefined }),
     enabled: !!user?.id,
   });
   
   // Fetch recent mentorados
   const { data: mentorados = [], isLoading: isLoadingMentorados } = useQuery<MentoradoWithStats[]>({
-    queryKey: ['recentMentorados', user?.id],
-    queryFn: () => getAllMentorados({ queryKey: ['recentMentorados', user?.id], signal: undefined }),
+    queryKey: ["recentMentorados", user?.id],
+    queryFn: () => getAllMentorados({ queryKey: ["recentMentorados", user?.id], signal: undefined }),
     enabled: !!user?.id,
   });
   
   // Fetch recent courses
   const { data: courses = [], isLoading: isLoadingCourses } = useQuery<CourseWithDetails[]>({
-    queryKey: ['recentCourses', user?.id],
-    queryFn: () => getAllCourses({ queryKey: ['recentCourses', user?.id], signal: undefined }),
+    queryKey: ["recentCourses", user?.id],
+    queryFn: () => getAllCourses({ queryKey: ["recentCourses", user?.id], signal: undefined }),
     enabled: !!user?.id,
   });
   

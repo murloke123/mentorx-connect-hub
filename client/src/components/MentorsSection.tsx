@@ -1,6 +1,6 @@
 import { Award } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { getFeaturedMentors } from '../services/mentorService';
+import { getFeaturedMentors } from "@/services/mentorService";
 import { Profile } from '../types/database';
 import MentorCard2 from './shared/MentorCard2';
 

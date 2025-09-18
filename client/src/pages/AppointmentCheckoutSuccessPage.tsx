@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth';
-import { notifyNewAppointment } from '../services/notificationService';
+import { notifyNewAppointment } from "@/services/notificationService";
 import { supabase } from '../utils/supabase';
 
 interface AppointmentData {

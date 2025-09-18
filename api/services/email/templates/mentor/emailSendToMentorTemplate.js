@@ -96,13 +96,13 @@ exports.emailSendToMentorTemplate = {
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 35px 0;">
                                 <!--[if mso]>
-                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentoraai.com.br" style="height:50px;v-text-anchor:middle;width:200px;" arcsize="16%" stroke="f" fillcolor="#6366f1">
+                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentorx.com.br" style="height:50px;v-text-anchor:middle;width:200px;" arcsize="16%" stroke="f" fillcolor="#6366f1">
                                 <w:anchorlock/>
                                 <center style="color:#ffffff;font-family:Arial;font-size:16px;font-weight:bold;">🎯 Acessar Plataforma</center>
                                 </v:roundrect>
                                 <![endif]-->
                                 <!--[if !mso]><!-->
-                                <a href="https://mentoraai.com.br" class="outlook-button" style="display: inline-block; background-color: #6366f1; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border-radius: 8px; font-family: Arial, sans-serif;">
+                                <a href="https://mentorx.com.br" class="outlook-button" style="display: inline-block; background-color: #6366f1; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border-radius: 8px; font-family: Arial, sans-serif;">
                                     🎯 Acessar Plataforma
                                 </a>
                                 <!--<![endif]-->
@@ -149,7 +149,7 @@ Para responder a esta mensagem, você pode:
 • Acessar sua conta na Mentora AI para gerenciar contatos
 • Entrar em contato através de outros canais se disponíveis
 
-🎯 Acesse a plataforma: https://mentoraai.com.br
+🎯 Acesse a plataforma: https://mentorx.com.br
 
 Este e-mail foi enviado para {{MENTOR_EMAIL}} através da Mentora AI
 © {{CURRENT_YEAR}} Mentora AI. Todos os direitos reservados.

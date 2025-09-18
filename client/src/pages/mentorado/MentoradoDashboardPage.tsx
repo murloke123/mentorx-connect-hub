@@ -5,10 +5,10 @@ import LoadingComponent from '@/components/shared/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
-import { getMenteeCourses, getMenteeFollowingCount, getMenteeProfile } from '@/services/menteeService';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Menu } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { getMenteeCourses, getMenteeFollowingCount, getMenteeProfile } from "@/services/menteeService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Course {
   id: string;
@@ -30,32 +30,32 @@ const MentoradoDashboardPage = () => {
   useEffect(() => {
     const handleFocus = () => {
       if (user?.id) {
-        queryClient.invalidateQueries({ queryKey: ['menteeCourses', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['menteeProfile', user.id] });
+        queryClient.invalidateQueries({ queryKey: ["menteeCourses", user.id] });
+        queryClient.invalidateQueries({ queryKey: ["menteeProfile", user.id] });
       }
     };
 
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [user?.id, queryClient]);
   
   // Fetch the mentee profile
   const { data: profile } = useQuery({
-    queryKey: ['menteeProfile', user?.id],
+    queryKey: ["menteeProfile", user?.id],
     queryFn: getMenteeProfile,
     enabled: !!user?.id,
   });
   
   // Fetch mentee enrolled courses
   const { data: courses = [], isLoading: isLoadingCourses } = useQuery({
-    queryKey: ['menteeCourses', user?.id],
+    queryKey: ["menteeCourses", user?.id],
     queryFn: getMenteeCourses,
     enabled: !!user?.id,
   });
 
   // Fetch mentee following count
   const { data: followingCount = 0 } = useQuery({
-    queryKey: ['menteeFollowingCount', user?.id],
+    queryKey: ["menteeFollowingCount", user?.id],
     queryFn: getMenteeFollowingCount,
     enabled: !!user?.id,
   });

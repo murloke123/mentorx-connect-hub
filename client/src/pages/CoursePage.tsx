@@ -1,14 +1,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createFreeEnrollment, redirectAfterEnrollment } from '@/services/courseService';
-import { triggerEnrollmentConfetti } from '@/utils/confetti';
-import { CheckCircle, Clock, Play, ShoppingCart, Star, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { startCourseCheckout } from '../services/stripeCheckoutService';
-import { supabase } from '../utils/supabase';
+import { createFreeEnrollment, redirectAfterEnrollment } from "@/services/courseService";
+import { triggerEnrollmentConfetti } from "@/utils/confetti";
+import { CheckCircle, Clock, Play, ShoppingCart, Star, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { startCourseCheckout } from "@/services/stripeCheckoutService";
+import { supabase } from "../utils/supabase";
 
 interface CourseData {
   id: string;
@@ -53,19 +53,19 @@ const CoursePage = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
             .single();
           setCurrentUser(profile);
 
           // Verificar se já está matriculado
           if (courseId) {
             const { data: enrollment } = await supabase
-              .from('matriculas')
-              .select('*')
-              .eq('course_id', courseId)
-              .eq('student_id', user.id)
+              .from("matriculas")
+              .select("*")
+              .eq("course_id", courseId)
+              .eq("student_id", user.id)
               .single();
             
             setIsEnrolled(!!enrollment);
@@ -75,18 +75,18 @@ const CoursePage = () => {
         // Carregar dados do curso
         if (courseId) {
           const { data: courseData } = await supabase
-            .from('cursos')
+            .from("cursos")
             .select(`
               *,
               profiles:mentor_id (full_name, avatar_url)
             `)
-            .eq('id', courseId)
+            .eq("id", courseId)
             .single();
 
           setCourse(courseData);
         }
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error("Erro ao carregar dados:", error);
       } finally {
         setLoading(false);
       }
@@ -96,25 +96,25 @@ const CoursePage = () => {
   }, [courseId]);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(price);
   };
 
   const handlePurchase = async () => {
     if (!currentUser) {
-      toast.error('Você precisa estar logado para comprar este curso');
-      navigate('/login');
+      toast.error("Você precisa estar logado para comprar este curso");
+      navigate("/login");
       return;
     }
 
     if (!courseId) {
-      toast.error('ID do curso não encontrado');
+      toast.error("ID do curso não encontrado");
       return;
     }
 
-    console.log('🛒 Iniciando processo de compra:', {
+    console.log("🛒 Iniciando processo de compra:", {
       courseId,
       userId: currentUser.id,
       course: course
@@ -123,18 +123,18 @@ const CoursePage = () => {
     setProcessingPayment(true);
     try {
       const result = await startCourseCheckout(courseId, currentUser.id);
-      console.log('✅ Sessão de checkout criada:', result);
+      console.log("✅ Sessão de checkout criada:", result);
       
       if (!result.sessionUrl) {
-        throw new Error('URL da sessão não retornada');
+        throw new Error("URL da sessão não retornada");
       }
       
       // Redirecionar para o Stripe Checkout
-      console.log('🔄 Redirecionando para:', result.sessionUrl);
-      window.open(result.sessionUrl, '_blank');
+      console.log("🔄 Redirecionando para:", result.sessionUrl);
+      window.open(result.sessionUrl, "_blank");
     } catch (error: any) {
-      console.error('❌ Erro ao processar pagamento:', error);
-      toast.error(error.message || 'Erro ao processar pagamento');
+      console.error("❌ Erro ao processar pagamento:", error);
+      toast.error(error.message || "Erro ao processar pagamento");
     } finally {
       setProcessingPayment(false);
     }
@@ -142,8 +142,8 @@ const CoursePage = () => {
 
   const handleStartFreeCourse = async () => {
     if (!currentUser) {
-      toast.error('Você precisa estar logado para se inscrever');
-      navigate('/login');
+      toast.error("Você precisa estar logado para se inscrever");
+      navigate("/login");
       return;
     }
 
@@ -159,7 +159,7 @@ const CoursePage = () => {
       triggerEnrollmentConfetti();
 
       // Toast personalizado com a mensagem solicitada
-      toast.success('Que bom que você adquiriu este curso gratuito! Aproveite!', {
+      toast.success("Que bom que você adquiriu este curso gratuito! Aproveite!", {
         duration: 4000,
       });
       
@@ -170,8 +170,8 @@ const CoursePage = () => {
       }, 2000);
 
     } catch (error: any) {
-      console.error('Erro ao se inscrever:', error);
-      toast.error(error.message || 'Erro ao se inscrever no curso');
+      console.error("Erro ao se inscrever:", error);
+      toast.error(error.message || "Erro ao se inscrever no curso");
     } finally {
       setProcessingEnrollment(false);
     }

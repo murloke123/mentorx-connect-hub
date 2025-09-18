@@ -35,9 +35,9 @@ import {
     excluirConteudo,
     getConteudoById,
     getConteudosByModuloId,
-} from '@/services/conteudoService';
-import { getModuloById } from '@/services/moduloService';
-import { supabase } from '@/utils/supabase';
+} from "@/services/conteudoService";
+import { getModuloById } from "@/services/moduloService";
+import { supabase } from "@/utils/supabase";
 
 const ConteudosPage = () => {
   const { cursoId, moduloId } = useParams<{ cursoId: string; moduloId: string }>();
@@ -48,18 +48,18 @@ const ConteudosPage = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCtaModalOpen, setIsCtaModalOpen] = useState(false);
-  const [ctaButtonName, setCtaButtonName] = useState('');
-  const [ctaRedirectUrl, setCtaRedirectUrl] = useState('');
+  const [ctaButtonName, setCtaButtonName] = useState("");
+  const [ctaRedirectUrl, setCtaRedirectUrl] = useState("");
   const [isCtaSubmitting, setIsCtaSubmitting] = useState(false);
 
   // Redirecionar se não tem ids necessários
   useEffect(() => {
     if (!cursoId || !moduloId) {
-      navigate('/mentor/meus-cursos');
+      navigate("/mentor/meus-cursos");
       toast({
-        title: 'Erro',
-        description: 'Informações necessárias não fornecidas',
-        variant: 'destructive',
+        title: "Erro",
+        description: "Informações necessárias não fornecidas",
+        variant: "destructive",
       });
     }
   }, [cursoId, moduloId, navigate]);
@@ -69,7 +69,7 @@ const ConteudosPage = () => {
     data: modulo,
     isLoading: isLoadingModulo,
   } = useQuery({
-    queryKey: ['modulo', moduloId],
+    queryKey: ["modulo", moduloId],
     queryFn: () => moduloId ? getModuloById(moduloId) : Promise.resolve(null),
     enabled: !!moduloId,
   });
@@ -81,7 +81,7 @@ const ConteudosPage = () => {
     isError,
     refetch 
   } = useQuery({
-    queryKey: ['conteudos', moduloId],
+    queryKey: ["conteudos", moduloId],
     queryFn: () => moduloId ? getConteudosByModuloId(moduloId) : Promise.resolve([]),
     enabled: !!moduloId,
   });
@@ -91,7 +91,7 @@ const ConteudosPage = () => {
     data: conteudoParaEditar,
     isLoading: isLoadingConteudoParaEditar 
   } = useQuery({
-    queryKey: ['conteudo', editingId],
+    queryKey: ["conteudo", editingId],
     queryFn: () => editingId ? getConteudoById(editingId) : Promise.resolve(null),
     enabled: !!editingId,
   });

@@ -17,7 +17,7 @@ function getClientEnvironmentConfig(): ClientEnvironmentConfig {
     SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyZnVpbmtmb3VpanhnZmt4aGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzU2NTAsImV4cCI6MjA2MjgxMTY1MH0.9cxdr4AC0HY3t64n3dJ939wVNwlp9Prpzlx-sxfCOnU',
     STRIPE_PUBLISHABLE_KEY: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder',
     NODE_ENV: import.meta.env.MODE || 'development',
-    APP_URL: import.meta.env.VITE_APP_URL || (import.meta.env.MODE === 'production' ? 'https://mentoraai.com.br' : 'http://localhost:5000')
+    APP_URL: import.meta.env.VITE_APP_URL || (import.meta.env.MODE === 'production' ? 'https://mentorx.com.br' : 'http://localhost:3000')
   };
 }
 

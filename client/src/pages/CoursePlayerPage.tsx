@@ -6,13 +6,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } from '@/services/coursePlayerService';
-import { triggerSuccessConfetti } from '@/utils/confetti';
-import { supabase } from '@/utils/supabase';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, LogIn, Menu, MessageSquare, Video, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ConteudoItemLocal, CursoItemLocal, getCursoCompleto, ModuloItemLocal } from "@/services/coursePlayerService";
+import { triggerSuccessConfetti } from "@/utils/confetti";
+import { supabase } from "@/utils/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Check, CheckCircle, ChevronLeft, ChevronRight, Circle, FileText, LogIn, Menu, MessageSquare, Video, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 // Hook para detectar orientação da tela
 const useOrientation = () => {
@@ -28,12 +28,12 @@ const useOrientation = () => {
     };
 
     checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
 
     return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener("resize", checkOrientation);
+      window.removeEventListener("orientationchange", checkOrientation);
     };
   }, []);
 
@@ -47,16 +47,16 @@ const getYouTubeEmbedUrl = (url: string): string | null => {
   if (match && match[1]) {
     // Parâmetros para esconder branding do YouTube e melhorar a experiência
     const params = new URLSearchParams({
-      'modestbranding': '1',        // Remove logo do YouTube
-      'rel': '0',                   // Não mostra vídeos relacionados
-      'showinfo': '0',              // Remove informações do vídeo
-      'controls': '1',              // Mantém controles básicos (play, pause, volume, velocidade)
-      'disablekb': '1',             // Desabilita controles do teclado
-      'fs': '0',                    // Remove botão de tela cheia
-      'iv_load_policy': '3',        // Remove anotações
-      'cc_load_policy': '0',        // Remove legendas automáticas
-      'playsinline': '1',           // Reproduz inline no mobile
-      'widget_referrer': window.location.origin // Define referrer para analytics
+      "modestbranding": "1",        // Remove logo do YouTube
+      "rel": "0",                   // Não mostra vídeos relacionados
+      "showinfo": "0",              // Remove informações do vídeo
+      "controls": "1",              // Mantém controles básicos (play, pause, volume, velocidade)
+      "disablekb": "1",             // Desabilita controles do teclado
+      "fs": "0",                    // Remove botão de tela cheia
+      "iv_load_policy": "3",        // Remove anotações
+      "cc_load_policy": "0",        // Remove legendas automáticas
+      "playsinline": "1",           // Reproduz inline no mobile
+      "widget_referrer": window.location.origin // Define referrer para analytics
     });
     
     return `https://www.youtube.com/embed/${match[1]}?${params.toString()}`;
@@ -101,7 +101,7 @@ const ContentRenderer: React.FC<{
     const currentModule = modulos.find(m => m.id === currentConteudo.module_id);
     if (!currentModule) return [];
     
-    return currentModule.conteudos.filter(c => c.content_type === 'cta_button');
+    return currentModule.conteudos.filter(c => c.content_type === "cta_button");
   };
 
   const currentModuleCTAs = getCurrentModuleCTAs();
@@ -110,7 +110,7 @@ const ContentRenderer: React.FC<{
   const handleCtaClick = (cta: ConteudoItemLocal) => {
     const redirectUrl = cta.cta_redirect_url || (cta.content_data as any)?.redirect_url;
     if (redirectUrl) {
-      window.open(redirectUrl, '_blank');
+      window.open(redirectUrl, "_blank");
     }
   };
 

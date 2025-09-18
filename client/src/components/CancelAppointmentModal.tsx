@@ -1,7 +1,7 @@
 import { AlertTriangle, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useToast } from '../hooks/use-toast';
-import { notifyScheduleCancelledByMentor } from '../services/notificationService';
+import { notifyScheduleCancelledByMentor } from "@/services/notificationService";
 import { supabase } from '../utils/supabase';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';

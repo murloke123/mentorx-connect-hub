@@ -22,11 +22,11 @@ import {
     deletarModulo,
     getModulosByCursoId,
     Modulo
-} from '@/services/moduloService';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Library, Menu } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+} from "@/services/moduloService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Library, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ModulosPage = () => {
   const { cursoId } = useParams<{ cursoId: string }>();
@@ -41,11 +41,11 @@ const ModulosPage = () => {
   // Redirecionar se não tem cursoId
   useEffect(() => {
     if (!cursoId) {
-      navigate('/mentor/meus-cursos');
+      navigate("/mentor/meus-cursos");
       toast({
-        title: 'Erro',
-        description: 'ID do curso não fornecido',
-        variant: 'destructive',
+        title: "Erro",
+        description: "ID do curso não fornecido",
+        variant: "destructive",
       });
     }
   }, [cursoId, navigate]);
@@ -57,7 +57,7 @@ const ModulosPage = () => {
     isError,
     refetch 
   } = useQuery({
-    queryKey: ['modulos', cursoId],
+    queryKey: ["modulos", cursoId],
     queryFn: () => cursoId ? getModulosByCursoId(cursoId) : Promise.resolve([]),
     enabled: !!cursoId,
   });
@@ -88,7 +88,7 @@ const ModulosPage = () => {
       });
       
       // Atualizar a lista de módulos
-      await queryClient.invalidateQueries({ queryKey: ['modulos', cursoId] });
+      await queryClient.invalidateQueries({ queryKey: ["modulos", cursoId] });
       setIsAddModalOpen(false);
       toast({
         title: "Módulo criado com sucesso!",

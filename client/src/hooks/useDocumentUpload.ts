@@ -1,13 +1,13 @@
-import { uploadAndAssociateDocument } from '@/services/stripeDocumentService';
-import { supabase } from '@/utils/supabase';
-import { useState } from 'react';
+import { uploadAndAssociateDocument } from "@/services/stripeDocumentService";
+import { supabase } from "@/utils/supabase";
+import { useState } from "react";
 
 export interface DocumentUploadState {
   isUploading: boolean;
   progress: number;
   error: string | null;
   previewUrl: string | null;
-  previewType: 'image' | 'pdf' | null;
+  previewType: "image" | "pdf" | null;
   stripeFileId: string | null;
   supabaseUrl: string | null;
   fileName: string | null;
@@ -15,10 +15,10 @@ export interface DocumentUploadState {
 
 export interface UseDocumentUploadReturn {
   uploadState: DocumentUploadState;
-  uploadDocument: (file: File, userId: string, documentType: string, side: 'front' | 'back') => Promise<boolean>;
+  uploadDocument: (file: File, userId: string, documentType: string, side: "front" | "back") => Promise<boolean>;
   clearUpload: () => void;
-  removeDocument: (userId: string, documentType: string, side: 'front' | 'back') => Promise<void>;
-  loadExistingDocument: (userId: string, side: 'front' | 'back') => Promise<void>;
+  removeDocument: (userId: string, documentType: string, side: "front" | "back") => Promise<void>;
+  loadExistingDocument: (userId: string, side: "front" | "back") => Promise<void>;
 }
 
 /**
@@ -27,17 +27,17 @@ export interface UseDocumentUploadReturn {
 const extractFilePathFromUrl = (url: string): string | null => {
   try {
     const urlObj = new URL(url);
-    // Para URLs do Supabase Storage, o caminho está após '/object/public/documents/'
-    const pathParts = urlObj.pathname.split('/object/public/documents/');
+    // Para URLs do Supabase Storage, o caminho está após "/object/public/documents/"
+    const pathParts = urlObj.pathname.split("/object/public/documents/");
     if (pathParts.length < 2) {
-      console.log('❌ URL não parece ser do Supabase Storage:', url);
+      console.log("❌ URL não parece ser do Supabase Storage:", url);
       return null;
     }
     const filePath = pathParts[1];
-    console.log('📁 Caminho do arquivo extraído:', filePath);
+    console.log("📁 Caminho do arquivo extraído:", filePath);
     return filePath;
   } catch (error) {
-    console.error('❌ Erro ao extrair caminho do arquivo:', error);
+    console.error("❌ Erro ao extrair caminho do arquivo:", error);
     return null;
   }
 };
@@ -45,56 +45,56 @@ const extractFilePathFromUrl = (url: string): string | null => {
 /**
  * Deletar arquivo anterior do Supabase Storage
  */
-const deleteOldFile = async (userId: string, documentType: string, side: 'front' | 'back'): Promise<void> => {
+const deleteOldFile = async (userId: string, documentType: string, side: "front" | "back"): Promise<void> => {
   try {
-    console.log('🗑️ Verificando documento anterior para exclusão...');
+    console.log("🗑️ Verificando documento anterior para exclusão...");
     
     // Buscar documento atual no perfil do usuário
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('document_front_url, document_back_url')
-      .eq('id', userId)
+      .from("profiles")
+      .select("document_front_url, document_back_url")
+      .eq("id", userId)
       .single();
 
     if (profileError || !profile) {
-      console.log('👤 Perfil não encontrado ou sem documento anterior');
+      console.log("👤 Perfil não encontrado ou sem documento anterior");
       return;
     }
 
-    const oldUrl = side === 'front' ? profile.document_front_url : profile.document_back_url;
+    const oldUrl = side === "front" ? profile.document_front_url : profile.document_back_url;
     if (!oldUrl) {
-      console.log('📄 Nenhum documento anterior encontrado');
+      console.log("📄 Nenhum documento anterior encontrado");
       return;
     }
 
     // Extrair caminho do arquivo da URL
     const filePath = extractFilePathFromUrl(oldUrl);
     if (!filePath) {
-      console.log('❌ Não foi possível extrair caminho do arquivo da URL:', oldUrl);
+      console.log("❌ Não foi possível extrair caminho do arquivo da URL:", oldUrl);
       return;
     }
 
     // Deletar arquivo do Storage
     const { error: deleteError } = await supabase.storage
-      .from('documents')
+      .from("documents")
       .remove([filePath]);
 
     if (deleteError) {
-      console.error('❌ Erro ao deletar arquivo anterior:', deleteError);
+      console.error("❌ Erro ao deletar arquivo anterior:", deleteError);
     } else {
-      console.log('✅ Arquivo anterior deletado com sucesso:', filePath);
+      console.log("✅ Arquivo anterior deletado com sucesso:", filePath);
     }
   } catch (error) {
-    console.error('❌ Erro inesperado ao deletar arquivo anterior:', error);
+    console.error("❌ Erro inesperado ao deletar arquivo anterior:", error);
   }
 };
 
 /**
  * Criar preview URL baseado no tipo de arquivo
  */
-const createPreviewUrl = (file: File): { url: string; type: 'image' | 'pdf' } => {
+const createPreviewUrl = (file: File): { url: string; type: "image" | "pdf" } => {
   const url = URL.createObjectURL(file);
-  const type = file.type === 'application/pdf' ? 'pdf' : 'image';
+  const type = file.type === "application/pdf" ? "pdf" : "image";
   return { url, type };
 };
 
@@ -111,34 +111,34 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
   });
 
   // Função para buscar documento existente do perfil
-  const loadExistingDocument = async (userId: string, side: 'front' | 'back'): Promise<void> => {
+  const loadExistingDocument = async (userId: string, side: "front" | "back"): Promise<void> => {
     try {
       const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('document_front_url, document_back_url, stripe_document_front_file_id, stripe_document_back_file_id, account_already_verified, document_verification_status')
-        .eq('id', userId)
+        .from("profiles")
+        .select("document_front_url, document_back_url, stripe_document_front_file_id, stripe_document_back_file_id, account_already_verified, document_verification_status")
+        .eq("id", userId)
         .single();
 
       if (!error && profile) {
-        const existingUrl = side === 'front' ? profile.document_front_url : profile.document_back_url;
-        const existingFileId = side === 'front' ? profile.stripe_document_front_file_id : profile.stripe_document_back_file_id;
+        const existingUrl = side === "front" ? profile.document_front_url : profile.document_back_url;
+        const existingFileId = side === "front" ? profile.stripe_document_front_file_id : profile.stripe_document_back_file_id;
         
         if (existingUrl && existingFileId) {
           setUploadState(prev => ({
             ...prev,
             stripeFileId: existingFileId,
             supabaseUrl: existingUrl,
-            fileName: 'Documento anexado anteriormente'
+            fileName: "Documento anexado anteriormente"
           }));
         }
         
         // Se a conta já está verificada, não mostrar elementos de upload
         if (profile.account_already_verified) {
-          console.log('✅ Conta já verificada - ocultando elementos de upload');
+          console.log("✅ Conta já verificada - ocultando elementos de upload");
         }
       }
     } catch (error) {
-      console.log('ℹ️ Não foi possível carregar documento existente:', error);
+      console.log("ℹ️ Não foi possível carregar documento existente:", error);
     }
   };
 
@@ -146,7 +146,7 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
     file: File, 
     userId: string, 
     documentType: string, 
-    side: 'front' | 'back'
+    side: "front" | "back"
   ): Promise<boolean> => {
     try {
       setUploadState(prev => ({
@@ -156,8 +156,8 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
         error: null
       }));
 
-      console.log('🚀 ===== INICIANDO UPLOAD DE DOCUMENTO =====');
-      console.log('📋 Dados:', { 
+      console.log("🚀 ===== INICIANDO UPLOAD DE DOCUMENTO =====");
+      console.log("📋 Dados:", { 
         fileName: file.name, 
         fileSize: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
         fileType: file.type, 
@@ -181,14 +181,14 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
       setUploadState(prev => ({ ...prev, progress: 20 }));
 
       // 3. Upload para Supabase Storage
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `${userId}/${documentType}_${side}_${Date.now()}.${fileExtension}`;
       
-      console.log('📁 Fazendo upload para Supabase Storage:', fileName);
+      console.log("📁 Fazendo upload para Supabase Storage:", fileName);
       const { data: supabaseData, error: supabaseError } = await supabase.storage
-        .from('documents')
+        .from("documents")
         .upload(fileName, file, {
-          cacheControl: '3600',
+          cacheControl: "3600",
           upsert: true
         });
 
@@ -200,10 +200,10 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
 
       // 4. Obter URL do Supabase (privada, mas acessível com token)
       const { data: { publicUrl } } = supabase.storage
-        .from('documents')
+        .from("documents")
         .getPublicUrl(fileName);
 
-      console.log('✅ Upload para Supabase concluído:', publicUrl);
+      console.log("✅ Upload para Supabase concluído:", publicUrl);
       setUploadState(prev => ({
         ...prev,
         supabaseUrl: publicUrl,
@@ -211,17 +211,17 @@ export const useDocumentUpload = (): UseDocumentUploadReturn => {
       }));
 
       // 5. Upload para Stripe e associação automática à conta conectada
-      console.log('📤 Fazendo upload para Stripe e associando à conta...');
+      console.log("📤 Fazendo upload para Stripe e associando à conta...");
       const stripeResult = await uploadAndAssociateDocument(
         file, 
         userId, 
-        side, // 'front' | 'back'  
-        'identity_document'
+        side, // "front" | "back"  
+        "identity_document"
       );
       
       if (!stripeResult.success) {
         // Verificar se é erro de conta já verificada
-        if (stripeResult.error === 'ACCOUNT_ALREADY_VERIFIED') {
+        if (stripeResult.error === "ACCOUNT_ALREADY_VERIFIED") {
           // Marcar conta como já verificada no banco de dados
           console.log('🔄 Atualizando status de verificação para "verified" no perfil do usuário...');
           try {

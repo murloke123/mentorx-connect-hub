@@ -81,13 +81,13 @@ exports.calendarCancelTemplate = {
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 35px 0;">
                                 <!--[if mso]>
-                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#667eea" fillcolor="#667eea">
+                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://mentorx.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#667eea" fillcolor="#667eea">
                                     <w:anchorlock/>
                                     <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">🔄 Reagendar na Mentor X</center>
                                 </v:roundrect>
                                 <![endif]-->
                                 <!--[if !mso]><!-->
-                                <a href="https://mentoraai.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="display: inline-block; background-color: #667eea; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border: 2px solid #667eea; text-align: center; min-width: 200px;">
+                                <a href="https://mentorx.com.br/mentor/publicschedule/{{MENTOR_ID}}" style="display: inline-block; background-color: #667eea; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; padding: 15px 30px; border: 2px solid #667eea; text-align: center; min-width: 200px;">
                                     🔄 Reagendar na Mentor X
                                 </a>
                                 <!--<![endif]-->

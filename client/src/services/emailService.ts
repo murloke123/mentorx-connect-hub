@@ -76,8 +76,8 @@ export async function enviarEmailBoasVindas(data: WelcomeEmailData): Promise<Ema
       userName: data.userName,
       userEmail: data.userEmail,
       userRole: data.userRole,
-      loginUrl: data.loginUrl || 'https://app.mentoraai.com.br/login',
-      supportUrl: data.supportUrl || 'https://app.mentoraai.com.br/suporte'
+      loginUrl: data.loginUrl || 'https://app.mentorx.com.br/login',
+      supportUrl: data.supportUrl || 'https://app.mentorx.com.br/suporte'
     };
 
     console.log('📤 [EMAIL-SERVICE] Payload enviado para API:', JSON.stringify(payload, null, 2));

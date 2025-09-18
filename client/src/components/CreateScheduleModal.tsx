@@ -354,7 +354,7 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   // Função para enviar e-mails de confirmação
   const sendAppointmentEmails = async (profile: any, formattedDate: string, meetLink: string) => {
     const isGuest = !user;
-    
+
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');
       return date.toLocaleDateString('pt-BR', {
@@ -373,21 +373,45 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
     const menteeName = isGuest ? guestName : (profile.full_name || 'Usuário');
     const menteeEmail = isGuest ? guestEmail : (profile.email || user?.email);
 
+    // Buscar email do mentor
+    let mentorEmail = '';
+    try {
+      const { data: mentorProfile, error: mentorError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', mentorId)
+        .single();
+
+      if (mentorError) {
+        console.error('❌ Erro ao buscar email do mentor:', mentorError);
+        throw new Error('Erro ao buscar informações do mentor');
+      }
+
+      mentorEmail = mentorProfile.email;
+      console.log('✅ [sendAppointmentEmails] Email do mentor encontrado:', mentorEmail);
+    } catch (error) {
+      console.error('❌ [sendAppointmentEmails] Falha crítica ao buscar mentor:', error);
+      throw error;
+    }
+
     // Enviar e-mail para o mentor
     try {
       console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentor...');
       const emailData = {
         mentorId: mentorId,
+        menteeId: user?.id || null,
         mentorName: mentorName,
+        mentorEmail: mentorEmail,        // ✅ CAMPO OBRIGATÓRIO ADICIONADO
         menteeName: menteeName,
+        menteeEmail: menteeEmail,        // ✅ CAMPO OBRIGATÓRIO ADICIONADO
         appointmentDate: formatDate(formattedDate),
         appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
-        timezone: 'America/Sao_Paulo (UTC-3)',
+        timezone: 'America/Sao_Paulo',
         notes: notes.trim() || undefined,
         meetLink: meetLink || undefined
       };
 
-      const emailResponse = await fetch('/api/calendar/new-appointment-email', {
+      const emailResponse = await fetch('/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -397,45 +421,18 @@ const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
 
       if (emailResponse.ok) {
         const emailResult = await emailResponse.json();
-        console.log('✅ [sendAppointmentEmails] E-mail do mentor enviado:', emailResult.messageId);
+        console.log('✅ [sendAppointmentEmails] Emails enviados com sucesso:', {
+          mentor: emailResult.notifications?.mentor?.success ? '✅' : '❌',
+          mentee: emailResult.notifications?.mentee?.success ? '✅' : '❌'
+        });
       } else {
-        console.error('⚠️ [sendAppointmentEmails] Falha no envio do e-mail do mentor');
+        console.error('⚠️ [sendAppointmentEmails] Falha no envio dos emails');
       }
     } catch (emailError) {
       console.error('💥 [sendAppointmentEmails] Erro crítico no envio de e-mail do mentor:', emailError);
     }
 
-    // Enviar e-mail para o mentorado
-    try {
-      console.log('📧 [sendAppointmentEmails] Enviando e-mail para o mentorado...');
-      const menteeEmailData = {
-        mentorName: mentorName,
-        menteeName: menteeName,
-        menteeEmail: menteeEmail,
-        appointmentDate: formatDate(formattedDate),
-        appointmentTime: `${formatTime(startTime + ':00')} - ${formatTime(endTime + ':00')}`,
-        timezone: 'America/Sao_Paulo (UTC-3)',
-        notes: notes.trim() || undefined,
-        meetLink: meetLink || undefined
-      };
-
-      const menteeEmailResponse = await fetch('/api/calendar/new-appointment-email/mentee', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(menteeEmailData),
-      });
-
-      if (menteeEmailResponse.ok) {
-        const menteeEmailResult = await menteeEmailResponse.json();
-        console.log('✅ [sendAppointmentEmails] E-mail do mentorado enviado:', menteeEmailResult.messageId);
-      } else {
-        console.error('⚠️ [sendAppointmentEmails] Falha no envio do e-mail do mentorado');
-      }
-    } catch (menteeEmailError) {
-      console.error('💥 [sendAppointmentEmails] Erro crítico no envio de e-mail do mentorado:', menteeEmailError);
-    }
+    // Não precisa enviar email separado para mentorado - o endpoint /api/appointments já envia para ambos
   };
 
   // Gerar opções de horário baseadas nas configurações do mentor

@@ -48,8 +48,8 @@ async function sendNewScheduleEmailToMenteeBasic(data) {
             TIMEZONE: data.timezone || 'UTC',
             NOTES: data.notes || 'Nenhuma observação',
             MEET_LINK: data.meetLink || 'https://meet.jit.si/test',
-            AGENDAMENTOS_URL: data.agendamentosUrl || 'https://app.mentoraai.com.br',
-            SUPPORT_URL: data.supportUrl || 'https://app.mentoraai.com.br/suporte',
+            AGENDAMENTOS_URL: data.agendamentosUrl || 'https://app.mentorx.com.br',
+            SUPPORT_URL: data.supportUrl || 'https://app.mentorx.com.br/suporte',
             CURRENT_YEAR: new Date().getFullYear().toString()
         };
         console.log('📤 [EMAIL-SERVICE-BASIC] Parâmetros do template:', JSON.stringify(templateParams, null, 2));

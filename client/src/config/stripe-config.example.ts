@@ -3,7 +3,7 @@
  * 
  * ATENÇÃO: 
  * - Copie este arquivo para 'stripe-config.ts' e preencha com sua chave pública.
- * - Chaves secretas devem estar APENAS no servidor (server/environment.ts)
+ * - Chaves secretas devem estar APENAS na API serverless (api/environment.js)
  * - O arquivo 'stripe-config.ts' está no .gitignore e nunca será commitado.
  */
 

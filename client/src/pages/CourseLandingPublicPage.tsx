@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { createFreeEnrollment, redirectAfterEnrollment } from '@/services/courseService';
+import { createFreeEnrollment, redirectAfterEnrollment } from "@/services/courseService";
 import { triggerEnrollmentConfetti } from '@/utils/confetti';
 import { supabase } from '@/utils/supabase';
 import {

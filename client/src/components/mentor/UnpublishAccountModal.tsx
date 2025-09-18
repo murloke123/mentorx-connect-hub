@@ -9,10 +9,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { updateMentorPublicStatus } from '@/services/mentorService';
-import { supabase } from '@/utils/supabase';
-import { AlertTriangle, Loader2 } from 'lucide-react';
-import React, { useState } from 'react';
+import { updateMentorPublicStatus } from "@/services/mentorService";
+import { supabase } from "@/utils/supabase";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import React, { useState } from "react";
 
 interface UnpublishAccountModalProps {
   isOpen: boolean;
@@ -36,15 +36,15 @@ export const UnpublishAccountModal: React.FC<UnpublishAccountModalProps> = ({
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        throw new Error('Usuário não autenticado');
+        throw new Error("Usuário não autenticado");
       }
       
       // Usar o serviço para atualizar o status público para false
       await updateMentorPublicStatus(user.id, false);
       
       toast({
-        title: 'Conta despublicada com sucesso!',
-        description: 'Sua conta não está mais visível para o público.',
+        title: "Conta despublicada com sucesso!",
+        description: "Sua conta não está mais visível para o público.",
       });
       
       // Chamar callback de sucesso se fornecido
@@ -54,11 +54,11 @@ export const UnpublishAccountModal: React.FC<UnpublishAccountModalProps> = ({
       
       onClose();
     } catch (error) {
-      console.error('Erro ao despublicar conta:', error);
+      console.error("Erro ao despublicar conta:", error);
       toast({
-        title: 'Erro ao despublicar conta',
-        description: 'Ocorreu um erro ao tentar despublicar sua conta. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro ao despublicar conta",
+        description: "Ocorreu um erro ao tentar despublicar sua conta. Tente novamente.",
+        variant: "destructive",
       });
     } finally {
       setIsUnpublishing(false);

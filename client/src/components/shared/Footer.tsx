@@ -49,7 +49,7 @@ const Footer = () => {
             <h3 className="font-semibold text-white mb-4">Contato</h3>
             <ul className="space-y-2">
               <li>
-                <a href="mailto:contato@mentoraai.com.br" className="hover:text-white transition-colors">contato@mentoraai.com.br</a>
+                <a href="mailto:contato@mentorx.com.br" className="hover:text-white transition-colors">contato@mentorx.com.br</a>
               </li>
               <li>
                 <a href="#" className="hover:text-white transition-colors">Suporte</a>

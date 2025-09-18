@@ -3,17 +3,17 @@ import MentoradosList from '@/components/admin/MentoradosList';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
-import { getAllMentorados, MentoradoWithStats } from '@/services/adminService';
-import { useQuery } from '@tanstack/react-query';
-import { Menu } from 'lucide-react';
-import { useState } from 'react';
+import { getAllMentorados, MentoradoWithStats } from "@/services/adminService";
+import { useQuery } from "@tanstack/react-query";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 const AdminMentoradosPage = () => {
   const { user } = useAuth();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   const { data: mentorados = [], isLoading, refetch } = useQuery<MentoradoWithStats[]>({
-    queryKey: ['allMentorados'],
+    queryKey: ["allMentorados"],
     queryFn: getAllMentorados,
     enabled: !!user?.id, // Só executa se há usuário autenticado
   });

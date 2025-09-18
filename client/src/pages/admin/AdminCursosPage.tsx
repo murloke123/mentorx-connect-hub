@@ -1,14 +1,14 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import CoursesList from '@/components/admin/CoursesList';
 import { useAuth } from '@/hooks/useAuth';
-import { CourseWithDetails, getAllCourses } from '@/services/adminService';
-import { useQuery } from '@tanstack/react-query';
+import { CourseWithDetails, getAllCourses } from "@/services/adminService";
+import { useQuery } from "@tanstack/react-query";
 
 const AdminCursosPage = () => {
   const { user } = useAuth();
   
   const { data: courses = [], isLoading, refetch } = useQuery<CourseWithDetails[]>({
-    queryKey: ['allCourses'],
+    queryKey: ["allCourses"],
     queryFn: getAllCourses,
     enabled: !!user?.id, // Só executa se há usuário autenticado
   });

@@ -59,12 +59,13 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendNewScheduleEmailToMentee = exports.enviarEmailBoasVindasMentorado = exports.enviarEmailNovoAgendamento = exports.enviarEmailBoasVindasMentor = void 0;
-exports.enviarEmailBoasVindas = enviarEmailBoasVindas;
-exports.notificarMentorNovoAgendamento = notificarMentorNovoAgendamento;
-exports.notificarMentoradoNovoAgendamento = notificarMentoradoNovoAgendamento;
-exports.testarConectividadeBrevo = testarConectividadeBrevo;
+// ES Module exports
+export {
+  enviarEmailBoasVindas,
+  notificarMentorNovoAgendamento,
+  notificarMentoradoNovoAgendamento,
+  testarConectividadeBrevo
+};
 const emailBoasVindasMentor_1 = require("./services/mentor/emailBoasVindasMentor");
 const emailNewSchedule_1 = require("./services/mentor/emailNewSchedule");
 const emailBoasVindasMentorado_1 = require("./services/mentorado/emailBoasVindasMentorado");
@@ -124,8 +125,8 @@ async function notificarMentorNovoAgendamento(data) {
         });
         const emailData = {
             ...data,
-            agendamentosUrl: 'https://mentoraai.com.br/mentor/agendamentos',
-            supportUrl: 'https://app.mentoraai.com.br/suporte'
+            agendamentosUrl: 'https://mentorx.com.br/mentor/agendamentos',
+            supportUrl: 'https://app.mentorx.com.br/suporte'
         };
         const result = await (0, emailNewSchedule_1.enviarEmailNovoAgendamento)(emailData);
         if (result.success) {
@@ -170,8 +171,8 @@ async function notificarMentoradoNovoAgendamento(data) {
             timezone: data.timezone,
             notes: data.notes,
             meetLink: data.meetLink,
-            agendamentosUrl: 'https://mentoraai.com.br/mentorado/meus-agendamentos',
-            supportUrl: 'https://app.mentoraai.com.br/suporte'
+            agendamentosUrl: 'https://mentorx.com.br/mentorado/meus-agendamentos',
+            supportUrl: 'https://app.mentorx.com.br/suporte'
         };
         const result = await (0, emailNewScheduleMentee_1.sendNewScheduleEmailToMentee)(emailData);
         if (result.success) {
@@ -203,10 +204,10 @@ async function testarConectividadeBrevo() {
         // Teste com dados fictícios
         const testData = {
             userName: 'Teste',
-            userEmail: 'teste@mentoraai.com.br',
+            userEmail: 'teste@mentorx.com.br',
             userRole: 'mentor',
-            loginUrl: 'https://app.mentoraai.com.br/login',
-            supportUrl: 'https://app.mentoraai.com.br/suporte'
+            loginUrl: 'https://app.mentorx.com.br/login',
+            supportUrl: 'https://app.mentorx.com.br/suporte'
         };
         // Não envia o e-mail, apenas testa a configuração
         console.log('🧪 Testando conectividade com Brevo...');

@@ -41,32 +41,12 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
     }
 
     const data = await response.json();
-    console.log('✅ stripeVerifyPayoutsService: Dados recebidos:', data);
     console.log('✅ stripeVerifyPayoutsService: Payouts verificados com sucesso');
 
-    // Verificar se a resposta tem o formato do serverless (statistics) ou do routes.ts (totalPaidOut)
-    let totalPaidOut = 0;
-    let currency = 'brl';
-    let payoutsCount = 0;
-    
-    if (data.statistics) {
-      // Formato do serverless verify-payouts.js
-      totalPaidOut = data.statistics.totalAmount || 0;
-      currency = data.statistics.currency || 'brl';
-      payoutsCount = data.statistics.total || 0;
-      console.log('📊 stripeVerifyPayoutsService: Usando formato serverless - totalAmount:', totalPaidOut);
-    } else {
-      // Formato do routes.ts
-      totalPaidOut = data.totalPaidOut || 0;
-      currency = data.currency || 'brl';
-      payoutsCount = data.payoutsCount || 0;
-      console.log('📊 stripeVerifyPayoutsService: Usando formato routes.ts - totalPaidOut:', totalPaidOut);
-    }
-
     return {
-      totalPaidOut,
-      currency,
-      payoutsCount,
+      totalPaidOut: data.totalPaidOut || 0,
+      currency: data.currency || 'brl',
+      payoutsCount: data.payoutsCount || 0,
       success: true,
       message: data.message
     };
@@ -90,4 +70,4 @@ export async function verifyStripePayouts(stripeAccountId: string): Promise<Stri
       message: errorMessage
     };
   }
-}
+} 
